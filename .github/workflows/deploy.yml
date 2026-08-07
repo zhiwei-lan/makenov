@@ -20,7 +20,17 @@ jobs:
             cd /opt/1panel/www/sites/makenov.vigo.co.kr/index
             git config --global --add safe.directory /opt/1panel/www/sites/makenov.vigo.co.kr/index 2>/dev/null || true
             git pull origin main
-           
+
+            echo "===== composer install ====="
+            if command -v composer >/dev/null 2>&1; then
+              composer install --no-dev --optimize-autoloader --no-interaction
+            elif [ -f composer.phar ]; then
+              php composer.phar install --no-dev --optimize-autoloader --no-interaction
+            else
+              echo "ERROR: composer가 서버에 없습니다. deploy 계정 PATH에 composer를 설치하세요."
+              exit 1
+            fi
+
             rm -rf writable/cache/* writable/debugbar/* 2>/dev/null || true
             chmod -R 775 writable/ 2>/dev/null || true
             echo "===== makenov 部署完成 ====="
