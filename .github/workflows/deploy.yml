@@ -16,7 +16,7 @@ jobs:
           key: ${{ secrets.SERVER_KEY }}
           port: 2218
           script: |
-            echo "===== 开始部署 makenov 54321====="
+            echo "===== 开始部署 makenov 000====="
             cd /opt/1panel/www/sites/makenov.vigo.co.kr/index
             git config --global --add safe.directory /opt/1panel/www/sites/makenov.vigo.co.kr/index 2>/dev/null || true
             git pull origin main
