@@ -466,8 +466,10 @@ Object.assign(Admin, {
     if(error) throw error;
 
     /* 거래조건이 '잠김' 표식이면 이 계정이 product_terms를 못 읽은 상태다.
-       그대로 올리면 실제 가격이 표식으로 덮여 사라진다 — 저장하지 않고 넘어간다. */
-    if(isLocked(p.price) && isLocked(p.moq) && isLocked(p.lead) && isLocked(p.terms)){
+       그대로 올리면 실제 가격이 표식으로 덮여 사라진다 — 저장하지 않고 넘어간다.
+       다국어 객체는 세 언어가 모두 비어 있으면 잠김과 같은 취급. */
+    const termEmpty = v => isLocked(v) || (typeof v==='object' && !String((v.ko||'')+(v.vi||'')+(v.en||'')).trim());
+    if(termEmpty(p.price) && termEmpty(p.moq) && termEmpty(p.lead) && termEmpty(p.terms)){
       console.warn('MAKENOV: 거래조건을 읽지 못해 product_terms 저장을 건너뜁니다', p.id);
     }else{
       const { error:e2 } = await SB.from('product_terms').upsert({

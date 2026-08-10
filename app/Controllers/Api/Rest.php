@@ -30,7 +30,7 @@ class Rest extends BaseApiController
         ],
         'product_terms' => [
             'cols' => ['product_id','price','moq','lead','terms','updated_at'],
-            'json' => [], 'bool' => [],
+            'json' => ['price','moq','lead','terms'], 'bool' => [],
         ],
         'columns_post' => [
             'cols' => ['id','cat','title','excerpt','body','img','date','slug','seo_title','seo_desc','published','created_at'],
@@ -355,7 +355,13 @@ class Rest extends BaseApiController
         foreach (self::SCHEMA[$table]['json'] as $c) {
             if (array_key_exists($c, $row) && is_string($row[$c])) {
                 $d = json_decode($row[$c], true);
-                $row[$c] = $d ?? $row[$c];
+                /* product_terms 는 다국어 객체 도입 전의 평문("3,000 units")이 남아 있다.
+                   "3000" 같은 평문이 숫자로 디코드되면 안 되므로 객체만 인정한다. */
+                if ($table === 'product_terms') {
+                    $row[$c] = is_array($d) ? $d : $row[$c];
+                } else {
+                    $row[$c] = $d ?? $row[$c];
+                }
             }
         }
         foreach (self::SCHEMA[$table]['bool'] as $c) {

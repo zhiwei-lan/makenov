@@ -1380,7 +1380,7 @@ function applyI18n(root){
   document.querySelectorAll('.mk-lang button').forEach(b=>b.classList.toggle('on', b.dataset.lang===MK_LANG));
 }
 /* localized field helper: product fields stored as {vi,ko,en} */
-function L(field){ if(field==null) return ''; if(typeof field==='string') return field; return field[MK_LANG] || field.vi || field.en || ''; }
+function L(field){ if(field==null) return ''; if(typeof field==='string') return field; return field[MK_LANG] || field.vi || field.en || field.ko || ''; }
 
 /* ---------- 잠긴 거래조건 ----------
    RLS 때문에 미인증 바이어에게는 가격·MOQ가 아예 전송되지 않는다.

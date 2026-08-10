@@ -99,10 +99,10 @@ function pageInit(){
         </div>
 
         <div class="lockbox">
-          <div class="lockrow"><span class="lbl" data-i18n="price"></span><span class="lockval">${esc(lockVal(p.price))}</span>${p.negotiable?`<span class="nego" data-i18n="negotiable_badge"></span>`:''}</div>
-          <div class="lockrow"><span class="lbl" data-i18n="moq"></span><span class="lockval">${esc(lockVal(p.moq))}</span></div>
-          <div class="lockrow"><span class="lbl" data-i18n="lead_time"></span><span class="lockval">${esc(lockVal(p.lead))}</span></div>
-          <div class="lockrow"><span class="lbl" data-i18n="supply_terms"></span><span class="lockval">${esc(lockVal(p.terms))}</span></div>
+          <div class="lockrow"><span class="lbl" data-i18n="price"></span><span class="lockval">${esc(lockVal(L(p.price)))}</span>${p.negotiable?`<span class="nego" data-i18n="negotiable_badge"></span>`:''}</div>
+          <div class="lockrow"><span class="lbl" data-i18n="moq"></span><span class="lockval">${esc(lockVal(L(p.moq)))}</span></div>
+          <div class="lockrow"><span class="lbl" data-i18n="lead_time"></span><span class="lockval">${esc(lockVal(L(p.lead)))}</span></div>
+          <div class="lockrow"><span class="lbl" data-i18n="supply_terms"></span><span class="lockval">${esc(lockVal(L(p.terms)))}</span></div>
           ${Store.session()?'':`<div class="locknote" data-i18n="locked_note"></div>`}
         </div>
 
