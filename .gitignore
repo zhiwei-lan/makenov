@@ -16,3 +16,5 @@ writable/logs/*
 writable/session/*
 writable/uploads/*
 writable/debugbar/*
+.env
+writable/

@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 560" width="1600" height="560">
+  <!-- MAKENOV hero 01 — 전시회 대신 클릭 한 번 : 와이어프레임 지구 + 항로 아크
+       ※ 카피가 좌하단을 덮으므로 주요 도형은 x>980 또는 y<180 안에 배치 -->
+  <defs>
+    <linearGradient id="g-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#04143F"/>
+      <stop offset=".55" stop-color="#022E7D"/>
+      <stop offset="1" stop-color="#0B45B4"/>
+    </linearGradient>
+    <radialGradient id="g-glow" cx=".76" cy=".44" r=".5">
+      <stop offset="0" stop-color="#27CAA1" stop-opacity=".36"/>
+      <stop offset=".5" stop-color="#0097E0" stop-opacity=".16"/>
+      <stop offset="1" stop-color="#0097E0" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="g-arc" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0097E0" stop-opacity="0"/>
+      <stop offset=".3" stop-color="#0097E0" stop-opacity=".75"/>
+      <stop offset=".7" stop-color="#27CAA1" stop-opacity="1"/>
+      <stop offset="1" stop-color="#27CAA1" stop-opacity=".25"/>
+    </linearGradient>
+    <pattern id="p-grid" width="44" height="44" patternUnits="userSpaceOnUse">
+      <path d="M44 0H0v44" fill="none" stroke="#fff" stroke-opacity=".05" stroke-width="1"/>
+    </pattern>
+    <radialGradient id="g-node">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset=".35" stop-color="#27CAA1"/>
+      <stop offset="1" stop-color="#27CAA1" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="f-soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="560" fill="url(#g-bg)"/>
+  <rect width="1600" height="560" fill="url(#p-grid)"/>
+  <rect width="1600" height="560" fill="url(#g-glow)"/>
+
+  <!-- 지구 와이어프레임 -->
+  <g transform="translate(1216 272)">
+    <circle r="252" fill="#073199" fill-opacity=".7"/>
+    <circle r="252" fill="none" stroke="#27CAA1" stroke-opacity=".85" stroke-width="1.8"/>
+    <g fill="none" stroke="#6FEAC9" stroke-opacity=".42" stroke-width="1.2">
+      <ellipse cy="-180" rx="176" ry="28"/>
+      <ellipse cy="-98"  rx="232" ry="33"/>
+      <ellipse cy="-6"   rx="252" ry="36"/>
+      <ellipse cy="88"   rx="236" ry="33"/>
+      <ellipse cy="176"  rx="180" ry="28"/>
+      <ellipse rx="252" ry="252"/>
+      <ellipse rx="210" ry="252"/>
+      <ellipse rx="148" ry="252"/>
+      <ellipse rx="70"  ry="252"/>
+      <ellipse rx="8"   ry="252"/>
+    </g>
+    <g fill="#3FE9C0">
+      <circle cx="-112" cy="-104" r="5"/>
+      <circle cx="56"   cy="-152" r="4"/>
+      <circle cx="138"  cy="-26"  r="5.5"/>
+      <circle cx="-40"  cy="50"   r="4.5"/>
+      <circle cx="104"  cy="126"  r="4"/>
+      <circle cx="-170" cy="28"   r="4"/>
+    </g>
+    <g fill="none" stroke="#3FE9C0" stroke-opacity=".6" stroke-width="1.2">
+      <circle cx="138" cy="-26" r="16"/>
+      <circle cx="-112" cy="-104" r="13"/>
+    </g>
+  </g>
+
+  <!-- 항로 아크 : 상단(카피 위)을 지나 지구로 수렴 -->
+  <g fill="none" stroke="url(#g-arc)" stroke-width="2.2" stroke-linecap="round">
+    <path d="M120 236C420 44 820 20 1236 96"/>
+    <path d="M60 130C400 -8 900 6 1352 176" stroke-opacity=".78"/>
+    <path d="M180 350C520 152 940 116 1330 240" stroke-opacity=".55"/>
+  </g>
+  <g fill="none" stroke="#27CAA1" stroke-opacity=".2" stroke-width="8" stroke-linecap="round" filter="url(#f-soft)">
+    <path d="M120 236C420 44 820 20 1236 96"/>
+  </g>
+
+  <circle cx="120" cy="236" r="28" fill="url(#g-node)" opacity=".5"/>
+  <circle cx="120" cy="236" r="5.5" fill="#fff"/>
+  <circle cx="1236" cy="96" r="24" fill="url(#g-node)" opacity=".85"/>
+  <circle cx="1236" cy="96" r="5.5" fill="#fff"/>
+
+  <rect width="1600" height="560" fill="#02061F" opacity=".08"/>
+</svg>
