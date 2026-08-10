@@ -11,7 +11,7 @@
    ⚠️ anon 키는 브라우저에 노출되는 게 정상입니다. 보안은 RLS가 담당합니다.
       service_role 키는 절대 여기 넣지 마세요.
    ============================================================ */
-const MK_SUPABASE_URL  = 'http://127.0.0.1:8080';
+const MK_SUPABASE_URL  = 'http://makenov.vigo.co.kr/';
 const MK_SUPABASE_ANON = 'c588966176574f36d29d4dc71fed1485bb1626adc5f794ff5e1409da69815080';
 
 /* 국세청 사업자 조회를 Edge Function으로 넘길지 여부.
