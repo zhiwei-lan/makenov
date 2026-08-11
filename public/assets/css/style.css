@@ -1459,6 +1459,18 @@ i.top{display:inline-block;font-style:normal;font-size:11px;font-weight:600;colo
   padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-body)}
 body.mkedit-on .mkedit-hot{outline:2px solid var(--mk-primary);outline-offset:2px;
   border-radius:3px;cursor:pointer;background:var(--mk-primary-soft)}
+/* 히어로 문구는 평소 클릭을 안 받는다 — 배너 아무 데나 눌러도 제품 목록으로 가야 하므로
+   .copy 를 pointer-events:none 으로 두고 배경 링크(.shot)가 클릭을 다 받게 해 뒀다.
+   그 탓에 문구 수정 모드에서도 글자를 집을 수 없었다(눌러도 배경 이미지가 잡힘).
+   수정 모드에서만 뒤집는다 — 평소 배너 동작은 그대로다.
+   ⚠ 반드시 .slide.on 으로 좁힌다. 슬라이드 4장은 같은 자리에 겹쳐 있고 꺼진 장도
+     DOM 에 그대로 있어서, .slide 없이 쓰면 안 보이는 장의 글자가 클릭을 가로챈다
+     (맨 뒤 슬라이드가 이김 — 실제로 슬라이드 1을 눌렀는데 hero.3 이 잡혔다). */
+body.mkedit-on .omc-hero .slide.on .copy{pointer-events:auto}
+body.mkedit-on .omc-hero .slide.on .copy h1,
+body.mkedit-on .omc-hero .slide.on .copy h2,
+body.mkedit-on .omc-hero .slide.on .copy p{pointer-events:auto;cursor:pointer}
+body.mkedit-on .omc-hero .slide.on .shot{pointer-events:none}
 .mkedit-pop{position:absolute;z-index:9100;width:min(440px,calc(100vw - 24px));background:#fff;
   border:1px solid var(--mk-line);border-radius:12px;box-shadow:0 16px 44px rgba(0,0,0,.24);padding:14px 16px 12px}
 .mkedit-pop .hd{display:flex;align-items:center;gap:8px;margin-bottom:10px}
