@@ -33,4 +33,13 @@ jobs:
 
             rm -rf writable/cache/* writable/debugbar/* 2>/dev/null || true
             chmod -R 775 writable/ 2>/dev/null || true
+
+            # PHP는 컨테이너 안에서 다른 UID로 돌아 group 권한이 통하지 않는다.
+            # deploy가 이 폴더 소유자라 root 없이 열 수 있다 — 소유자를 바꾸지
+            # 않으므로 git pull도 계속 동작한다. PHP UID 확인 후 2775로 조일 것.
+            echo "===== uploads 쓰기 권한 ====="
+            mkdir -p public/uploads
+            chmod -R 777 public/uploads
+            ls -ld public/uploads public/uploads/2026 2>/dev/null || true
+
             echo "===== makenov 部署完成 ====="
