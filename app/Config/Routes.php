@@ -18,6 +18,11 @@ use CodeIgniter\Router\RouteCollection;
 
 $routes->get('/', static fn () => file_get_contents(ROOTPATH . 'public/index.html'));
 
+/* ── 칼럼 RSS 피드 ─────────────────────────────────────────
+   정적 파일이 아니라 라우트다 — 서버 public/ 소유권 때문에 git pull 이
+   새 파일을 못 만들고, 라우트면 칼럼 발행 시 피드도 자동 갱신된다 */
+$routes->get('rss.xml', 'App\Controllers\Api\Rss::feed');
+
 /* ── REST (PostgREST 미믹) ─────────────────────────────────
    GET/POST/PATCH/DELETE /rest/v1/{table}
    권한은 Api\Rest 의 POLICY 맵이 RLS 를 그대로 옮겨 시행한다 */
