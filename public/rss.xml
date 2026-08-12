@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>메이크노브 MAKENOV 칼럼</title>
+  <link>https://makenov.com/ko/columns.html</link>
+  <description>글로벌 소싱과 수출 실무 가이드 — 견적 요청, 샘플 확인, 바이어 회신 등 B2B 무역 실무 칼럼</description>
+  <language>ko</language>
+  <atom:link href="https://makenov.com/rss.xml" rel="self" type="application/rss+xml"/>
+  <item>
+    <title>해외 공급사에 견적을 요청할 때, 무엇을 적어야 할까?</title>
+    <link>https://makenov.com/ko/columns/quote-request-checklist.html</link>
+    <guid isPermaLink="true">https://makenov.com/ko/columns/quote-request-checklist.html</guid>
+    <description>견적 요청을 보내고 답이 없다면 대부분 상대가 답을 못 하는 상황입니다. 수량·시기·조건을 어떻게 적어야 하루 만에 회신이 오는지 정리했습니다.</description>
+    <pubDate>Wed, 05 Aug 2026 09:00:00 +0900</pubDate>
+  </item>
+  <item>
+    <title>샘플을 요청하기 전에, 무엇을 정해두어야 할까?</title>
+    <link>https://makenov.com/ko/columns/sample-request-checklist.html</link>
+    <guid isPermaLink="true">https://makenov.com/ko/columns/sample-request-checklist.html</guid>
+    <description>샘플은 받는 것보다 무엇을 볼지 정해두고 받는 것이 중요합니다. 요청 전에 정할 여섯 가지와 받은 뒤 남겨야 할 기록을 정리했습니다.</description>
+    <pubDate>Tue, 04 Aug 2026 09:00:00 +0900</pubDate>
+  </item>
+  <item>
+    <title>해외 바이어 문의가 왔을 때, 무엇부터 답해야 할까?</title>
+    <link>https://makenov.com/ko/columns/supplier-first-reply.html</link>
+    <guid isPermaLink="true">https://makenov.com/ko/columns/supplier-first-reply.html</guid>
+    <description>첫 회신에 무엇을 담느냐로 다음 연락이 올지가 갈립니다. 길게 쓸 필요는 없고, 바이어가 결정하는 데 필요한 여섯 가지만 있으면 됩니다.</description>
+    <pubDate>Mon, 03 Aug 2026 09:00:00 +0900</pubDate>
+  </item>
+</channel>
+</rss>
