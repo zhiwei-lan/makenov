@@ -18,3 +18,7 @@ writable/uploads/*
 writable/debugbar/*
 .env
 writable/
+
+# 사용자 업로드 파일은 서버에만 존재 (자리표시 index.html 제외)
+public/uploads/*
+!public/uploads/index.html
