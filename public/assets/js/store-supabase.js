@@ -627,11 +627,21 @@ Object.assign(MkImg, {
     const blob = await (await fetch(dataUrl)).blob();
     const ext  = blob.type === 'image/png' ? 'png' : 'jpg';
     const path = `${new Date().getFullYear()}/${Date.now().toString(36)}${Math.floor(Math.random()*1e9).toString(36)}.${ext}`;
-    const { error } = await SB.storage.from(BUCKET).upload(path, blob, {
-      contentType: blob.type, cacheControl: '31536000', upsert: false,
+    /* storage-js v2 최신은 Blob 을 multipart/form-data 로 보내는데,
+       이 CI4 미믹 서버는 multipart 본문을 읽지 못한다(php://input 기본값 그대로 →
+       'php://input' 문자열이 파일로 저장되는 버그). storage 클라이언트를 우회하고
+       원본 바이너리 본문을 직접 POST 한다. */
+    const { data:{ session } } = await SB.auth.getSession();
+    const base = MK_SUPABASE_URL.replace(/\/$/,'');
+    const res = await fetch(base + '/storage/v1/object/product-images/' + path, {
+      method:'POST',
+      headers:{ 'Content-Type': blob.type,
+                'apikey': MK_SUPABASE_ANON,
+                'Authorization':'Bearer ' + (session ? session.access_token : '') },
+      body: blob,
     });
-    if(error) throw new Error('업로드 실패: ' + error.message);
-    return SB.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+    if(!res.ok) throw new Error('업로드 실패: ' + await res.text());
+    return base + '/storage/v1/object/public/product-images/' + path;
   },
   async save(file){
     const { dataUrl, w, h, bytes } = await this.compress(file);

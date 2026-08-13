@@ -112,7 +112,8 @@ function toastA(msg){
 function uploader(id, value, opts){
   opts = opts || {};
   const v = value || '';
-  const src = MkImg.isRef(v) ? MkImg.resolve(v) : v;
+  /* 상대경로는 /admin/ 기준에서 깨지므로 imgSrc() 로 정규화 (../ 첨부) */
+  const src = v ? imgSrc(v) : '';
   return `
   <div class="upl" id="${id}-box" ondragover="uplDrag(event,1)" ondragleave="uplDrag(event,0)" ondrop="uplDrop(event,'${id}')">
     <input type="hidden" id="${id}" value="${esc(v)}">
@@ -172,7 +173,7 @@ function renderGallery(){
   if(!el) return;
   el.innerHTML = pGallery.length ? pGallery.map((g,i)=>`
     <div class="gal-item">
-      <img src="${esc(MkImg.isRef(g)?MkImg.resolve(g):g)}" alt="">
+      <img src="${esc(g?imgSrc(g):'')}" alt="">
       <div class="gal-acts">
         <button type="button" onclick="galMove(${i},-1)" ${i===0?'disabled':''}>←</button>
         <button type="button" onclick="galMove(${i},1)" ${i===pGallery.length-1?'disabled':''}>→</button>

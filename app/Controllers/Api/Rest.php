@@ -242,7 +242,9 @@ class Rest extends BaseApiController
         if ($this->prefer('return=representation')) {
             return $this->rows($written)->setStatusCode(201);
         }
-        return $this->response->setStatusCode(201)->setBody('');
+        /* text/html 기본값을 그대로 두면 디버그바(개발)가 툴바 HTML 을 주입하고,
+           postgrest-js 는 빈 본문/비 JSON 을 .json() 으로 파싱하다 실패한다. */
+        return $this->json(null, 201);
     }
 
     private function specialInsertAllowed(string $table, array $row): bool
@@ -301,7 +303,7 @@ class Rest extends BaseApiController
             $this->applyQuery($b2, self::SCHEMA[$table]['cols'], self::SCHEMA[$table]['bool']);
             return $this->rows(array_map(fn ($r) => $this->decode($table, $r), $b2->get()->getResultArray()));
         }
-        return $this->response->setStatusCode(204)->setBody('');
+        return $this->json(null);
     }
 
     /* ================= DELETE ================= */
@@ -339,12 +341,12 @@ class Rest extends BaseApiController
         }
 
         $b->delete();
-        return $this->response->setStatusCode(204)->setBody('');
+        return $this->json(null);
     }
 
     private function emptyWrite(): ResponseInterface
     {
-        return $this->response->setStatusCode(204)->setBody('');
+        return $this->json(null);
     }
 
     /* ================= 타입 변환 ================= */
