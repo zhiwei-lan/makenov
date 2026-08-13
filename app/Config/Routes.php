@@ -45,6 +45,11 @@ $routes->group('auth/v1', ['namespace' => 'App\Controllers\Api'], static functio
 /* ── 사업자 인증 (엣지함수 미믹) ─────────────────────────── */
 $routes->post('functions/v1/verify-business', 'App\Controllers\Api\Verify::handle');
 
+/* ── 관리자 계정 관리 ──────────────────────────────────────
+   admins 는 Rest 에서 write='none' 으로 잠겨 있다. 추가·해제·비밀번호는
+   관리자 본인 토큰을 확인하는 이 창구만 지난다 */
+$routes->post('functions/v1/admin-users', 'App\Controllers\Api\AdminUsers::handle');
+
 /* ── Storage (버킷 product-images) ───────────────────────── */
 $routes->group('storage/v1', ['namespace' => 'App\Controllers\Api'], static function ($routes) {
     $routes->post('object/product-images/(:any)', 'Storage::upload/$1');
