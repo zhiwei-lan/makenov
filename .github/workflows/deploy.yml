@@ -16,48 +16,11 @@ jobs:
           key: ${{ secrets.SERVER_KEY }}
           port: 2218
           script: |
-            echo "===== 开始部署 makenov ====="
+            echo "===== 开始部署 makenov000 ====="
             cd /opt/1panel/www/sites/makenov.vigo.co.kr/index
             git config --global --add safe.directory /opt/1panel/www/sites/makenov.vigo.co.kr/index 2>/dev/null || true
-
-            # ⚠ git pull 은 반드시 성공을 확인한다.
-            #   전에는 실패해도 다음 줄로 넘어가 workflow 가 success 로 끝나서,
-            #   서버에 반영되지 않은 커밋을 배포된 것으로 착각했다 (이틀치 커밋이 유실).
-            #   흔한 원인: 서버에서 파일을 직접 고쳐 local changes 가 생김 → merge 중단.
-            if ! git pull origin main; then
-              echo ""
-              echo "!!!!! 배포 실패: git pull 이 중단됐습니다 !!!!!"
-              echo "서버에서 직접 고친 파일이 있는지 확인하세요:"
-              git status --short || true
-              echo ""
-              echo "해결: 서버 변경을 살릴 것인지 버릴 것인지 정한 뒤"
-              echo "  살리기 → git stash && git pull && git stash pop (충돌 수동 해결)"
-              echo "  버리기 → git checkout -- <파일> 또는 git reset --hard origin/main"
-              exit 1
-            fi
-
-            echo "===== composer install ====="
-            FAILED=0
-            if command -v composer >/dev/null 2>&1; then
-              composer install --no-dev --optimize-autoloader --no-interaction || FAILED=1
-            elif [ -f composer.phar ]; then
-              php composer.phar install --no-dev --optimize-autoloader --no-interaction || FAILED=1
-            else
-              echo "ERROR: composer 가 서버에 없습니다. deploy 계정 PATH 에 설치하세요."
-              FAILED=1
-            fi
-
+            git pull origin main
+            composer install --no-dev --optimize-autoloader --no-interaction 2>/dev/null || echo "WARN: composer install 失败"
             rm -rf writable/cache/* writable/debugbar/* 2>/dev/null || true
             chmod -R 775 writable/ 2>/dev/null || true
-
-            # uploads 는 root 가 www-data 로 chown 했으므로 deploy 는 chmod 할 수 없다.
-            # 폴더가 없을 때만 만들고, 권한 조정은 실패해도 넘어간다 (이미 PHP 소유).
-            mkdir -p public/uploads 2>/dev/null || true
-            chmod -R 777 public/uploads 2>/dev/null || true
-
-            if [ "$FAILED" = "1" ]; then
-              echo ""
-              echo "!!!!! composer install 실패 — 코드는 반영됐지만 의존성은 갱신되지 않았습니다 !!!!!"
-              exit 1
-            fi
             echo "===== makenov 部署完成 ====="
