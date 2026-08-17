@@ -656,4 +656,27 @@ Object.assign(MkImg, {
   async gc(){ return 0; },
 });
 
+/* ---------- 관리자 계정 관리 ----------
+   admins 테이블은 REST 에서 쓰기가 잠겨 있다(누구나 스스로를 관리자로
+   만들 수 있으므로). 전용 창구 /functions/v1/admin-users 로만 오간다.
+   응답은 언제나 {ok, ...} — 네트워크 실패도 같은 모양으로 감싼다. */
+window.MkAdminApi = {
+  async call(action, payload){
+    const { data:{ session } } = await SB.auth.getSession();
+    if(!session) return { ok:false, err:'no_session' };
+    try{
+      const r = await fetch(MK_SUPABASE_URL.replace(/\/$/,'') + '/functions/v1/admin-users', {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json',
+                  'apikey': MK_SUPABASE_ANON,
+                  'Authorization':'Bearer ' + session.access_token },
+        body: JSON.stringify(Object.assign({ action }, payload || {})),
+      });
+      const j = await r.json().catch(()=>null);
+      if(j && typeof j.ok === 'boolean') return j;
+      return { ok:false, err:'http_' + r.status };
+    }catch(e){ return { ok:false, err:'unreachable' }; }
+  },
+};
+
 }  /* end supabase mode */

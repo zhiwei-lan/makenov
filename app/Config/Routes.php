@@ -42,8 +42,15 @@ $routes->group('auth/v1', ['namespace' => 'App\Controllers\Api'], static functio
     $routes->post('resend', 'Auth::resend');
 });
 
-/* ── 사업자 인증 (엣지함수 미믹) ─────────────────────────── */
-$routes->post('functions/v1/verify-business', 'App\Controllers\Api\Verify::handle');
+/* ── 사업자 인증 (엣지함수 미믹) ───────────────────────────
+   ⚠ 맨 앞의 \ 를 빼면 CI4 가 기본 네임스페이스를 덧붙여
+     App\Controllers\App\Controllers\Api\... 가 되고 404 가 된다 (rss.xml 과 같은 함정) */
+$routes->post('functions/v1/verify-business', '\App\Controllers\Api\Verify::handle');
+
+/* ── 관리자 계정 관리 ──────────────────────────────────────
+   admins 는 Rest 에서 write='none' 으로 잠겨 있다. 추가·해제·비밀번호는
+   관리자 본인 토큰을 확인하는 이 창구만 지난다 */
+$routes->post('functions/v1/admin-users', '\App\Controllers\Api\AdminUsers::handle');
 
 /* ── 관리자 계정 관리 ──────────────────────────────────────
    admins 는 Rest 에서 write='none' 으로 잠겨 있다. 추가·해제·비밀번호는

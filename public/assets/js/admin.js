@@ -288,7 +288,7 @@ function imgSrc(v){
 /* ---------- 사이드바 · 탭 ---------- */
 /* ⚠ 탭을 새로 만들면 NAV 와 여기 둘 다에 넣어야 한다.
    여기 빠지면 메뉴는 보이는데 눌러도 화면이 hidden 인 채로 남는다 (SEO 탭에서 실제로 겪음) */
-const TABS = ['dash','inq','leads','buyers','products','columns','faq','notices','copy','seo','settings'];
+const TABS = ['dash','inq','leads','buyers','products','columns','faq','notices','copy','seo','admins','settings'];
 const NAV = [
   { id:'dash',     label:'대시보드', title:'대시보드',      desc:'플랫폼 현황 한눈에 보기' },
   { id:'inq',      label:'문의함',   title:'문의함',        desc:'바이어가 보낸 견적 문의' },
@@ -300,6 +300,7 @@ const NAV = [
   { id:'notices',  label:'공지사항', title:'공지사항 관리',   desc:'고객센터 공지 게시판 (신제품·업데이트 소식)' },
   { id:'copy',     label:'카피',     title:'카피 수정',      desc:'사이트 문구를 코드 수정 없이 고칩니다' },
   { id:'seo',      label:'SEO',      title:'SEO 설정',       desc:'검색결과 제목·설명, 공유 이미지, 파비콘' },
+  { id:'admins',   label:'관리자',   title:'관리자 계정',     desc:'콘솔에 로그인할 수 있는 계정을 관리합니다' },
   { id:'settings', label:'설정',     title:'설정 · 내보내기', desc:'배포용 데이터와 계정 관리' },
 ];
 let curTab = 'dash';
@@ -343,7 +344,7 @@ function toggleSb(open){
 
 function renderAll(){
   renderNav(); renderDash();
-  renderInq(); renderLeads(); renderBuyers(); renderProducts(); renderColumns(); renderFaqTab(); renderNotices(); renderCopy(); renderSeo(); renderSettings();
+  renderInq(); renderLeads(); renderBuyers(); renderProducts(); renderColumns(); renderFaqTab(); renderNotices(); renderCopy(); renderSeo(); renderAdmins(); renderSettings();
   showTab(curTab);
 }
 
@@ -1587,6 +1588,134 @@ async function seoFillCurrent(){
   }
 }
 
+/* ============================================================
+   9. 관리자 계정 — admins 테이블 (서버 모드 전용)
+   ------------------------------------------------------------
+   REST 로는 admins 에 쓸 수 없다(누구나 스스로를 관리자로 만들 수 있으므로).
+   모든 동작은 /functions/v1/admin-users 창구를 지난다 — MkAdminApi 참고.
+   ============================================================ */
+let admUsers = [];
+
+/* 서버가 돌려주는 err 코드를 사람 말로 */
+const ADM_ERR = {
+  not_admin:          '관리자 권한이 없습니다. 다시 로그인해 보세요.',
+  no_session:         '로그인이 만료됐습니다. 새로고침 후 다시 로그인하세요.',
+  bad_email:          '이메일 형식이 올바르지 않습니다.',
+  weak_password:      '비밀번호는 8자 이상이어야 합니다.',
+  already_admin:      '이미 관리자로 등록된 계정입니다.',
+  cannot_remove_self: '본인 권한은 해제할 수 없습니다. 다른 관리자에게 요청하세요.',
+  last_admin:         '마지막 관리자는 해제할 수 없습니다. 먼저 다른 관리자를 추가하세요.',
+  not_admin_target:   '관리자 계정만 비밀번호를 변경할 수 있습니다.',
+  wrong_current:      '현재 비밀번호가 올바르지 않습니다.',
+  not_found:          '대상을 찾을 수 없습니다.',
+  unreachable:        '서버에 연결할 수 없습니다.',
+};
+const admErr = r => ADM_ERR[r && r.err] || ('처리에 실패했습니다 (' + ((r && r.err) || '알 수 없는 오류') + ')');
+
+function renderAdmins(){
+  const el = document.getElementById('tab-admins');
+  if(!el) return;
+
+  /* 로컬 모드(localStorage 게이트)에는 계정 개념이 없다 */
+  if(!isSB() || typeof MkAdminApi === 'undefined'){
+    el.innerHTML = `<div class="card"><h3>관리자 계정</h3><p class="note" style="margin:0">
+      이 기능은 서버 모드에서만 동작합니다. <code>assets/js/config.js</code> 의
+      <code>MK_SUPABASE_URL</code> · <code>MK_SUPABASE_ANON</code> 이 채워져 있어야 합니다.</p></div>`;
+    return;
+  }
+
+  el.innerHTML = `
+    <div class="card"><div class="bar"><h3 style="margin:0">관리자 목록</h3><span class="grow"></span><button class="btn btn-ghost btn-sm" onclick="loadAdminUsers()">새로고침</button></div><p class="note">이 목록에 있는 계정만 관리자 콘솔에 들어올 수 있습니다. 권한을 해제해도 계정과 문의·관심제품 이력은 남습니다.</p><div class="tbl-wrap"><table><thead><tr><th>이메일</th><th>관리자 등록일</th><th style="width:120px"></th></tr></thead><tbody id="adm-users-rows"><tr class="empty-row"><td colspan="3">불러오는 중…</td></tr></tbody></table></div></div>
+
+    <div class="card"><h3>관리자 추가</h3><p class="note">이미 회원가입된 이메일이면 그 계정에 관리자 권한을 줍니다. 처음 보는 이메일이면 <b>새 계정을 만들어</b> 관리자로 등록합니다 (이때 비밀번호가 필요합니다).</p><div class="fgrid two"><div class="fld"><label>이메일</label><input id="adm-new-email" type="email" placeholder="admin@makenov.com" autocomplete="off"></div><div class="fld"><label>비밀번호 <span style="color:var(--adm-sub);font-size:11px">새 계정일 때만 · 8자 이상</span></label><input id="adm-new-pw" type="password" autocomplete="new-password"></div></div><button class="btn btn-primary btn-sm" onclick="addAdminUser()">추가</button></div>
+
+    <div class="card"><h3>내 비밀번호 변경</h3><p class="note">변경하면 다른 기기·브라우저의 로그인은 모두 끊기고, 지금 이 화면만 그대로 유지됩니다.</p><div class="fgrid"><div class="fld"><label>현재 비밀번호</label><input id="adm-pw-cur" type="password" autocomplete="current-password"></div><div class="fld"><label>새 비밀번호 <span style="color:var(--adm-sub);font-size:11px">8자 이상</span></label><input id="adm-pw-new" type="password" autocomplete="new-password"></div><div class="fld"><label>새 비밀번호 확인</label><input id="adm-pw-new2" type="password" autocomplete="new-password"></div></div><button class="btn btn-primary btn-sm" onclick="changeMyPassword()">변경</button></div>
+
+    <div class="card"><h3>다른 관리자 비밀번호 재설정</h3><p class="note">비밀번호를 잊은 관리자를 위해 새 비밀번호를 지정합니다. 그 계정의 모든 로그인이 끊기므로, 새 비밀번호를 당사자에게 직접 전달하세요.</p><div class="fgrid"><div class="fld"><label>대상 관리자</label><select id="adm-reset-target"></select></div><div class="fld"><label>새 비밀번호 <span style="color:var(--adm-sub);font-size:11px">8자 이상</span></label><input id="adm-reset-pw" type="password" autocomplete="new-password"></div><div class="fld"><label>새 비밀번호 확인</label><input id="adm-reset-pw2" type="password" autocomplete="new-password"></div></div><button class="btn btn-ghost btn-sm" onclick="resetAdminPassword()">재설정</button></div>`;
+
+  loadAdminUsers();
+}
+
+async function loadAdminUsers(){
+  const rows = document.getElementById('adm-users-rows');
+  if(!rows) return;
+  const r = await MkAdminApi.call('list');
+  if(!r.ok){
+    rows.innerHTML = `<tr class="empty-row"><td colspan="3">${esc(admErr(r))}</td></tr>`;
+    return;
+  }
+  admUsers = r.list || [];
+
+  rows.innerHTML = admUsers.length ? admUsers.map(u => `
+    <tr class="row-hover"><td><b>${esc(u.email)}</b>${u.self?' <span class="pill-st st-vip">나</span>':''}<div class="sub">${esc(u.user_id)}</div></td><td>${esc(String(u.created_at||'').slice(0,10))}</td><td>${u.self?'<span class="sub">본인</span>':`<button class="btn btn-ghost btn-sm" onclick="removeAdminUser('${esc(u.user_id)}','${esc(u.email)}')">권한 해제</button>`}</td></tr>`).join('')
+    : `<tr class="empty-row"><td colspan="3">관리자가 없습니다</td></tr>`;
+
+  /* 비밀번호 재설정 대상 — 본인은 위쪽 카드에서 바꾼다 */
+  const sel = document.getElementById('adm-reset-target');
+  if(sel){
+    const others = admUsers.filter(u => !u.self);
+    sel.innerHTML = others.length
+      ? others.map(u=>`<option value="${esc(u.user_id)}">${esc(u.email)}</option>`).join('')
+      : `<option value="">다른 관리자가 없습니다</option>`;
+  }
+}
+
+async function addAdminUser(){
+  const email = av('adm-new-email');
+  const pw    = av('adm-new-pw');
+  if(!email){ toastA('이메일을 입력하세요'); return; }
+
+  toastA('추가하는 중…');
+  const r = await MkAdminApi.call('add', { email, password: pw });
+  if(!r.ok){ toastA(admErr(r)); return; }
+
+  toastA(r.mode === 'created' ? `새 계정 ${r.email} 을 관리자로 등록했습니다` : `${r.email} 에게 관리자 권한을 부여했습니다`);
+  document.getElementById('adm-new-email').value = '';
+  document.getElementById('adm-new-pw').value = '';
+  loadAdminUsers();
+}
+
+async function removeAdminUser(user_id, email){
+  if(!confirm(email + '\n\n이 계정의 관리자 권한을 해제할까요?\n계정 자체는 삭제되지 않습니다.')) return;
+
+  toastA('해제하는 중…');
+  const r = await MkAdminApi.call('remove', { user_id });
+  if(!r.ok){ toastA(admErr(r)); return; }
+  toastA('관리자 권한을 해제했습니다');
+  loadAdminUsers();
+}
+
+async function changeMyPassword(){
+  const cur = av('adm-pw-cur'), a = av('adm-pw-new'), b = av('adm-pw-new2');
+  if(a.length < 8){ toastA('새 비밀번호는 8자 이상이어야 합니다'); return; }
+  if(a !== b){ toastA('두 비밀번호가 다릅니다'); return; }
+  if(!cur){ toastA('현재 비밀번호를 입력하세요'); return; }
+
+  toastA('변경하는 중…');
+  const r = await MkAdminApi.call('password', { current: cur, password: a });
+  if(!r.ok){ toastA(admErr(r)); return; }
+  toastA('비밀번호를 변경했습니다');
+  ['adm-pw-cur','adm-pw-new','adm-pw-new2'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+}
+
+async function resetAdminPassword(){
+  const user_id = av('adm-reset-target');
+  const a = av('adm-reset-pw'), b = av('adm-reset-pw2');
+  if(!user_id){ toastA('대상 관리자를 선택하세요'); return; }
+  if(a.length < 8){ toastA('새 비밀번호는 8자 이상이어야 합니다'); return; }
+  if(a !== b){ toastA('두 비밀번호가 다릅니다'); return; }
+
+  const who = (admUsers.find(u=>u.user_id===user_id)||{}).email || '';
+  if(!confirm(who + '\n\n이 관리자의 비밀번호를 재설정할까요?\n해당 계정의 모든 로그인이 끊깁니다.')) return;
+
+  toastA('재설정하는 중…');
+  const r = await MkAdminApi.call('password', { user_id, password: a });
+  if(!r.ok){ toastA(admErr(r)); return; }
+  toastA(`${r.email||who} 의 비밀번호를 재설정했습니다`);
+  document.getElementById('adm-reset-pw').value = '';
+  document.getElementById('adm-reset-pw2').value = '';
+}
+
 function renderSettings(){
   const S = (typeof MK_SETTINGS !== 'undefined') ? MK_SETTINGS : { topbar:{} };
   const tb = S.topbar || {};
@@ -1596,8 +1725,9 @@ function renderSettings(){
     <div class="card"><div class="bar"><h3 style="margin:0">상단 띠배너</h3><span class="grow"></span><button class="btn btn-ghost btn-sm" onclick="autoTranslate(this,['set-tb'],false)" title="한국어를 베트남어·영어로 자동 번역 (빈 칸만 채움)">🌐 한국어 자동번역</button><button class="btn btn-primary btn-sm" onclick="saveTopbar()">저장</button></div><p class="note">모든 페이지 맨 위에 뜨는 파란 띠입니다. 방문자가 ✕로 닫으면 그 세션 동안만 숨겨집니다.</p><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span></label><textarea id="set-tb-ko" rows="2">${g('ko')}</textarea></div><div class="fld"><label><span class="lang-tag">VI</span></label><textarea id="set-tb-vi" rows="2">${g('vi')}</textarea></div><div class="fld"><label><span class="lang-tag">EN</span></label><textarea id="set-tb-en" rows="2">${g('en')}</textarea></div></div><div class="fgrid two" style="margin-top:14px"><div class="fld"><label>클릭 시 이동할 주소 (비우면 링크 없음)</label><input id="set-tb-link" value="${esc(S.topbarLink||'')}" placeholder="maker.html"></div><div class="fld"><label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="set-tb-on" ${S.topbarOn!==false?'checked':''} style="width:auto"> 띠배너 노출</label></div></div></div><div class="card"><h3>배포용 데이터 내보내기</h3><p class="note">지금 편집한 제품·칼럼은 <b>이 브라우저에만</b> 저장돼 있습니다.
       아래에서 <code>data.js</code>를 내려받아 <code>makenov/assets/js/data.js</code>를 교체하면
       다른 기기와 배포 사이트에도 반영됩니다.</p><div class="bar"><button class="btn btn-primary btn-sm" onclick="exportDataJs()">data.js 내려받기</button><button class="btn btn-ghost btn-sm" onclick="exportJson()">전체 백업 (JSON)</button><label class="btn btn-ghost btn-sm" style="cursor:pointer;margin:0">
-          백업 복원<input type="file" accept=".json" style="display:none" onchange="importJson(this)"></label></div></div><div class="card"><h3>비밀번호 변경</h3><div class="fgrid two"><div class="fld"><label>새 비밀번호</label><input id="set-pw" type="password"></div><div class="fld"><label>새 비밀번호 확인</label><input id="set-pw2" type="password"></div></div><button class="btn btn-primary btn-sm" onclick="changePw()">변경</button><p class="note" style="margin:12px 0 0"> 이 관리자는 브라우저에서 동작하는 임시 게이트입니다.
-      실제 서비스에서는 2단계 Supabase 인증으로 교체해야 합니다.</p></div><div class="card"><h3>편집 내용 초기화</h3><p class="note">관리자에서 편집한 제품·칼럼을 모두 버리고 최초 시드 데이터로 되돌립니다. 문의·바이어 데이터는 유지됩니다.</p><button class="btn btn-ghost btn-sm"
+          백업 복원<input type="file" accept=".json" style="display:none" onchange="importJson(this)"></label></div></div>${isSB() ? `<div class="card"><h3>비밀번호 변경</h3><p class="note" style="margin:0">서버 모드에서는 관리자마다 계정과 비밀번호가 따로 있습니다.
+      왼쪽 메뉴 <b>관리자</b> 탭에서 변경하세요 — 아래 게이트 비밀번호는 이 모드에서 쓰이지 않습니다.</p></div>` : `<div class="card"><h3>비밀번호 변경</h3><div class="fgrid two"><div class="fld"><label>새 비밀번호</label><input id="set-pw" type="password"></div><div class="fld"><label>새 비밀번호 확인</label><input id="set-pw2" type="password"></div></div><button class="btn btn-primary btn-sm" onclick="changePw()">변경</button><p class="note" style="margin:12px 0 0"> 이 관리자는 브라우저에서 동작하는 임시 게이트입니다.
+      실제 서비스에서는 2단계 Supabase 인증으로 교체해야 합니다.</p></div>`}<div class="card"><h3>편집 내용 초기화</h3><p class="note">관리자에서 편집한 제품·칼럼을 모두 버리고 최초 시드 데이터로 되돌립니다. 문의·바이어 데이터는 유지됩니다.</p><button class="btn btn-ghost btn-sm"
         onclick="if(confirm('편집한 제품·칼럼을 모두 버리고 초기 상태로 되돌립니다.\\n계속할까요?')){Admin.resetContent();location.reload();}">초기 데이터로 되돌리기</button></div><div class="card"><h3>업로드 이미지 저장공간</h3><p class="note">올린 사진은 <b>이 브라우저 안에</b> 저장됩니다(IndexedDB).
       업로드 시 자동으로 긴 변 1600px · JPEG 품질 82%로 압축합니다.
       다른 기기나 실제 서버에 반영하려면 위의 <b>JSON 백업</b>을 받아 옮기세요.
