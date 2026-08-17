@@ -23,6 +23,10 @@ $routes->get('/', static fn () => file_get_contents(ROOTPATH . 'public/index.htm
    새 파일을 못 만들고, 라우트면 칼럼 발행 시 피드도 자동 갱신된다 */
 $routes->get('rss.xml', '\App\Controllers\Api\Rss::feed');
 
+/* ── 배포 확인 ─────────────────────────────────────────────
+   Actions 초록불 ≠ 서버 반영. 이 응답의 마커로 실제 반영을 대조한다 */
+$routes->get('deploy-check', '\App\Controllers\Api\DeployCheck::index');
+
 /* ── REST (PostgREST 미믹) ─────────────────────────────────
    GET/POST/PATCH/DELETE /rest/v1/{table}
    권한은 Api\Rest 의 POLICY 맵이 RLS 를 그대로 옮겨 시행한다 */
@@ -51,11 +55,6 @@ $routes->post('functions/v1/verify-business', '\App\Controllers\Api\Verify::hand
    admins 는 Rest 에서 write='none' 으로 잠겨 있다. 추가·해제·비밀번호는
    관리자 본인 토큰을 확인하는 이 창구만 지난다 */
 $routes->post('functions/v1/admin-users', '\App\Controllers\Api\AdminUsers::handle');
-
-/* ── 관리자 계정 관리 ──────────────────────────────────────
-   admins 는 Rest 에서 write='none' 으로 잠겨 있다. 추가·해제·비밀번호는
-   관리자 본인 토큰을 확인하는 이 창구만 지난다 */
-$routes->post('functions/v1/admin-users', 'App\Controllers\Api\AdminUsers::handle');
 
 /* ── Storage (버킷 product-images) ───────────────────────── */
 $routes->group('storage/v1', ['namespace' => 'App\Controllers\Api'], static function ($routes) {
