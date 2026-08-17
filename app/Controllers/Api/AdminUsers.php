@@ -8,7 +8,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 /**
  * /functions/v1/admin-users — 관리자 계정 관리 (엣지함수 자리).
  * ------------------------------------------------------------
- * 관리자 판정은 admins 테이블 대조다(BaseApiController::resolveUser).
+ * 000관리자 판정은 admins 테이블 대조다(BaseApiController::resolveUser).
  * 그래서 admins 는 Rest 의 POLICY 에서 write='none' 으로 잠겨 있다 —
  * PostgREST 문법으로 임의 INSERT 가 되면 로그인한 누구나 스스로를
  * 관리자로 만들 수 있기 때문이다. 계정 추가·해제는 이 창구만 지난다.
