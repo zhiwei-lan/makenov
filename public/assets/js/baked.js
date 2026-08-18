@@ -7,27 +7,11 @@ window.MK_BAKED = {
     "p11",
     "p10",
     "p9",
-    "p0",
-    "p8",
-    "p4",
-    "p3",
-    "p1",
-    "p2",
-    "p5",
-    "p6",
-    "p7"
+    "p0"
   ],
   "companies": [
     "lgind",
     "incore",
-    "daon",
-    "hanil",
-    "cleanlab",
-    "jinseng",
-    "toto",
-    "airio",
-    "modam",
-    "dalsung",
     "wellbeing"
   ],
   "columns": {

@@ -54,93 +54,21 @@ const MK_COMPANIES = [
       ko:'(주)라지는 2009년 12월 설립된 대구 소재 자동차부품 공급사로, 유리섬유 직물·열가소성 복합재료·배기계 단열재를 주력으로 합니다. IATF 16949:2016 인증을 보유하고 2010년 기업부설연구소를 설립했으며, 2016년 독일 Fraunhofer ICT와 복합재 공동 기술개발 협약을 체결했습니다. 이 내열소재 기술을 응용한 브랜드가 파이어싹으로, 경남소방본부·성남도시개발공사 등 공공기관에 납품 실적이 있습니다.',
       en:'LARGE Co., Ltd. (founded Dec 2009, Daegu) manufactures automotive components centred on glass-fibre textiles, thermoplastic composites and exhaust-system insulation. It holds IATF 16949:2016, established an in-house research institute in 2010, and signed a joint composite development agreement with Germany\'s Fraunhofer ICT in 2016. Its FIRESSAK brand applies that heat-resistant material base to EV fire blankets, with supply records to public bodies including the Gyeongnam Fire Department and Seongnam Urban Development Corp.'} },
 
-  { id:'daon', brand:'DAON COSMETIC', logo:'https://picsum.photos/seed/mkc-daon/200/200',
-    cover:'https://picsum.photos/seed/mkc-daon-cv/1200/400', cat:'beauty',
-    name:{vi:'DAON COSMETIC', ko:'다온코스메틱', en:'DAON COSMETIC'},
-    location:{vi:'Daegu, Hàn Quốc', ko:'대구광역시', en:'Daegu, Korea'},
-    since:'2014', staff:'52', export:'14', moqPolicy:'3,000',
-    certs:['CGMP','CPNP','FDA','ISO 22716'],
-    tagline:{vi:'12 năm OEM/ODM cho các thương hiệu K-Beauty', ko:'K-뷰티 브랜드 OEM/ODM 12년', en:'12 years of K-Beauty OEM/ODM'},
-    intro:{vi:'DAON COSMETIC là nhà sản xuất mỹ phẩm tại Daegu với 12 năm kinh nghiệm OEM/ODM cho các thương hiệu K-Beauty. Nhà máy đạt chuẩn CGMP, xuất khẩu sang 14 quốc gia. Hỗ trợ đầy đủ hồ sơ công bố mỹ phẩm và phát triển công thức riêng.',
-      ko:'다온코스메틱은 대구 소재 화장품 공급사로, K-뷰티 브랜드 OEM/ODM 12년 경력을 보유하고 있습니다. CGMP 인증 공장에서 14개국에 수출하고 있으며, 화장품 공고 서류 지원과 자체 처방 개발이 가능합니다.',
-      en:'DAON COSMETIC is a Daegu-based manufacturer with 12 years of K-Beauty OEM/ODM experience. Its CGMP-certified factory exports to 14 countries, with full notification-dossier support and in-house formulation.'} },
+  
 
-  { id:'hanil', brand:'HANIL FOOD', logo:'https://picsum.photos/seed/mkc-hanil/200/200',
-    cover:'https://picsum.photos/seed/mkc-hanil-cv/1200/400', cat:'food',
-    name:{vi:'HANIL FOOD', ko:'하니일푸드', en:'HANIL FOOD'},
-    location:{vi:'Daegu, Hàn Quốc', ko:'대구광역시', en:'Daegu, Korea'},
-    since:'1998', staff:'120', export:'9', moqPolicy:'10,000',
-    certs:['HACCP','ISO 22000','Halal(진행중)'],
-    tagline:{vi:'Thực phẩm tiện lợi Hàn Quốc từ 1998', ko:'1998년부터 한국 간편식 전문', en:'Korean convenience food since 1998'},
-    intro:{vi:'HANIL FOOD sản xuất thực phẩm tiện lợi Hàn Quốc từ năm 1998. Dây chuyền đạt chuẩn HACCP, sản phẩm có mặt tại CU và GS25 trên toàn Hàn Quốc. Chuyên các dòng tự sôi và ăn liền cho kênh cửa hàng tiện lợi.',
-      ko:'하니일푸드는 1998년부터 한국 간편식품을 생산해온 기업입니다. HACCP 인증 라인을 갖추고 전국 CU·GS25에 입점해 있으며, 편의점 채널용 자체발열·즉석식 라인에 강점이 있습니다.',
-      en:'HANIL FOOD has produced Korean convenience food since 1998. HACCP-certified lines supply CU and GS25 nationwide, with a focus on self-heating and instant lines for convenience-store channels.'} },
+  
 
-  { id:'cleanlab', brand:'CLEANLAB', logo:'https://picsum.photos/seed/mkc-clean/200/200',
-    cover:'https://picsum.photos/seed/mkc-clean-cv/1200/400', cat:'living',
-    name:{vi:'CLEANLAB', ko:'클린랩', en:'CLEANLAB'},
-    location:{vi:'Daegu, Hàn Quốc', ko:'대구광역시', en:'Daegu, Korea'},
-    since:'2019', staff:'28', export:'6', moqPolicy:'500',
-    certs:['CE','KC','RoHS'],
-    tagline:{vi:'Thiết bị vệ sinh nhà bếp thông minh', ko:'스마트 주방위생 가전', en:'Smart kitchen-hygiene devices'},
-    intro:{vi:'CLEANLAB phát triển thiết bị vệ sinh nhà bếp thông minh, đạt giải thưởng thiết kế Hàn Quốc 2025. Sản phẩm dùng UV-C LED, có sẵn phiên bản điện áp 220V cho thị trường Đông Nam Á.',
-      ko:'클린랩은 스마트 주방위생 가전 전문기업으로 2025 대한민국 디자인어워드 수상 기업입니다. UV-C LED 기반 제품을 개발하며 동남아 시장용 220V 사양을 보유하고 있습니다.',
-      en:'CLEANLAB builds smart kitchen-hygiene devices and won the 2025 Korea Design Award. Its UV-C LED products ship with 220V variants for Southeast Asian markets.'} },
+  
 
-  { id:'jinseng', brand:'JINSENG HOUSE', logo:'https://picsum.photos/seed/mkc-jin/200/200',
-    cover:'https://picsum.photos/seed/mkc-jin-cv/1200/400', cat:'health',
-    name:{vi:'JINSENG HOUSE', ko:'진생하우스', en:'JINSENG HOUSE'},
-    location:{vi:'Daegu, Hàn Quốc', ko:'대구광역시', en:'Daegu, Korea'},
-    since:'2006', staff:'44', export:'20', moqPolicy:'1,000',
-    certs:['HACCP','건강기능식품 GMP'],
-    tagline:{vi:'Hồng sâm 6 năm tuổi, xuất khẩu 20 năm', ko:'6년근 홍삼 전문, 수출 20년', en:'6-year red ginseng, 20 years exporting'},
-    intro:{vi:'JINSENG HOUSE chuyên chế biến hồng sâm từ vùng trồng sâm nổi tiếng của Hàn Quốc với 20 năm kinh nghiệm xuất khẩu. Cung cấp đa dạng quy cách quà tặng, phù hợp mùa cao điểm Tết.',
-      ko:'진생하우스는 한국 대표 인삼 산지의 홍삼 전문 공급사로 수출 경력 20년입니다. 다양한 선물 패키지 규격을 보유해 뗏(설) 성수기 대응이 가능합니다.',
-      en:'JINSENG HOUSE processes red ginseng from Korea\'s famous ginseng regions with 20 years of export experience, offering a range of gift formats for peak seasons.'} },
+  
 
-  { id:'toto', brand:'TOTO KIDS', logo:'https://picsum.photos/seed/mkc-toto/200/200',
-    cover:'https://picsum.photos/seed/mkc-toto-cv/1200/400', cat:'kids',
-    name:{vi:'TOTO KIDS', ko:'토토키즈', en:'TOTO KIDS'},
-    location:{vi:'Daegu, Hàn Quốc', ko:'대구광역시', en:'Daegu, Korea'},
-    since:'2011', staff:'36', export:'11', moqPolicy:'2,000',
-    certs:['KC','CE','EN71'],
-    tagline:{vi:'Đồ chơi giáo dục cho trường mầm non Hàn Quốc', ko:'한국 유치원 납품 교육완구', en:'Educational toys for Korean kindergartens'},
-    intro:{vi:'TOTO KIDS sản xuất đồ chơi giáo dục trong 15 năm, cung cấp cho các trường mầm non Hàn Quốc. Vật liệu ABS không BPA, hỗ trợ in hộp theo yêu cầu.',
-      ko:'토토키즈는 15년 경력의 교육완구 공급사로 한국 유치원·어린이집에 납품하고 있습니다. BPA-free ABS 소재를 사용하며 주문 패키지 인쇄를 지원합니다.',
-      en:'TOTO KIDS has made educational toys for 15 years, supplying Korean kindergartens. BPA-free ABS materials with custom box printing available.'} },
+  
 
-  { id:'airio', brand:'AIRIO', logo:'https://picsum.photos/seed/mkc-airio/200/200',
-    cover:'https://picsum.photos/seed/mkc-airio-cv/1200/400', cat:'tech',
-    name:{vi:'AIRIO', ko:'에어리오', en:'AIRIO'},
-    location:{vi:'Daegu, Hàn Quốc', ko:'대구광역시', en:'Daegu, Korea'},
-    since:'2020', staff:'19', export:'5', moqPolicy:'1,000',
-    certs:['CE','FCC','KC'],
-    tagline:{vi:'Thiết bị môi trường trong nhà, giải Red Dot 2024', ko:'실내환경 가전, 2024 레드닷 수상', en:'Indoor-environment devices, Red Dot 2024'},
-    intro:{vi:'AIRIO là startup thiết bị môi trường trong nhà, đạt giải Red Dot Design Award 2024. Sử dụng bộ lọc HEPA H13 và cảm biến PM2.5, tập trung vào dòng để bàn nhỏ gọn.',
-      ko:'에어리오는 실내환경 가전 스타트업으로 2024 레드닷 디자인 어워드를 수상했습니다. HEPA H13 필터와 PM2.5 센서를 적용한 컴팩트 데스크 라인에 집중하고 있습니다.',
-      en:'AIRIO is an indoor-environment device startup and 2024 Red Dot Design Award winner, focused on compact desktop units with HEPA H13 filters and PM2.5 sensors.'} },
+  
 
-  { id:'modam', brand:'MODAM', logo:'https://picsum.photos/seed/mkc-modam/200/200',
-    cover:'https://picsum.photos/seed/mkc-modam-cv/1200/400', cat:'beauty',
-    name:{vi:'MODAM', ko:'모담', en:'MODAM'},
-    location:{vi:'Daegu, Hàn Quốc', ko:'대구광역시', en:'Daegu, Korea'},
-    since:'2016', staff:'67', export:'8', moqPolicy:'30,000',
-    certs:['CGMP','CPNP'],
-    tagline:{vi:'Công suất 500.000 miếng mặt nạ mỗi ngày', ko:'일 50만 장 마스크팩 생산능력', en:'500,000 sheet masks per day'},
-    intro:{vi:'MODAM chuyên sản xuất mặt nạ giấy với công suất 500.000 miếng mỗi ngày tại nhà máy Daegu. Nhận private label với giá vốn cạnh tranh cho các đơn hàng lớn.',
-      ko:'모담은 대구 공장에서 일 50만 장 생산능력을 갖춘 마스크팩 전문 공급사입니다. 대량 주문에 경쟁력 있는 원가로 프라이빗 라벨을 제공합니다.',
-      en:'MODAM specializes in sheet masks with 500,000 sheets/day capacity at its Daegu factory, offering private label at competitive cost for large orders.'} },
+  
 
-  { id:'dalsung', brand:'DALSUNG TEA', logo:'https://picsum.photos/seed/mkc-dal/200/200',
-    cover:'https://picsum.photos/seed/mkc-dal-cv/1200/400', cat:'food',
-    name:{vi:'DALSUNG TEA', ko:'달성티', en:'DALSUNG TEA'},
-    location:{vi:'Dalseong, Daegu', ko:'대구 달성군', en:'Dalseong, Daegu'},
-    since:'2009', staff:'14', export:'4', moqPolicy:'5,000',
-    certs:['유기농 인증(한국)','HACCP'],
-    tagline:{vi:'Trà hữu cơ trồng và chế biến tại Dalseong', ko:'달성군 직영 유기농 차 재배·가공', en:'Organic tea grown and processed in Dalseong'},
-    intro:{vi:'DALSUNG TEA trồng và chế biến trà tại vùng Dalseong, Daegu theo chuẩn hữu cơ Hàn Quốc. Chuyên dòng trà ngũ cốc không caffeine, nhận OEM quy cách túi lọc.',
-      ko:'달성티는 대구 달성군에서 유기농 인증 기준으로 차를 재배·가공합니다. 카페인 없는 곡물차 라인이 주력이며 티백 규격 OEM이 가능합니다.',
-      en:'DALSUNG TEA grows and processes tea in Dalseong, Daegu under Korean organic standards, specializing in caffeine-free grain teas with tea-bag OEM available.'} },
+  
 
   /*  실제 기업 — 웰빙헬스팜 3wbmall.com / wh-pharm.com 공개정보 기준 (사업자번호·주소·대표 실값) */
   { id:'wellbeing', brand:'WELLBEING HEALTHFARM', logo:'https://3wbmall.com/web/upload/weskin11/kr/main/logo.png',
@@ -233,127 +161,14 @@ const MK_PRODUCTS = [
         en:'Suited to underground car parks, charging stations, logistics warehouses, depots and corporate fleets. The maker holds IATF 16949:2016 and provides a test report for this model.'}},
     ]
   },
-  {
-    id:'p1', cat:'beauty', featured:true, isNew:true, createdAt:'2026-07-20',
-    companyId:'daon', brand:'DAON COSMETIC', origin:'Daegu, Korea',
-    name:{vi:'Serum tái tạo da Daon Cica Pro', ko:'다온 시카 프로 재생 세럼', en:'Daon Cica Pro Repair Serum'},
-    tagline:{vi:'Serum phục hồi da chuyên sâu với 82% chiết xuất rau má Hàn Quốc', ko:'한국산 병풀 추출물 82% 고농축 진정 세럼', en:'Intensive repair serum with 82% Korean centella extract'},
-    img:'https://picsum.photos/seed/mkv-serum/800/600',
-    gallery:['https://picsum.photos/seed/mkv-serum/800/600','https://picsum.photos/seed/mkv-serum2/800/600','https://picsum.photos/seed/mkv-serum3/800/600'],
-    video:'', inquiries:23, views:1840,
-    price:'US$ 4.20 / unit (FOB Busan)', moq:'3,000 units', lead:'30 days', terms:'OEM/ODM available · Private label OK',
-    brandStory:{vi:'DAON COSMETIC là nhà sản xuất mỹ phẩm tại Daegu với 12 năm kinh nghiệm OEM/ODM cho các thương hiệu K-Beauty. Nhà máy đạt chuẩn CGMP, xuất khẩu sang 14 quốc gia.',
-      ko:'다온코스메틱은 대구 소재 화장품 공급사로, K-뷰티 브랜드 OEM/ODM 12년 경력을 보유하고 있습니다. CGMP 인증 공장, 14개국 수출 실적.',
-      en:'DAON COSMETIC is a Daegu-based manufacturer with 12 years of K-Beauty OEM/ODM experience. CGMP-certified factory exporting to 14 countries.'},
-    detail:[
-      {type:'p', text:{vi:'Chứng nhận CPNP & FDA. Không paraben, không hương liệu nhân tạo — phù hợp làn da nhạy cảm của khí hậu nhiệt đới.', ko:'CPNP·FDA 인증. 파라벤·인공향료 무첨가로 열대기후 민감성 피부에 적합합니다.', en:'CPNP & FDA certified. Paraben-free, no artificial fragrance — ideal for sensitive skin in tropical climates.'}},
-      {type:'img', src:'https://picsum.photos/seed/mkv-serum-d1/900/600'},
-      {type:'p', text:{vi:'Đã có mặt tại Olive Young Hàn Quốc và các chuỗi drugstore lớn. Hỗ trợ đầy đủ hồ sơ công bố mỹ phẩm tại Việt Nam.', ko:'올리브영 및 주요 드럭스토어 입점 제품. 베트남 화장품 공고 서류 지원 가능.', en:'Available in Olive Young Korea and major drugstores. Full support for Vietnam cosmetic notification dossiers.'}},
-      {type:'img', src:'https://picsum.photos/seed/mkv-serum-d2/900/600'},
-    ]
-  },
-  {
-    id:'p2', cat:'food', featured:true, isNew:false, createdAt:'2026-07-14',
-    companyId:'hanil', brand:'HANIL FOOD', origin:'Daegu, Korea',
-    name:{vi:'Tteokbokki tự sôi HanilPot', ko:'하니포트 자체발열 즉석 떡볶이', en:'HanilPot Self-Heating Tteokbokki'},
-    tagline:{vi:'Món ăn Hàn Quốc tự làm nóng trong 8 phút — không cần bếp, không cần điện', ko:'불 없이 8분, 자체발열 즉석 떡볶이', en:'Self-heating Korean street food ready in 8 minutes — no stove needed'},
-    img:'https://picsum.photos/seed/mkv-tteok/800/600',
-    gallery:['https://picsum.photos/seed/mkv-tteok/800/600','https://picsum.photos/seed/mkv-tteok2/800/600'],
-    video:'', inquiries:41, views:3120,
-    price:'US$ 1.85 / pack (FOB Busan)', moq:'10,000 packs', lead:'25 days', terms:'Halal cert. in progress · Shelf life 12 months',
-    brandStory:{vi:'HANIL FOOD sản xuất thực phẩm tiện lợi Hàn Quốc từ 1998. Dây chuyền HACCP, sản phẩm có mặt tại CU, GS25 toàn Hàn Quốc.',
-      ko:'하니일푸드는 1998년부터 한국 간편식품을 생산해온 기업입니다. HACCP 인증 라인, 전국 CU·GS25 입점.',
-      en:'HANIL FOOD has produced Korean convenience food since 1998. HACCP-certified lines; products in CU and GS25 nationwide.'},
-    detail:[
-      {type:'p', text:{vi:'Cơm hộp tự sôi là xu hướng lớn tại thị trường Đông Nam Á — phù hợp cửa hàng tiện lợi, khu du lịch, đồ ăn văn phòng.', ko:'자체발열 간편식은 동남아 시장의 큰 트렌드 — 편의점·관광지·오피스 판로에 적합합니다.', en:'Self-heating meals are a major SEA trend — perfect for convenience stores, tourist areas, and office snacking.'}},
-      {type:'img', src:'https://picsum.photos/seed/mkv-tteok-d1/900/600'},
-    ]
-  },
-  {
-    id:'p3', cat:'living', featured:true, isNew:true, createdAt:'2026-07-22',
-    companyId:'cleanlab', brand:'CLEANLAB', origin:'Daegu, Korea',
-    name:{vi:'Máy khử trùng dao thớt UV CleanLab', ko:'클린랩 UV 도마·칼 살균기', en:'CleanLab UV Cutting Board Sterilizer'},
-    tagline:{vi:'Khử 99.9% vi khuẩn trên dao thớt trong 10 phút bằng UV-C LED', ko:'UV-C LED로 10분 만에 도마·칼 99.9% 살균', en:'Kills 99.9% of germs on knives & boards in 10 minutes with UV-C LED'},
-    img:'https://picsum.photos/seed/mkv-uv/800/600',
-    gallery:['https://picsum.photos/seed/mkv-uv/800/600','https://picsum.photos/seed/mkv-uv2/800/600'],
-    video:'', inquiries:17, views:980,
-    price:'US$ 28.50 / unit (FOB Busan)', moq:'500 units', lead:'35 days', terms:'CE/KC certified · 220V SEA plug available',
-    brandStory:{vi:'CLEANLAB phát triển thiết bị vệ sinh nhà bếp thông minh, đạt giải thưởng thiết kế Hàn Quốc 2025.', ko:'클린랩은 스마트 주방위생 가전 전문기업으로 2025 대한민국 디자인어워드 수상 기업입니다.', en:'CLEANLAB builds smart kitchen-hygiene devices; winner of the 2025 Korea Design Award.'},
-    detail:[
-      {type:'p', text:{vi:'Khí hậu nóng ẩm Việt Nam khiến dụng cụ bếp dễ nhiễm khuẩn — sản phẩm giải quyết đúng nỗi lo của gia đình hiện đại.', ko:'고온다습한 베트남 기후에서 주방도구 위생 문제를 정확히 해결하는 제품입니다.', en:'Vietnam\'s hot, humid climate makes kitchen tools prone to bacteria — this solves a real worry for modern families.'}},
-      {type:'img', src:'https://picsum.photos/seed/mkv-uv-d1/900/600'},
-    ]
-  },
-  {
-    id:'p4', cat:'health', featured:false, isNew:true, createdAt:'2026-07-24',
-    companyId:'jinseng', brand:'JINSENG HOUSE', origin:'Daegu, Korea',
-    name:{vi:'Nước hồng sâm Hàn Quốc 6 năm tuổi', ko:'6년근 고려 홍삼액 스틱', en:'6-Year Korean Red Ginseng Extract Sticks'},
-    tagline:{vi:'Hồng sâm 6 năm tuổi dạng gói tiện lợi — quà biếu cao cấp được ưa chuộng', ko:'휴대가 간편한 스틱형 6년근 홍삼액', en:'Premium 6-year red ginseng in convenient stick packs'},
-    img:'https://picsum.photos/seed/mkv-ginseng/800/600',
-    gallery:['https://picsum.photos/seed/mkv-ginseng/800/600'],
-    video:'', inquiries:35, views:2540,
-    price:'US$ 12.00 / box (30 sticks)', moq:'1,000 boxes', lead:'20 days', terms:'Gift packaging · OEM available',
-    brandStory:{vi:'JINSENG HOUSE chuyên chế biến hồng sâm từ vùng trồng sâm nổi tiếng của Hàn Quốc, xuất khẩu 20 năm.', ko:'진생하우스는 한국 대표 인삼 산지의 홍삼 전문 공급사로 수출 경력 20년입니다.', en:'JINSENG HOUSE processes red ginseng from Korea\'s famous ginseng regions, exporting for 20 years.'},
-    detail:[
-      {type:'p', text:{vi:'Hồng sâm Hàn Quốc là mặt hàng quà biếu số 1 tại Việt Nam dịp Tết. Bao bì quà tặng sang trọng, sẵn sàng cho mùa cao điểm.', ko:'홍삼은 베트남 뗏(설) 시즌 1위 선물 품목입니다. 고급 선물 패키지로 성수기 대응이 가능합니다.', en:'Korean red ginseng is the #1 gift item in Vietnam during Tet. Luxury gift packaging ready for peak season.'}},
-    ]
-  },
-  {
-    id:'p5', cat:'kids', featured:false, isNew:false, createdAt:'2026-07-10',
-    companyId:'toto', brand:'TOTO KIDS', origin:'Daegu, Korea',
-    name:{vi:'Bộ đồ chơi khối nam châm ToTo Block', ko:'토토블럭 자석 블록 세트', en:'ToTo Block Magnetic Building Set'},
-    tagline:{vi:'Đồ chơi giáo dục STEAM an toàn — nhựa ABS không BPA, chứng nhận KC/CE', ko:'BPA-free ABS 안전 소재 STEAM 교육 자석블록', en:'Safe STEAM educational toy — BPA-free ABS, KC/CE certified'},
-    img:'https://picsum.photos/seed/mkv-block/800/600',
-    gallery:['https://picsum.photos/seed/mkv-block/800/600'],
-    video:'', inquiries:12, views:760,
-    price:'US$ 9.80 / set (64pcs)', moq:'2,000 sets', lead:'40 days', terms:'CE/KC certified · Custom box printing',
-    brandStory:{vi:'TOTO KIDS sản xuất đồ chơi giáo dục 15 năm, cung cấp cho các trường mầm non Hàn Quốc.', ko:'토토키즈는 15년 경력의 교육완구 공급사로 한국 유치원·어린이집에 납품하고 있습니다.', en:'TOTO KIDS has made educational toys for 15 years, supplying Korean kindergartens.'},
-    detail:[
-      {type:'p', text:{vi:'Tầng lớp trung lưu Việt Nam đầu tư mạnh cho giáo dục sớm — đồ chơi STEAM Hàn Quốc có vị thế thương hiệu cao.', ko:'베트남 중산층의 조기교육 투자가 급증 — 한국 STEAM 완구의 브랜드 위상이 높습니다.', en:'Vietnam\'s middle class invests heavily in early education — Korean STEAM toys carry strong brand equity.'}},
-    ]
-  },
-  {
-    id:'p6', cat:'tech', featured:true, isNew:false, createdAt:'2026-07-05',
-    companyId:'airio', brand:'AIRIO', origin:'Daegu, Korea',
-    name:{vi:'Máy lọc không khí mini AIRIO Cube', ko:'에어리오 큐브 미니 공기청정기', en:'AIRIO Cube Mini Air Purifier'},
-    tagline:{vi:'Máy lọc không khí để bàn với cảm biến PM2.5 — thiết kế giải thưởng Red Dot', ko:'PM2.5 센서 탑재 데스크 공기청정기 — 레드닷 수상 디자인', en:'Desktop air purifier with PM2.5 sensor — Red Dot award design'},
-    img:'https://picsum.photos/seed/mkv-air/800/600',
-    gallery:['https://picsum.photos/seed/mkv-air/800/600','https://picsum.photos/seed/mkv-air2/800/600'],
-    video:'', inquiries:28, views:2210,
-    price:'US$ 32.00 / unit (FOB Busan)', moq:'1,000 units', lead:'45 days', terms:'CE/FCC · HEPA H13 filter',
-    brandStory:{vi:'AIRIO là startup thiết bị môi trường trong nhà, đạt giải Red Dot Design Award 2024.', ko:'에어리오는 실내환경 가전 스타트업으로 2024 레드닷 디자인 어워드를 수상했습니다.', en:'AIRIO is an indoor-environment device startup and 2024 Red Dot Design Award winner.'},
-    detail:[
-      {type:'p', text:{vi:'Ô nhiễm không khí đô thị là mối quan tâm hàng đầu tại Hà Nội và TP.HCM — thị trường máy lọc khí tăng 30%/năm.', ko:'하노이·호치민의 대기오염 이슈로 공기청정기 시장이 연 30% 성장 중입니다.', en:'Urban air pollution is a top concern in Hanoi and HCMC — the purifier market grows 30% yearly.'}},
-    ]
-  },
-  {
-    id:'p7', cat:'beauty', featured:false, isNew:false, createdAt:'2026-06-28',
-    companyId:'modam', brand:'MODAM', origin:'Daegu, Korea',
-    name:{vi:'Mặt nạ dưỡng ẩm collagen MODAM', ko:'모담 콜라겐 수분 마스크팩', en:'MODAM Collagen Hydration Mask Pack'},
-    tagline:{vi:'Mặt nạ K-Beauty với collagen thủy phân — bán chạy trên Shopee Hàn', ko:'가수분해 콜라겐 함유 K-뷰티 마스크팩', en:'K-Beauty sheet mask with hydrolyzed collagen — Shopee bestseller'},
-    img:'https://picsum.photos/seed/mkv-mask/800/600',
-    gallery:['https://picsum.photos/seed/mkv-mask/800/600'],
-    video:'', inquiries:19, views:1430,
-    price:'US$ 0.45 / sheet (FOB Busan)', moq:'30,000 sheets', lead:'20 days', terms:'Private label OK · CPNP',
-    brandStory:{vi:'MODAM chuyên sản xuất mặt nạ giấy với công suất 500,000 miếng/ngày tại nhà máy Daegu.', ko:'모담은 대구 공장에서 일 50만 장 생산능력을 갖춘 마스크팩 전문 공급사입니다.', en:'MODAM specializes in sheet masks with 500,000 sheets/day capacity at its Daegu factory.'},
-    detail:[
-      {type:'p', text:{vi:'Mặt nạ giấy Hàn Quốc là sản phẩm K-Beauty phổ biến nhất tại Việt Nam với giá vốn thấp, biên lợi nhuận cao.', ko:'마스크팩은 베트남에서 가장 대중적인 K-뷰티 품목 — 낮은 원가와 높은 마진이 강점입니다.', en:'Korean sheet masks are Vietnam\'s most popular K-Beauty item — low cost, high margin.'}},
-    ]
-  },
-  {
-    id:'p8', cat:'food', featured:false, isNew:true, createdAt:'2026-07-25',
-    companyId:'dalsung', brand:'DALSUNG TEA', origin:'Daegu, Korea',
-    name:{vi:'Trà gạo rang hữu cơ Dalsung', ko:'달성 유기농 현미 누룽지차', en:'Dalsung Organic Roasted Rice Tea'},
-    tagline:{vi:'Trà gạo rang hữu cơ không caffeine — vị ấm quen thuộc với người Việt', ko:'카페인 없는 유기농 현미 누룽지차', en:'Caffeine-free organic roasted rice tea — a familiar warm taste'},
-    img:'https://picsum.photos/seed/mkv-tea/800/600',
-    gallery:['https://picsum.photos/seed/mkv-tea/800/600'],
-    video:'', inquiries:8, views:520,
-    price:'US$ 3.10 / box (20 bags)', moq:'5,000 boxes', lead:'30 days', terms:'Organic cert. (Korea) · OEM',
-    brandStory:{vi:'DALSUNG TEA trồng và chế biến trà tại vùng Dalseong, Daegu theo chuẩn hữu cơ Hàn Quốc.', ko:'달성티는 대구 달성군에서 유기농 인증 기준으로 차를 재배·가공합니다.', en:'DALSUNG TEA grows and processes tea in Dalseong, Daegu under Korean organic standards.'},
-    detail:[
-      {type:'p', text:{vi:'Người tiêu dùng Việt ngày càng tìm đồ uống lành mạnh không caffeine — trà gạo rang Hàn Quốc đang lên xu hướng.', ko:'베트남 소비자의 건강음료 수요 증가로 한국 곡물차가 트렌드로 부상 중입니다.', en:'Vietnamese consumers increasingly seek healthy caffeine-free drinks — Korean grain teas are trending.'}},
-    ]
-  },
+  
+  
+  
+  
+  
+  
+  
+  
   {
     id:'p9', cat:'beauty', featured:false, isNew:true, createdAt:'2026-07-29',
     companyId:'wellbeing', brand:'WELLBEING HEALTHFARM', origin:'Incheon, Korea',
@@ -576,12 +391,12 @@ const MK_COLUMNS = [
 
 /* spotlight feed — kind: new|inquiry|webinar, ts: ISO date */
 const MK_SPOTLIGHT = [
-  { kind:'inquiry', ts:'2026-07-27T09:10:00', pid:'p2' },
-  { kind:'new',     ts:'2026-07-25T14:00:00', pid:'p8' },
-  { kind:'inquiry', ts:'2026-07-25T11:30:00', pid:'p4' },
-  { kind:'new',     ts:'2026-07-24T10:00:00', pid:'p4' },
-  { kind:'inquiry', ts:'2026-07-23T16:20:00', pid:'p6' },
-  { kind:'new',     ts:'2026-07-22T09:00:00', pid:'p3' },
+  
+  
+  
+  
+  
+  
 ];
 
 /* ---------- 히어로 메시지 (홈 최상단 슬라이더) ----------
