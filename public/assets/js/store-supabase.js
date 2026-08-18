@@ -93,7 +93,8 @@ const MkData = {
     /* FAQ — 06_faq_seo.sql 미적용이면 테이블이 없으므로 시드(data.js)를 그대로 둔다 */
     try{
       const fq = await SB.from('faqs').select('*').order('sort');
-      if(!fq.error && fq.data && typeof MK_FAQ !== 'undefined'){
+      /* 빈 테이블이면 시드 유지. 공지와 같은 이유(CI4 이관 누락) */
+      if(!fq.error && fq.data && fq.data.length && typeof MK_FAQ !== 'undefined'){
         MK_FAQ.length = 0;
         fq.data.forEach(f => MK_FAQ.push({
           id:f.id, page:f.page||'home', q:f.q, a:f.a,
@@ -102,10 +103,12 @@ const MkData = {
       }
     }catch(e){}
 
-    /* 공지사항 — 11_notices.sql 미적용이면 시드(data.js)를 그대로 둔다 */
+    /* 공지사항. 테이블이 없거나(에러) 비어 있으면 시드(data.js)를 그대로 둔다.
+       CI4 이관 때 행이 안 넘어와 빈 테이블이 조회에 성공하면서,
+       먼저 그려진 시드 공지를 지워 공지가 깜빨이다 사라졌다(2026-08-17). */
     try{
       const nt = await SB.from('notices').select('*').eq('published', true).order('date',{ascending:false});
-      if(!nt.error && nt.data && typeof MK_NOTICES !== 'undefined'){
+      if(!nt.error && nt.data && nt.data.length && typeof MK_NOTICES !== 'undefined'){
         MK_NOTICES.length = 0;
         nt.data.forEach(n => MK_NOTICES.push({
           id:n.id, title:n.title, body:n.body,
