@@ -32,8 +32,7 @@ window.MK_BAKED = {
   ],
   "columns": {
     "c-quote": "quote-request-checklist",
-    "c-sample": "sample-request-checklist",
-    "c-reply": "supplier-first-reply"
+    "c-sample": "sample-request-checklist"
   }
 };
 
@@ -41,8 +40,8 @@ window.MK_BAKED = {
    없으면 브라우저가 DB 응답을 기다리는 1초 동안 옛 문구가 보였다가 바뀐다. */
 window.MK_COPY_BAKED = {
   "ui.mk_f3": {
-    "en": "Prices and transaction terms are disclosed only to certified buyers.",
-    "ko": "가격·거래조건은 인증 바이어에게만 공개",
+    "en": "Prices and transaction terms are disclosed only to certified distribution partners.",
+    "ko": "가격·거래조건은 인증 유통 파트너에게만 공개",
     "vi": "Giá cả và điều khoản giao dịch chỉ được tiết lộ cho người mua được chứng nhận."
   },
   "hero.0.sub": {
@@ -76,8 +75,8 @@ window.MK_COPY_BAKED = {
     "vi": "3 ngôn ngữ"
   },
   "ui.ft_desc": {
-    "en": "A global innovation platform that connects the world’s products and buyers",
-    "ko": "세계의 제품과 바이어를 하나로 잇는 글로벌 혁신 플랫폼",
+    "en": "A global innovation platform that connects the world’s products and distribution partners",
+    "ko": "세계의 제품과 유통 파트너를 하나로 잇는 글로벌 혁신 플랫폼",
     "vi": "Nền tảng đổi mới toàn cầu kết nối sản phẩm và người mua trên thế giới"
   },
   "ui.gd_b1_t": {
@@ -136,8 +135,8 @@ window.MK_COPY_BAKED = {
     "vi": "tìm nguồn cung ứng toàn cầu,\nBắt đầu ngay bây giờ ở một nơi."
   },
   "about.lock.h2": {
-    "en": "Prices and terms of trade are disclosed only to verified buyers.",
-    "ko": "가격과 거래조건은 인증된 바이어에게만 공개됩니다",
+    "en": "Prices and terms of trade are disclosed only to verified distribution partners.",
+    "ko": "가격과 거래조건은 인증된 유통 파트너에게만 공개됩니다",
     "vi": "Giá cả và điều khoản giao dịch chỉ được tiết lộ cho người mua đã được xác minh."
   },
   "ui.kr_cta_btn": {
@@ -146,8 +145,8 @@ window.MK_COPY_BAKED = {
     "vi": "Nhà cung cấp yêu cầu mở cửa hàng"
   },
   "ui.promo_desc": {
-    "en": "Certified buyers can check the price, MOQ, and delivery date, and request a quote for the desired product directly from the supplier.",
-    "ko": "인증된 바이어는 가격·MOQ·납기를 확인하고, 원하는 제품의 견적을 공급사에 직접 요청할 수 있습니다.",
+    "en": "Certified distribution partners can check the price, MOQ, and delivery date, and request a quote for the desired product directly from the supplier.",
+    "ko": "인증된 유통 파트너는 가격·MOQ·납기를 확인하고, 원하는 제품의 견적을 공급사에 직접 요청할 수 있습니다.",
     "vi": "Người mua được chứng nhận có thể kiểm tra giá, MOQ, ngày giao hàng và yêu cầu báo giá cho sản phẩm mong muốn trực tiếp từ nhà cung cấp."
   },
   "about.lock.tag": {
@@ -161,8 +160,8 @@ window.MK_COPY_BAKED = {
     "vi": "Từ đăng ký thành viên đến tìm hiểu nhà cung cấp, 4 bước"
   },
   "ui.kr_cta_desc": {
-    "en": "When you register a product on MAKENOV, it will be introduced to certified buyers, and quotation inquiries will be sent directly to the supplier.",
-    "ko": "MAKENOV에 제품을 등록하면 인증된 바이어에게 소개되고, 견적 문의가 공급사에 직접 전달됩니다.",
+    "en": "When you register a product on MAKENOV, it will be introduced to certified distribution partners, and quotation inquiries will be sent directly to the supplier.",
+    "ko": "MAKENOV에 제품을 등록하면 인증된 유통 파트너에게 소개되고, 견적 문의가 공급사에 직접 전달됩니다.",
     "vi": "Khi bạn đăng ký một sản phẩm trên MAKENOV, sản phẩm đó sẽ được giới thiệu với những người mua được chứng nhận và yêu cầu báo giá sẽ được gửi trực tiếp đến nhà cung cấp."
   },
   "ui.promo_title": {
@@ -171,8 +170,8 @@ window.MK_COPY_BAKED = {
     "vi": "Với một lần xác minh doanh nghiệp\nTừ xác nhận giá đến yêu cầu báo giá"
   },
   "about.hero.kick": {
-    "en": "What if you are a buyer?",
-    "ko": "바이어라면?",
+    "en": "What if you are a distribution partner?",
+    "ko": "유통 파트너라면?",
     "vi": "Nếu bạn là người mua thì sao?"
   },
   "about.hero.lead": {
@@ -181,8 +180,8 @@ window.MK_COPY_BAKED = {
     "vi": "Khám phá các sản phẩm và nhà cung cấp trên khắp thế giới,\nSau khi xác minh doanh nghiệp của bạn, hãy kiểm tra giá, MOQ, ngày giao hàng và yêu cầu báo giá."
   },
   "about.lock.desc": {
-    "en": "Price, minimum order quantity (MOQ), delivery date, and supply conditions can only be checked on accounts that have completed business verification. We protect the supplier's transaction information while providing the necessary information to buyers for actual purchase purposes.",
-    "ko": "가격·최소주문수량(MOQ)·납기·공급조건은 사업자 인증을 완료한 계정에서만 확인할 수 있습니다. 공급사의 거래정보를 보호하면서 실제 구매 목적의 바이어에게 필요한 정보를 제공합니다.",
+    "en": "Price, minimum order quantity (MOQ), delivery date, and supply conditions can only be checked on accounts that have completed business verification. We protect the supplier's transaction information while providing the necessary information to distribution partners for actual purchase purposes.",
+    "ko": "가격·최소주문수량(MOQ)·납기·공급조건은 사업자 인증을 완료한 계정에서만 확인할 수 있습니다. 공급사의 거래정보를 보호하면서 실제 구매 목적의 유통 파트너에게 필요한 정보를 제공합니다.",
     "vi": "Giá, số lượng đặt hàng tối thiểu (MOQ), ngày giao hàng và điều kiện cung cấp chỉ có thể được kiểm tra trên các tài khoản đã hoàn tất xác minh doanh nghiệp. Chúng tôi bảo vệ thông tin giao dịch của nhà cung cấp đồng thời cung cấp thông tin cần thiết cho người mua vì mục đích mua hàng thực tế."
   },
   "about.lock.note": {
@@ -191,8 +190,8 @@ window.MK_COPY_BAKED = {
     "vi": "Kiểm tra các điều khoản giao dịch được nhà cung cấp đăng ký ngay sau khi xác minh."
   },
   "ui.kr_cta_title": {
-    "en": "Are you looking for overseas buyers?",
-    "ko": "해외 바이어를 찾고 계신가요?",
+    "en": "Are you looking for overseas distribution partners?",
+    "ko": "해외 유통 파트너를 찾고 계신가요?",
     "vi": "Bạn đang tìm kiếm người mua ở nước ngoài?"
   },
   "about.problem.h2": {

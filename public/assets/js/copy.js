@@ -9,7 +9,7 @@
 
    경로 규칙
      ui.nav_directory          공통 UI (i18n.js 의 키)
-     about.hero.h1             바이어 랜딩 (about-copy.js 의 AB)
+     about.hero.h1             유통 파트너 랜딩 (about-copy.js 의 AB)
      maker.hero.h1             공급사 랜딩 (data.js 의 MK_MAKER)
      site.topbar               상단 배너 (MK_SETTINGS)
 
@@ -24,7 +24,7 @@ function mkCopySources(){
   return [
     { id:'ui',    label:'공통 UI',        hint:'메뉴·버튼·라벨·안내문. 모든 페이지에 쓰인다',
       kind:'i18n', root:(typeof I18N !== 'undefined') ? I18N : null },
-    { id:'about', label:'서비스 소개(바이어)', hint:'about.html 본문',
+    { id:'about', label:'서비스 소개(유통 파트너)', hint:'about.html 본문',
       kind:'tree', root:(typeof AB !== 'undefined') ? AB : null },
     /* maker.html 은 한국 공급사 대상이라 문구가 한국어 평문이다 */
     { id:'makerbody', label:'공급사 안내 본문', hint:'maker.html 전체 — 히어로·비교표·절차·FAQ·신청 폼',
@@ -175,7 +175,7 @@ function mkCopyGroup(field){
    (예전엔 admin.js 안에만 있어서 사이트 쪽에서는 못 썼다)
 
    ⚠ 기계번역이다. 채워 넣은 뒤 사람이 한 번 봐야 한다.
-     특히 베트남어는 바이어가 첫 화면에서 보는 말이다.
+     특히 베트남어는 유통 파트너가 첫 화면에서 보는 말이다.
    ============================================================ */
 
 /* 키가 필요 없는 무료 엔드포인트. 실패하면 다른 곳으로 한 번 더 시도한다 */

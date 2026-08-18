@@ -1,5 +1,5 @@
 /* ============================================================
-   MAKENOV — 바이어 랜딩(about.html) 카피
+   MAKENOV — 유통 파트너 랜딩(about.html) 카피
    ------------------------------------------------------------
    ★ 한국어가 원본이다. vi/en 은 한국어가 확정된 뒤에 맞춘다.
 
@@ -12,7 +12,7 @@
 const AB = {
 
 hero:{
-  kick:{ko:'바이어 전용', vi:'Dành cho nhà mua', en:'For buyers'},
+  kick:{ko:'유통 파트너 전용', vi:'Dành cho nhà phân phối', en:'For distribution partners'},
   h1:{ko:'전 세계 혁신 제품을 한자리에서 보고,\n공급사에 바로 미팅을 요청합니다.',
       vi:'Xem sản phẩm đổi mới từ khắp thế giới ở một nơi,\nvà đặt lịch trao đổi thẳng với nhà sản xuất.',
       en:'See innovative products from around the world in one place,\nand request a meeting with the manufacturer directly.'},
@@ -93,9 +93,9 @@ lock:{
     lead:{ko:'30일',vi:'30 ngày',en:'30 days'},
     terms:{ko:'FOB · OEM',vi:'FOB · OEM',en:'FOB · OEM'},
   },
-  h2:{ko:'가격은 인증한 바이어에게만 보냅니다',
-      vi:'Giá chỉ được gửi tới nhà mua đã xác thực',
-      en:'Prices are sent only to verified buyers'},
+  h2:{ko:'가격은 인증한 유통 파트너에게만 보냅니다',
+      vi:'Giá chỉ được gửi tới nhà phân phối đã xác thực',
+      en:'Prices are sent only to verified distribution partners'},
   desc:{ko:'단가, 최소주문수량, 납기, 공급 조건은 사업자 인증을 통과한 계정에만 전송됩니다. 화면에서 가리는 방식이 아니라 인증 전에는 데이터를 아예 보내지 않습니다.',
         vi:'Đơn giá, số lượng tối thiểu, thời gian giao hàng và điều kiện cung ứng chỉ gửi tới tài khoản đã xác thực doanh nghiệp. Không phải che trên màn hình: chưa xác thực thì dữ liệu không được gửi đi.',
         en:'Unit price, minimum order quantity, lead time and supply terms are sent only to verified accounts. They are not masked on screen; before verification the data is not sent at all.'},

@@ -29,7 +29,17 @@ class App extends BaseConfig
      *
      * @var list<string>
      */
-    public array $allowedHostnames = [];
+    /* 시장별 서브도메인 분리 (2026-08-17).
+       vn=베트남어 실서비스, kr=한국 공급사, 루트=영어 글로벌(준비 중).
+       CI4 는 baseURL 의 호스트와 다른 호스트로 들어온 요청을 거부하므로
+       받아야 할 호스트를 전부 적어 둔다. baseURL 과 겹치는 값이 있어도 무해하다.
+       서버 .env 의 app.baseURL 이 어느 도메인이든 이 목록이면 세 곳 다 뜬다. */
+    public array $allowedHostnames = [
+        'makenov.com',
+        'www.makenov.com',
+        'vn.makenov.com',
+        'kr.makenov.com',
+    ];
 
     /**
      * --------------------------------------------------------------------------

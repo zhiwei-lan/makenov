@@ -20,11 +20,12 @@ class Rss extends Controller
 {
     private const ORIGIN = 'https://makenov.com';
 
-    /** 초기 칼럼 3편은 DB slug 가 비어 있다 — 구운 정적 페이지의 경로로 잇는다 */
+    /** 초기 칼럼은 DB slug 가 비어 있다. 구운 정적 페이지의 경로로 잇는다.
+        c-reply(공급사 첫 회신)는 2026-08-17 개편에서 삭제했다. 읽는 사람이
+        유통 파트너인데 답하는 쪽 관점으로 쓰인 글이라 자리가 맞지 않았다. */
     private const SLUG_FALLBACK = [
         'c-quote'  => 'quote-request-checklist',
         'c-sample' => 'sample-request-checklist',
-        'c-reply'  => 'supplier-first-reply',
     ];
 
     public function feed(): ResponseInterface

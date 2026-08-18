@@ -19,7 +19,7 @@ const MkData = {
   session: null,
   profile: null,
   admin: false,
-  termsLoaded: false,   // 인증 바이어일 때만 true
+  termsLoaded: false,   // 인증 유통 파트너일 때만 true
 
   async boot(){
     const { data:{ session } } = await SB.auth.getSession();
@@ -51,7 +51,7 @@ const MkData = {
     ]);
     if(co.error || pr.error) { console.error('MAKENOV 콘텐츠 로드 실패', co.error || pr.error); return; }
 
-    /* ★ 거래 조건은 별도 테이블. RLS 때문에 인증 바이어가 아니면 0건이 돌아온다.
+    /* ★ 거래 조건은 별도 테이블. RLS 때문에 인증 유통 파트너가 아니면 0건이 돌아온다.
        즉 미인증 사용자에게는 가격이 애초에 전송되지 않는다. */
     const tm = await SB.from('product_terms').select('*');
     const terms = {};

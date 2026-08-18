@@ -291,9 +291,9 @@ function imgSrc(v){
 const TABS = ['dash','inq','leads','buyers','products','columns','faq','notices','copy','seo','admins','settings'];
 const NAV = [
   { id:'dash',     label:'대시보드', title:'대시보드',      desc:'플랫폼 현황 한눈에 보기' },
-  { id:'inq',      label:'문의함',   title:'문의함',        desc:'바이어가 보낸 견적 문의' },
+  { id:'inq',      label:'문의함',   title:'문의함',        desc:'유통 파트너가 보낸 견적 문의' },
   { id:'leads',    label:'입점문의', title:'입점 문의',      desc:'제품 등록 랜딩(maker.html)으로 들어온 공급사' },
-  { id:'buyers',   label:'바이어',   title:'바이어 관리',    desc:'사업자 인증을 통과한 회원' },
+  { id:'buyers',   label:'유통 파트너',   title:'유통 파트너 관리',    desc:'사업자 인증을 통과한 회원' },
   { id:'products', label:'제품',     title:'제품 관리',      desc:'등록·수정 시 사이트에 즉시 반영' },
   { id:'columns',  label:'칼럼',     title:'칼럼 관리',      desc:'인사이트 글 작성 및 발행' },
   { id:'faq',      label:'FAQ',      title:'FAQ 관리',       desc:'메인페이지 자주 묻는 질문' },
@@ -402,17 +402,17 @@ function renderDash(){
   const peak = Math.max(1, ...days.map(d=>d.n));
 
   document.getElementById('tab-dash').innerHTML = `
-    <div class="kpi"><div class="kpi-card"><div class="lbl">누적 문의</div><div class="num">${inqs.length}</div><div class="sub">미처리 <b>${newCnt}</b>건</div></div><div class="kpi-card"><div class="lbl">인증 바이어</div><div class="num">${buyers.length}</div><div class="sub">VIP <b>${vipCnt}</b> · 정부DB인증 <b>${ntsCnt}</b></div></div><div class="kpi-card"><div class="lbl">등록 제품</div><div class="num">${MK_PRODUCTS.length}</div><div class="sub">추천 <b>${MK_PRODUCTS.filter(p=>p.featured).length}</b>건</div></div><div class="kpi-card"><div class="lbl">칼럼</div><div class="num">${MK_COLUMNS.length}</div><div class="sub">발행됨</div></div></div><div class="card"><div class="card-head"><h3>최근 7일 문의 추이</h3><span class="sp"></span><span class="note" style="margin:0">최대 ${peak}건</span></div><div style="display:flex;align-items:flex-end;gap:10px;height:130px;padding-top:6px">
+    <div class="kpi"><div class="kpi-card"><div class="lbl">누적 문의</div><div class="num">${inqs.length}</div><div class="sub">미처리 <b>${newCnt}</b>건</div></div><div class="kpi-card"><div class="lbl">인증 유통 파트너</div><div class="num">${buyers.length}</div><div class="sub">VIP <b>${vipCnt}</b> · 정부DB인증 <b>${ntsCnt}</b></div></div><div class="kpi-card"><div class="lbl">등록 제품</div><div class="num">${MK_PRODUCTS.length}</div><div class="sub">추천 <b>${MK_PRODUCTS.filter(p=>p.featured).length}</b>건</div></div><div class="kpi-card"><div class="lbl">칼럼</div><div class="num">${MK_COLUMNS.length}</div><div class="sub">발행됨</div></div></div><div class="card"><div class="card-head"><h3>최근 7일 문의 추이</h3><span class="sp"></span><span class="note" style="margin:0">최대 ${peak}건</span></div><div style="display:flex;align-items:flex-end;gap:10px;height:130px;padding-top:6px">
         ${days.map(d=>`
           <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;height:100%"><div style="flex:1;width:100%;display:flex;align-items:flex-end"><div title="${d.n}건" style="width:100%;height:${Math.round((d.n/peak)*100)}%;min-height:3px;
                 background:${d.n?'var(--mk-primary)':'#E9ECEF'};border-radius:5px 5px 0 0"></div></div><span style="font-size:11px;color:var(--adm-sub)">${d.label}</span></div>`).join('')}
       </div></div><div class="card"><div class="card-head"><h3>최근 문의</h3><span class="sp"></span><button class="btn btn-ghost btn-sm" onclick="showTab('inq')">전체 보기</button></div><div class="tbl-wrap"><table><thead><tr><th style="width:96px">일시</th><th>제품</th><th>회사</th><th>담당자</th><th style="width:76px">상태</th></tr></thead><tbody>${inqs.length ? inqs.slice(0,5).map(i=>{
           const p=mkProduct(i.pid), m=Admin.inqMeta(i.id), lb=ST_LABEL[m.status]||ST_LABEL.new;
           return `<tr><td>${new Date(i.createdAt).toLocaleDateString('ko-KR')}</td><td>${p?esc(p.name.ko||p.name.vi):esc(i.pid)}</td><td>${esc(i.company||'-')}</td><td>${esc(i.contactName||'-')}</td><td><span class="pill-st ${lb[1]}">${lb[0]}</span></td></tr>`;
-        }).join('') : `<tr class="empty-row"><td colspan="5">아직 접수된 문의가 없습니다</td></tr>`}</tbody></table></div></div><div class="card"><div class="card-head"><h3>최근 가입 바이어</h3><span class="sp"></span><button class="btn btn-ghost btn-sm" onclick="showTab('buyers')">전체 보기</button></div><div class="tbl-wrap"><table><thead><tr><th style="width:96px">가입일</th><th>국가</th><th>회사</th><th>인증</th><th style="width:76px">등급</th></tr></thead><tbody>${buyers.length ? buyers.slice(0,5).map(b=>{
+        }).join('') : `<tr class="empty-row"><td colspan="5">아직 접수된 문의가 없습니다</td></tr>`}</tbody></table></div></div><div class="card"><div class="card-head"><h3>최근 가입 유통 파트너</h3><span class="sp"></span><button class="btn btn-ghost btn-sm" onclick="showTab('buyers')">전체 보기</button></div><div class="tbl-wrap"><table><thead><tr><th style="width:96px">가입일</th><th>국가</th><th>회사</th><th>인증</th><th style="width:76px">등급</th></tr></thead><tbody>${buyers.length ? buyers.slice(0,5).map(b=>{
           const c=b.country?mkCountry(b.country):null, tier=Admin.tier(b.email);
           return `<tr><td>${b.createdAt?new Date(b.createdAt).toLocaleDateString('ko-KR'):'-'}</td><td>${c?c.flag:''} ${esc(b.countryName||'')}</td><td>${esc(b.company)}</td><td>${esc(VERIFY_LABEL[b.verifiedBy]||'-')}</td><td>${tier==='vip'?'<span class="pill-st st-vip">VIP</span>':'<span class="pill-st st-done">인증</span>'}</td></tr>`;
-        }).join('') : `<tr class="empty-row"><td colspan="5">아직 가입한 바이어가 없습니다</td></tr>`}</tbody></table></div></div><div class="card"><div class="card-head"><h3>바로가기</h3></div><div class="bar" style="margin:0"><button class="btn btn-primary btn-sm" onclick="showTab('products');pEditing='';pBlocks=[];renderProducts()">+ 제품 등록</button><button class="btn btn-ghost btn-sm" onclick="showTab('columns');cEditing='';renderColumns()">+ 칼럼 작성</button><button class="btn btn-ghost btn-sm" onclick="showTab('settings')">data.js 내보내기</button></div></div>`;
+        }).join('') : `<tr class="empty-row"><td colspan="5">아직 가입한 유통 파트너가 없습니다</td></tr>`}</tbody></table></div></div><div class="card"><div class="card-head"><h3>바로가기</h3></div><div class="bar" style="margin:0"><button class="btn btn-primary btn-sm" onclick="showTab('products');pEditing='';pBlocks=[];renderProducts()">+ 제품 등록</button><button class="btn btn-ghost btn-sm" onclick="showTab('columns');cEditing='';renderColumns()">+ 칼럼 작성</button><button class="btn btn-ghost btn-sm" onclick="showTab('settings')">data.js 내보내기</button></div></div>`;
 }
 
 /* ============================================================
@@ -464,7 +464,7 @@ function renderInq(){
   const filtered = (inqSearch || inqProd!=='all' || inqFilter!=='all' || inqSort!=='new');
 
   document.getElementById('tab-inq').innerHTML = `
-    <div class="card"><p class="note">바이어가 보낸 견적 문의입니다. <b>행을 누르면 문의 전문과 바이어 정보</b>가 열립니다.</p>
+    <div class="card"><p class="note">유통 파트너가 보낸 견적 문의입니다. <b>행을 누르면 문의 전문과 유통 파트너 정보</b>가 열립니다.</p>
     <div class="bar"><button class="btn btn-sm ${inqFilter==='all'?'btn-primary':'btn-ghost'}" onclick="inqFilter='all';renderInq()">전체 ${all.length}</button><button class="btn btn-sm ${inqFilter==='new'?'btn-primary':'btn-ghost'}" onclick="inqFilter='new';renderInq()">신규 ${cnt('new')}</button><button class="btn btn-sm ${inqFilter==='doing'?'btn-primary':'btn-ghost'}" onclick="inqFilter='doing';renderInq()">처리중 ${cnt('doing')}</button><button class="btn btn-sm ${inqFilter==='done'?'btn-primary':'btn-ghost'}" onclick="inqFilter='done';renderInq()">완료 ${cnt('done')}</button></div>
     <div class="bar">
       <input class="srch" style="min-width:220px" placeholder="회사·담당자·제품·내용·메모 검색" value="${esc(inqSearch)}" oninput="inqSearch=this.value;renderInq()">
@@ -489,7 +489,7 @@ function renderInq(){
 }
 
 /* ============================================================
-   상세 보기 모달 — 문의 · 바이어
+   상세 보기 모달 — 문의 · 유통 파트너
    ============================================================ */
 function openAdmModal(title, html){
   document.getElementById('adm-modal-title').textContent = title;
@@ -506,7 +506,7 @@ document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeAdmModal(); 
 const dl = rows => `<dl class="dl">${rows.filter(r=>r[1]).map(r=>`<dt>${esc(r[0])}</dt><dd>${r[2]==='raw'?r[1]:esc(r[1])}</dd>`).join('')}</dl>`;
 const fmtDT = s => s ? new Date(s).toLocaleString('ko-KR') : '-';
 
-/* 한 바이어의 문의 목록 (모달 안에서 서로 오갈 수 있게) */
+/* 한 유통 파트너의 문의 목록 (모달 안에서 서로 오갈 수 있게) */
 function inqsOfBuyer(email, exceptId){
   return (ADM.inqs||[]).filter(i=>i.buyerEmail===email && i.id!==exceptId);
 }
@@ -535,7 +535,7 @@ function openInq(id){
     <div class="mbox"><h4>문의 내용</h4>
       <div class="msg">${String(i.message||'').trim() ? esc(i.message) : '<span class="sub">내용 없이 문의만 눌렀습니다.</span>'}</div>
     </div>
-    <div class="mbox"><h4>보낸 바이어</h4>
+    <div class="mbox"><h4>보낸 유통 파트너</h4>
       ${dl([
         ['회사', i.company],
         ['등록번호', i.mst],
@@ -546,11 +546,11 @@ function openInq(id){
         ['전화', i.phone],
         ['메신저', i.zalo],
         ['인증', VERIFY_LABEL[i.verifiedBy] || i.verifiedBy],
-        ['등급', i.tier === 'vip' ? 'VIP' : '인증 바이어'],
+        ['등급', i.tier === 'vip' ? 'VIP' : '인증 유통 파트너'],
       ])}
-      ${buyer ? `<button class="btn btn-ghost btn-sm" onclick="openBuyer('${esc(buyer.email)}')">이 바이어 전체 보기</button>` : ''}
+      ${buyer ? `<button class="btn btn-ghost btn-sm" onclick="openBuyer('${esc(buyer.email)}')">이 유통 파트너 전체 보기</button>` : ''}
     </div>
-    <div class="mbox"><h4>같은 바이어의 다른 문의</h4>${miniInqList(inqsOfBuyer(i.buyerEmail, i.id))}</div>
+    <div class="mbox"><h4>같은 유통 파트너의 다른 문의</h4>${miniInqList(inqsOfBuyer(i.buyerEmail, i.id))}</div>
     <div class="mbox"><h4>처리</h4>
       <div class="bar" style="margin:0">
         <select class="srch" style="min-width:120px" onchange="admDo(Admin.setInqMeta('${i.id}',{status:this.value}),0)">
@@ -583,13 +583,13 @@ function openBuyer(email){
       ['메신저', b.messenger || b.zalo],
       ['인증 방식', VERIFY_LABEL[b.verifiedBy] || b.verifiedBy],
       ['인증 상태', b.status],
-      ['등급', tier === 'vip' ? 'VIP' : '인증 바이어'],
+      ['등급', tier === 'vip' ? 'VIP' : '인증 유통 파트너'],
     ])}
     <div class="mbox"><h4>문의 ${mine.length}건</h4>${miniInqList(mine)}</div>
     <div class="mbox"><h4>등급</h4>
       <select class="srch" style="min-width:150px"
         onchange="admDo(Admin.setTier('${esc(b.email)}',this.value),0);toastA('등급 변경됨')">
-        <option value="verified" ${tier!=='vip'?'selected':''}>인증 바이어</option>
+        <option value="verified" ${tier!=='vip'?'selected':''}>인증 유통 파트너</option>
         <option value="vip" ${tier==='vip'?'selected':''}>VIP</option></select>
       <p class="note" style="margin:8px 0 0">VIP로 올리면 한국 기업 직통 연락처를 열어줍니다.</p>
     </div>`);
@@ -611,16 +611,16 @@ function exportInquiries(){
 }
 
 /* ============================================================
-   2. 바이어
+   2. 유통 파트너
    ============================================================ */
 const VERIFY_LABEL = { gov:'국세청', nts:'국세청', checksum:'체크섬', domain:'도메인' };
 
-/* ---------- 바이어(회원) 필터 상태 ---------- */
+/* ---------- 유통 파트너(회원) 필터 상태 ---------- */
 let bSearch='', bCountry='all', bVerify='all', bTier='all', bSort='new';
 function bVerifyGroup(vb){ if(vb==='gov'||vb==='nts') return 'gov'; if(vb==='checksum') return 'checksum'; if(vb==='domain') return 'domain'; return 'other'; }
 function bInqCount(b){ return (ADM.inqs||[]).filter(i=>i.buyerEmail===b.email).length; }
 
-/* 검색·필터·정렬을 모두 적용한 바이어 목록 (테이블·CSV 공용) */
+/* 검색·필터·정렬을 모두 적용한 유통 파트너 목록 (테이블·CSV 공용) */
 function filteredBuyers(){
   const q = bSearch.trim().toLowerCase();
   let list = (ADM.buyers||[]).filter(b=>{
@@ -662,7 +662,7 @@ function renderBuyers(){
 
   document.getElementById('tab-buyers').innerHTML = `
     <div class="kpi" style="margin-bottom:16px">
-      <div class="kpi-card"><div class="lbl">전체 회원</div><div class="num">${all.length}</div><div class="sub">인증 바이어</div></div>
+      <div class="kpi-card"><div class="lbl">전체 회원</div><div class="num">${all.length}</div><div class="sub">인증 유통 파트너</div></div>
       <div class="kpi-card"><div class="lbl">VIP</div><div class="num">${vipCnt}</div><div class="sub">직통 연락처 열림</div></div>
       <div class="kpi-card"><div class="lbl">국세청 인증</div><div class="num">${govCnt}</div><div class="sub">정부 DB 대조 통과</div></div>
       <div class="kpi-card"><div class="lbl">진출 국가</div><div class="num">${countries.filter(k=>k!=='??').length}</div><div class="sub">국가 수</div></div>
@@ -686,8 +686,8 @@ function renderBuyers(){
         const n = bInqCount(b);
         return `<tr class="row-hover" style="cursor:pointer" onclick="if(!event.target.closest('input,select,button'))openBuyer('${esc(b.email)}')"><td>${b.createdAt?new Date(b.createdAt).toLocaleDateString('ko-KR'):'-'}</td><td>${c?c.flag:''} ${esc(b.countryName||b.country||'')}</td><td>${esc(b.company)}<div class="sub">${esc(b.address||'')}</div></td><td>${esc(b.regNo||b.mst||'-')}</td><td>${esc(VERIFY_LABEL[b.verifiedBy]||'-')}<div class="sub">${esc(b.status||'')}</div></td><td>${esc(b.contactName||'')}<div class="sub">${esc(b.position||'')}</div></td><td>${esc(b.phone||b.zalo||'')}<div class="sub">${esc(b.messenger||'')} ${esc(b.messengerId||'')}<br>${esc(b.email)}</div></td><td><b>${n}</b></td><td>${tier==='vip'?'<span class="pill-st st-vip">VIP</span>':'<span class="pill-st st-done">인증</span>'}
             <div style="margin-top:6px"><select class="srch" style="width:100%;min-width:0;font-size:12px;padding:5px 8px"
-                onchange="admDo(Admin.setTier('${esc(b.email)}',this.value),0);toastA('등급 변경됨')"><option value="verified" ${tier!=='vip'?'selected':''}>인증 바이어</option><option value="vip"${tier==='vip'?'selected':''}>VIP</option></select></div></td></tr>`;
-      }).join('') : `<tr class="empty-row"><td colspan="9">${all.length?'조건에 맞는 바이어가 없습니다':'아직 가입한 바이어가 없습니다'}</td></tr>`}
+                onchange="admDo(Admin.setTier('${esc(b.email)}',this.value),0);toastA('등급 변경됨')"><option value="verified" ${tier!=='vip'?'selected':''}>인증 유통 파트너</option><option value="vip"${tier==='vip'?'selected':''}>VIP</option></select></div></td></tr>`;
+      }).join('') : `<tr class="empty-row"><td colspan="9">${all.length?'조건에 맞는 유통 파트너가 없습니다':'아직 가입한 유통 파트너가 없습니다'}</td></tr>`}
       </tbody></table></div>
     </div>`;
 }
@@ -701,7 +701,7 @@ function exportBuyers(){
       b.contactName||'', b.position||'', b.phone||b.zalo||'', b.messenger||'', b.messengerId||'',
       b.email||'', Admin.tier(b.email)==='vip'?'VIP':'인증']);
   });
-  downloadFile('makenov-바이어_'+today()+'.csv',
+  downloadFile('makenov-유통 파트너_'+today()+'.csv',
     '﻿'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n'), 'text/csv');
 }
 
@@ -782,7 +782,7 @@ function productForm(id){
   const t3 = v => isLocked(v) ? {} : (typeof v==='string' ? {ko:v} : (v||{}));
   const pr = t3(p&&p.price), mq = t3(p&&p.moq), ld = t3(p&&p.lead), tm = t3(p&&p.terms);
   return `
-    <div class="card"><div class="bar"><h3 style="margin:0">${p?'제품 수정':'새 제품 등록'}</h3><span class="grow"></span><button class="btn btn-ghost btn-sm" onclick="autoTranslate(this,['f-name','f-tag','f-story','f-price','f-moq','f-lead','f-terms'],true)" title="한국어를 베트남어·영어로 자동 번역 (빈 칸만 채움)">🌐 한국어 자동번역</button><button class="btn btn-ghost btn-sm" onclick="pEditing=null;renderProducts()">취소</button><button class="btn btn-primary btn-sm" onclick="saveProduct('${id}')">저장</button></div><div class="fgrid two"><div class="fld"><label>브랜드 / 공급사</label><input id="f-brand" value="${esc(p?p.brand:'')}" placeholder="DAON COSMETIC"></div><div class="fld"><label>소재지</label><input id="f-origin" value="${esc(p?p.origin:'')}" placeholder="Daegu, Korea"></div></div><div class="fld"><label>카테고리</label><select id="f-cat">${MK_CATEGORIES.map(c=>`<option value="${c.id}" ${p&&p.cat===c.id?'selected':''}>${esc(c.name.ko)}</option>`).join('')}</select></div><div class="sect"><h4>제품명 (3개 국어)</h4><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span>한국어</label><input id="f-name-ko" value="${esc(g(nm,'ko'))}"></div><div class="fld"><label><span class="lang-tag">VI</span>베트남어</label><input id="f-name-vi" value="${esc(g(nm,'vi'))}"></div><div class="fld"><label><span class="lang-tag">EN</span>영어</label><input id="f-name-en" value="${esc(g(nm,'en'))}"></div></div></div><div class="sect"><h4>한 줄 소개 (3개 국어)</h4><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span>한국어</label><textarea id="f-tag-ko">${esc(g(tg,'ko'))}</textarea></div><div class="fld"><label><span class="lang-tag">VI</span>베트남어</label><textarea id="f-tag-vi">${esc(g(tg,'vi'))}</textarea></div><div class="fld"><label><span class="lang-tag">EN</span>영어</label><textarea id="f-tag-en">${esc(g(tg,'en'))}</textarea></div></div></div><div class="sect"><h4>대표 이미지</h4>${uploader('f-img', p?p.img:'', {hint:'목록·카드에 쓰이는 사진입니다. 끌어다 놓거나 파일을 선택하세요.'})}</div><div class="sect"><h4>갤러리 <span style="color:var(--adm-sub);font-size:11px"> 상세페이지 상단 슬라이드</span></h4><div class="gal-grid" id="gal-list"></div><div class="bar" style="margin:12px 0 0"><button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('gal-file').click()">사진 추가 (여러 장 선택 가능)</button><input type="file" id="gal-file" accept="image/*" multiple hidden onchange="galAdd(this)"><span class="hint" id="gal-info" style="margin:0">비워두면 대표 이미지만 사용됩니다.</span></div></div><div class="sect"><h4>대표 영상 <span style="color:var(--mk-muted);font-size:11px"> 선택 · 없으면 비워두세요</span></h4><div class="fld"><label>영상 URL</label><input id="f-video" value="${esc(p&&p.video?p.video:'')}" placeholder="https://www.youtube.com/watch?v=... 또는 https://youtu.be/..."><p class="hint">유튜브·Vimeo 주소를 그대로 붙여넣으면 됩니다. 비워두면 상세페이지에 영상 영역이 아예 표시되지 않습니다.</p></div></div><div class="sect"><h4>거래 조건 (3개 국어) <span style="color:var(--mk-lock);font-size:11px"> 인증 바이어만 열람</span></h4><div style="margin:4px 0 6px;font-weight:600;font-size:13px">가격 / 공급가 <span style="color:var(--mk-accent);font-size:11px">USD 표기 권장</span></div><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span>한국어</label><input id="f-price-ko" value="${esc(g(pr,'ko'))}" placeholder="US$ 4.20 / unit (FOB Busan)"></div><div class="fld"><label><span class="lang-tag">VI</span>베트남어</label><input id="f-price-vi" value="${esc(g(pr,'vi'))}"></div><div class="fld"><label><span class="lang-tag">EN</span>영어</label><input id="f-price-en" value="${esc(g(pr,'en'))}"></div></div><div style="margin:14px 0 6px;font-weight:600;font-size:13px">최소주문수량 MOQ</div><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span>한국어</label><input id="f-moq-ko" value="${esc(g(mq,'ko'))}" placeholder="3,000 units"></div><div class="fld"><label><span class="lang-tag">VI</span>베트남어</label><input id="f-moq-vi" value="${esc(g(mq,'vi'))}"></div><div class="fld"><label><span class="lang-tag">EN</span>영어</label><input id="f-moq-en" value="${esc(g(mq,'en'))}"></div></div><div style="margin:14px 0 6px;font-weight:600;font-size:13px">납기</div><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span>한국어</label><input id="f-lead-ko" value="${esc(g(ld,'ko'))}" placeholder="30 days"></div><div class="fld"><label><span class="lang-tag">VI</span>베트남어</label><input id="f-lead-vi" value="${esc(g(ld,'vi'))}"></div><div class="fld"><label><span class="lang-tag">EN</span>영어</label><input id="f-lead-en" value="${esc(g(ld,'en'))}"></div></div><div style="margin:14px 0 6px;font-weight:600;font-size:13px">공급 조건</div><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span>한국어</label><input id="f-terms-ko" value="${esc(g(tm,'ko'))}" placeholder="OEM/ODM available"></div><div class="fld"><label><span class="lang-tag">VI</span>베트남어</label><input id="f-terms-vi" value="${esc(g(tm,'vi'))}"></div><div class="fld"><label><span class="lang-tag">EN</span>영어</label><input id="f-terms-en" value="${esc(g(tm,'en'))}"></div></div><label class="chk" style="margin-top:12px;display:inline-flex;gap:8px;align-items:center"><input type="checkbox" id="f-nego" ${p&&p.negotiable?'checked':''}> 가격 협의 가능 — 상세페이지 가격 옆에 <b>협의 가능</b> 배지 표시</label></div><div class="sect"><h4>브랜드 소개 (3개 국어)</h4><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span>한국어</label><textarea id="f-story-ko">${esc(g(bs,'ko'))}</textarea></div><div class="fld"><label><span class="lang-tag">VI</span>베트남어</label><textarea id="f-story-vi">${esc(g(bs,'vi'))}</textarea></div><div class="fld"><label><span class="lang-tag">EN</span>영어</label><textarea id="f-story-en">${esc(g(bs,'en'))}</textarea></div></div></div><div class="sect"><h4>상세 페이지 구성</h4><div id="blk-list"></div><div class="bar" style="margin:12px 0 0"><button class="btn btn-primary btn-sm" onclick="document.getElementById('detail-file').click()">상세페이지 통이미지 올리기 (여러 장 선택 가능)</button><input type="file" id="detail-file" accept="image/*" multiple hidden onchange="detailUpload(this)"><button class="btn btn-ghost btn-sm" onclick="addBlock('p')">+ 문단</button><button class="btn btn-ghost btn-sm" onclick="addBlock('img')">+ 이미지</button><button class="btn btn-ghost btn-sm" onclick="addBlock('video')">+ 영상</button></div><p class="hint" id="detail-info" style="margin:8px 0 0">세로로 긴 상세페이지 이미지를 그대로 올리세요. 가로 해상도는 유지하고 세로만 자동으로 나눠 담습니다.<br>상세페이지가 <b>여러 장으로 나뉘어 있으면 한 번에 모두 선택</b>하세요 — 파일명 순서(1, 2, 3 …)대로 이어 붙입니다.</p></div><div class="sect"><h4>노출 설정</h4><div class="fgrid"><div class="fld"><label>문의 수</label><input id="f-inq" type="number" value="${p?p.inquiries:0}"></div><div class="fld"><label>관심 수</label><input id="f-views" type="number" value="${p?p.views:0}"></div><div class="fld"><label>등록일</label><input id="f-date" value="${esc(p?p.createdAt:today())}"></div></div><div style="display:flex;gap:22px;margin-top:4px"><label class="chk"><input type="checkbox" id="f-featured" ${p&&p.featured?'checked':''}> 추천 제품 (홈 상단 노출)</label><label class="chk"><input type="checkbox" id="f-new" ${p&&p.isNew?'checked':''}> 신규 배지 표시</label></div></div><div class="bar" style="margin-top:22px"><span class="grow"></span><button class="btn btn-ghost" onclick="pEditing=null;renderProducts()">취소</button><button class="btn btn-primary" onclick="saveProduct('${id}')">저장</button></div></div>`;
+    <div class="card"><div class="bar"><h3 style="margin:0">${p?'제품 수정':'새 제품 등록'}</h3><span class="grow"></span><button class="btn btn-ghost btn-sm" onclick="autoTranslate(this,['f-name','f-tag','f-story','f-price','f-moq','f-lead','f-terms'],true)" title="한국어를 베트남어·영어로 자동 번역 (빈 칸만 채움)">🌐 한국어 자동번역</button><button class="btn btn-ghost btn-sm" onclick="pEditing=null;renderProducts()">취소</button><button class="btn btn-primary btn-sm" onclick="saveProduct('${id}')">저장</button></div><div class="fgrid two"><div class="fld"><label>브랜드 / 공급사</label><input id="f-brand" value="${esc(p?p.brand:'')}" placeholder="DAON COSMETIC"></div><div class="fld"><label>소재지</label><input id="f-origin" value="${esc(p?p.origin:'')}" placeholder="Daegu, Korea"></div></div><div class="fld"><label>카테고리</label><select id="f-cat">${MK_CATEGORIES.map(c=>`<option value="${c.id}" ${p&&p.cat===c.id?'selected':''}>${esc(c.name.ko)}</option>`).join('')}</select></div><div class="sect"><h4>제품명 (3개 국어)</h4><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span>한국어</label><input id="f-name-ko" value="${esc(g(nm,'ko'))}"></div><div class="fld"><label><span class="lang-tag">VI</span>베트남어</label><input id="f-name-vi" value="${esc(g(nm,'vi'))}"></div><div class="fld"><label><span class="lang-tag">EN</span>영어</label><input id="f-name-en" value="${esc(g(nm,'en'))}"></div></div></div><div class="sect"><h4>한 줄 소개 (3개 국어)</h4><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span>한국어</label><textarea id="f-tag-ko">${esc(g(tg,'ko'))}</textarea></div><div class="fld"><label><span class="lang-tag">VI</span>베트남어</label><textarea id="f-tag-vi">${esc(g(tg,'vi'))}</textarea></div><div class="fld"><label><span class="lang-tag">EN</span>영어</label><textarea id="f-tag-en">${esc(g(tg,'en'))}</textarea></div></div></div><div class="sect"><h4>대표 이미지</h4>${uploader('f-img', p?p.img:'', {hint:'목록·카드에 쓰이는 사진입니다. 끌어다 놓거나 파일을 선택하세요.'})}</div><div class="sect"><h4>갤러리 <span style="color:var(--adm-sub);font-size:11px"> 상세페이지 상단 슬라이드</span></h4><div class="gal-grid" id="gal-list"></div><div class="bar" style="margin:12px 0 0"><button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('gal-file').click()">사진 추가 (여러 장 선택 가능)</button><input type="file" id="gal-file" accept="image/*" multiple hidden onchange="galAdd(this)"><span class="hint" id="gal-info" style="margin:0">비워두면 대표 이미지만 사용됩니다.</span></div></div><div class="sect"><h4>대표 영상 <span style="color:var(--mk-muted);font-size:11px"> 선택 · 없으면 비워두세요</span></h4><div class="fld"><label>영상 URL</label><input id="f-video" value="${esc(p&&p.video?p.video:'')}" placeholder="https://www.youtube.com/watch?v=... 또는 https://youtu.be/..."><p class="hint">유튜브·Vimeo 주소를 그대로 붙여넣으면 됩니다. 비워두면 상세페이지에 영상 영역이 아예 표시되지 않습니다.</p></div></div><div class="sect"><h4>거래 조건 (3개 국어) <span style="color:var(--mk-lock);font-size:11px"> 인증 유통 파트너만 열람</span></h4><div style="margin:4px 0 6px;font-weight:600;font-size:13px">가격 / 공급가 <span style="color:var(--mk-accent);font-size:11px">USD 표기 권장</span></div><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span>한국어</label><input id="f-price-ko" value="${esc(g(pr,'ko'))}" placeholder="US$ 4.20 / unit (FOB Busan)"></div><div class="fld"><label><span class="lang-tag">VI</span>베트남어</label><input id="f-price-vi" value="${esc(g(pr,'vi'))}"></div><div class="fld"><label><span class="lang-tag">EN</span>영어</label><input id="f-price-en" value="${esc(g(pr,'en'))}"></div></div><div style="margin:14px 0 6px;font-weight:600;font-size:13px">최소주문수량 MOQ</div><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span>한국어</label><input id="f-moq-ko" value="${esc(g(mq,'ko'))}" placeholder="3,000 units"></div><div class="fld"><label><span class="lang-tag">VI</span>베트남어</label><input id="f-moq-vi" value="${esc(g(mq,'vi'))}"></div><div class="fld"><label><span class="lang-tag">EN</span>영어</label><input id="f-moq-en" value="${esc(g(mq,'en'))}"></div></div><div style="margin:14px 0 6px;font-weight:600;font-size:13px">납기</div><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span>한국어</label><input id="f-lead-ko" value="${esc(g(ld,'ko'))}" placeholder="30 days"></div><div class="fld"><label><span class="lang-tag">VI</span>베트남어</label><input id="f-lead-vi" value="${esc(g(ld,'vi'))}"></div><div class="fld"><label><span class="lang-tag">EN</span>영어</label><input id="f-lead-en" value="${esc(g(ld,'en'))}"></div></div><div style="margin:14px 0 6px;font-weight:600;font-size:13px">공급 조건</div><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span>한국어</label><input id="f-terms-ko" value="${esc(g(tm,'ko'))}" placeholder="OEM/ODM available"></div><div class="fld"><label><span class="lang-tag">VI</span>베트남어</label><input id="f-terms-vi" value="${esc(g(tm,'vi'))}"></div><div class="fld"><label><span class="lang-tag">EN</span>영어</label><input id="f-terms-en" value="${esc(g(tm,'en'))}"></div></div><label class="chk" style="margin-top:12px;display:inline-flex;gap:8px;align-items:center"><input type="checkbox" id="f-nego" ${p&&p.negotiable?'checked':''}> 가격 협의 가능 — 상세페이지 가격 옆에 <b>협의 가능</b> 배지 표시</label></div><div class="sect"><h4>브랜드 소개 (3개 국어)</h4><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span>한국어</label><textarea id="f-story-ko">${esc(g(bs,'ko'))}</textarea></div><div class="fld"><label><span class="lang-tag">VI</span>베트남어</label><textarea id="f-story-vi">${esc(g(bs,'vi'))}</textarea></div><div class="fld"><label><span class="lang-tag">EN</span>영어</label><textarea id="f-story-en">${esc(g(bs,'en'))}</textarea></div></div></div><div class="sect"><h4>상세 페이지 구성</h4><div id="blk-list"></div><div class="bar" style="margin:12px 0 0"><button class="btn btn-primary btn-sm" onclick="document.getElementById('detail-file').click()">상세페이지 통이미지 올리기 (여러 장 선택 가능)</button><input type="file" id="detail-file" accept="image/*" multiple hidden onchange="detailUpload(this)"><button class="btn btn-ghost btn-sm" onclick="addBlock('p')">+ 문단</button><button class="btn btn-ghost btn-sm" onclick="addBlock('img')">+ 이미지</button><button class="btn btn-ghost btn-sm" onclick="addBlock('video')">+ 영상</button></div><p class="hint" id="detail-info" style="margin:8px 0 0">세로로 긴 상세페이지 이미지를 그대로 올리세요. 가로 해상도는 유지하고 세로만 자동으로 나눠 담습니다.<br>상세페이지가 <b>여러 장으로 나뉘어 있으면 한 번에 모두 선택</b>하세요 — 파일명 순서(1, 2, 3 …)대로 이어 붙입니다.</p></div><div class="sect"><h4>노출 설정</h4><div class="fgrid"><div class="fld"><label>문의 수</label><input id="f-inq" type="number" value="${p?p.inquiries:0}"></div><div class="fld"><label>관심 수</label><input id="f-views" type="number" value="${p?p.views:0}"></div><div class="fld"><label>등록일</label><input id="f-date" value="${esc(p?p.createdAt:today())}"></div></div><div style="display:flex;gap:22px;margin-top:4px"><label class="chk"><input type="checkbox" id="f-featured" ${p&&p.featured?'checked':''}> 추천 제품 (홈 상단 노출)</label><label class="chk"><input type="checkbox" id="f-new" ${p&&p.isNew?'checked':''}> 신규 배지 표시</label></div></div><div class="bar" style="margin-top:22px"><span class="grow"></span><button class="btn btn-ghost" onclick="pEditing=null;renderProducts()">취소</button><button class="btn btn-primary" onclick="saveProduct('${id}')">저장</button></div></div>`;
 }
 
 /* 상세 블록 편집기 */
@@ -933,7 +933,7 @@ function renderColFaqs(){
   if(!el) return;
   el.innerHTML = cFaqs.length ? cFaqs.map((f,i)=>`
     <div class="cfaq" data-i="${i}"><div class="bar" style="margin-bottom:10px"><b style="font-size:13px">Q${i+1}</b><span class="grow"></span><button type="button" class="btn btn-ghost btn-sm" onclick="autoTranslate(this,['cf${i}-q','cf${i}-a'],false)" title="한국어를 베트남어·영어로 자동 번역 (빈 칸만 채움)">🌐</button><button type="button" class="btn btn-ghost btn-sm" onclick="delColFaq(${i})">삭제</button></div><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span>질문</label><input id="cf${i}-q-ko" value="${esc(f.q.ko||'')}"></div><div class="fld"><label><span class="lang-tag">VI</span></label><input id="cf${i}-q-vi" value="${esc(f.q.vi||'')}"></div><div class="fld"><label><span class="lang-tag">EN</span></label><input id="cf${i}-q-en" value="${esc(f.q.en||'')}"></div></div><div class="fgrid" style="margin-top:8px"><div class="fld"><label><span class="lang-tag">KO</span>답변</label><textarea id="cf${i}-a-ko" rows="3">${esc(f.a.ko||'')}</textarea></div><div class="fld"><label><span class="lang-tag">VI</span></label><textarea id="cf${i}-a-vi" rows="3">${esc(f.a.vi||'')}</textarea></div><div class="fld"><label><span class="lang-tag">EN</span></label><textarea id="cf${i}-a-en" rows="3">${esc(f.a.en||'')}</textarea></div></div></div>`).join('')
-    : `<p class="hint" style="margin:0">아직 질문이 없습니다. 바이어가 이 글을 읽고 물어볼 만한 것을 넣어주세요.</p>`;
+    : `<p class="hint" style="margin:0">아직 질문이 없습니다. 유통 파트너가 이 글을 읽고 물어볼 만한 것을 넣어주세요.</p>`;
 }
 /* 화면의 입력값을 작업 사본으로 되읽는다 — 추가·삭제로 다시 그리기 전에 호출 */
 function syncColFaqs(){
@@ -1002,7 +1002,7 @@ function renderFaqTab(){
   const colCnt = (typeof MK_FAQ !== 'undefined' ? MK_FAQ : []).filter(f => (f.page||'home') !== 'home').length;
   el.innerHTML = `
     <div class="card"><p class="note">메인페이지 하단 <b>자주 묻는 질문</b>입니다.
-      검색엔진과 AI(FAQPage 스키마)에도 전달되므로 바이어가 실제로 묻는 질문 위주로 관리하세요.
+      검색엔진과 AI(FAQPage 스키마)에도 전달되므로 유통 파트너가 실제로 묻는 질문 위주로 관리하세요.
       ${colCnt?`칼럼에 달린 FAQ ${colCnt}개는 <b>칼럼 탭 → 해당 칼럼 수정</b> 화면에서 편집합니다.`:'칼럼별 FAQ는 <b>칼럼 수정 화면</b>에서 함께 작성합니다.'}
       수정 후 배포 전에는 <code>node bake.js</code>를 다시 실행해야 스키마에 반영됩니다.</p><div class="bar"><span class="grow"></span><button class="btn btn-primary btn-sm" onclick="fEditing='';renderFaqTab()">+ 새 질문</button></div><div class="tbl-wrap"><table><thead><tr><th style="width:64px">순서</th><th>질문</th><th style="width:80px">노출</th><th style="width:120px"></th></tr></thead><tbody>${list.length ? list.map(f=>`
         <tr class="row-hover"><td>${f.sort||0}</td><td><b>${esc((f.q&&(f.q.ko||f.q.vi))||'')}</b><div class="sub">${esc((f.q&&f.q.vi)||'')}</div></td><td>${f.published!==false?'노출':'<span style="color:#B02A37">숨김</span>'}</td><td><button class="btn btn-ghost btn-sm" onclick="fEditing='${f.id}';renderFaqTab()">수정</button><button class="btn btn-ghost btn-sm" onclick="if(confirm('삭제할까요?')){admDo(Admin.deleteFaq('${f.id}'));}">삭제</button></td></tr>`).join('') : `<tr class="empty-row"><td colspan="4">FAQ가 없습니다</td></tr>`}
@@ -1143,7 +1143,7 @@ async function cpTranslate(path, btn, quiet){
 }
 
 /* 한국어만 고치고 저장하면 베트남어·영어는 옛 문구로 남는다.
-   그러면 언어마다 다른 말을 하게 되는데, 바이어 대부분이 베트남 사람이라 이게 제일 나쁘다.
+   그러면 언어마다 다른 말을 하게 되는데, 유통 파트너 대부분이 베트남 사람이라 이게 제일 나쁘다.
    저장 직전에 그런 항목을 찾아 번역할지 물어본다. */
 function cpKoOnlyEdits(){
   const all = mkCopyFields();
@@ -1727,7 +1727,7 @@ function renderSettings(){
       다른 기기와 배포 사이트에도 반영됩니다.</p><div class="bar"><button class="btn btn-primary btn-sm" onclick="exportDataJs()">data.js 내려받기</button><button class="btn btn-ghost btn-sm" onclick="exportJson()">전체 백업 (JSON)</button><label class="btn btn-ghost btn-sm" style="cursor:pointer;margin:0">
           백업 복원<input type="file" accept=".json" style="display:none" onchange="importJson(this)"></label></div></div>${isSB() ? `<div class="card"><h3>비밀번호 변경</h3><p class="note" style="margin:0">서버 모드에서는 관리자마다 계정과 비밀번호가 따로 있습니다.
       왼쪽 메뉴 <b>관리자</b> 탭에서 변경하세요 — 아래 게이트 비밀번호는 이 모드에서 쓰이지 않습니다.</p></div>` : `<div class="card"><h3>비밀번호 변경</h3><div class="fgrid two"><div class="fld"><label>새 비밀번호</label><input id="set-pw" type="password"></div><div class="fld"><label>새 비밀번호 확인</label><input id="set-pw2" type="password"></div></div><button class="btn btn-primary btn-sm" onclick="changePw()">변경</button><p class="note" style="margin:12px 0 0"> 이 관리자는 브라우저에서 동작하는 임시 게이트입니다.
-      실제 서비스에서는 2단계 Supabase 인증으로 교체해야 합니다.</p></div>`}<div class="card"><h3>편집 내용 초기화</h3><p class="note">관리자에서 편집한 제품·칼럼을 모두 버리고 최초 시드 데이터로 되돌립니다. 문의·바이어 데이터는 유지됩니다.</p><button class="btn btn-ghost btn-sm"
+      실제 서비스에서는 2단계 Supabase 인증으로 교체해야 합니다.</p></div>`}<div class="card"><h3>편집 내용 초기화</h3><p class="note">관리자에서 편집한 제품·칼럼을 모두 버리고 최초 시드 데이터로 되돌립니다. 문의·유통 파트너 데이터는 유지됩니다.</p><button class="btn btn-ghost btn-sm"
         onclick="if(confirm('편집한 제품·칼럼을 모두 버리고 초기 상태로 되돌립니다.\\n계속할까요?')){Admin.resetContent();location.reload();}">초기 데이터로 되돌리기</button></div><div class="card"><h3>업로드 이미지 저장공간</h3><p class="note">올린 사진은 <b>이 브라우저 안에</b> 저장됩니다(IndexedDB).
       업로드 시 자동으로 긴 변 1600px · JPEG 품질 82%로 압축합니다.
       다른 기기나 실제 서버에 반영하려면 위의 <b>JSON 백업</b>을 받아 옮기세요.

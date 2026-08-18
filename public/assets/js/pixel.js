@@ -11,7 +11,7 @@
      ViewContent          제품 상세 (광고 목적지)
      AddToWishlist        관심제품 담기
      InitiateCheckout     견적 문의 모달 열기
-     Lead                 견적 문의 발송 / 바이어 간편문의
+     Lead                 견적 문의 발송 / 유통 파트너 간편문의
      CompleteRegistration 가입 + 사업자 인증 완료
      SubmitApplication    공급사 입점 문의 (maker.html — 공급자 퍼널)
 

@@ -144,7 +144,7 @@ function closeModal(){ const b=document.getElementById('mk-modal-back'); if(b) b
 /* ---------- auth modal — 단일 화면 가입 ----------
    이전에는 3단계로 나눠 받았는데, 단계마다 이탈이 생겼다.
    지금은 한 화면에 전부 보여주고, 사업자 인증만 그 자리에서 인라인으로 처리한다.
-   인증에 실패하거나 번호가 없는 바이어도 '간편 문의'로 빠져나가지 않게 한다. */
+   인증에 실패하거나 번호가 없는 유통 파트너도 '간편 문의'로 빠져나가지 않게 한다. */
 let _verified = null;          // 인증 통과 결과
 let _suCountry = 'VN';         // 선택된 국가
 
@@ -379,7 +379,7 @@ async function suDone(){
 }
 
 /* ---------- 간편 문의 ----------
-   사업자 인증이 안 되거나 번호가 없는 바이어를 그냥 놓치지 않기 위한 경로.
+   사업자 인증이 안 되거나 번호가 없는 유통 파트너를 그냥 놓치지 않기 위한 경로.
    가입 없이 연락처만 받아 관리자가 직접 인증을 도와준다. */
 function openEasyLead(){
   const c = mkCountry(_suCountry);
@@ -412,8 +412,8 @@ async function sendEasyLead(){
   await Store.addMakerLead({
     company: v('ez-company'), name: v('ez-name'),
     tel: v('ez-tel') || '-', email: v('ez-email') || '-',
-    site: '', cat: 'buyer',                    // cat=buyer → 관리자에서 바이어 문의로 구분
-    message: '[바이어 간편문의 · ' + _suCountry + '] ' + v('ez-msg'),
+    site: '', cat: 'buyer',                    // cat=buyer → 관리자에서 유통 파트너 문의로 구분
+    message: '[유통 파트너 간편문의 · ' + _suCountry + '] ' + v('ez-msg'),
   });
   mkTrack('Lead', { content_category:'easy_lead', country:_suCountry });
   closeModal();

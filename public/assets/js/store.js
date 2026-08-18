@@ -206,7 +206,7 @@ const Admin = {
     localStorage.setItem('mk_maker_leads', JSON.stringify(Store.allMakerLeads().filter(l=>l.id!==id)));
   },
 
-  /* ---- 바이어 등급 (VIP 승격) ---- */
+  /* ---- 유통 파트너 등급 (VIP 승격) ---- */
   _tiers(){ try{ return JSON.parse(localStorage.getItem('mk_buyer_tier')||'{}'); }catch(e){ return {}; } },
   tier(email){ return this._tiers()[email] || 'verified'; },
   setTier(email, tier){
