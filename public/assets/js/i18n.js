@@ -1305,7 +1305,7 @@ function t(key){ return (I18N[MK_LANG] && I18N[MK_LANG][key]) || I18N.vi[key] ||
 
 /* 언어판이 있는 페이지 목록. 여기 있는 것만 .ko.html / .en.html 이 실제로 구워진다.
    (maker.html 은 한국어 전용, mypage·admin 은 비공개라 언어판이 없다) */
-const MK_LANG_PAGES = ['index.html','directory.html','companies.html','columns.html',
+const MK_LANG_PAGES = ['index.html','products.html','directory.html','companies.html','columns.html',
                        'about.html','guide.html','support.html'];
 
 /* 사이트 루트의 경로.
