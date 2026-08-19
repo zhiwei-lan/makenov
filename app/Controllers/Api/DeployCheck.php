@@ -17,13 +17,30 @@ use CodeIgniter\HTTP\ResponseInterface;
 class DeployCheck extends Controller
 {
     /** 배포 확인용 마커. 배포를 검증할 때마다 숫자를 올린다. */
-    private const MARKER = 'deploy-check-69';
+    private const MARKER = 'deploy-check-70';
 
     public function index(): ResponseInterface
     {
+        $body = self::MARKER;
+        /* ?diag=1 — 이미지 WebP 변환 경로 진단 (GD·webp 지원·캐시 디렉터리 쓰기). 민감정보 없음 */
+        if ($this->request->getGet('diag') === '1') {
+            $gd = function_exists('gd_info') ? gd_info() : [];
+            $dir = WRITEPATH . 'cache' . DIRECTORY_SEPARATOR . 'img';
+            @mkdir($dir, 0775, true);
+            $body .= "
+" . json_encode([
+                'php'        => PHP_VERSION,
+                'gd'         => function_exists('gd_info'),
+                'imagewebp'  => function_exists('imagewebp'),
+                'webp'       => (bool) ($gd['WebP Support'] ?? false),
+                'cache_dir'  => is_dir($dir),
+                'cache_writable' => is_writable($dir),
+                'env'        => ENVIRONMENT,
+            ]);
+        }
         return $this->response
             ->setContentType('text/plain')
             ->setHeader('Cache-Control', 'no-store')
-            ->setBody(self::MARKER);
+            ->setBody($body);
     }
 }

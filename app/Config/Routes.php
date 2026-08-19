@@ -18,8 +18,9 @@ use CodeIgniter\Router\RouteCollection;
 
 /* GET+HEAD — HEAD 가 404 면 링크 체커·일부 봇이 홈을 죽은 페이지로 본다(2026-08-19 점검) */
 $routes->match(['GET', 'HEAD'], '/', static function () {
-    return service('response')
-        ->setHeader('Cache-Control', 'public, max-age=300')
+    $r = service('response');
+    $r->removeHeader('Cache-Control');
+    return $r->setHeader('Cache-Control', 'public, max-age=300')
         ->setBody(file_get_contents(ROOTPATH . 'public/index.html'));
 });
 
