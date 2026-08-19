@@ -405,41 +405,20 @@ const MK_SPOTLIGHT = [
    link = CTA가 아닌 배경 클릭 시 이동할 곳
    kicker/title/sub = 3개 국어 (title의 \n은 줄바꿈) */
 const MK_HERO = [
-  { art:'assets/img/hero/hero-global.svg', link:'directory.html',
-    kicker:{ vi:'Không cần bay, không cần hội chợ', ko:'전시회, 수출상담회', en:'No flights. No trade fairs.' },
-    title:{ vi:'Đi hội chợ đến bao giờ?\nMột cú click là đủ.',
-            ko:'전시회, 수출상담회\n언제까지 다니실 건가요?',
-            en:'How long will you keep\nflying to trade shows?' },
-    sub:{ vi:'Ngồi tại văn phòng, click một lần — thông tin sản phẩm đổi mới từ khắp thế giới đến với bạn.',
-          ko:'사무실에 앉아서 클릭 한 번이면, 전 세계 혁신제품 정보가 찾아옵니다.',
-          en:'Stay at your desk. One click brings the world\'s innovative products to you.' } },
+  { art:"assets/img/hero/hero-spec.svg", link:"guide.html",
+    kicker:{"vi": "Hỗ trợ kết nối và họp", "ko": "연결부터 미팅까지", "en": "Connection to meeting"},
+    title:{"ko": "공급사와의 연결부터 미팅까지\n메이크노브가 지원합니다", "vi": "Từ kết nối nhà cung cấp đến buổi họp,\nMAKENOV hỗ trợ bạn", "en": "From supplier connection to meetings,\nMAKENOV supports you"},
+    sub:{"ko": "관심 제품에 문의를 남기면 공급사 연결과 소통, 통역, 온·오프라인 미팅 진행까지 필요한 과정을 지원합니다.", "vi": "Chỉ cần để lại yêu cầu cho sản phẩm quan tâm, chúng tôi hỗ trợ kết nối và trao đổi với nhà cung cấp, phiên dịch, cho đến tổ chức họp online và trực tiếp.", "en": "Leave an inquiry on a product you like and we support supplier connection, communication, interpretation, and online or in-person meetings."} },
 
-  { art:'assets/img/hero/hero-scale.svg', link:'directory.html',
-    kicker:{ vi:'Chi phí một chuyến công tác', ko:'출장 한 번 비용으로', en:'The cost of one business trip' },
-    title:{ vi:'Một chuyến công tác gặp 5 nhà máy.\nỞ đây gặp hàng trăm.',
-            ko:'출장 한 번에 공장 다섯 곳,\n여기선 수백 개 제품.',
-            en:'One trip: five factories.\nHere: hundreds of products.' },
-    sub:{ vi:'Vé máy bay, khách sạn, thông dịch — thay bằng danh mục mở 24 giờ mỗi ngày.',
-          ko:'항공권·숙박·통역 대신, 24시간 열려 있는 제품 디렉토리로.',
-          en:'Skip the airfare, hotels and interpreters — browse a directory that never closes.' } },
+  { art:"assets/img/hero/hero-scale.svg", link:"directory.html",
+    kicker:{"vi": "Tất cả ở một nơi", "ko": "한곳에서", "en": "All in one place"},
+    title:{"ko": "전 세계 혁신 제품을\n한곳에서 만나보세요", "vi": "Sản phẩm đổi mới từ khắp thế giới,\ntất cả ở một nơi", "en": "Innovative products from around the world,\nall in one place"},
+    sub:{"ko": "다양한 카테고리의 제품을 살펴보고 내 판매 채널에 어울리는 새로운 유통 기회를 발견할 수 있습니다.", "vi": "Khám phá sản phẩm ở nhiều danh mục và tìm cơ hội phân phối mới phù hợp với kênh bán hàng của bạn.", "en": "Browse products across categories and find new distribution opportunities that fit your sales channels."} },
 
-  { art:'assets/img/hero/hero-spec.svg', link:'companies.html',
-    kicker:{ vi:'Chỉ nhà sản xuất đã xác thực', ko:'검증된 공급사만', en:'Verified manufacturers only' },
-    title:{ vi:'Giá, MOQ, thời gian giao hàng\ntrên cùng một màn hình.',
-            ko:'가격, MOQ, 납기까지\n한 화면에서 확인하세요.',
-            en:'Price, MOQ and lead time\non a single screen.' },
-    sub:{ vi:'Mọi nhà sản xuất đều qua xác thực doanh nghiệp. Không còn phải dò hỏi từng nơi.',
-          ko:'모든 공급사가 사업자 인증을 거칩니다. 하나하나 수소문할 필요 없습니다.',
-          en:'Every manufacturer passes business verification. No more chasing down each supplier.' } },
-
-  { art:'assets/img/hero/hero-inquiry.svg', link:'mypage.html',
-    kicker:{ vi:'Gửi yêu cầu hàng loạt', ko:'일괄 견적 요청', en:'Bulk inquiry' },
-    title:{ vi:'Chọn sản phẩm quan tâm,\ngửi báo giá một lần.',
-            ko:'관심 제품을 담고,\n한 번에 견적을 받으세요.',
-            en:'Save what interests you,\nrequest every quote at once.' },
-    sub:{ vi:'Không cần liên hệ từng nhà sản xuất. Thêm vào danh sách rồi gửi yêu cầu cùng lúc.',
-          ko:'공급사마다 따로 연락할 필요 없습니다. 담아두고 한 번에 문의하세요.',
-          en:'Stop emailing suppliers one by one. Add to your list and send a single request.' } },
+  { art:"assets/img/hero/hero-global.svg", link:"directory.html",
+    kicker:{"vi": "Không cần hội chợ", "ko": "전시회 없이", "en": "No trade fairs needed"},
+    title:{"ko": "누구나 글로벌 혁신 제품의\n공식 유통사가 될 수 있습니다", "vi": "Ai cũng có thể trở thành nhà phân phối chính thức\ncủa sản phẩm đổi mới toàn cầu", "en": "Anyone can become the official distributor\nof a global innovative product"},
+    sub:{"ko": "해외 전시회나 현지를 직접 찾아가지 않아도 새로운 제품과 공식 유통 기회를 만날 수 있습니다.", "vi": "Không cần đến hội chợ nước ngoài hay bay sang tận nơi, bạn vẫn gặp được sản phẩm mới và cơ hội phân phối chính thức.", "en": "Meet new products and official distribution opportunities without traveling to overseas trade shows or visiting in person."} },
 ];
 
 /* ---------- 공급사 유치 랜딩(maker.html) 설정 ----------
