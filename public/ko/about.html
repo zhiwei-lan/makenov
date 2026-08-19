@@ -81,7 +81,7 @@
 .mkd-stage{position:absolute;inset:0;overflow:hidden}
 .mkd-sc{position:absolute;inset:0;opacity:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .mkd-t{color:#fff;font-weight:800;letter-spacing:-.02em;text-align:center}
-.blob{position:absolute;border-radius:50%;filter:blur(42px)}
+.blob{position:absolute;border-radius:50%}
 /* 장면 창 (22s) */
 .mkd-sc.A{animation:wA 22s ease-in-out infinite}
 .mkd-sc.B{animation:wB 22s ease-in-out infinite}
@@ -99,9 +99,9 @@
 @keyframes wH{0%,79.5%{opacity:0}83%,97%{opacity:1}100%{opacity:0}}
 /* ── A 인트로 ── */
 .mkd-sc.A{background:linear-gradient(135deg,#0C1F2E 0%,#123A33 55%,#0B2470 100%)}
-.blob.a1{width:52%;padding-top:52%;background:#27CAA1;opacity:.5;left:-14%;top:-24%;animation:fl1 22s ease-in-out infinite}
-.blob.a2{width:38%;padding-top:38%;background:#3D5CCC;opacity:.28;right:-10%;bottom:-26%;animation:fl2 22s ease-in-out infinite}
-.blob.a3{width:24%;padding-top:24%;background:#DFFFF6;opacity:.22;left:20%;bottom:-14%;animation:fl3 22s ease-in-out infinite}
+.blob.a1{width:52%;padding-top:52%;background:radial-gradient(circle,#27CAA1 0%,rgba(0,0,0,0) 62%);opacity:.5;left:-14%;top:-24%;animation:fl1 22s ease-in-out infinite}
+.blob.a2{width:38%;padding-top:38%;background:radial-gradient(circle,#3D5CCC 0%,rgba(0,0,0,0) 62%);opacity:.28;right:-10%;bottom:-26%;animation:fl2 22s ease-in-out infinite}
+.blob.a3{width:24%;padding-top:24%;background:radial-gradient(circle,#DFFFF6 0%,rgba(0,0,0,0) 62%);opacity:.22;left:20%;bottom:-14%;animation:fl3 22s ease-in-out infinite}
 @keyframes fl1{0%{transform:translate(0,0) scale(1)}50%{transform:translate(7%,9%) scale(1.12)}100%{transform:translate(0,0) scale(1)}}
 @keyframes fl2{0%{transform:translate(0,0) scale(1)}50%{transform:translate(-8%,-7%) scale(1.15)}100%{transform:translate(0,0) scale(1)}}
 @keyframes fl3{0%{transform:translate(0,0)}50%{transform:translate(10%,-10%) scale(1.2)}100%{transform:translate(0,0)}}
@@ -118,8 +118,8 @@
 /* ── B 키네틱 ── */
 .mkd-sc.B{background:linear-gradient(120deg,#081335 0%,#123A33 100%);background-size:200% 200%;animation:wB 22s ease-in-out infinite,bgpan 22s ease-in-out infinite}
 @keyframes bgpan{0%,13%{background-position:0% 0%}24%{background-position:100% 100%}100%{background-position:100% 100%}}
-.blob.b1{width:44%;padding-top:44%;background:#27CAA1;opacity:.34;left:-10%;top:30%;animation:fl2 22s ease-in-out infinite}
-.blob.b2{width:34%;padding-top:34%;background:#3D5CCC;opacity:.25;right:-6%;top:-16%;animation:fl1 22s ease-in-out infinite}
+.blob.b1{width:44%;padding-top:44%;background:radial-gradient(circle,#27CAA1 0%,rgba(0,0,0,0) 62%);opacity:.34;left:-10%;top:30%;animation:fl2 22s ease-in-out infinite}
+.blob.b2{width:34%;padding-top:34%;background:radial-gradient(circle,#3D5CCC 0%,rgba(0,0,0,0) 62%);opacity:.25;right:-6%;top:-16%;animation:fl1 22s ease-in-out infinite}
 .kin{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
 .kin b{position:relative;color:#fff;font-weight:900;font-size:clamp(56px,13vw,120px);letter-spacing:-.03em;opacity:0}
 .kin s{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-decoration:none;color:transparent;-webkit-text-stroke:1.5px rgba(255,255,255,.12);font-weight:900;font-size:clamp(100px,24vw,220px);letter-spacing:-.03em;opacity:0}
@@ -134,7 +134,7 @@
 @keyframes ks3{0%,20.2%{opacity:0}21.6%,23.2%{opacity:1}24.4%,100%{opacity:0}}
 /* ── D UI 카드 + 커서 ── */
 .mkd-sc.D{background:#0A1740;flex-direction:column;gap:16px}
-.blob.d1{width:48%;padding-top:48%;background:#1E8F73;opacity:.3;right:-14%;bottom:-24%;animation:fl2 22s ease-in-out infinite}
+.blob.d1{width:48%;padding-top:48%;background:radial-gradient(circle,#1E8F73 0%,rgba(0,0,0,0) 62%);opacity:.3;right:-14%;bottom:-24%;animation:fl2 22s ease-in-out infinite}
 .mkd-t.mid{font-size:clamp(18px,3.6vw,30px);animation:dT 22s ease-out infinite;position:relative;z-index:2}
 @keyframes dT{0%,25%{opacity:0;transform:translateY(12px)}27.5%,44%{opacity:1;transform:translateY(0)}45.5%,100%{opacity:0}}
 .ui{position:relative;z-index:2;width:74%;max-width:520px;background:#fff;border-radius:18px;box-shadow:0 22px 60px rgba(0,0,0,.5);padding:4.2% 4.6%;animation:dU 22s cubic-bezier(.2,.9,.25,1) infinite}
@@ -198,8 +198,8 @@
 @keyframes gw3{0%,71.5%{opacity:0;transform:translateY(14px);filter:blur(6px)}73.5%,78.5%{opacity:1;transform:translateY(0);filter:blur(0)}81%,100%{opacity:0}}
 /* ── H 로고 리빌 ── */
 .mkd-sc.H{background:linear-gradient(160deg,#F7FDFB,#EAF7F2);flex-direction:column;gap:14px}
-.blob.h1{width:40%;padding-top:40%;background:#27CAA1;opacity:.16;left:-8%;top:-14%;animation:fl1 22s ease-in-out infinite}
-.blob.h2{width:32%;padding-top:32%;background:#3D5CCC;opacity:.1;right:-8%;bottom:-16%;animation:fl2 22s ease-in-out infinite}
+.blob.h1{width:40%;padding-top:40%;background:radial-gradient(circle,#27CAA1 0%,rgba(0,0,0,0) 62%);opacity:.16;left:-8%;top:-14%;animation:fl1 22s ease-in-out infinite}
+.blob.h2{width:32%;padding-top:32%;background:radial-gradient(circle,#3D5CCC 0%,rgba(0,0,0,0) 62%);opacity:.1;right:-8%;bottom:-16%;animation:fl2 22s ease-in-out infinite}
 .hbox{position:relative;width:46%;max-width:340px;overflow:hidden;border-radius:8px}
 .hlogo{display:block;width:100%;animation:hL 22s cubic-bezier(.2,1.35,.3,1) infinite}
 @keyframes hL{0%,81%{opacity:0;transform:scale(.84) translateY(8px)}85%{opacity:1;transform:scale(1.02) translateY(0)}87%,96.5%{opacity:1;transform:scale(1)}100%{opacity:0}}
