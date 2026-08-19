@@ -5,7 +5,8 @@
    primary mint #27CAA1 (btn r4) / accent blue #0097E0 + yellow #FCFC32
    section h3 22px/600 · card radius 16
    ============================================================ */
-@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css");
+/* 가변 다이나믹 서브셋: 글리프를 잘게 쪼개 쓰는 만큼만 받는다(정적판은 굵기당 765KB 전체 폰트를 받았다, 2026-08-19) */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
 
 :root{
   /* == ohmycompany 실측 토큰 == */
@@ -37,8 +38,8 @@
   --r-base:8px;
   --r-card:16px;                   /* 카드 */
   --r-pill:999px;
-  --font-body:'Pretendard',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
-  --font-head:'Pretendard',-apple-system,BlinkMacSystemFont,sans-serif;
+  --font-body:'Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  --font-head:'Pretendard Variable','Pretendard',-apple-system,BlinkMacSystemFont,sans-serif;
   /* 컨테이너 폭 — addwel.co.kr 실측(고정 1400px, 1440·1920 뷰포트 동일)에 맞춰 넓혔다.
      이전 1140은 요즘 모니터에서 좌우가 과하게 비었다. */
   --maxw:1400px;
@@ -461,6 +462,10 @@ button{font-family:var(--font-body);cursor:pointer;border:none;background:none;c
 .pd-strip img{width:100%;height:auto;display:block;margin:0;border-radius:0}
 .pd-video{width:100%;aspect-ratio:16/9;border-radius:8px;overflow:hidden;margin:0 0 26px;background:#000}
 .pd-video iframe{width:100%;height:100%;border:0;display:block}
+.pd-video.yt-lite{position:relative;cursor:pointer;background-size:cover;background-position:center}
+.pd-video.yt-lite .yt-play{position:absolute;left:50%;top:50%;width:68px;height:48px;margin:-24px 0 0 -34px;border:0;border-radius:12px;background:rgba(0,0,0,.72);cursor:pointer}
+.pd-video.yt-lite .yt-play::after{content:"";position:absolute;left:26px;top:14px;border-style:solid;border-width:10px 0 10px 18px;border-color:transparent transparent transparent #fff}
+.pd-video.yt-lite:hover .yt-play{background:#f00}
 
 /* 사이드 구매박스 */
 .pd-side .box{border:1px solid var(--mk-line);border-radius:8px;padding:26px 24px;background:#fff}
@@ -622,9 +627,15 @@ button{font-family:var(--font-body);cursor:pointer;border:none;background:none;c
 .mk-footer .social a{display:flex;align-items:center;justify-content:center;width:34px;height:34px;
   border-radius:50%;border:1px solid var(--mk-line-strong);color:var(--mk-muted);font-size:14px;font-weight:700;padding:0}
 .mk-footer .social a:hover{border-color:var(--mk-primary);color:var(--mk-primary)}
-.mk-footer .base{border-top:1px solid var(--mk-line);padding:16px 20px;font-size:12px;
-  text-align:center;color:var(--mk-muted);line-height:1.7}
-@media(max-width:860px){.mk-footer .wrap{grid-template-columns:1fr 1fr}}
+.mk-footer .mail{display:inline-block;margin-top:14px;font-size:13px;font-weight:600;color:var(--mk-navy);padding:0}
+.mk-footer .base{border-top:1px solid var(--mk-line);font-size:12px;color:var(--mk-muted);line-height:1.7;
+  padding:14px max(20px,calc((100% - var(--maxw))/2 + 15px));
+  display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.mk-footer .ft-lang{display:flex;gap:16px}
+.mk-footer .ft-lang button{background:none;border:0;padding:0;font-size:12px;color:var(--mk-muted);cursor:pointer}
+.mk-footer .ft-lang button.on{color:var(--mk-ink);font-weight:700}
+.mk-footer .ft-lang button:hover{color:var(--mk-primary)}
+@media(max-width:860px){.mk-footer .wrap{grid-template-columns:1fr 1fr}.mk-footer .brand{grid-column:1/-1}}
 
 /* ---------- toast ---------- */
 .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);
@@ -1487,3 +1498,11 @@ body.mkedit-on .omc-hero .slide.on .shot{pointer-events:none}
 .mkedit-pop textarea:focus{outline:none;border-color:var(--mk-primary)}
 .mkedit-pop .ft{display:flex;align-items:center;gap:8px;margin-top:4px}
 .mkedit-pop .ft .msg{flex:1;font-size:12px;color:var(--mk-sub)}
+
+/* 사전 렌더 표시 중(.mk-pre): 정적 헤더·푸터 사본은 숨기고(실제 헤더가 위에 그려짐), 런타임 컨테이너는 교체 전까지 숨긴다 */
+.mk-pre #mk-prerender .mk-static-mk-header,.mk-pre #mk-prerender .mk-static-mk-footer{display:none}
+.mk-pre main > :not(#mk-prerender){display:none !important}
+/* 헤더가 JS 로 그려지기 전 높이를 미리 잡아 둔다(레이아웃 이동 방지) */
+#mk-header:empty{min-height:137px}
+@media(max-width:640px){#mk-header:empty{min-height:63px}}
+.topbar .wrap > span:empty{display:inline-block;min-height:1em}

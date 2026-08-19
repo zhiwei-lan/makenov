@@ -59,7 +59,9 @@ class Filters extends BaseFilters
         'after' => [
             'pagecache',   // Web Page Caching
             'performance', // Performance Metrics
-            'toolbar',     // Debug Toolbar
+            /* 'toolbar' 제거 (2026-08-19): 운영 서버 .env 가 development 로 되어 있어 디버그 툴바가
+               실제 페이지에 주입되고 있었다(index.php?debugbar 로 DB 쿼리까지 노출).
+               근본 조치는 서버 .env 의 CI_ENVIRONMENT = production. 환경과 무관하게 툴바는 끈다. */
         ],
     ];
 

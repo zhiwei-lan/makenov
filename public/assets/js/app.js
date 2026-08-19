@@ -38,6 +38,23 @@ function ytEmbed(url){
   if(m) return 'https://player.vimeo.com/video/' + m[1];
   return u;
 }
+
+/* 영상 자리 마크업. 유튜브는 플레이어(≈850KB JS)를 바로 싣지 않고 썸네일+재생 버튼만 두었다가
+   누를 때 iframe 으로 바꾼다(2026-08-19 Lighthouse: 제품 상세 전송량의 1/3이 유튜브 플레이어였다). */
+function mkVideoEmbed(url){
+  const src = ytEmbed(url);
+  if(!src) return '';
+  const yt = src.match(/youtube\.com\/embed\/([A-Za-z0-9_-]{6,})/);
+  if(yt){
+    return `<div class="pd-video yt-lite" data-embed="${esc(src)}" style="background-image:url('https://i.ytimg.com/vi/${yt[1]}/hqdefault.jpg')" onclick="mkPlayVideo(this)"><button type="button" class="yt-play" aria-label="Play video"></button></div>`;
+  }
+  return `<div class="pd-video"><iframe src="${esc(src)}" allowfullscreen loading="lazy" title="video"></iframe></div>`;
+}
+function mkPlayVideo(el){
+  const src = el.getAttribute('data-embed'); if(!src) return;
+  el.classList.remove('yt-lite'); el.removeAttribute('style'); el.onclick = null;
+  el.innerHTML = `<iframe src="${esc(src + (src.includes('?') ? '&' : '?') + 'autoplay=1')}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen title="video"></iframe>`;
+}
 function toast(msg){
   let el = document.querySelector('.toast');
   if(!el){ el = document.createElement('div'); el.className='toast'; document.body.appendChild(el); }
@@ -80,6 +97,8 @@ function renderChrome(active){
       : `<span>${esc(tbMsg)}</span>`;
     tb.innerHTML = `<div class="wrap">${body}<button class="x" onclick="sessionStorage.setItem('mk_topbar_off','1');this.closest('.topbar').remove()">✕</button></div>`;
     hdr.parentNode.insertBefore(tb, hdr);
+  }else if(old && (!tbOn || sessionStorage.getItem('mk_topbar_off'))){
+    old.remove();                                      // 정적 자리표시자(CLS 방지용)였는데 꺼진 상태면 제거
   }else if(tbOn && old){
     const slot = old.querySelector('.wrap > a, .wrap > span');
     if(slot) slot.textContent = tbMsg;                 // 언어 전환 시 문구만 교체
@@ -95,13 +114,21 @@ function renderChrome(active){
         onkeydown="if(event.key==='Enter'){${doSearch}}"><span class="ico" role="button" tabindex="0" onclick="${doSearch}">${MK_ICO.search}</span></div><div class="mk-head-right"><div class="mk-lang"><button data-lang="vi" onclick="setLang('vi')">VI</button><button data-lang="ko" onclick="setLang('ko')">KO</button><button data-lang="en" onclick="setLang('en')">EN</button></div><a class="mk-util" href="mypage.html">${MK_ICO.heart}<span class="badge" id="cart-badge">0</span><span class="lb" data-i18n="util_wish"></span></a>
       ${s
         ? `<a class="mk-util" href="mypage.html">${MK_ICO.user}<span class="lb">${esc(s.contactName||s.email.split('@')[0])}</span></a><a class="mk-util" onclick="Store.logout();location.reload()" style="cursor:pointer">${MK_ICO.logout}<span class="lb" data-i18n="logout"></span></a>`
-        : `<a class="mk-util" onclick="openAuth('login')" style="cursor:pointer">${MK_ICO.user}<span class="lb" data-i18n="login"></span></a><button class="btn btn-primary btn-sm" style="margin-left:6px;height:40px;padding:0 18px" onclick="openAuth('signup')" data-i18n="signup"></button>`}
+        : `<a class="mk-util" href="mypage.html" onclick="event.preventDefault();openAuth('login')">${MK_ICO.user}<span class="lb" data-i18n="login"></span></a><button class="btn btn-primary btn-sm" style="margin-left:6px;height:40px;padding:0 18px" onclick="openAuth('signup')" data-i18n="signup"></button>`}
     </div></div><nav class="mk-nav mk-head-nav"><a href="${mkUrl('products.html')}" data-i18n="nav_directory"></a><a href="${mkUrl('companies.html')}" data-i18n="nav_companies"></a><a href="${mkUrl('columns.html')}" data-i18n="nav_columns"></a><span class="gnb"><a href="${mkUrl('guide.html')}" data-i18n="nav_guide"></a><span class="drop"><a href="${mkUrl('support.html')}" data-i18n="nav_support"></a><span class="menu"><a href="${mkUrl('support.html#notice')}" data-i18n="nav_sp_notice"></a><a href="${mkUrl('support.html#faq')}" data-i18n="nav_sp_faq"></a><a href="${mkUrl('support.html#ask')}" data-i18n="nav_sp_ask"></a></span></span></span></nav></div>`;
   document.getElementById('mk-footer').innerHTML = `
-  <div class="wrap"><div><div class="logo"><img src="${mkAsset('assets/img/logo.png')}" alt="MAKENOV"
-      onerror="this.parentNode.classList.add(&quot;txt&quot;);this.remove()"><span>MAKE<b>NOV</b></span></div><p class="desc" data-i18n="ft_desc"></p><div class="social"><a href="#" title="Facebook">f</a><a href="#" title="TikTok">t</a><a href="#" title="YouTube">▶</a><a href="#" title="Instagram">◎</a><a href="#" title="Zalo">Z</a></div></div><div><h4 data-i18n="ft_platform"></h4><a href="${mkUrl('products.html')}" data-i18n="nav_directory"></a><a href="${mkUrl('columns.html')}" data-i18n="nav_columns"></a></div><div><h4 data-i18n="ft_support"></h4><a href="${mkUrl('support.html')}" data-i18n="nav_support"></a><a href="${mkUrl('guide.html')}" data-i18n="nav_guide"></a><a href="sitemap.html" data-i18n="ft_sitemap"></a><a href="mailto:contact@makenov.com" data-i18n="ft_contact"></a></div></div><div class="base">© 2026 MAKENOV. All rights reserved. · Innovative products from suppliers worldwide.</div>`;
+  <div class="wrap"><div class="brand"><div class="logo"><img src="${mkAsset('assets/img/logo.png')}" alt="MAKENOV"
+      onerror="this.parentNode.classList.add(&quot;txt&quot;);this.remove()"><span>MAKE<b>NOV</b></span></div><p class="desc" data-i18n="ft_desc"></p><a class="mail" href="mailto:contact@makenov.com">contact@makenov.com</a></div><div><h4 data-i18n="ft_platform"></h4><a href="${mkUrl('products.html')}" data-i18n="nav_directory"></a><a href="${mkUrl('companies.html')}" data-i18n="nav_companies"></a><a href="${mkUrl('columns.html')}" data-i18n="nav_columns"></a></div><div><h4 data-i18n="ft_partner"></h4><a href="mypage.html" onclick="return mkFtJoin(event)" data-i18n="ft_join"></a><a href="mypage.html" data-i18n="ft_verify"></a><a href="maker.html" data-i18n="util_maker"></a></div><div><h4 data-i18n="ft_support"></h4><a href="${mkUrl('support.html')}" data-i18n="nav_support"></a><a href="${mkUrl('guide.html')}" data-i18n="nav_guide"></a><a href="${mkUrl('support.html#ask')}" data-i18n="ft_contact"></a><a href="sitemap.html" data-i18n="ft_sitemap"></a></div></div><div class="base"><span>© 2026 MAKENOV. All rights reserved.</span><span class="ft-lang"><button data-lang="vi" onclick="setLang('vi')">Tiếng Việt</button><button data-lang="ko" onclick="setLang('ko')">한국어</button><button data-lang="en" onclick="setLang('en')">English</button></span></div>`;
   updateCartBadge();
   applyI18n();
+}
+/* 푸터 '유통 파트너 가입': 비로그인은 가입 모달, 로그인 상태면 마이페이지로 */
+function mkFtJoin(ev){
+  let on = false; try{ on = !!(Store.session() || (Store.sessionHint && Store.sessionHint())); }catch(e){}
+  if(on) return true;
+  if(ev) ev.preventDefault();
+  openAuth('signup');
+  return false;
 }
 function updateCartBadge(){
   const b = document.getElementById('cart-badge');
@@ -648,6 +675,13 @@ function productCard(p){
       <button class="heart ${inCart?'on':''}" onclick="event.preventDefault();event.stopPropagation();toggleCart('${p.id}',this)">${inCart?'♥':'♡'}</button></div><div class="body"><span class="brand">${esc(p.brand)}</span><h3>${esc(L(p.name))}</h3><div class="meta">${cardMeta(p)}<span class="left">${esc(p.origin)}</span></div></div></a>`;
 }
 
+/* 사전 렌더(크롤러용 정적 사본) → 실제 렌더 교체. 한 번만 */
+function mkSwapPrerender(){
+  const pre = document.getElementById('mk-prerender');
+  if(pre) pre.remove();
+  document.documentElement.classList.remove('mk-pre');
+}
+
 /* ---------- boot ---------- */
 document.addEventListener('DOMContentLoaded', async ()=>{
   document.documentElement.lang = MK_LANG;
@@ -656,8 +690,13 @@ document.addEventListener('DOMContentLoaded', async ()=>{
         prerender.js 가 크롤러용으로 구워 넣은 정적 사본이다. JS가 도는 브라우저에서는
         아래에서 실제 렌더가 일어나므로 부팅 첫 줄에서 걷어낸다.
         (원본 컨테이너는 그대로 남아 있어서 pageInit 이 평소대로 채운다) */
+  /* ★ 2026-08-19: 부팅 첫 줄에서 바로 지우면 데이터가 올 때까지(≈1초) 페이지가 빈 껍데기로
+        주저앉았다가 다시 펴진다(Lighthouse CLS 0.999). 그래서 실제 렌더가 끝날 때까지는
+        사전 렌더를 그대로 보여 주고(헤더·푸터 정적 사본만 숨김), 런타임 컨테이너는 숨겨 둔다.
+        교체는 아래 mkSwapPrerender() — 첫 pageInit 직후 한 번. */
   const pre = document.getElementById('mk-prerender');
-  if(pre) pre.remove();
+  /* 랜딩처럼 사전 렌더가 display:none(정적 헤더·푸터 사본뿐)인 페이지는 교체할 화면이 없으므로 제외 */
+  if(pre && pre.style.display !== 'none') document.documentElement.classList.add('mk-pre');
 
   /* 0-B) 구워둔 카피를 먼저 덮는다.
      관리자에서 고친 문구는 DB에 있는데, 그걸 받아오는 데 1초쯤 걸린다.
@@ -703,6 +742,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   if(typeof MkData !== 'undefined') renderChrome();
   if(typeof pageInit === 'function') pageInit();
   applyI18n();
+  mkSwapPrerender();
   unlockIfAuthed();
   document.addEventListener('mk:lang', ()=>{ renderChrome(); if(typeof pageInit==='function') pageInit(); applyI18n(); unlockIfAuthed(); });
 });

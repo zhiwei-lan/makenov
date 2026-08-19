@@ -1,0 +1,146 @@
+[
+ {
+  "id": "c-quote-f1",
+  "page": "c-quote",
+  "sort": 1,
+  "published": true,
+  "q": {
+   "vi": "Yêu cầu báo giá và hỏi nhanh khác nhau thế nào?",
+   "ko": "견적 요청과 간단 문의는 어떻게 다른가요?",
+   "en": "How is a quote request different from a quick question?"
+  },
+  "a": {
+   "vi": "Yêu cầu báo giá là quy trình lấy số lượng và thời điểm để tính đơn giá; hỏi nhanh là kênh trao đổi ngắn cho những câu không liên quan số lượng. Chưa chốt số lượng thì hỏi nhanh sẽ nhanh hơn.",
+   "ko": "견적 요청은 수량과 시기를 받아 단가를 뽑는 절차이고, 간단 문의는 수량과 무관한 질문을 짧게 주고받는 창구입니다. 아직 수량을 못 정했다면 간단 문의가 빠릅니다.",
+   "en": "A quote request takes your quantity and timing to produce a price. A quick question is a short exchange for anything unrelated to volume. If the quantity is not settled, the quick route is faster."
+  }
+ },
+ {
+  "id": "c-quote-f2",
+  "page": "c-quote",
+  "sort": 2,
+  "published": true,
+  "q": {
+   "vi": "Có bắt buộc xác thực mới xem được giá không?",
+   "ko": "단가를 보려면 꼭 인증해야 하나요?",
+   "en": "Do I have to verify to see prices?"
+  },
+  "a": {
+   "vi": "Có. Đơn giá và số lượng tối thiểu chỉ được gửi tới tài khoản đã xác thực doanh nghiệp, vì đó là điều kiện để nhà cung cấp công khai giá xuất khẩu thật. Xác thực miễn phí, mất khoảng một phút.",
+   "ko": "네. 단가와 최소주문수량은 사업자 인증을 통과한 계정에만 전송됩니다. 공급사가 실제 수출 단가를 공개하는 조건이기 때문입니다. 인증은 무료이고 1분 정도 걸립니다.",
+   "en": "Yes. Unit price and minimum order quantity are sent only to verified accounts, because that is the condition on which suppliers publish real export pricing. Verification is free and takes about a minute."
+  }
+ },
+ {
+  "id": "c-quote-f3",
+  "page": "c-quote",
+  "sort": 3,
+  "published": true,
+  "q": {
+   "vi": "Hỏi nhiều sản phẩm cùng lúc được không?",
+   "ko": "여러 제품을 한 번에 물어볼 수 있나요?",
+   "en": "Can I ask about several products at once?"
+  },
+  "a": {
+   "vi": "Lưu vào danh sách quan tâm rồi gửi yêu cầu hàng loạt, mỗi yêu cầu sẽ tới đúng nhà cung cấp của nó. Bạn đặt các điều kiện cạnh nhau mà so.",
+   "ko": "관심제품에 담아두고 일괄 견적을 요청하면 각 공급사에 따로 전달됩니다. 조건을 나란히 놓고 비교하실 수 있습니다.",
+   "en": "Save them to your wishlist and send a bulk request; each one reaches its own supplier, and you can line the terms up side by side."
+  }
+ },
+ {
+  "id": "c-quote-f4",
+  "page": "c-quote",
+  "sort": 4,
+  "published": true,
+  "q": {
+   "vi": "Thường bao lâu thì có trả lời?",
+   "ko": "답변은 보통 얼마나 걸리나요?",
+   "en": "How long does a reply take?"
+  },
+  "a": {
+   "vi": "Khoảng 1–3 ngày làm việc. Quá ba ngày chưa có tin, hãy báo bộ phận hỗ trợ kèm tên sản phẩm, chúng tôi sẽ xác nhận trực tiếp với nhà cung cấp.",
+   "ko": "영업일 1~3일입니다. 사흘이 지나도 소식이 없으면 고객센터로 제품명과 함께 알려주세요. 저희가 공급사에 직접 확인합니다.",
+   "en": "One to three business days. If three days pass with nothing, tell support with the product name and we will check with the supplier directly."
+  }
+ },
+ {
+  "id": "c-quote-f5",
+  "page": "c-quote",
+  "sort": 5,
+  "published": true,
+  "q": {
+   "vi": "Sau khi nhận báo giá thì cần kiểm tra gì?",
+   "ko": "견적서를 받은 뒤에는 무엇을 확인해야 하나요?",
+   "en": "What should I check once the quote arrives?"
+  },
+  "a": {
+   "vi": "Kiểm tra điều kiện của giá (FOB hay CIF), thời hạn hiệu lực, điều kiện thanh toán, và thời gian giao tính từ ngày chốt đơn hay không. Thiếu bốn mục này thì về sau dễ phát sinh tranh cãi.",
+   "ko": "단가의 기준 조건(FOB인지 CIF인지), 유효 기간, 결제 조건, 그리고 납기가 발주 확정일 기준인지 확인하세요. 이 네 가지가 빠진 견적은 나중에 말이 달라질 수 있습니다.",
+   "en": "Check the pricing basis (FOB or CIF), how long the quote is valid, payment terms, and whether the lead time counts from order confirmation. A quote missing these four tends to shift later."
+  }
+ },
+ {
+  "id": "c-sample-f1",
+  "page": "c-sample",
+  "sort": 1,
+  "published": true,
+  "q": {
+   "vi": "Chưa cần báo giá, xin mẫu trước được không?",
+   "ko": "견적 없이 샘플만 먼저 요청해도 되나요?",
+   "en": "Can I ask for samples before a quote?"
+  },
+  "a": {
+   "vi": "Được. Nhưng hãy ghi kèm số lượng dự kiến và thời điểm cần. Đó là căn cứ để nhà cung cấp chọn quy cách gửi, và bạn nhận luôn cả đơn giá trong cùng một hồi âm.",
+   "ko": "됩니다. 다만 예상 수량과 필요 시기를 함께 적어주세요. 공급사가 어느 규격으로 보낼지 판단할 근거가 되고, 같은 회신에 단가까지 함께 받을 수 있습니다.",
+   "en": "Yes. Include your expected quantity and timing though — it tells the supplier which specification to send, and you get the price back in the same reply."
+  }
+ },
+ {
+  "id": "c-sample-f2",
+  "page": "c-sample",
+  "sort": 2,
+  "published": true,
+  "q": {
+   "vi": "Tiền mẫu thường là bao nhiêu?",
+   "ko": "샘플 비용은 보통 얼마인가요?",
+   "en": "How much do samples usually cost?"
+  },
+  "a": {
+   "vi": "Tùy sản phẩm và số lượng nên khó nói chung. Khi gửi yêu cầu báo giá, hãy hỏi luôn điều kiện hàng mẫu để được báo cùng đơn giá.",
+   "ko": "제품과 수량에 따라 달라서 일률적으로 말하기 어렵습니다. 견적을 요청할 때 샘플 조건을 함께 물어보시면 단가와 같이 안내받을 수 있습니다.",
+   "en": "It varies by product and quantity, so there is no single answer. Ask about sample terms in your quote request and you will get both together."
+  }
+ },
+ {
+  "id": "c-sample-f3",
+  "page": "c-sample",
+  "sort": 3,
+  "published": true,
+  "q": {
+   "vi": "Gửi mẫu mất bao lâu?",
+   "ko": "샘플 배송은 얼마나 걸리나요?",
+   "en": "How long does sample delivery take?"
+  },
+  "a": {
+   "vi": "Chuyển phát nhanh quốc tế thường 3–7 ngày sau khi gửi, nhưng có thể lâu hơn tùy tình hình thông quan và mặt hàng. Mỹ phẩm và thực phẩm nên gửi kèm hồ sơ thành phần cho dễ thông quan.",
+   "ko": "국제 특송 기준으로 발송 후 3~7일이 일반적이지만, 통관 상황과 품목에 따라 더 걸릴 수 있습니다. 화장품과 식품은 성분 자료를 함께 보내야 통관이 수월합니다.",
+   "en": "Typically three to seven days by international courier, though customs and the product category can add time. For cosmetics and food, sending the ingredient documents along makes clearance easier."
+  }
+ },
+ {
+  "id": "c-sample-f4",
+  "page": "c-sample",
+  "sort": 4,
+  "published": true,
+  "q": {
+   "vi": "Mẫu không như mong đợi thì làm sao?",
+   "ko": "샘플이 기대와 다르면 어떻게 하나요?",
+   "en": "What if the sample is not what I expected?"
+  },
+  "a": {
+   "vi": "Hãy nói rõ chỗ nào khác ra sao kèm ảnh. Nhiều trường hợp bạn sẽ được đề xuất quy cách thay thế hoặc dòng khác. Dù quyết định dừng, vẫn nên báo kết luận.",
+   "ko": "어느 부분이 어떻게 다른지 사진과 함께 알려주세요. 대체 규격이나 다른 라인을 제안받는 경우가 많습니다. 진행하지 않기로 했더라도 결론은 알려주는 편이 좋습니다.",
+   "en": "Say what differs and how, with photos. Suppliers often propose an alternative specification or another line. Even if you decide not to proceed, it is worth telling them."
+  }
+ }
+]

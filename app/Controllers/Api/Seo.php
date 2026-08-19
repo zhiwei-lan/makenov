@@ -52,11 +52,13 @@ class Seo extends Controller
     }
 
     /** 루트 `/` — 호스트 언어의 랜딩을 낸다 (Nginx 가 먼저 잡지만 이중 안전장치) */
-    public function home(): string
+    public function home(): ResponseInterface
     {
         $lang = $this->langOfHost();
         $dir = $lang === 'kr' ? 'ko/' : ($lang === 'en' ? 'en/' : '');
         $file = ROOTPATH . 'public/' . $dir . 'index.html';
-        return is_file($file) ? file_get_contents($file) : file_get_contents(ROOTPATH . 'public/index.html');
+        $html = is_file($file) ? file_get_contents($file) : file_get_contents(ROOTPATH . 'public/index.html');
+        $this->response->removeHeader('Cache-Control');
+        return $this->response->setHeader('Cache-Control', 'public, max-age=300')->setBody($html);
     }
 }

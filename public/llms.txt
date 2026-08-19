@@ -1,0 +1,30 @@
+# MAKENOV
+
+> MAKENOV (메이크노브) là nền tảng B2B kết nối sản phẩm đổi mới toàn cầu với nhà phân phối tại Việt Nam. / 메이크노브는 글로벌 혁신 제품과 베트남 유통 파트너를 연결하는 B2B 플랫폼입니다. / MAKENOV is a B2B platform connecting innovative products from global suppliers with distribution partners in Vietnam.
+
+Website: https://makenov.com/ (vi) · https://makenov.com/ko/index.html (ko) · https://makenov.com/en/index.html (en)
+Contact: contact@makenov.com
+Languages: Vietnamese, Korean, English
+
+## What MAKENOV does
+- Lists innovative products from verified suppliers (mainly Korea) by category: beauty, food & beverage, living, health, kids, tech.
+- Trade terms (supply price, MOQ, lead time) are unlocked only for distribution partners that pass a free business verification (Vietnam: tax code MST; Korea: business registration number).
+- Inquiries go directly to the supplier. MAKENOV supports supplier connection, communication, interpretation and online/offline meetings.
+- Exclusive or official distribution rights can be discussed per product ("negotiable" badge).
+- Registration, browsing, verification and inquiries are free.
+
+## Key pages
+- Products: https://makenov.com/ko/products.html · https://makenov.com/products.html
+- Product directory (filter by category): https://makenov.com/ko/directory.html
+- Suppliers: https://makenov.com/ko/companies.html
+- Guide (how to join, verify, find products, contact suppliers): https://makenov.com/ko/guide.html
+- Insights / columns: https://makenov.com/ko/columns.html
+- Support (FAQ, notices, 1:1 contact): https://makenov.com/ko/support.html
+- For suppliers (list a product, Korean): https://makenov.com/maker.html
+- Sitemap: https://makenov.com/sitemap.xml · RSS (columns, ko): https://makenov.com/rss.xml
+
+## Frequently asked
+- Is it free? Yes — signup, browsing, business verification and quote inquiries are free.
+- Why are price and MOQ locked? They are B2B trade terms shown only to verified businesses; verification takes about a minute.
+- Do I deal with the supplier directly? Yes; quotes and terms are negotiated with the supplier, and MAKENOV supports the process (connection, communication, meetings).
+- Can I start without import experience? Yes; start by finding a product and leaving an inquiry.

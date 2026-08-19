@@ -24,9 +24,9 @@ class Rest extends BaseApiController
             'json' => ['name','tagline','intro','location','certs'], 'bool' => [],
         ],
         'products' => [
-            'cols' => ['id','company_id','cat','brand','origin','name','tagline','brand_story','img','gallery','video','detail','inquiries','views','wish_count','featured','is_new','published','created_at'],
+            'cols' => ['id','company_id','cat','brand','origin','name','tagline','brand_story','img','gallery','video','detail','inquiries','views','wish_count','featured','is_new','negotiable','published','created_at'],
             'json' => ['name','tagline','brand_story','gallery','detail'],
-            'bool' => ['featured','is_new','published'],
+            'bool' => ['featured','is_new','negotiable','published'],
         ],
         'product_terms' => [
             'cols' => ['product_id','price','moq','lead','terms','updated_at'],
@@ -376,12 +376,31 @@ class Rest extends BaseApiController
     }
 
     /** 프론트 페이로드 → DB 행 (객체 → JSON 문자열, bool → 0/1, 모르는 키 제거) */
+    /** 실제 DB 컬럼 목록 (요청당 테이블별 1회). 마이그레이션이 아직 안 돈 컬럼을 보내면
+        '알 수 없는 컬럼' 500 으로 저장 전체가 죽으므로, 없는 컬럼은 조용히 버린다. */
+    private array $fieldCache = [];
+    private function dbFields(string $table): array
+    {
+        if (! isset($this->fieldCache[$table])) {
+            try {
+                $this->fieldCache[$table] = db_connect()->getFieldNames($table) ?: [];
+            } catch (\Throwable $e) {
+                $this->fieldCache[$table] = [];
+            }
+        }
+        return $this->fieldCache[$table];
+    }
+
     private function encode(string $table, array $row): array
     {
         $out = [];
+        $dbf = $this->dbFields($table);
         foreach ($row as $k => $v) {
             if (! in_array($k, self::SCHEMA[$table]['cols'], true)) {
                 continue;
+            }
+            if ($dbf && ! in_array($k, $dbf, true)) {
+                continue;      // 스키마 목록엔 있지만 DB 에 아직 없는 컬럼(마이그레이션 전)
             }
             if (in_array($k, self::SCHEMA[$table]['json'], true)) {
                 $out[$k] = is_string($v) ? $v : json_encode($v, JSON_UNESCAPED_UNICODE);
