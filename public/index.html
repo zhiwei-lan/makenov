@@ -420,5 +420,17 @@ document.querySelectorAll('[data-section-id="faq"] button[id^="question-"]').for
   });
 });
 </script>
+<a id="mk-float-cta" href="products.html" style="position:fixed;left:50%;bottom:26px;z-index:80;display:flex;align-items:center;gap:9px;background:#0B2470;color:#fff;font-family:Pretendard,sans-serif;font-size:15px;font-weight:700;padding:14px 26px;border-radius:999px;box-shadow:0 12px 32px rgba(11,36,112,.35);text-decoration:none;opacity:0;pointer-events:none;transform:translate(-50%,14px);transition:opacity .25s ease,transform .25s ease"><span style="font-size:17px">✨</span><span>Khám phá sản phẩm đổi mới</span></a>
+<script>
+/* 플로팅 CTA - 데모 절반을 지나면 나타나고, 하단 CTA 섭션에 닿으면 숨는다 */
+(function(){var el=document.getElementById("mk-float-cta");if(!el)return;
+var demo=document.querySelector(".mkdemo"),end=document.querySelector("[data-section-id=\"bottom_cta\"]");
+function upd(){var show=false;
+if(demo){var r=demo.getBoundingClientRect();show=r.bottom<innerHeight*0.5}else{show=scrollY>500}
+if(end){var rc=end.getBoundingClientRect();if(rc.top<innerHeight)show=false}
+el.style.opacity=show?"1":"0";el.style.pointerEvents=show?"auto":"none";
+el.style.transform=show?"translate(-50%,0)":"translate(-50%,14px)"}
+addEventListener("scroll",upd,{passive:true});setInterval(upd,800);upd()})();
+</script>
 </body>
 </html>
