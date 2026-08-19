@@ -15,8 +15,13 @@ window.MK_BAKED = {
     "wellbeing"
   ],
   "columns": {
-    "c-quote": "quote-request-checklist",
-    "c-sample": "sample-request-checklist"
+      "c-margin": "why-innovative-products",
+      "c-verify": "supplier-verification",
+      "c-exclusive": "exclusive-rights-checklist",
+      "c-moq": "moq-negotiation",
+      "c-mkt": "marketing-support",
+      "c-quote": "quote-request-checklist",
+      "c-sample": "sample-request-checklist"
   }
 };
 

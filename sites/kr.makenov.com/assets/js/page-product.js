@@ -39,14 +39,14 @@ function pageInit(){
     }
     if(b.type==='p')          detail += `<p>${esc(L(b.text))}</p>`;
     else if(b.type==='img')   detail += `<img src="${b.src}" alt="${esc(L(p.name))}" loading="lazy">`;
-    else if(b.type==='video') detail += `<div class="pd-video"><iframe src="${ytEmbed(b.src)}" allowfullscreen loading="lazy"></iframe></div>`;
+    else if(b.type==='video') detail += mkVideoEmbed(b.src);
     i++;
   }
 
   /* 대표 영상 — 등록된 제품만 노출 */
   const mainVideo = p.video
     ? `<div class="pd-sec"><h2 data-i18n="pd_video"></h2>
-         <div class="pd-video"><iframe src="${ytEmbed(p.video)}" allowfullscreen loading="lazy"></iframe></div></div>`
+         ${mkVideoEmbed(p.video)}</div>`
     : '';
 
   document.getElementById('pd-root').innerHTML = `
