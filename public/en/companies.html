@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <base href="../">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="assets/css/style.css?v=20260819g">
+<link rel="stylesheet" href="assets/css/style.css?v=20260819h">
 <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
 
 
@@ -29,7 +29,7 @@
 <!-- /mk:seo -->
 </head>
 <body>
-<header class="mk-header" id="mk-header"></header><main class="wrap">
+<div id="mk-topbar" class="topbar"><div class="wrap"><span></span><button class="x" onclick="sessionStorage.setItem('mk_topbar_off','1');this.closest('.topbar').remove()">✕</button></div></div><header class="mk-header" id="mk-header"></header><main class="wrap">
 <!-- mk:pre (prerender.js가 관리 — 직접 수정 금지) -->
 <div id="mk-prerender"><div class="dir-top"><h1 data-i18n="co_dir_title">Maker directory</h1><p data-i18n="co_dir_desc">Check production capacity, certifications and export record before you inquire.</p></div><div class="filterbar"><a class="chip on" href="companies.html" data-i18n="dir_all">All</a><a class="chip " href="companies.html?category=beauty">Beauty &amp; Cosmetics</a><a class="chip " href="companies.html?category=food">Food &amp; Beverage</a><a class="chip " href="companies.html?category=living">Home &amp; Living</a><a class="chip " href="companies.html?category=health">Health &amp; Wellness</a><a class="chip " href="companies.html?category=kids">Kids &amp; Baby</a><a class="chip " href="companies.html?category=tech">Tech &amp; Devices</a></div><section class="sec" style="padding-top:28px"><div class="co-grid">
   <a class="co-card" href="en/companies/lgind.html"><div class="cv"><img src="https://picsum.photos/seed/mkc-lgind-cv/1200/400" alt="" loading="lazy"></div><div class="bd"><img class="lg" src="https://picsum.photos/seed/mkc-lgind/200/200" alt="LARGE Co., Ltd. (FIRESSAK)" loading="lazy"><h3>LARGE Co., Ltd. (FIRESSAK)</h3><p class="tag">EV fire-suppression solutions built on automotive composite materials</p><div class="meta"><span>Daegu, Korea</span><i></i><span><b>1</b> <span data-i18n="co_prod_unit">products</span></span><i></i><span>since 2009</span></div></div></a>
@@ -68,7 +68,7 @@
 <script src="assets/js/upload.js?v=20260817b"></script>
 <script src="assets/js/store-supabase.js?v=20260817b"></script>
 <script src="assets/js/copy-edit.js?v=20260817b"></script>
-<script src="assets/js/app.js?v=20260819g"></script>
+<script src="assets/js/app.js?v=20260819h"></script>
 <script>
 function pageInit(){
   const cat = new URLSearchParams(location.search).get('category') || '';

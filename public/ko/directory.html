@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <base href="../">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="assets/css/style.css?v=20260819g">
+<link rel="stylesheet" href="assets/css/style.css?v=20260819h">
 <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
 
 
@@ -29,7 +29,7 @@
 <!-- /mk:seo -->
 </head>
 <body>
-<header class="mk-header" id="mk-header"></header><main class="wrap">
+<div id="mk-topbar" class="topbar"><div class="wrap"><span></span><button class="x" onclick="sessionStorage.setItem('mk_topbar_off','1');this.closest('.topbar').remove()">✕</button></div></div><header class="mk-header" id="mk-header"></header><main class="wrap">
 <!-- mk:pre (prerender.js가 관리 — 직접 수정 금지) -->
 <div id="mk-prerender"><div class="dir-top"><h1 data-i18n="dir_title">제품 디렉토리</h1><p data-i18n="dir_desc">글로벌 혁신 제품들을 만나보세요</p></div><div class="filterbar"><a class="chip on" href="directory.html?sort=new" data-i18n="dir_all">전체</a><a class="chip " href="directory.html?category=beauty&amp;sort=new">뷰티·화장품</a><a class="chip " href="directory.html?category=food&amp;sort=new">식품·음료</a><a class="chip " href="directory.html?category=living&amp;sort=new">리빙·생활용품</a><a class="chip " href="directory.html?category=health&amp;sort=new">헬스·건강</a><a class="chip " href="directory.html?category=kids&amp;sort=new">키즈·육아</a><a class="chip " href="directory.html?category=tech&amp;sort=new">테크·가전</a><select class="sortsel" onchange="location.href='directory.html?sort='+this.value"><option value="new" selected="">최신순</option><option value="popular">인기순</option><option value="inq">문의 많은 순</option></select></div><section class="sec" style="padding-top:28px"><div class="grid">
   <a class="p-card" href="ko/products/p12.html"><div class="thumb"><img src="assets/img/products/miralet/mist.jpg" alt="미라렛 피토 더블 미스트 50g" loading="lazy"><span class="flag" data-i18n="spot_new">신제품 등록</span>
@@ -83,7 +83,7 @@
 <script src="assets/js/upload.js?v=20260817b"></script>
 <script src="assets/js/store-supabase.js?v=20260817b"></script>
 <script src="assets/js/copy-edit.js?v=20260817b"></script>
-<script src="assets/js/app.js?v=20260819g"></script>
+<script src="assets/js/app.js?v=20260819h"></script>
 <script>
 function pageInit(){
   const params = new URLSearchParams(location.search);

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <base href="../">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="assets/css/style.css?v=20260819g">
+<link rel="stylesheet" href="assets/css/style.css?v=20260819h">
 <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
 
 
@@ -29,7 +29,7 @@
 <!-- /mk:seo -->
 </head>
 <body>
-<header class="mk-header" id="mk-header"></header><main class="wrap">
+<div id="mk-topbar" class="topbar"><div class="wrap"><span></span><button class="x" onclick="sessionStorage.setItem('mk_topbar_off','1');this.closest('.topbar').remove()">✕</button></div></div><header class="mk-header" id="mk-header"></header><main class="wrap">
 <!-- mk:pre (prerender.js가 관리 — 직접 수정 금지) -->
 <div id="mk-prerender"><div class="dir-top"><h1 data-i18n="co_dir_title">공급사 디렉토리</h1><p data-i18n="co_dir_desc">생산 능력·인증·수출 실적을 확인하고 바로 문의하세요.</p></div><div class="filterbar"><a class="chip on" href="companies.html" data-i18n="dir_all">전체</a><a class="chip " href="companies.html?category=beauty">뷰티·화장품</a><a class="chip " href="companies.html?category=food">식품·음료</a><a class="chip " href="companies.html?category=living">리빙·생활용품</a><a class="chip " href="companies.html?category=health">헬스·건강</a><a class="chip " href="companies.html?category=kids">키즈·육아</a><a class="chip " href="companies.html?category=tech">테크·가전</a></div><section class="sec" style="padding-top:28px"><div class="co-grid">
   <a class="co-card" href="ko/companies/lgind.html"><div class="cv"><img src="https://picsum.photos/seed/mkc-lgind-cv/1200/400" alt="" loading="lazy"></div><div class="bd"><img class="lg" src="https://picsum.photos/seed/mkc-lgind/200/200" alt="(주)라지 · 파이어싹" loading="lazy"><h3>(주)라지 · 파이어싹</h3><p class="tag">자동차 복합소재 기술로 만든 전기차 화재 진압 솔루션</p><div class="meta"><span>대구 달성군 테크노폴리스</span><i></i><span><b>1</b> <span data-i18n="co_prod_unit">개 제품</span></span><i></i><span>since 2009</span></div></div></a>
@@ -68,7 +68,7 @@
 <script src="assets/js/upload.js?v=20260817b"></script>
 <script src="assets/js/store-supabase.js?v=20260817b"></script>
 <script src="assets/js/copy-edit.js?v=20260817b"></script>
-<script src="assets/js/app.js?v=20260819g"></script>
+<script src="assets/js/app.js?v=20260819h"></script>
 <script>
 function pageInit(){
   const cat = new URLSearchParams(location.search).get('category') || '';

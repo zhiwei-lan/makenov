@@ -1502,3 +1502,7 @@ body.mkedit-on .omc-hero .slide.on .shot{pointer-events:none}
 /* 사전 렌더 표시 중(.mk-pre): 정적 헤더·푸터 사본은 숨기고(실제 헤더가 위에 그려짐), 런타임 컨테이너는 교체 전까지 숨긴다 */
 .mk-pre #mk-prerender .mk-static-mk-header,.mk-pre #mk-prerender .mk-static-mk-footer{display:none}
 .mk-pre main > :not(#mk-prerender){display:none !important}
+/* 헤더가 JS 로 그려지기 전 높이를 미리 잡아 둔다(레이아웃 이동 방지) */
+#mk-header:empty{min-height:137px}
+@media(max-width:640px){#mk-header:empty{min-height:63px}}
+.topbar .wrap > span:empty{display:inline-block;min-height:1em}

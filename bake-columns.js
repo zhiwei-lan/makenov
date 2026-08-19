@@ -110,7 +110,7 @@ ${FAVICON}
 </head>
 <body>
 <div class="blog-progress"><div class="blog-progress-bar" id="progress-bar"></div></div>
-<header class="mk-header" id="mk-header"></header>
+<div id="mk-topbar" class="topbar"><div class="wrap"><span></span><button class="x" onclick="sessionStorage.setItem('mk_topbar_off','1');this.closest('.topbar').remove()">✕</button></div></div><header class="mk-header" id="mk-header"></header>
 <main class="wrap">
 <article class="blog-single" id="col-root">
   <nav class="blog-breadcrumb"><a href="${f('index.html')}">${esc(L.home)}</a> - <a href="${f('columns.html')}">${esc(L.post)}</a> - <span>${esc(title)}</span></nav>

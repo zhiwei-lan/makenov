@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <base href="../">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="assets/css/style.css?v=20260819g">
+<link rel="stylesheet" href="assets/css/style.css?v=20260819h">
 <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
 
 
@@ -29,7 +29,7 @@
 <!-- /mk:seo -->
 </head>
 <body>
-<header class="mk-header" id="mk-header"></header><main class="wrap">
+<div id="mk-topbar" class="topbar"><div class="wrap"><span></span><button class="x" onclick="sessionStorage.setItem('mk_topbar_off','1');this.closest('.topbar').remove()">✕</button></div></div><header class="mk-header" id="mk-header"></header><main class="wrap">
 <!-- mk:pre (prerender.js가 관리 — 직접 수정 금지) -->
 <div id="mk-prerender"><div class="dir-top"><h1 data-i18n="nav_columns">Insights</h1><p data-i18n="col_desc">Market Insights for Global Sourcing and Exporting</p></div><section class="blog-layout"><aside class="blog-sidebar"><div class="blog-search"><input type="search" data-i18n-ph="col_search_ph" oninput="colQ=this.value;renderCols()" placeholder="Search articles"></div><h3 class="blog-sidebar-tit" data-i18n="col_category">Category</h3><ul class="blog-cat-list"><li class="blog-cat-item is-active"><a class="blog-cat-link" onclick="colCat='all';renderCols()"><span data-i18n="dir_all">All</span><span class="blog-cat-count">(3)</span></a></li>
       <li class="blog-cat-item "><a class="blog-cat-link" onclick="colCat='가이드';renderCols()"><span>가이드</span><span class="blog-cat-count">(2)</span></a></li>
@@ -65,7 +65,7 @@
 <script src="assets/js/upload.js?v=20260817b"></script>
 <script src="assets/js/store-supabase.js?v=20260817b"></script>
 <script src="assets/js/copy-edit.js?v=20260817b"></script>
-<script src="assets/js/app.js?v=20260819g"></script>
+<script src="assets/js/app.js?v=20260819h"></script>
 <script>
 let colCat = 'all', colQ = '';
 

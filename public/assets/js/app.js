@@ -97,6 +97,8 @@ function renderChrome(active){
       : `<span>${esc(tbMsg)}</span>`;
     tb.innerHTML = `<div class="wrap">${body}<button class="x" onclick="sessionStorage.setItem('mk_topbar_off','1');this.closest('.topbar').remove()">✕</button></div>`;
     hdr.parentNode.insertBefore(tb, hdr);
+  }else if(old && (!tbOn || sessionStorage.getItem('mk_topbar_off'))){
+    old.remove();                                      // 정적 자리표시자(CLS 방지용)였는데 꺼진 상태면 제거
   }else if(tbOn && old){
     const slot = old.querySelector('.wrap > a, .wrap > span');
     if(slot) slot.textContent = tbMsg;                 // 언어 전환 시 문구만 교체

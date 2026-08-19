@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="assets/css/style.css?v=20260819g">
+<link rel="stylesheet" href="assets/css/style.css?v=20260819h">
 <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
 
 
@@ -28,7 +28,7 @@
 <!-- /mk:seo -->
 </head>
 <body>
-<header class="mk-header" id="mk-header"></header><main class="wrap">
+<div id="mk-topbar" class="topbar"><div class="wrap"><span></span><button class="x" onclick="sessionStorage.setItem('mk_topbar_off','1');this.closest('.topbar').remove()">✕</button></div></div><header class="mk-header" id="mk-header"></header><main class="wrap">
 <!-- mk:pre (prerender.js가 관리 — 직접 수정 금지) -->
 <div id="mk-prerender"><div class="dir-top"><h1 data-i18n="dir_title">Danh mục sản phẩm</h1><p data-i18n="dir_desc">Gặp gỡ các sản phẩm sáng tạo toàn cầu</p></div><div class="filterbar"><a class="chip on" href="directory.html?sort=new" data-i18n="dir_all">Tất cả</a><a class="chip " href="directory.html?category=beauty&amp;sort=new">Mỹ phẩm &amp; Làm đẹp</a><a class="chip " href="directory.html?category=food&amp;sort=new">Thực phẩm &amp; Đồ uống</a><a class="chip " href="directory.html?category=living&amp;sort=new">Đồ gia dụng</a><a class="chip " href="directory.html?category=health&amp;sort=new">Sức khỏe &amp; Thể thao</a><a class="chip " href="directory.html?category=kids&amp;sort=new">Mẹ &amp; Bé</a><a class="chip " href="directory.html?category=tech&amp;sort=new">Thiết bị &amp; Công nghệ</a><select class="sortsel" onchange="location.href='directory.html?sort='+this.value"><option value="new" selected="">Mới nhất</option><option value="popular">Quan tâm nhiều</option><option value="inq">Nhiều yêu cầu nhất</option></select></div><section class="sec" style="padding-top:28px"><div class="grid">
   <a class="p-card" href="products/p12.html"><div class="thumb"><img src="assets/img/products/miralet/mist.jpg" alt="Xịt khoáng MIRALET Phyto Double Mist 50g" loading="lazy"><span class="flag" data-i18n="spot_new">Sản phẩm mới</span>
@@ -81,7 +81,7 @@
 <script src="assets/js/upload.js?v=20260817b"></script>
 <script src="assets/js/store-supabase.js?v=20260817b"></script>
 <script src="assets/js/copy-edit.js?v=20260817b"></script>
-<script src="assets/js/app.js?v=20260819g"></script>
+<script src="assets/js/app.js?v=20260819h"></script>
 <script>
 function pageInit(){
   const params = new URLSearchParams(location.search);
