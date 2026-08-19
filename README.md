@@ -120,3 +120,16 @@ supabase/03_lockdown.sql 의 정책을 `Api\Rest::POLICY` 로 옮겼습니다.
 
 - 프론트 저장소: github.com/leegunhee010/makenov (정적 HTML, `node build.js` 로 굽기)
 - supabase/ 폴더에 원본 스키마·시드·RLS SQL 전부 있음 (이 패키지의 근거 문서)
+
+## 언어별 서브도메인 (vn / kr / en.makenov.com)
+
+`public/` 이 원본이고, `node build-sites.js` 가 호스트별 독립 정적 사이트를 `sites/` 에 생성한다.
+
+| 호스트 | 루트 | 내용 |
+|---|---|---|
+| vn.makenov.com | `sites/vn.makenov.com` | 베트남어 = `public/` 루트 파일 |
+| kr.makenov.com | `sites/kr.makenov.com` | 한국어 = `public/ko/*` 를 루트로 |
+| en.makenov.com | `sites/en.makenov.com` | 영어 = `public/en/*` 를 루트로 |
+| makenov.com | `public` (CI4) | API·/admin/·/uploads·/rss.xml. 페이지는 301 → 언어 사이트 (`nginx.makenov.com.conf.example`) |
+
+페이지나 `assets/` 를 고치면 `node build-sites.js` 를 다시 돌려 `sites/` 를 함께 커밋한다. 언어 결정은 `i18n.js` 의 `MK_HOSTS`(호스트 → 언어) 가 맡고, 세션은 `.makenov.com` 쿠키로 호스트 간 공유된다.
