@@ -513,5 +513,18 @@
 <script src="assets/js/app.js?v=20260817b"></script>
 <script src="assets/js/about-copy.js?v=20260817b"></script>
 <script>function pageInit(){}</script>
-</body>
+<style>.mk-anim-paused,.mk-anim-paused *{animation-play-state:paused !important}</style>
+<script>
+/* 히어로 데모·카테고리 마퀴가 화면 밖에서도 무한 애니메이션(대형 blur 포함)을
+   돌려 GPU 페인트가 고갈되고, 스크롤 후반부(FAQ 등)가 백지로 나오는 문제.
+   뷰포트를 벗어나면 재생을 멈춘다. */
+(function(){
+  if(!('IntersectionObserver' in window))return;
+  var ts=[document.querySelector('.mkdemo'),document.querySelector('.cmq')].filter(Boolean);
+  var io=new IntersectionObserver(function(es){es.forEach(function(en){
+    en.target.classList.toggle('mk-anim-paused',!en.isIntersecting);
+  })},{rootMargin:'120px'});
+  ts.forEach(function(t){io.observe(t)});
+})();
+</script></body>
 </html>
