@@ -95,7 +95,7 @@ function renderChrome(active){
         onkeydown="if(event.key==='Enter'){${doSearch}}"><span class="ico" role="button" tabindex="0" onclick="${doSearch}">${MK_ICO.search}</span></div><div class="mk-head-right"><div class="mk-lang"><button data-lang="vi" onclick="setLang('vi')">VI</button><button data-lang="ko" onclick="setLang('ko')">KO</button><button data-lang="en" onclick="setLang('en')">EN</button></div><a class="mk-util" href="mypage.html">${MK_ICO.heart}<span class="badge" id="cart-badge">0</span><span class="lb" data-i18n="util_wish"></span></a>
       ${s
         ? `<a class="mk-util" href="mypage.html">${MK_ICO.user}<span class="lb">${esc(s.contactName||s.email.split('@')[0])}</span></a><a class="mk-util" onclick="Store.logout();location.reload()" style="cursor:pointer">${MK_ICO.logout}<span class="lb" data-i18n="logout"></span></a>`
-        : `<a class="mk-util" onclick="openAuth('login')" style="cursor:pointer">${MK_ICO.user}<span class="lb" data-i18n="login"></span></a><button class="btn btn-primary btn-sm" style="margin-left:6px;height:40px;padding:0 18px" onclick="openAuth('signup')" data-i18n="signup"></button>`}
+        : `<a class="mk-util" href="mypage.html" onclick="event.preventDefault();openAuth('login')">${MK_ICO.user}<span class="lb" data-i18n="login"></span></a><button class="btn btn-primary btn-sm" style="margin-left:6px;height:40px;padding:0 18px" onclick="openAuth('signup')" data-i18n="signup"></button>`}
     </div></div><nav class="mk-nav mk-head-nav"><a href="${mkUrl('products.html')}" data-i18n="nav_directory"></a><a href="${mkUrl('companies.html')}" data-i18n="nav_companies"></a><a href="${mkUrl('columns.html')}" data-i18n="nav_columns"></a><span class="gnb"><a href="${mkUrl('guide.html')}" data-i18n="nav_guide"></a><span class="drop"><a href="${mkUrl('support.html')}" data-i18n="nav_support"></a><span class="menu"><a href="${mkUrl('support.html#notice')}" data-i18n="nav_sp_notice"></a><a href="${mkUrl('support.html#faq')}" data-i18n="nav_sp_faq"></a><a href="${mkUrl('support.html#ask')}" data-i18n="nav_sp_ask"></a></span></span></span></nav></div>`;
   document.getElementById('mk-footer').innerHTML = `
   <div class="wrap"><div class="brand"><div class="logo"><img src="${mkAsset('assets/img/logo.png')}" alt="MAKENOV"
@@ -656,6 +656,13 @@ function productCard(p){
       <button class="heart ${inCart?'on':''}" onclick="event.preventDefault();event.stopPropagation();toggleCart('${p.id}',this)">${inCart?'♥':'♡'}</button></div><div class="body"><span class="brand">${esc(p.brand)}</span><h3>${esc(L(p.name))}</h3><div class="meta">${cardMeta(p)}<span class="left">${esc(p.origin)}</span></div></div></a>`;
 }
 
+/* 사전 렌더(크롤러용 정적 사본) → 실제 렌더 교체. 한 번만 */
+function mkSwapPrerender(){
+  const pre = document.getElementById('mk-prerender');
+  if(pre) pre.remove();
+  document.documentElement.classList.remove('mk-pre');
+}
+
 /* ---------- boot ---------- */
 document.addEventListener('DOMContentLoaded', async ()=>{
   document.documentElement.lang = MK_LANG;
@@ -664,8 +671,13 @@ document.addEventListener('DOMContentLoaded', async ()=>{
         prerender.js 가 크롤러용으로 구워 넣은 정적 사본이다. JS가 도는 브라우저에서는
         아래에서 실제 렌더가 일어나므로 부팅 첫 줄에서 걷어낸다.
         (원본 컨테이너는 그대로 남아 있어서 pageInit 이 평소대로 채운다) */
+  /* ★ 2026-08-19: 부팅 첫 줄에서 바로 지우면 데이터가 올 때까지(≈1초) 페이지가 빈 껍데기로
+        주저앉았다가 다시 펴진다(Lighthouse CLS 0.999). 그래서 실제 렌더가 끝날 때까지는
+        사전 렌더를 그대로 보여 주고(헤더·푸터 정적 사본만 숨김), 런타임 컨테이너는 숨겨 둔다.
+        교체는 아래 mkSwapPrerender() — 첫 pageInit 직후 한 번. */
   const pre = document.getElementById('mk-prerender');
-  if(pre) pre.remove();
+  /* 랜딩처럼 사전 렌더가 display:none(정적 헤더·푸터 사본뿐)인 페이지는 교체할 화면이 없으므로 제외 */
+  if(pre && pre.style.display !== 'none') document.documentElement.classList.add('mk-pre');
 
   /* 0-B) 구워둔 카피를 먼저 덮는다.
      관리자에서 고친 문구는 DB에 있는데, 그걸 받아오는 데 1초쯤 걸린다.
@@ -711,6 +723,7 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   if(typeof MkData !== 'undefined') renderChrome();
   if(typeof pageInit === 'function') pageInit();
   applyI18n();
+  mkSwapPrerender();
   unlockIfAuthed();
   document.addEventListener('mk:lang', ()=>{ renderChrome(); if(typeof pageInit==='function') pageInit(); applyI18n(); unlockIfAuthed(); });
 });

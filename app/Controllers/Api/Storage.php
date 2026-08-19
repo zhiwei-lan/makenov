@@ -65,16 +65,70 @@ class Storage extends BaseApiController
         if ($path === '' || ! is_file($file)) {
             return $this->json(['message' => 'not found'], 404);
         }
+        $ext  = strtolower(pathinfo($file, PATHINFO_EXTENSION));
         $mime = [
             'jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png',
             'webp' => 'image/webp', 'gif' => 'image/gif', 'svg' => 'image/svg+xml',
             'pdf' => 'application/pdf',
-        ][strtolower(pathinfo($file, PATHINFO_EXTENSION))] ?? 'application/octet-stream';
+        ][$ext] ?? 'application/octet-stream';
+
+        /* 관리자가 올린 원본(1.5~2MB PNG)을 그대로 내보내면 제품 페이지가 8MB 를 넘는다(2026-08-19 Lighthouse).
+           브라우저가 WebP 를 받을 수 있으면 긴 변 1600px 로 줄인 WebP 를 만들어 writable/cache/img 에 두고 그걸 낸다.
+           DB 의 이미지 주소는 그대로(.png) 라 데이터 수정 없이 전 이미지에 적용된다. GD 가 없거나 실패하면 원본. */
+        if (in_array($ext, ['jpg', 'jpeg', 'png'], true)
+            && str_contains((string) $this->request->getHeaderLine('Accept'), 'image/webp')) {
+            $webp = $this->webpVariant($file);
+            if ($webp !== null) {
+                return $this->response
+                    ->setHeader('Content-Type', 'image/webp')
+                    ->setHeader('Vary', 'Accept')
+                    ->setHeader('Cache-Control', 'public, max-age=31536000')
+                    ->setBody(file_get_contents($webp));
+            }
+        }
 
         return $this->response
             ->setHeader('Content-Type', $mime)
+            ->setHeader('Vary', 'Accept')
             ->setHeader('Cache-Control', 'public, max-age=31536000')
             ->setBody(file_get_contents($file));
+    }
+
+    /** 원본 → 최대 1600px WebP(q80). 캐시 파일 경로를 돌려주고, 못 만들면 null */
+    private function webpVariant(string $file): ?string
+    {
+        if (! function_exists('imagewebp') || ! function_exists('imagecreatefromstring')) {
+            return null;
+        }
+        $dir = WRITEPATH . 'cache' . DIRECTORY_SEPARATOR . 'img';
+        $out = $dir . DIRECTORY_SEPARATOR . md5($file) . '-' . filemtime($file) . '.webp';
+        if (is_file($out)) {
+            return $out;
+        }
+        try {
+            if (! is_dir($dir) && ! @mkdir($dir, 0775, true)) {
+                return null;
+            }
+            $src = @imagecreatefromstring((string) file_get_contents($file));
+            if (! $src) {
+                return null;
+            }
+            $w = imagesx($src); $h = imagesy($src);
+            $max = 1600;
+            if ($w > $max || $h > $max) {
+                $r  = min($max / $w, $max / $h);
+                $nw = (int) round($w * $r); $nh = (int) round($h * $r);
+                $dst = imagecreatetruecolor($nw, $nh);
+                imagealphablending($dst, false); imagesavealpha($dst, true);
+                imagecopyresampled($dst, $src, 0, 0, 0, 0, $nw, $nh, $w, $h);
+                imagedestroy($src); $src = $dst;
+            }
+            $ok = @imagewebp($src, $out, 80);
+            imagedestroy($src);
+            return ($ok && is_file($out)) ? $out : null;
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 
     /** 세그먼트들을 안전한 경로로 — 탈출 차단 + 문자 정제 */

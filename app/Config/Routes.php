@@ -16,16 +16,21 @@ use CodeIgniter\Router\RouteCollection;
 
 /** @var RouteCollection $routes */
 
-$routes->get('/', static fn () => file_get_contents(ROOTPATH . 'public/index.html'));
+/* GET+HEAD — HEAD 가 404 면 링크 체커·일부 봇이 홈을 죽은 페이지로 본다(2026-08-19 점검) */
+$routes->match(['GET', 'HEAD'], '/', static function () {
+    return service('response')
+        ->setHeader('Cache-Control', 'public, max-age=300')
+        ->setBody(file_get_contents(ROOTPATH . 'public/index.html'));
+});
 
 /* ── 칼럼 RSS 피드 ─────────────────────────────────────────
    정적 파일이 아니라 라우트다 — 서버 public/ 소유권 때문에 git pull 이
    새 파일을 못 만들고, 라우트면 칼럼 발행 시 피드도 자동 갱신된다 */
-$routes->get('rss.xml', '\App\Controllers\Api\Rss::feed');
+$routes->match(['GET', 'HEAD'], 'rss.xml', '\App\Controllers\Api\Rss::feed');
 
 /* ── 배포 확인 ─────────────────────────────────────────────
    Actions 초록불 ≠ 서버 반영. 이 응답의 마커로 실제 반영을 대조한다 */
-$routes->get('deploy-check', '\App\Controllers\Api\DeployCheck::index');
+$routes->match(['GET', 'HEAD'], 'deploy-check', '\App\Controllers\Api\DeployCheck::index');
 
 /* ── REST (PostgREST 미믹) ─────────────────────────────────
    GET/POST/PATCH/DELETE /rest/v1/{table}
