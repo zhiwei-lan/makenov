@@ -9,8 +9,43 @@
    ============================================================ */
 if (typeof MK_BACKEND !== 'undefined' && MK_BACKEND === 'supabase') {
 
+/* ---------- 세션 저장소: 서브도메인 간 공유 ----------
+   vn/kr/en.makenov.com 은 서로 다른 origin 이라 localStorage 가 안 넘어간다.
+   언어를 바꿀 때마다 로그인이 풀리지 않도록, 세션을 `.makenov.com` 쿠키에도 같이 둔다.
+   읽을 땐 쿠키(다른 호스트에서 로그인한 것) 우선, 없으면 localStorage.
+   로컬(localhost 등)에서는 그냥 localStorage 만 쓴다. 쿠키 4KB 한도를 넘는 값은 쿠키에 안 넣는다. */
+const MK_COOKIE_DOMAIN = /(^|\.)makenov\.com$/.test(location.hostname) ? '.makenov.com' : null;
+const mkSessionStorage = {
+  _ck(name){
+    const parts = document.cookie ? document.cookie.split('; ') : [];
+    for(let i = 0; i < parts.length; i++){
+      const eq = parts[i].indexOf('=');
+      if(eq > 0 && parts[i].slice(0, eq) === name) return decodeURIComponent(parts[i].slice(eq + 1));
+    }
+    return null;
+  },
+  getItem(k){
+    if(MK_COOKIE_DOMAIN){ const v = this._ck(k); if(v != null) return v; }
+    try{ return localStorage.getItem(k); }catch(e){ return null; }
+  },
+  setItem(k, v){
+    try{ localStorage.setItem(k, v); }catch(e){}
+    if(MK_COOKIE_DOMAIN){
+      const enc = encodeURIComponent(v);
+      if(enc.length < 3900){
+        document.cookie = k + '=' + enc + '; Domain=' + MK_COOKIE_DOMAIN + '; Path=/; Max-Age=2592000; Secure; SameSite=Lax';
+      }
+    }
+  },
+  removeItem(k){
+    try{ localStorage.removeItem(k); }catch(e){}
+    if(MK_COOKIE_DOMAIN){
+      document.cookie = k + '=; Domain=' + MK_COOKIE_DOMAIN + '; Path=/; Max-Age=0; Secure; SameSite=Lax';
+    }
+  },
+};
 const SB = supabase.createClient(MK_SUPABASE_URL, MK_SUPABASE_ANON, {
-  auth: { persistSession: true, autoRefreshToken: true },
+  auth: { persistSession: true, autoRefreshToken: true, storage: mkSessionStorage },
 });
 window.SB = SB;
 
@@ -33,10 +68,10 @@ const MkData = {
       this.profile = prof || null;
       this.admin   = !!adm;
       /* 다음 페이지의 첫 헤더 렌더가 쓸 힌트 (sessionHint 참고) */
-      try{ localStorage.setItem('mk_ui_auth', JSON.stringify({
+      try{ mkSessionStorage.setItem('mk_ui_auth', JSON.stringify({
         email: session.user.email, name: (prof && prof.contact_name) || '' })); }catch(e){}
     }else{
-      try{ localStorage.removeItem('mk_ui_auth'); }catch(e){}
+      try{ mkSessionStorage.removeItem('mk_ui_auth'); }catch(e){}
     }
     await this.loadContent();
   },
@@ -167,11 +202,11 @@ Object.assign(Store, {
     if(MkData.session) return this.session();
     try{
       const ref = (MK_SUPABASE_URL.match(/\/\/([^.]+)\./) || [])[1];
-      const raw = localStorage.getItem('sb-' + ref + '-auth-token');
+      const raw = mkSessionStorage.getItem('sb-' + ref + '-auth-token');
       if(!raw) return null;
       const tok = JSON.parse(raw);
       if(!tok || !tok.user || (tok.expires_at && tok.expires_at * 1000 < Date.now() - 60000)) return null;
-      let ui = {}; try{ ui = JSON.parse(localStorage.getItem('mk_ui_auth')||'{}'); }catch(e){}
+      let ui = {}; try{ ui = JSON.parse(mkSessionStorage.getItem('mk_ui_auth')||'{}'); }catch(e){}
       return { email: tok.user.email, contactName: ui.name || '', _hint: true };
     }catch(e){ return null; }
   },
@@ -313,7 +348,7 @@ Object.assign(Store, {
   async logout(){
     await SB.auth.signOut();
     MkData.session = null; MkData.profile = null;
-    try{ localStorage.removeItem('mk_ui_auth'); }catch(e){}   // 힌트도 지워야 다음 렌더가 로그인으로 안 보인다
+    try{ mkSessionStorage.removeItem('mk_ui_auth'); }catch(e){}   // 힌트도 지워야 다음 렌더가 로그인으로 안 보인다
   },
 
   /* ---- 관심제품 ---- */

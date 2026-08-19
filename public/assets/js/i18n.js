@@ -1300,6 +1300,17 @@ const I18N = {
    기본형(.html)은 예전처럼 localStorage 를 따른다. 한국어로 보던 사람이
    북마크한 주소로 돌아왔을 때 갑자기 베트남어가 되지 않게 하려는 것이고,
    크롤러는 localStorage 가 비어 있으므로 항상 베트남어를 본다. */
+/* 언어별 호스트 (서브도메인 운영).
+   vn.makenov.com = 베트남어(루트 파일), kr.makenov.com = 한국어(ko/), en.makenov.com = 영어(en/).
+   Nginx 가 호스트별로 언어 폴더를 먼저 찾아 주므로(kr 호스트에서 /products.html → ko/products.html)
+   주소에는 언어 폴더가 드러나지 않는다. 이 호스트 중 하나로 들어오면 언어는 호스트가 정한다. */
+const MK_HOSTS = { vi:'vn.makenov.com', ko:'kr.makenov.com', en:'en.makenov.com' };
+const MK_HOST_LANG = (function(){
+  const h = location.hostname;
+  for (const l in MK_HOSTS) if (MK_HOSTS[l] === h) return l;
+  return null;
+})();
+if (MK_HOST_LANG) window.MK_FORCE_LANG = MK_HOST_LANG;
 let MK_LANG = window.MK_FORCE_LANG || localStorage.getItem('mk_lang') || 'vi';
 function t(key){ return (I18N[MK_LANG] && I18N[MK_LANG][key]) || I18N.vi[key] || key; }
 
@@ -1321,6 +1332,7 @@ function mkSiteRoot(){
    문서 안의 상대경로는 <base> 덕분에 루트 기준이라 앞에 언어 폴더만 붙이면 된다. */
 function mkUrl(rel){
   const l = window.MK_FORCE_LANG;
+  if(MK_HOST_LANG) return rel;                       // 서브도메인에선 호스트가 언어라 경로에 안 붙인다
   if(!l || l === 'vi') return rel;
   const m = String(rel).match(/^([^#?]+)([#?].*)?$/);
   if(!m || MK_LANG_PAGES.indexOf(m[1]) < 0) return rel;
@@ -1338,7 +1350,7 @@ function mkDocUrl(kind, id){
   if(!B) return viewer;
   /* 구운 문서는 세 언어가 모두 있으므로 지금 언어판으로 보낸다 */
   const l = window.MK_FORCE_LANG;
-  const doc = rel => (!l || l === 'vi') ? rel : l + '/' + rel;
+  const doc = rel => (MK_HOST_LANG || !l || l === 'vi') ? rel : l + '/' + rel;
   if(kind === 'product') return B.products.indexOf(id) < 0 ? viewer : doc('products/' + id + '.html');
   if(kind === 'company') return B.companies.indexOf(id) < 0 ? viewer : doc('companies/' + id + '.html');
   if(kind === 'column'){
@@ -1353,7 +1365,18 @@ function mkLangHref(l){
   /* 이 페이지에 언어판이 있는지는 head 의 hreflang 링크로 판단한다.
      링크의 href 는 절대주소(확정 도메인 기준)라 이동에는 쓰지 않고,
      존재 여부만 본다. 실제 이동 경로는 파일명 규칙으로 만든다. */
-  if(!document.querySelector('link[rel="alternate"][hreflang="' + l + '"]')) return null;
+  const alt = document.querySelector('link[rel="alternate"][hreflang="' + l + '"]');
+  if(!alt) return null;
+  /* 서브도메인 운영: hreflang 링크가 곧 그 언어판의 절대주소(다른 호스트)다 */
+  if(MK_HOST_LANG){
+    if(l === MK_HOST_LANG) return null;               // 지금 호스트의 언어면 이동 없음
+    try{
+      const u = new URL(alt.getAttribute('href'), location.href);
+      if(u.hostname !== location.hostname){ u.search = location.search; u.hash = location.hash; return u.href; }
+    }catch(e){}
+    let rel = location.pathname; if(rel === '' || /\/$/.test(rel)) rel += 'index.html';
+    return 'https://' + MK_HOSTS[l] + rel.replace(/^\/(ko|en)\//, '/') + location.search + location.hash;
+  }
   const root = mkSiteRoot();
   let rel = location.pathname.slice(root.length);
   if(rel === '' || /\/$/.test(rel)) rel += 'index.html';
@@ -1365,7 +1388,7 @@ function mkLangHref(l){
 function setLang(l){
   localStorage.setItem('mk_lang', l);
   const href = mkLangHref(l);
-  if(href && href !== location.pathname + location.search + location.hash){
+  if(href && href !== location.pathname + location.search + location.hash && href !== location.href){
     location.href = href;                              // 언어판이 있으면 그 주소로 간다
     return;
   }

@@ -2,7 +2,7 @@
 
 /* ---------- helpers ---------- */
 /* 서비스 소개는 언어판이 갈린다 - 루트(KO/EN 텍스트 모드)에서도 새 언어판 랜딩으로 보낸다 */
-function mkAboutUrl(){var l=window.MK_FORCE_LANG;try{l=l||MK_LANG}catch(e){}return (l&&l!=='vi')?l+'/about.html':'about.html'}
+function mkAboutUrl(){var l=window.MK_FORCE_LANG;try{l=l||MK_LANG}catch(e){}if(typeof MK_HOST_LANG!=='undefined'&&MK_HOST_LANG)return 'about.html';return (l&&l!=='vi')?l+'/about.html':'about.html'}
 
 function esc(s){ return String(s??'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 function timeAgo(iso){

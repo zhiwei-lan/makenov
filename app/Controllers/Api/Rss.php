@@ -18,7 +18,8 @@ use CodeIgniter\HTTP\ResponseInterface;
  */
 class Rss extends Controller
 {
-    private const ORIGIN = 'https://makenov.com';
+    /** 한국어 피드 → 한국어 호스트. (서브도메인 전환 후 makenov.com/ko/* 는 kr 호스트로 301) */
+    private const ORIGIN = 'https://kr.makenov.com';
 
     /** 초기 칼럼은 DB slug 가 비어 있다. 구운 정적 페이지의 경로로 잇는다.
         c-reply(공급사 첫 회신)는 2026-08-17 개편에서 삭제했다. 읽는 사람이
@@ -43,7 +44,7 @@ class Rss extends Controller
             }
             $title   = $this->ko($row['title']);
             $excerpt = $this->ko($row['excerpt']);
-            $link    = self::ORIGIN . '/ko/columns/' . $slug . '.html';
+            $link    = self::ORIGIN . '/columns/' . $slug . '.html';
             $pubDate = date('D, d M Y', strtotime($row['date'])) . ' 09:00:00 +0900';
 
             $items .= "  <item>\n"
@@ -59,7 +60,7 @@ class Rss extends Controller
             . '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">' . "\n"
             . "<channel>\n"
             . "  <title>메이크노브 MAKENOV 칼럼</title>\n"
-            . '  <link>' . self::ORIGIN . "/ko/columns.html</link>\n"
+            . '  <link>' . self::ORIGIN . "/columns.html</link>\n"
             . "  <description>글로벌 소싱과 수출 실무 가이드 — 견적 요청, 샘플 확인, 바이어 회신 등 B2B 무역 실무 칼럼</description>\n"
             . "  <language>ko</language>\n"
             . '  <atom:link href="' . self::ORIGIN . '/rss.xml" rel="self" type="application/rss+xml"/>' . "\n"

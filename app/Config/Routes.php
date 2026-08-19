@@ -16,7 +16,10 @@ use CodeIgniter\Router\RouteCollection;
 
 /** @var RouteCollection $routes */
 
-$routes->get('/', static fn () => file_get_contents(ROOTPATH . 'public/index.html'));
+/* ── 루트 / sitemap / robots — 호스트(vn·kr·en 서브도메인)별로 다르게 낸다 ── */
+$routes->get('/', '\App\Controllers\Api\Seo::home');
+$routes->get('sitemap.xml', '\App\Controllers\Api\Seo::sitemap');
+$routes->get('robots.txt', '\App\Controllers\Api\Seo::robots');
 
 /* ── 칼럼 RSS 피드 ─────────────────────────────────────────
    정적 파일이 아니라 라우트다 — 서버 public/ 소유권 때문에 git pull 이
