@@ -98,10 +98,18 @@ function renderChrome(active){
         : `<a class="mk-util" onclick="openAuth('login')" style="cursor:pointer">${MK_ICO.user}<span class="lb" data-i18n="login"></span></a><button class="btn btn-primary btn-sm" style="margin-left:6px;height:40px;padding:0 18px" onclick="openAuth('signup')" data-i18n="signup"></button>`}
     </div></div><nav class="mk-nav mk-head-nav"><a href="${mkUrl('products.html')}" data-i18n="nav_directory"></a><a href="${mkUrl('companies.html')}" data-i18n="nav_companies"></a><a href="${mkUrl('columns.html')}" data-i18n="nav_columns"></a><span class="gnb"><a href="${mkUrl('guide.html')}" data-i18n="nav_guide"></a><span class="drop"><a href="${mkUrl('support.html')}" data-i18n="nav_support"></a><span class="menu"><a href="${mkUrl('support.html#notice')}" data-i18n="nav_sp_notice"></a><a href="${mkUrl('support.html#faq')}" data-i18n="nav_sp_faq"></a><a href="${mkUrl('support.html#ask')}" data-i18n="nav_sp_ask"></a></span></span></span></nav></div>`;
   document.getElementById('mk-footer').innerHTML = `
-  <div class="wrap"><div><div class="logo"><img src="${mkAsset('assets/img/logo.png')}" alt="MAKENOV"
-      onerror="this.parentNode.classList.add(&quot;txt&quot;);this.remove()"><span>MAKE<b>NOV</b></span></div><p class="desc" data-i18n="ft_desc"></p><div class="social"><a href="#" title="Facebook">f</a><a href="#" title="TikTok">t</a><a href="#" title="YouTube">▶</a><a href="#" title="Instagram">◎</a><a href="#" title="Zalo">Z</a></div></div><div><h4 data-i18n="ft_platform"></h4><a href="${mkUrl('products.html')}" data-i18n="nav_directory"></a><a href="${mkUrl('columns.html')}" data-i18n="nav_columns"></a></div><div><h4 data-i18n="ft_support"></h4><a href="${mkUrl('support.html')}" data-i18n="nav_support"></a><a href="${mkUrl('guide.html')}" data-i18n="nav_guide"></a><a href="sitemap.html" data-i18n="ft_sitemap"></a><a href="mailto:contact@makenov.com" data-i18n="ft_contact"></a></div></div><div class="base">© 2026 MAKENOV. All rights reserved. · Innovative products from suppliers worldwide.</div>`;
+  <div class="wrap"><div class="brand"><div class="logo"><img src="${mkAsset('assets/img/logo.png')}" alt="MAKENOV"
+      onerror="this.parentNode.classList.add(&quot;txt&quot;);this.remove()"><span>MAKE<b>NOV</b></span></div><p class="desc" data-i18n="ft_desc"></p><a class="mail" href="mailto:contact@makenov.com">contact@makenov.com</a></div><div><h4 data-i18n="ft_platform"></h4><a href="${mkUrl('products.html')}" data-i18n="nav_directory"></a><a href="${mkUrl('companies.html')}" data-i18n="nav_companies"></a><a href="${mkUrl('columns.html')}" data-i18n="nav_columns"></a></div><div><h4 data-i18n="ft_partner"></h4><a href="mypage.html" onclick="return mkFtJoin(event)" data-i18n="ft_join"></a><a href="mypage.html" data-i18n="ft_verify"></a><a href="maker.html" data-i18n="util_maker"></a></div><div><h4 data-i18n="ft_support"></h4><a href="${mkUrl('support.html')}" data-i18n="nav_support"></a><a href="${mkUrl('guide.html')}" data-i18n="nav_guide"></a><a href="${mkUrl('support.html#ask')}" data-i18n="ft_contact"></a><a href="sitemap.html" data-i18n="ft_sitemap"></a></div></div><div class="base"><span>© 2026 MAKENOV. All rights reserved.</span><span class="ft-lang"><button data-lang="vi" onclick="setLang('vi')">Tiếng Việt</button><button data-lang="ko" onclick="setLang('ko')">한국어</button><button data-lang="en" onclick="setLang('en')">English</button></span></div>`;
   updateCartBadge();
   applyI18n();
+}
+/* 푸터 '유통 파트너 가입': 비로그인은 가입 모달, 로그인 상태면 마이페이지로 */
+function mkFtJoin(ev){
+  let on = false; try{ on = !!(Store.session() || (Store.sessionHint && Store.sessionHint())); }catch(e){}
+  if(on) return true;
+  if(ev) ev.preventDefault();
+  openAuth('signup');
+  return false;
 }
 function updateCartBadge(){
   const b = document.getElementById('cart-badge');

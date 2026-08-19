@@ -622,9 +622,15 @@ button{font-family:var(--font-body);cursor:pointer;border:none;background:none;c
 .mk-footer .social a{display:flex;align-items:center;justify-content:center;width:34px;height:34px;
   border-radius:50%;border:1px solid var(--mk-line-strong);color:var(--mk-muted);font-size:14px;font-weight:700;padding:0}
 .mk-footer .social a:hover{border-color:var(--mk-primary);color:var(--mk-primary)}
-.mk-footer .base{border-top:1px solid var(--mk-line);padding:16px 20px;font-size:12px;
-  text-align:center;color:var(--mk-muted);line-height:1.7}
-@media(max-width:860px){.mk-footer .wrap{grid-template-columns:1fr 1fr}}
+.mk-footer .mail{display:inline-block;margin-top:14px;font-size:13px;font-weight:600;color:var(--mk-navy);padding:0}
+.mk-footer .base{border-top:1px solid var(--mk-line);font-size:12px;color:var(--mk-muted);line-height:1.7;
+  padding:14px max(20px,calc((100% - var(--maxw))/2 + 15px));
+  display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.mk-footer .ft-lang{display:flex;gap:16px}
+.mk-footer .ft-lang button{background:none;border:0;padding:0;font-size:12px;color:var(--mk-muted);cursor:pointer}
+.mk-footer .ft-lang button.on{color:var(--mk-ink);font-weight:700}
+.mk-footer .ft-lang button:hover{color:var(--mk-primary)}
+@media(max-width:860px){.mk-footer .wrap{grid-template-columns:1fr 1fr}.mk-footer .brand{grid-column:1/-1}}
 
 /* ---------- toast ---------- */
 .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(80px);

@@ -228,6 +228,9 @@ const I18N = {
     // footer
     ft_desc: "Nền tảng kết nối sản phẩm sáng tạo với nhà phân phối toàn cầu.",
     ft_platform: "Nền tảng",
+    ft_partner: "Tham gia",
+    ft_join: "Đăng ký làm nhà phân phối",
+    ft_verify: "Xác thực doanh nghiệp",
     ft_support: "Hỗ trợ",
     ft_company: "Công ty",
     ft_contact: "Liên hệ",
@@ -650,6 +653,9 @@ const I18N = {
     col_desc: "유통 파트너를 위한 소싱 가이드와 시장 이야기",
     ft_desc: "혁신 제품을 글로벌 유통 파트너와 연결하는 플랫폼.",
     ft_platform: "플랫폼",
+    ft_partner: "참여하기",
+    ft_join: "유통 파트너 가입",
+    ft_verify: "사업자 인증",
     ft_support: "지원",
     ft_company: "회사",
     ft_contact: "문의하기",
@@ -1076,6 +1082,9 @@ const I18N = {
     col_desc: "Sourcing guides and market notes for distribution partners",
     ft_desc: "Connecting innovative products with global distribution partners.",
     ft_platform: "Platform",
+    ft_partner: "Get started",
+    ft_join: "Join as a distribution partner",
+    ft_verify: "Verify your business",
     ft_support: "Support",
     ft_company: "Company",
     ft_contact: "Contact",
@@ -1377,7 +1386,7 @@ function setLang(l){
 function applyI18n(root){
   (root||document).querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent = t(el.dataset.i18n); });
   (root||document).querySelectorAll('[data-i18n-ph]').forEach(el=>{ el.placeholder = t(el.dataset.i18nPh); });
-  document.querySelectorAll('.mk-lang button').forEach(b=>b.classList.toggle('on', b.dataset.lang===MK_LANG));
+  document.querySelectorAll('.mk-lang button, .ft-lang button').forEach(b=>b.classList.toggle('on', b.dataset.lang===MK_LANG));
 }
 /* localized field helper: product fields stored as {vi,ko,en} */
 function L(field){ if(field==null) return ''; if(typeof field==='string') return field; return field[MK_LANG] || field.vi || field.en || field.ko || ''; }
