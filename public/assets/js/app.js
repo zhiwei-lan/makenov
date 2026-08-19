@@ -38,6 +38,23 @@ function ytEmbed(url){
   if(m) return 'https://player.vimeo.com/video/' + m[1];
   return u;
 }
+
+/* 영상 자리 마크업. 유튜브는 플레이어(≈850KB JS)를 바로 싣지 않고 썸네일+재생 버튼만 두었다가
+   누를 때 iframe 으로 바꾼다(2026-08-19 Lighthouse: 제품 상세 전송량의 1/3이 유튜브 플레이어였다). */
+function mkVideoEmbed(url){
+  const src = ytEmbed(url);
+  if(!src) return '';
+  const yt = src.match(/youtube\.com\/embed\/([A-Za-z0-9_-]{6,})/);
+  if(yt){
+    return `<div class="pd-video yt-lite" data-embed="${esc(src)}" style="background-image:url('https://i.ytimg.com/vi/${yt[1]}/hqdefault.jpg')" onclick="mkPlayVideo(this)"><button type="button" class="yt-play" aria-label="Play video"></button></div>`;
+  }
+  return `<div class="pd-video"><iframe src="${esc(src)}" allowfullscreen loading="lazy" title="video"></iframe></div>`;
+}
+function mkPlayVideo(el){
+  const src = el.getAttribute('data-embed'); if(!src) return;
+  el.classList.remove('yt-lite'); el.removeAttribute('style'); el.onclick = null;
+  el.innerHTML = `<iframe src="${esc(src + (src.includes('?') ? '&' : '?') + 'autoplay=1')}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen title="video"></iframe>`;
+}
 function toast(msg){
   let el = document.querySelector('.toast');
   if(!el){ el = document.createElement('div'); el.className='toast'; document.body.appendChild(el); }
