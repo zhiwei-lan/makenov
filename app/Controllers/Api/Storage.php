@@ -77,7 +77,10 @@ class Storage extends BaseApiController
            DB 의 이미지 주소는 그대로(.png) 라 데이터 수정 없이 전 이미지에 적용된다. GD 가 없거나 실패하면 원본. */
         if (in_array($ext, ['jpg', 'jpeg', 'png'], true)
             && str_contains((string) $this->request->getHeaderLine('Accept'), 'image/webp')) {
-            $webp = $this->webpVariant($file);
+            /* 미리 만들어 둔 형제 파일(x.png → x.webp)이 있으면 그걸 먼저. 서버 PHP 에 GD 가 없어서(2026-08-19 진단)
+               온더플라이 변환이 안 되는 동안은 레포에 함께 커밋한 형제 파일이 유일한 경로다 */
+            $sib = preg_replace('/\.(jpe?g|png)$/i', '.webp', $file);
+            $webp = ($sib !== $file && is_file($sib)) ? $sib : $this->webpVariant($file);
             if ($webp !== null) {
                 return $this->response
                     ->setHeader('Content-Type', 'image/webp')
