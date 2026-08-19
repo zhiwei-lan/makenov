@@ -515,16 +515,27 @@
 <script>function pageInit(){}</script>
 <style>.mk-anim-paused,.mk-anim-paused *{animation-play-state:paused !important}</style>
 <script>
-/* 히어로 데모·카테고리 마퀴가 화면 밖에서도 무한 애니메이션(대형 blur 포함)을
-   돌려 GPU 페인트가 고갈되고, 스크롤 후반부(FAQ 등)가 백지로 나오는 문제.
-   뷰포트를 벗어나면 재생을 멈춘다. */
+/* 히어로 데모·마퀴가 화면 밖에서도 무한 애니메이션(대형 blur)을 돌려 GPU
+   페인트가 고갈되고 스크롤 후반부가 백지가 되는 문제. IO 콜백은 렌더
+   파이프라인 의존이라 굶은 상태에선 안 와서, 스크롤+타이머로 판정한다. */
 (function(){
-  if(!('IntersectionObserver' in window))return;
   var ts=[document.querySelector('.mkdemo'),document.querySelector('.cmq')].filter(Boolean);
-  var io=new IntersectionObserver(function(es){es.forEach(function(en){
-    en.target.classList.toggle('mk-anim-paused',!en.isIntersecting);
-  })},{rootMargin:'120px'});
-  ts.forEach(function(t){io.observe(t)});
+  if(!ts.length)return;
+  function tick(){
+    var vh=window.innerHeight;
+    ts.forEach(function(t){
+      var r=t.getBoundingClientRect();
+      var off=r.bottom < -120 || r.top > vh+120;
+      t.classList.toggle('mk-anim-paused',off);
+    });
+  }
+  var lock=false;
+  window.addEventListener('scroll',function(){
+    if(lock)return; lock=true;
+    setTimeout(function(){lock=false;tick()},150);
+  },{passive:true});
+  setInterval(tick,1000);
+  tick();
 })();
 </script></body>
 </html>
