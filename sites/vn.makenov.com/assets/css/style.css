@@ -112,11 +112,11 @@ button{font-family:var(--font-body);cursor:pointer;border:none;background:none;c
   width:6px;height:6px;border-right:1.6px solid currentColor;border-bottom:1.6px solid currentColor;
   transform:translateY(-2px) rotate(45deg);transition:transform .18s}
 .mk-nav .drop:hover > a::after{transform:translateY(1px) rotate(225deg)}
-.mk-nav .drop .menu{position:absolute;top:100%;left:50%;transform:translate(-50%,6px);
+.mk-nav .drop .menu{position:absolute;top:100%;right:0;transform:translateY(6px);
   min-width:190px;background:#fff;border:1px solid var(--mk-line);border-radius:10px;
   box-shadow:0 10px 30px rgba(0,0,0,.1);padding:6px;display:flex;flex-direction:column;
   opacity:0;visibility:hidden;transition:opacity .15s,transform .15s,visibility .15s;z-index:210}
-.mk-nav .drop:hover .menu,.mk-nav .drop:focus-within .menu{opacity:1;visibility:visible;transform:translate(-50%,0)}
+.mk-nav .drop:hover .menu,.mk-nav .drop:focus-within .menu{opacity:1;visibility:visible;transform:translateY(0)}
 .mk-nav .drop .menu a{font-size:14px;font-weight:500;color:var(--mk-body);
   padding:10px 14px;border-radius:7px;border-bottom:0;white-space:nowrap}
 .mk-nav .drop .menu a:hover{background:var(--mk-primary-soft);color:var(--mk-primary-dark);border-bottom:0}

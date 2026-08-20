@@ -33,6 +33,21 @@ const ROOT_SKIP = new Set(['admin', 'index.php', 'uploads', 'sitemaps', 'ko', 'e
 /* 루트에만 있는 언어 중립 페이지(JS 가 호스트 언어로 그림). kr/en 사이트에도 복사한다 */
 const NEUTRAL = ['mypage.html', 'product.html', 'company.html', 'column.html', 'sitemap.html', 'maker.html', 'about.html', 'favicon.ico'];
 
+const NEUTRAL_META = {
+  'product.html': {
+    ko: { title: '제품 | MAKENOV', description: 'MAKENOV 제품 상세 정보입니다.' },
+    en: { title: 'Product | MAKENOV', description: 'Product details on MAKENOV.' },
+  },
+  'company.html': {
+    ko: { title: '공급사 | MAKENOV', description: 'MAKENOV 공급사 상세 정보입니다.' },
+    en: { title: 'Supplier | MAKENOV', description: 'Supplier profile on MAKENOV.' },
+  },
+  'column.html': {
+    ko: { title: '칼럼 | MAKENOV', description: 'MAKENOV 칼럼 상세 내용입니다.' },
+    en: { title: 'Article | MAKENOV', description: 'Article details on MAKENOV.' },
+  },
+};
+
 function rmrf(p){ fs.rmSync(p, { recursive: true, force: true }); }
 function cp(src, dst){
   const st = fs.statSync(src);
@@ -56,6 +71,20 @@ function rehost(html, host){
     .replace(/(<meta property="og:url" content=")https:\/\/vn\.makenov\.com\//g, `$1https://${host}/`);
 }
 
+function localizeNeutral(html, file, lang, host){
+  html = rehost(html, host);
+  const meta = NEUTRAL_META[file]?.[lang];
+  if(!meta) return html;
+  return html
+    .replace('<html lang="vi">', `<html lang="${lang}">`)
+    .replace(/<title>[^<]*<\/title>/, `<title>${meta.title}</title>`)
+    .replace(/(<meta name="description" content=")[^"]*(">)/, `$1${meta.description}$2`)
+    .replace(/(<meta property="og:title" content=")[^"]*(">)/, `$1${meta.title}$2`)
+    .replace(/(<meta property="og:description" content=")[^"]*(">)/, `$1${meta.description}$2`)
+    .replace(/(<meta name="twitter:title" content=")[^"]*(">)/, `$1${meta.title}$2`)
+    .replace(/(<meta name="twitter:description" content=")[^"]*(">)/, `$1${meta.description}$2`);
+}
+
 rmrf(OUT);
 for(const [host, cfg] of Object.entries(SITES)){
   const dst = path.join(OUT, host);
@@ -75,7 +104,7 @@ for(const [host, cfg] of Object.entries(SITES)){
       const s = path.join(PUB, f);
       if(!fs.existsSync(s)) continue;
       if(fs.existsSync(path.join(dst, f))) continue;   // 언어판이 있으면 그걸 쓴다
-      if(f.endsWith('.html')) fs.writeFileSync(path.join(dst, f), rehost(fs.readFileSync(s, 'utf8'), host));
+      if(f.endsWith('.html')) fs.writeFileSync(path.join(dst, f), localizeNeutral(fs.readFileSync(s, 'utf8'), f, cfg.lang, host));
       else cp(s, path.join(dst, f));
     }
   }
