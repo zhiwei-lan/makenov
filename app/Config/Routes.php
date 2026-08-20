@@ -16,13 +16,10 @@ use CodeIgniter\Router\RouteCollection;
 
 /** @var RouteCollection $routes */
 
-/* GET+HEAD — HEAD 가 404 면 링크 체커·일부 봇이 홈을 죽은 페이지로 본다(2026-08-19 점검) */
-$routes->match(['GET', 'HEAD'], '/', static function () {
-    $r = service('response');
-    $r->removeHeader('Cache-Control');
-    return $r->setHeader('Cache-Control', 'public, max-age=300')
-        ->setBody(file_get_contents(ROOTPATH . 'public/index.html'));
-});
+/* ── 루트 / sitemap / robots — 호스트(vn·kr·en 서브도메인)별로 다르게 낸다. GET+HEAD ── */
+$routes->match(['GET', 'HEAD'], '/', '\App\Controllers\Api\Seo::home');
+$routes->match(['GET', 'HEAD'], 'sitemap.xml', '\App\Controllers\Api\Seo::sitemap');
+$routes->match(['GET', 'HEAD'], 'robots.txt', '\App\Controllers\Api\Seo::robots');
 
 /* ── 칼럼 RSS 피드 ─────────────────────────────────────────
    정적 파일이 아니라 라우트다 — 서버 public/ 소유권 때문에 git pull 이

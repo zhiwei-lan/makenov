@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /mypage.html
+
+Sitemap: https://kr.makenov.com/sitemap.xml

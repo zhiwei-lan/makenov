@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 560" width="1600" height="560">
+  <!-- MAKENOV hero 04 — 여러 제조사를 담아 한 번에 견적 : 다수 노드가 하나로 수렴
+       ※ 카피가 좌하단을 덮으므로 노드·허브를 모두 우측 절반에 배치 -->
+  <defs>
+    <linearGradient id="c-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#04143F"/>
+      <stop offset=".5" stop-color="#022E7D"/>
+      <stop offset="1" stop-color="#0B45B4"/>
+    </linearGradient>
+    <radialGradient id="c-glow" cx=".84" cy=".5" r=".46">
+      <stop offset="0" stop-color="#27CAA1" stop-opacity=".38"/>
+      <stop offset=".5" stop-color="#0097E0" stop-opacity=".14"/>
+      <stop offset="1" stop-color="#0097E0" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="c-line" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0097E0" stop-opacity=".25"/>
+      <stop offset=".5" stop-color="#27CAA1" stop-opacity=".85"/>
+      <stop offset="1" stop-color="#7FF0D4" stop-opacity="1"/>
+    </linearGradient>
+    <pattern id="c-grid" width="44" height="44" patternUnits="userSpaceOnUse">
+      <path d="M44 0H0v44" fill="none" stroke="#fff" stroke-opacity=".04" stroke-width="1"/>
+    </pattern>
+    <radialGradient id="c-hub">
+      <stop offset="0" stop-color="#7FF0D4"/>
+      <stop offset=".45" stop-color="#27CAA1"/>
+      <stop offset="1" stop-color="#27CAA1" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="c-soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="16"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="560" fill="url(#c-bg)"/>
+  <rect width="1600" height="560" fill="url(#c-grid)"/>
+  <rect width="1600" height="560" fill="url(#c-glow)"/>
+
+  <!-- 수렴 라인 -->
+  <g fill="none" stroke="url(#c-line)" stroke-width="2" stroke-linecap="round">
+    <path d="M1130 66C1200 66 1230 208 1288 264"/>
+    <path d="M1070 158C1160 158 1200 238 1288 272"/>
+    <path d="M1114 250C1190 250 1230 268 1288 278"/>
+    <path d="M1058 342C1160 342 1210 312 1288 284"/>
+    <path d="M1126 434C1200 434 1240 338 1288 292"/>
+    <path d="M1082 512C1180 512 1240 366 1288 296"/>
+  </g>
+  <!-- 좌측 배경 텍스처 (카피 뒤쪽은 흐리게) -->
+  <g fill="none" stroke="#27CAA1" stroke-opacity=".1" stroke-width="1.4">
+    <path d="M120 66h864"/><path d="M120 158h804"/><path d="M120 250h848"/>
+    <path d="M120 342h792"/><path d="M120 434h860"/><path d="M120 512h816"/>
+  </g>
+
+  <!-- 관심제품 노드 -->
+  <g>
+    <g fill="#08307F" fill-opacity=".7" stroke="#7FF0D4" stroke-opacity=".7" stroke-width="1.4">
+      <rect x="1066" y="34"  width="64" height="64" rx="13"/>
+      <rect x="1006" y="126" width="64" height="64" rx="13"/>
+      <rect x="1050" y="218" width="64" height="64" rx="13"/>
+      <rect x="994"  y="310" width="64" height="64" rx="13"/>
+      <rect x="1062" y="402" width="64" height="64" rx="13"/>
+      <rect x="1018" y="480" width="64" height="64" rx="13"/>
+    </g>
+    <g fill="#3FE9C0" fill-opacity=".45">
+      <rect x="1078" y="76"  width="40" height="5" rx="2.5"/>
+      <rect x="1018" y="168" width="40" height="5" rx="2.5"/>
+      <rect x="1062" y="260" width="40" height="5" rx="2.5"/>
+      <rect x="1006" y="352" width="40" height="5" rx="2.5"/>
+      <rect x="1074" y="444" width="40" height="5" rx="2.5"/>
+      <rect x="1030" y="522" width="40" height="5" rx="2.5"/>
+    </g>
+  </g>
+
+  <!-- 수렴 허브 : 하나의 문의 -->
+  <g transform="translate(1288 278)">
+    <circle r="160" fill="url(#c-hub)" opacity=".26" filter="url(#c-soft)"/>
+    <circle r="104" fill="none" stroke="#27CAA1" stroke-opacity=".26" stroke-width="1.2"/>
+    <circle r="76"  fill="none" stroke="#27CAA1" stroke-opacity=".45" stroke-width="1.4"/>
+    <circle r="50"  fill="#04205C" stroke="#27CAA1" stroke-width="2.4"/>
+    <g fill="none" stroke="#3FE9C0" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M-21-14h42v28h-42z"/>
+      <path d="M-21-14l21 16 21-16"/>
+    </g>
+  </g>
+
+  <rect width="1600" height="560" fill="#02061F" opacity=".08"/>
+</svg>

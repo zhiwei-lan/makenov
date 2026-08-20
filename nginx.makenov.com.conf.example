@@ -1,0 +1,41 @@
+# MAKENOV — 언어별 서브도메인 운영 시 makenov.com(bare, CI4) 사이트의 Nginx 추가 규칙
+# ------------------------------------------------------------------------------------
+# 구조
+#   vn.makenov.com  → 1Panel 정적 사이트, 루트 = <repo>/sites/vn.makenov.com   (베트남어)
+#   kr.makenov.com  → 1Panel 정적 사이트, 루트 = <repo>/sites/kr.makenov.com   (한국어)
+#   en.makenov.com  → 1Panel 정적 사이트, 루트 = <repo>/sites/en.makenov.com   (영어)
+#   makenov.com     → 기존 PHP(CI4) 사이트 그대로, 루트 = <repo>/public
+#                     API(/rest/v1, /auth/v1, /functions/v1, /storage/v1)·/admin/·/uploads·/rss.xml·/deploy-check 담당
+#                     페이지 주소(html)는 언어 사이트로 301
+#
+# 언어 사이트 3개는 1Panel 기본 정적 사이트 설정이면 충분하다 (try_files $uri $uri/ =404).
+# 아래는 makenov.com 사이트의 server{} 안 `location /` 자리에 넣는 규칙이다. PHP location 은 기존 그대로.
+
+    # 검색엔진 소유확인 파일은 리다이렉트 예외
+    location = /google17861e0b4b6f5a98.html { try_files $uri =404; }
+    location = /naver6bbd9863e5f526a16ff68dfcec96b5ef.html { try_files $uri =404; }
+
+    # 옛 언어 경로 → 언어 호스트 (?raw=1 은 관리자 SEO 탭이 같은 origin 에서 원문을 읽는 용도라 예외)
+    location ~ ^/ko/(.*)$ { if ($arg_raw = "") { return 301 https://kr.makenov.com/$1$is_args$args; } try_files $uri =404; }
+    location ~ ^/en/(.*)$ { if ($arg_raw = "") { return 301 https://en.makenov.com/$1$is_args$args; } try_files $uri =404; }
+
+    location / {
+        # 페이지만 vn 으로 (API·assets·uploads·admin·rss·deploy-check 는 그대로 CI4/정적)
+        if ($arg_raw = "") {
+            rewrite ^/$ https://vn.makenov.com/ permanent;
+            rewrite ^/maker\.html$ https://kr.makenov.com/maker.html permanent;        # 공급사 안내(한국어 전용)
+            rewrite ^/((products|companies|columns)/.*)$ https://vn.makenov.com/$1 permanent;
+            rewrite ^/([A-Za-z0-9_-]+\.html)$ https://vn.makenov.com/$1 permanent;
+        }
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    # /admin/ 은 위 rewrite 에 걸리지 않는다(경로가 /admin/ 로 시작, html 단일 파일 패턴 아님). 그대로 makenov.com/admin/ 에서 동작.
+
+# 확인
+#   curl -sI https://kr.makenov.com/products.html | head -1                # 200 (정적 사이트)
+#   curl -sI https://makenov.com/ko/products.html | grep -i location       # → https://kr.makenov.com/products.html
+#   curl -sI https://makenov.com/products.html | grep -i location          # → https://vn.makenov.com/products.html
+#   curl -sI https://makenov.com/rest/v1/products | head -1                # 401 (API 는 그대로)
+#   curl -sI https://makenov.com/admin/ | head -1                          # 200
+#   curl -s  https://kr.makenov.com/robots.txt                             # Sitemap: https://kr.makenov.com/sitemap.xml

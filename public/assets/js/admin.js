@@ -1572,7 +1572,8 @@ async function seoFillCurrent(){
       const key = cssId(p.file) + '-' + lang;
       if(!_seoCur[key]){
         try{
-          const html = await (await fetch('../' + rel, { cache:'no-store' })).text();
+          /* ?raw=1 : 서브도메인 운영 후 /ko/·/en/ 는 언어 호스트로 301 되는데, 관리자는 같은 origin 에서 원문만 읽으면 되므로 Nginx 가 이 인자를 보고 리다이렉트를 건너뛴다 */
+          const html = await (await fetch('../' + rel + '?raw=1', { cache:'no-store' })).text();
           _seoCur[key] = {
             title: (html.match(/<title>([^<]*)/) || [])[1] || '',
             desc:  (html.match(/name="description" content="([^"]*)/) || [])[1] || '',

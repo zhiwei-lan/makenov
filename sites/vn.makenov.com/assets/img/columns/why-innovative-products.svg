@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675" role="img">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#04143F"/><stop offset="0.62" stop-color="#022E7D"/><stop offset="1" stop-color="#0B45B4"/></linearGradient><linearGradient id="mint" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#27CAA1"/><stop offset="1" stop-color="#3AD8B4"/></linearGradient><pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse"><path d="M44 0H0v44" fill="none" stroke="#fff" stroke-opacity=".05" stroke-width="1"/></pattern></defs>
+<rect width="1200" height="675" fill="url(#bg)"/><rect width="1200" height="675" fill="url(#grid)"/><circle cx="1080" cy="120" r="260" fill="#32D1B1" fill-opacity=".10"/>
+
+<g transform="translate(160 150)">
+  <rect x="0" y="30" width="230" height="300" rx="16" fill="#fff" fill-opacity=".92"/>
+  <rect x="34" y="66" width="162" height="96" rx="10" fill="#212529" fill-opacity=".10"/>
+  <rect x="34" y="186" width="120" height="12" rx="6" fill="#212529" fill-opacity=".18"/>
+  <rect x="24" y="212" width="86" height="30" rx="15" fill="#FADBD8"/>
+  <rect x="44" y="222" width="46" height="10" rx="5" fill="#C0392B" fill-opacity=".75"/>
+  <rect x="60" y="0" width="230" height="300" rx="16" fill="#fff" fill-opacity=".78" transform="translate(150 40)"/>
+  <rect x="244" y="106" width="162" height="96" rx="10" fill="#212529" fill-opacity=".10"/>
+  <rect x="244" y="226" width="120" height="12" rx="6" fill="#212529" fill-opacity=".18"/>
+  <rect x="234" y="252" width="86" height="30" rx="15" fill="#FADBD8"/>
+  <rect x="254" y="262" width="46" height="10" rx="5" fill="#C0392B" fill-opacity=".75"/>
+</g>
+<path d="M620 180v320" stroke="#fff" stroke-opacity=".18" stroke-width="2" stroke-dasharray="2 10"/>
+<g transform="translate(730 140)">
+  <rect x="0" y="0" width="300" height="400" rx="18" fill="#fff" fill-opacity=".97"/>
+  <rect x="30" y="30" width="240" height="150" rx="12" fill="url(#mint)"/>
+  <path d="M150 66l34 14v26c0 26-15 40-34 48-19-8-34-22-34-48V80z" fill="none" stroke="#fff" stroke-width="7" stroke-linejoin="round"/>
+  <rect x="30" y="208" width="160" height="14" rx="7" fill="#212529" fill-opacity=".2"/>
+  <rect x="30" y="236" width="100" height="14" rx="7" fill="#27CAA1"/>
+  <rect x="30" y="286" width="240" height="44" rx="22" fill="#EAF7F2"/>
+  <rect x="30" y="344" width="240" height="44" rx="22" fill="#04143F"/>
+</g>
+</svg>
