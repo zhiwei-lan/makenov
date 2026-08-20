@@ -296,10 +296,10 @@ const NAV = [
   { id:'buyers',   label:'유통 파트너',   title:'유통 파트너 관리',    desc:'사업자 인증을 통과한 회원' },
   { id:'products', label:'제품',     title:'제품 관리',      desc:'등록·수정 시 사이트에 즉시 반영' },
   { id:'columns',  label:'칼럼',     title:'칼럼 관리',      desc:'인사이트 글 작성 및 발행' },
-  { id:'faq',      label:'FAQ',      title:'FAQ 관리',       desc:'메인페이지 자주 묻는 질문' },
+  { id:'faq',      label:'FAQ',      title:'FAQ 관리',       desc:'고객센터·제품 홈의 FAQ. 랜딩(홈) FAQ 는 카피 탭 > 홈(랜딩)' },
   { id:'notices',  label:'공지사항', title:'공지사항 관리',   desc:'고객센터 공지 게시판 (신제품·업데이트 소식)' },
   { id:'copy',     label:'카피',     title:'카피 수정',      desc:'사이트 문구를 코드 수정 없이 고칩니다' },
-  { id:'seo',      label:'SEO',      title:'SEO 설정',       desc:'검색결과 제목·설명, 공유 이미지, 파비콘' },
+  { id:'seo',      label:'SEO',      title:'SEO 설정',       desc:'검색결과 제목·설명, 공유 이미지, 파비콘. 저장 후 서버에서 node bake-seo.js 를 돌려야 실제 HTML 에 반영됩니다' },
   { id:'admins',   label:'관리자',   title:'관리자 계정',     desc:'콘솔에 로그인할 수 있는 계정을 관리합니다' },
   { id:'settings', label:'설정',     title:'설정 · 내보내기', desc:'배포용 데이터와 계정 관리' },
 ];
@@ -1364,11 +1364,11 @@ function renderCopy(){
 /* 언어판이 있는 허브 페이지 + 단독 페이지.
    ⚠ bake.js 의 HUB · PAGES 와 파일명이 같아야 한다. 여기 없는 페이지는 코드 기본값만 쓴다. */
 const SEO_PAGES = [
-  { file:'index.html',      label:'홈',            langs:['ko','vi','en'] },
+  { file:'index.html',      label:'홈(랜딩)',       langs:['ko','vi','en'] },
   { file:'directory.html',  label:'제품 목록',      langs:['ko','vi','en'] },
   { file:'companies.html',  label:'공급사 목록',    langs:['ko','vi','en'] },
   { file:'columns.html',    label:'칼럼 목록',      langs:['ko','vi','en'] },
-  { file:'about.html',      label:'서비스 소개',    langs:['ko','vi','en'] },
+  { file:'products.html',   label:'제품 홈',        langs:['ko','vi','en'] },
   { file:'guide.html',      label:'이용 가이드',    langs:['ko','vi','en'] },
   { file:'support.html',    label:'고객센터',       langs:['ko','vi','en'] },
   { file:'maker.html',      label:'공급사 입점',    langs:['ko'], note:'한국 공급사 대상이라 한국어만 있습니다' },
