@@ -17,7 +17,7 @@
    ============================================================ */
 const postcss = require('postcss'); const fs = require('fs'); const path = require('path');
 const PUB = path.join(__dirname, 'public');
-const html = ['index.html', 'ko/index.html'].map(f => fs.readFileSync(path.join(PUB, f), 'utf8')).join('\n')
+const html = ['index.html', 'ko/index.html', 'en/index.html'].map(f => fs.readFileSync(path.join(PUB, f), 'utf8')).join('\n')
   .replace(/&amp;/g, '&').replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&quot;/g, '"');
 const used = new Set((html.match(/[^<>"'`\s]*[^<>"'`\s:]/g) || []));
 for (const m of html.matchAll(/class="([^"]*)"/g)) m[1].split(/\s+/).forEach(c => c && used.add(c));
