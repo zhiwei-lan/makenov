@@ -24,14 +24,16 @@ function mkCopySources(){
   return [
     { id:'ui',    label:'공통 UI',        hint:'메뉴·버튼·라벨·안내문. 모든 페이지에 쓰인다',
       kind:'i18n', root:(typeof I18N !== 'undefined') ? I18N : null },
-    { id:'about', label:'서비스 소개(유통 파트너)', hint:'about.html 본문',
-      kind:'tree', root:(typeof AB !== 'undefined') ? AB : null },
+    /* 2026-08-20: about.html 은 홈 개편 때 리다이렉트 스텁이 됐다(본문 없음).
+       AB 편집 섹션은 화면이 없는데 저장만 되는 함정이라 목록에서 뺐다. */
+    { id:'landing', label:'홈(랜딩)', hint:'개편 홈 본문 — 히어로·카테고리·지원 스텝·경쟁력·비용·FAQ·마무리. 세 언어 랜딩에 공통 적용',
+      kind:'tree', root:(typeof LND !== 'undefined') ? LND : null },
     /* maker.html 은 한국 공급사 대상이라 문구가 한국어 평문이다 */
     { id:'makerbody', label:'공급사 안내 본문', hint:'maker.html 전체 — 히어로·비교표·절차·FAQ·신청 폼',
       kind:'tree', strLeaf:true, root:(typeof MKC !== 'undefined') ? MKC : null },
     { id:'maker', label:'공급사 안내 수치',  hint:'통계 4칸·주요 시장·연락처',
       kind:'tree', strLeaf:true, root:(typeof MK_MAKER !== 'undefined') ? MK_MAKER : null },
-    { id:'hero',  label:'홈 히어로',       hint:'홈 최상단 슬라이드 문구',
+    { id:'hero',  label:'제품 페이지 히어로', hint:'제품(products) 페이지 최상단 슬라이드 문구',
       kind:'tree', root:(typeof MK_HERO !== 'undefined') ? MK_HERO : null },
     { id:'site',  label:'상단 배너',       hint:'전 페이지 최상단 띠',
       kind:'tree', root:(typeof MK_SETTINGS !== 'undefined') ? MK_SETTINGS : null },
@@ -117,6 +119,8 @@ function mkApplyCopy(map){
   if(!map) return 0;
   let n = 0;
   Object.keys(map).forEach(p=>{ if(mkCopyApplyOne(p, map[p])) n++; });
+  /* 랜딩 본문은 데이터가 아니라 DOM 이 원본이라, LND 를 덮은 뒤 화면에 다시 그려야 한다 */
+  if(typeof mkApplyLanding === 'function') mkApplyLanding();
   return n;
 }
 
@@ -146,9 +150,9 @@ const MK_COPY_GROUPS = {
     mypage:'마이페이지', wish:'마이페이지', inquiries:'마이페이지',
   },
   /* 랜딩은 최상위 섹션이 곧 구역이다 */
-  about: {
-    hero:'1 히어로', problem:'2 문제 제기', vs:'3 비교', lock:'4 가격 잠금',
-    steps:'5 이용 절차', bens:'6 받는 것', verify:'7 인증', faq:'8 FAQ', last:'9 마무리',
+  landing: {
+    hero:'1 히어로', stats:'2 지표', cat:'3 카테고리', steps:'4 지원 스텝',
+    cols:'5 가이드', pain:'6 경쟁력', cost:'7 비용', faq:'8 FAQ', cta:'9 마무리', float:'플로팅 버튼',
   },
   makerbody: {
     hero:'1 히어로', problem:'2 문제 제기', compare:'3 비교표', promise:'4 약속 · 시장',
