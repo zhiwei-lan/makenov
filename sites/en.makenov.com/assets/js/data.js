@@ -441,7 +441,7 @@ const MK_MAKER = {
     { name:'중국',   desc:'도매상과 크로스보더 셀러 등 다양한 판매 채널을 운영하는 유통 파트너를 대상으로 합니다.' },
     { name:'미얀마', desc:'수입사·유통사 등 해외 제품을 찾는 현지 사업자에게 제품을 소개합니다.' },
   ],
-  contactEmail: 'contact@makenov.com',
+  contactEmail: 'notice@makenov.com',
   contactTel: '',
 };
 
