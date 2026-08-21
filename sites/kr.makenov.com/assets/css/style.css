@@ -123,8 +123,8 @@ button{font-family:var(--font-body);cursor:pointer;border:none;background:none;c
 @media(max-width:1180px){.mk-nav{gap:22px;font-size:17px}.mk-nav .gnb{gap:18px}}
 .mk-head-right{margin-left:auto;display:flex;align-items:center;gap:8px}
 .mk-lang{display:flex;border:1px solid var(--mk-line-strong);border-radius:var(--r-sm);overflow:hidden;margin-right:8px}
-.mk-lang button{padding:5px 9px;font-size:12px;font-weight:600;color:var(--mk-muted)}
-.mk-lang button.on{background:var(--mk-ink);color:#fff}
+.mk-lang a{display:flex;align-items:center;justify-content:center;padding:5px 9px;font-size:12px;font-weight:600;color:var(--mk-muted)}
+.mk-lang a.on{background:var(--mk-ink);color:#fff}
 
 /* 우측 유틸 — 아이콘 위, 라벨 아래 (addwel 구조) */
 .mk-util{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
@@ -156,13 +156,13 @@ button{font-family:var(--font-body);cursor:pointer;border:none;background:none;c
   .mk-head-top{height:62px;gap:14px}
   .mk-nav.mk-head-nav{display:none}
   .mk-lang{margin-right:2px}
-  .mk-lang button{padding:4px 6px;font-size:11px}
+  .mk-lang a{padding:4px 6px;font-size:11px}
 }
 /* 좁은 화면에선 좌우가 넘친다 — 푸터에도 있는 항목(언어·제조사 등록)을 접는다 */
 @media(max-width:640px){
   .mk-head-top{height:104px;align-items:flex-start;padding-top:14px;position:relative}
   .mk-head-right .mk-lang{display:flex;position:absolute;left:0;right:0;bottom:8px;margin:0;width:100%;height:32px}
-  .mk-head-right .mk-lang button{flex:1;padding:0;font-size:12px}
+  .mk-head-right .mk-lang a{flex:1;padding:0;font-size:12px}
   .mk-head-right .mk-util.opt{display:none}
   .mk-head-right{gap:2px}
 }
@@ -634,9 +634,9 @@ button{font-family:var(--font-body);cursor:pointer;border:none;background:none;c
   padding:14px max(20px,calc((100% - var(--maxw))/2 + 15px));
   display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .mk-footer .ft-lang{display:flex;gap:16px}
-.mk-footer .ft-lang button{background:none;border:0;padding:0;font-size:12px;color:var(--mk-muted);cursor:pointer}
-.mk-footer .ft-lang button.on{color:var(--mk-ink);font-weight:700}
-.mk-footer .ft-lang button:hover{color:var(--mk-primary)}
+.mk-footer .ft-lang a{background:none;border:0;padding:0;font-size:12px;color:var(--mk-muted);cursor:pointer}
+.mk-footer .ft-lang a.on{color:var(--mk-ink);font-weight:700}
+.mk-footer .ft-lang a:hover{color:var(--mk-primary)}
 @media(max-width:860px){.mk-footer .wrap{grid-template-columns:1fr 1fr}.mk-footer .brand{grid-column:1/-1}}
 
 /* ---------- toast ---------- */

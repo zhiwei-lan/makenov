@@ -1421,7 +1421,7 @@ function setLang(l){
 function applyI18n(root){
   (root||document).querySelectorAll('[data-i18n]').forEach(el=>{ el.textContent = t(el.dataset.i18n); });
   (root||document).querySelectorAll('[data-i18n-ph]').forEach(el=>{ el.placeholder = t(el.dataset.i18nPh); });
-  document.querySelectorAll('.mk-lang button, .ft-lang button').forEach(b=>b.classList.toggle('on', b.dataset.lang===MK_LANG));
+  document.querySelectorAll('.mk-lang [data-lang], .ft-lang [data-lang]').forEach(b=>b.classList.toggle('on', b.dataset.lang===MK_LANG));
 }
 /* localized field helper: product fields stored as {vi,ko,en} */
 function L(field){ if(field==null) return ''; if(typeof field==='string') return field; return field[MK_LANG] || field.vi || field.en || field.ko || ''; }
