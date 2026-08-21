@@ -72,17 +72,25 @@ function rehost(html, host){
 }
 
 function localizeNeutral(html, file, lang, host){
-  html = rehost(html, host);
+  html = rehost(html, host)
+    .replace(/<html lang="[^"]+">/, `<html lang="${lang}">`);
   const meta = NEUTRAL_META[file]?.[lang];
   if(!meta) return html;
   return html
-    .replace('<html lang="vi">', `<html lang="${lang}">`)
     .replace(/<title>[^<]*<\/title>/, `<title>${meta.title}</title>`)
     .replace(/(<meta name="description" content=")[^"]*(">)/, `$1${meta.description}$2`)
     .replace(/(<meta property="og:title" content=")[^"]*(">)/, `$1${meta.title}$2`)
     .replace(/(<meta property="og:description" content=")[^"]*(">)/, `$1${meta.description}$2`)
     .replace(/(<meta name="twitter:title" content=")[^"]*(">)/, `$1${meta.title}$2`)
     .replace(/(<meta name="twitter:description" content=")[^"]*(">)/, `$1${meta.description}$2`);
+}
+
+function repairMissingDetailLinks(html, dst){
+  return html.replace(/href="(products|companies)\/([^"/?]+)\.html"/g, (match, kind, id) => {
+    if(fs.existsSync(path.join(dst, kind, `${id}.html`))) return match;
+    const page = kind === 'products' ? 'product' : 'company';
+    return `href="${page}.html?id=${id}"`;
+  });
 }
 
 rmrf(OUT);
@@ -107,6 +115,22 @@ for(const [host, cfg] of Object.entries(SITES)){
       if(f.endsWith('.html')) fs.writeFileSync(path.join(dst, f), localizeNeutral(fs.readFileSync(s, 'utf8'), f, cfg.lang, host));
       else cp(s, path.join(dst, f));
     }
+
+    /* /ko 또는 /en 아래에서 두 단계 올라가던 상세 페이지를 호스트 루트 기준으로 보정 */
+    for(const f of walk(dst).filter(f => f.endsWith('.html'))){
+      const html = fs.readFileSync(f, 'utf8').replace('<base href="../../">', '<base href="../">');
+      fs.writeFileSync(f, html);
+    }
+  }
+
+  /* 공통 페이지도 각 호스트의 문서 언어와 canonical을 사용 */
+  for(const file of NEUTRAL.filter(f => f.endsWith('.html'))){
+    const f = path.join(dst, file);
+    if(fs.existsSync(f)) fs.writeFileSync(f, localizeNeutral(fs.readFileSync(f, 'utf8'), file, cfg.lang, host));
+  }
+
+  for(const f of walk(dst).filter(f => f.endsWith('.html'))){
+    fs.writeFileSync(f, repairMissingDetailLinks(fs.readFileSync(f, 'utf8'), dst));
   }
 
   /* 2) about-assets — 이 사이트의 HTML 이 실제로 참조하는 파일만 */
