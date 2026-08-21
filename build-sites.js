@@ -94,7 +94,7 @@ function repairMissingDetailLinks(html, dst){
 }
 
 function writeLegacyHomeRedirects(dst){
-  for(const [prefix, host] of Object.entries({ ko: HOSTS.ko, en: HOSTS.en })){
+  for(const [prefix, host] of Object.entries({ ko: HOSTS.ko, en: HOSTS.en, vi: HOSTS.vi, vn: HOSTS.vi })){
     const dir = path.join(dst, prefix);
     fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(path.join(dir, 'index.html'), `<!doctype html>
