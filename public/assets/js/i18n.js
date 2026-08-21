@@ -1382,11 +1382,20 @@ function mkLangHref(l){
     if(alt){
       try{
         const u = new URL(alt.getAttribute('href'), location.href);
-        if(u.hostname !== location.hostname){ u.search = location.search; u.hash = location.hash; return u.href; }
+        if(u.hostname !== location.hostname){
+          u.search = location.search;
+          u.searchParams.set('lang', l);
+          u.hash = location.hash;
+          return u.href;
+        }
       }catch(e){}
     }
     let rel = location.pathname; if(rel === '' || /\/$/.test(rel)) rel += 'index.html';
-    return 'https://' + MK_HOSTS[l] + rel.replace(/^\/(ko|en)\//, '/') + location.search + location.hash;
+    const u = new URL('https://' + MK_HOSTS[l] + rel.replace(/^\/(ko|en)\//, '/'));
+    u.search = location.search;
+    u.searchParams.set('lang', l);
+    u.hash = location.hash;
+    return u.href;
   }
   if(!alt) return null;
   const root = mkSiteRoot();
