@@ -84,6 +84,13 @@ function renderChrome(active){
      설정이 비어 있으면 i18n 기본 문구로 되돌아간다. */
   const hdr = document.getElementById('mk-header');
   const cfg = (typeof MK_SETTINGS !== 'undefined') ? MK_SETTINGS : {};
+  const langUi = {
+    vi: { flag:'🇻🇳', code:'VI', name:'Tiếng Việt' },
+    ko: { flag:'🇰🇷', code:'KO', name:'한국어' },
+    en: { flag:'🇺🇸', code:'EN', name:'English' },
+  };
+  const currentLangUi = langUi[MK_LANG] || langUi.vi;
+  const mobileLangMenu = `<details class="mk-lang-mobile"><summary><span class="flag">${currentLangUi.flag}</span><b>${currentLangUi.code}</b></summary><div class="menu">${Object.entries(langUi).map(([lang,item]) => `<a class="${lang===MK_LANG?'on':''}" href="${esc(mkLangHref(lang) || location.href)}" onclick="localStorage.setItem('mk_lang','${lang}')"><span class="flag">${item.flag}</span><span>${item.name}</span></a>`).join('')}</div></details>`;
   const tbMsg = L(cfg.topbar) || t('topbar_msg');
   const tbOn  = cfg.topbarOn !== false && !!tbMsg;
 
@@ -111,7 +118,7 @@ function renderChrome(active){
   hdr.innerHTML = `
   <div class="wrap"><div class="mk-head-top"><a class="mk-logo" href="index.html"><img src="${mkAsset('assets/img/logo.png')}" alt="MAKENOV"
         onerror="this.parentNode.classList.add(&quot;txt&quot;);this.remove()"><span>MAKE<b>NOV</b></span></a><div class="mk-search"><input id="mk-search-input" type="search" data-i18n-ph="search_ph"
-        onkeydown="if(event.key==='Enter'){${doSearch}}"><span class="ico" role="button" tabindex="0" onclick="${doSearch}">${MK_ICO.search}</span></div><div class="mk-head-right"><div class="mk-lang"><a data-lang="vi" href="${esc(mkLangHref('vi') || location.href)}" onclick="localStorage.setItem('mk_lang','vi')">VI</a><a data-lang="ko" href="${esc(mkLangHref('ko') || location.href)}" onclick="localStorage.setItem('mk_lang','ko')">KO</a><a data-lang="en" href="${esc(mkLangHref('en') || location.href)}" onclick="localStorage.setItem('mk_lang','en')">EN</a></div><a class="mk-util" href="mypage.html">${MK_ICO.heart}<span class="badge" id="cart-badge">0</span><span class="lb" data-i18n="util_wish"></span></a>
+        onkeydown="if(event.key==='Enter'){${doSearch}}"><span class="ico" role="button" tabindex="0" onclick="${doSearch}">${MK_ICO.search}</span></div><div class="mk-head-right"><div class="mk-lang"><a data-lang="vi" href="${esc(mkLangHref('vi') || location.href)}" onclick="localStorage.setItem('mk_lang','vi')">VI</a><a data-lang="ko" href="${esc(mkLangHref('ko') || location.href)}" onclick="localStorage.setItem('mk_lang','ko')">KO</a><a data-lang="en" href="${esc(mkLangHref('en') || location.href)}" onclick="localStorage.setItem('mk_lang','en')">EN</a></div>${mobileLangMenu}<a class="mk-util" href="mypage.html">${MK_ICO.heart}<span class="badge" id="cart-badge">0</span><span class="lb" data-i18n="util_wish"></span></a>
       ${s
         ? `<a class="mk-util" href="mypage.html">${MK_ICO.user}<span class="lb">${esc(s.contactName||s.email.split('@')[0])}</span></a><a class="mk-util" onclick="Store.logout();location.reload()" style="cursor:pointer">${MK_ICO.logout}<span class="lb" data-i18n="logout"></span></a>`
         : `<a class="mk-util" href="mypage.html" onclick="event.preventDefault();openAuth('login')">${MK_ICO.user}<span class="lb" data-i18n="login"></span></a><button class="btn btn-primary btn-sm" style="margin-left:6px;height:40px;padding:0 18px" onclick="openAuth('signup')" data-i18n="signup"></button>`}

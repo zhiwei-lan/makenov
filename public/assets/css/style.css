@@ -125,6 +125,17 @@ button{font-family:var(--font-body);cursor:pointer;border:none;background:none;c
 .mk-lang{display:flex;border:1px solid var(--mk-line-strong);border-radius:var(--r-sm);overflow:hidden;margin-right:8px}
 .mk-lang a{display:flex;align-items:center;justify-content:center;padding:5px 9px;font-size:12px;font-weight:600;color:var(--mk-muted)}
 .mk-lang a.on{background:var(--mk-ink);color:#fff}
+.mk-lang-mobile{display:none;position:relative}
+.mk-lang-mobile summary{list-style:none;width:76px;height:38px;display:flex;align-items:center;justify-content:center;gap:7px;
+  border:1px solid var(--mk-line-strong);border-radius:7px;background:#fff;color:var(--mk-ink);font-size:13px;cursor:pointer}
+.mk-lang-mobile summary::-webkit-details-marker{display:none}
+.mk-lang-mobile summary::after{content:"";width:5px;height:5px;border-right:1.5px solid var(--mk-muted);border-bottom:1.5px solid var(--mk-muted);transform:translateY(-2px) rotate(45deg)}
+.mk-lang-mobile[open] summary::after{transform:translateY(2px) rotate(225deg)}
+.mk-lang-mobile .flag{font-size:16px;line-height:1}
+.mk-lang-mobile .menu{position:absolute;right:0;top:44px;width:148px;padding:5px;background:#fff;border:1px solid var(--mk-line);
+  border-radius:7px;box-shadow:0 10px 28px rgba(0,0,0,.12);z-index:220}
+.mk-lang-mobile .menu a{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:5px;font-size:13px;color:var(--mk-body)}
+.mk-lang-mobile .menu a:hover,.mk-lang-mobile .menu a.on{background:var(--mk-primary-soft);color:var(--mk-primary-dark);font-weight:700}
 
 /* 우측 유틸 — 아이콘 위, 라벨 아래 (addwel 구조) */
 .mk-util{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
@@ -160,10 +171,11 @@ button{font-family:var(--font-body);cursor:pointer;border:none;background:none;c
 }
 /* 좁은 화면에선 좌우가 넘친다 — 푸터에도 있는 항목(언어·제조사 등록)을 접는다 */
 @media(max-width:640px){
-  .mk-head-top{height:104px;align-items:flex-start;padding-top:14px;position:relative}
-  .mk-head-right .mk-lang{display:flex;position:absolute;left:0;right:0;bottom:8px;margin:0;width:100%;height:32px}
-  .mk-head-right .mk-lang a{flex:1;padding:0;font-size:12px}
+  .mk-head-top{height:62px}
+  .mk-head-right .mk-lang{display:none}
+  .mk-head-right .mk-lang-mobile{display:block}
   .mk-head-right .mk-util.opt{display:none}
+  .mk-head-right > .btn{display:none}
   .mk-head-right{gap:2px}
 }
 
