@@ -93,6 +93,20 @@ function repairMissingDetailLinks(html, dst){
   });
 }
 
+function writeLegacyHomeRedirects(dst){
+  for(const [prefix, host] of Object.entries({ ko: HOSTS.ko, en: HOSTS.en })){
+    const dir = path.join(dst, prefix);
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, 'index.html'), `<!doctype html>
+<html lang="${prefix}"><head><meta charset="utf-8">
+<meta http-equiv="refresh" content="0;url=https://${host}/">
+<link rel="canonical" href="https://${host}/">
+<title>MAKENOV</title></head><body>
+<script>location.replace('https://${host}/'+location.search+location.hash)</script>
+<a href="https://${host}/">Continue</a></body></html>\n`);
+  }
+}
+
 rmrf(OUT);
 for(const [host, cfg] of Object.entries(SITES)){
   const dst = path.join(OUT, host);
@@ -132,6 +146,8 @@ for(const [host, cfg] of Object.entries(SITES)){
   for(const f of walk(dst).filter(f => f.endsWith('.html'))){
     fs.writeFileSync(f, repairMissingDetailLinks(fs.readFileSync(f, 'utf8'), dst));
   }
+
+  writeLegacyHomeRedirects(dst);
 
   /* 2) about-assets — 이 사이트의 HTML 이 실제로 참조하는 파일만 */
   const htmls = walk(dst).filter(f => f.endsWith('.html'));
