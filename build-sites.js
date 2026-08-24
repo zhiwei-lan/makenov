@@ -28,7 +28,16 @@ const HOSTS = { vi: 'vn.makenov.com', ko: 'kr.makenov.com', en: 'en.makenov.com'
 
 /* makenov.com(CI4) 에만 남는 것 — 언어 사이트에 복사하지 않는다 */
 const ROOT_SKIP = new Set(['admin', 'index.php', 'uploads', 'sitemaps', 'ko', 'en',
-  'google17861e0b4b6f5a98.html', 'naver6bbd9863e5f526a16ff68dfcec96b5ef.html']);
+  'google17861e0b4b6f5a98.html', 'naver6bbd9863e5f526a16ff68dfcec96b5ef.html',
+  'google28ab2b08be07d6c0.html', 'naver275b123d9640d96c00f54d8f0d0da9a1.html']);
+
+/* 검색엔진 소유확인 파일 — 원본은 public/ 에 두고(ROOT_SKIP 으로 일괄복사 제외),
+   실제 등록한 속성의 호스트에만 복사한다. 새 속성을 등록하면 여기에 파일명을 추가할 것 */
+const VERIFY = {
+  'vn.makenov.com': ['google28ab2b08be07d6c0.html', 'naver275b123d9640d96c00f54d8f0d0da9a1.html'],
+  'kr.makenov.com': [],   // 속성 등록 시 발급받는 확인파일명을 여기에
+  'en.makenov.com': [],   // 속성 등록 시 발급받는 확인파일명을 여기에
+};
 
 /* 루트에만 있는 언어 중립 페이지(JS 가 호스트 언어로 그림). kr/en 사이트에도 복사한다 */
 const NEUTRAL = ['mypage.html', 'product.html', 'company.html', 'column.html', 'sitemap.html', 'maker.html', 'about.html', 'favicon.ico'];
@@ -94,11 +103,13 @@ function repairMissingDetailLinks(html, dst){
 }
 
 function writeLegacyHomeRedirects(dst){
-  for(const [prefix, host] of Object.entries({ ko: HOSTS.ko, en: HOSTS.en, vi: HOSTS.vi, vn: HOSTS.vi })){
+  const LEGACY = { ko: { host: HOSTS.ko, lang: 'ko' }, en: { host: HOSTS.en, lang: 'en' },
+                   vi: { host: HOSTS.vi, lang: 'vi' }, vn: { host: HOSTS.vi, lang: 'vi' } };  // vn 은 옛 경로, 문서 언어는 vi
+  for(const [prefix, { host, lang }] of Object.entries(LEGACY)){
     const dir = path.join(dst, prefix);
     fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(path.join(dir, 'index.html'), `<!doctype html>
-<html lang="${prefix}"><head><meta charset="utf-8">
+<html lang="${lang}"><head><meta charset="utf-8">
 <meta http-equiv="refresh" content="0;url=https://${host}/">
 <link rel="canonical" href="https://${host}/">
 <title>MAKENOV</title></head><body>
@@ -165,6 +176,12 @@ for(const [host, cfg] of Object.entries(SITES)){
     for(const e of fs.readdirSync(path.join(PUB, 'about-assets'))){
       if(e === 'f' || e.endsWith('.css')) cp(path.join(PUB, 'about-assets', e), path.join(dst, 'about-assets', e));
     }
+  }
+
+  /* 2-b) 검색엔진 소유확인 파일 */
+  for(const f of (VERIFY[host] || [])){
+    const s = path.join(PUB, f);
+    if(fs.existsSync(s)) fs.copyFileSync(s, path.join(dst, f));
   }
 
   /* 3) sitemap.xml / robots.txt — 호스트별 정적 파일 */
