@@ -10,14 +10,20 @@
      2) columns/<slug>.html 을 vi / ko/ / en/ 세 벌 생성
         (Article+Breadcrumb+FAQPage 스키마, 이전·다음·다른 칼럼 링크)
      3) assets/js/baked.js 의 columns 목록 갱신 → 카드 링크가 ?id= 뷰어 대신 정식 주소로
-     4) sitemap.xml 의 칼럼 항목 교체 + lastmod 갱신
+     4) sitemaps/{vn,kr,en}.xml 의 칼럼 항목 교체 + lastmod 갱신
    템플릿 머리(스크립트 목록·파비콘·CSS 버전)는 기존 구운 칼럼 페이지에서 그대로 물려받는다.
 
-   실행: node bake-columns.js   → 커밋·푸시 (서브도메인 운영 중이면 node build-sites.js 도)
+   ★서브도메인 체계(2026-08-19 전환, cfda4a1) — 페이지 URL 은 언어 호스트를 쓴다:
+     vi=vn.makenov.com  ko=kr.makenov.com  en=en.makenov.com
+     canonical·hreflang·og:url·JSON-LD 는 언어 호스트, 내부 링크는 언어 접두 없이
+     (kr/en 서브도메인이 ko/·en/ 폴더를 루트로 서빙하므로). 자산(이미지·로고)은 makenov.com.
+
+   실행: node bake-columns.js && node build-sites.js   → 커밋·푸시
    ============================================================ */
 const fs = require('fs'), path = require('path');
 const PUB = path.join(__dirname, 'public');
-const SITE = 'https://makenov.com';
+const SITE = 'https://makenov.com';   // 자산(이미지·로고) 전용 — 페이지 URL 은 HOST 를 쓴다
+const HOST = { vi: 'https://vn.makenov.com', ko: 'https://kr.makenov.com', en: 'https://en.makenov.com' };
 const LANGS = ['vi', 'ko', 'en'];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const T = (v, lang) => (v && typeof v === 'object') ? (v[lang] || v.vi || v.ko || v.en || '') : String(v ?? '');
@@ -27,10 +33,11 @@ const absUrl = u => /^https?:\/\//.test(u || '') ? u : SITE + '/' + String(u || 
 const read = f => fs.readFileSync(path.join(PUB, f), 'utf8');
 const write = (f, s) => { fs.mkdirSync(path.dirname(path.join(PUB, f)), { recursive: true }); fs.writeFileSync(path.join(PUB, f), s); };
 const today = new Date().toISOString().slice(0, 10);
-const langFile = (rel, lang) => lang === 'vi' ? rel : `${lang}/${rel}`;
+const langFile = (rel, lang) => lang === 'vi' ? rel : `${lang}/${rel}`;   // 파일이 놓이는 위치 (public/ 안)
+const pageUrl = (rel, lang) => `${HOST[lang]}/${rel}`;                     // 페이지의 공개 URL (언어 호스트, 접두 없음)
 const baseTag = rel => { const d = (rel.match(/\//g) || []).length; return d ? `<base href="${'../'.repeat(d)}">` : ''; };
-const altTags = relVi => [...LANGS.map(l => `<link rel="alternate" hreflang="${l}" href="${SITE}/${langFile(relVi, l)}">`),
-  `<link rel="alternate" hreflang="x-default" href="${SITE}/${relVi}">`].join('\n');
+const altTags = relVi => [...LANGS.map(l => `<link rel="alternate" hreflang="${l}" href="${pageUrl(relVi, l)}">`),
+  `<link rel="alternate" hreflang="x-default" href="${pageUrl(relVi, 'vi')}">`].join('\n');
 /* 초기 칼럼 2편은 DB slug 가 비어 있다 — Rss.php 의 SLUG_FALLBACK 과 같은 값 (구운 파일명 유지) */
 const SLUG_FALLBACK = { 'c-quote': 'quote-request-checklist', 'c-sample': 'sample-request-checklist' };
 const colFile = c => c.slug || SLUG_FALLBACK[c.id] || c.id;
@@ -69,31 +76,32 @@ function staticColFaq(faqs, lang){
   if(!faqs.length) return '';
   return `\n  <section class="blog-faq">\n    <h2>${esc(LB[lang].faq)}</h2>\n    ${faqs.map(f => `<details><summary>${esc(T(f.q, lang))}</summary><div>${esc(T(f.a, lang))}</div></details>`).join('\n    ')}\n  </section>`;
 }
+/* 내부 링크는 언어 접두 없이 — kr/en 서브도메인이 언어 폴더를 루트로 서빙한다 */
 function staticColNav(prev, next, lang){
   if(!prev && !next) return '';
-  const f = c => langFile(`columns/${colFile(c)}.html`, lang);
+  const f = c => `columns/${colFile(c)}.html`;
   return `\n  <div class="blog-nav">\n    ${prev ? `<a href="${f(prev)}"><div class="dir">${esc(LB[lang].prev)}</div><b>${esc(T(prev.title, lang))}</b></a>` : '<span></span>'}\n    ${next ? `<a class="next" href="${f(next)}"><div class="dir">${esc(LB[lang].next)}</div><b>${esc(T(next.title, lang))}</b></a>` : '<span></span>'}\n  </div>`;
 }
 function staticColOthers(others, lang){
   if(!others.length) return '';
   const L = LB[lang];
-  return `\n<section class="blog-main" id="col-others" style="margin-top:56px">\n  <div class="sec-head"><h2>${esc(L.others)}</h2><a class="more" href="${langFile('columns.html', lang)}">${esc(L.more)}</a></div>\n  <div class="blog-list">\n    ${others.map(o => `<div class="blog-item"><a class="blog-item-link" href="${langFile(`columns/${colFile(o)}.html`, lang)}"><div class="blog-item-thumb"><img src="${esc(o.img)}" alt="${esc(T(o.title, lang))}" loading="lazy"></div><div class="blog-item-info"><div class="blog-item-cat">${esc(T(o.cat, lang))}</div><h3 class="blog-item-tit">${esc(T(o.title, lang))}</h3><div class="blog-item-meta"><span>${esc(o.date)}</span></div></div></a></div>`).join('\n    ')}\n  </div>\n</section>`;
+  return `\n<section class="blog-main" id="col-others" style="margin-top:56px">\n  <div class="sec-head"><h2>${esc(L.others)}</h2><a class="more" href="columns.html">${esc(L.more)}</a></div>\n  <div class="blog-list">\n    ${others.map(o => `<div class="blog-item"><a class="blog-item-link" href="columns/${colFile(o)}.html"><div class="blog-item-thumb"><img src="${esc(o.img)}" alt="${esc(T(o.title, lang))}" loading="lazy"></div><div class="blog-item-info"><div class="blog-item-cat">${esc(T(o.cat, lang))}</div><h3 class="blog-item-tit">${esc(T(o.title, lang))}</h3><div class="blog-item-meta"><span>${esc(o.date)}</span></div></div></a></div>`).join('\n    ')}\n  </div>\n</section>`;
 }
 function columnPage(c, colFaqs, prev, next, others, lang){
-  const L = LB[lang], f = rel => langFile(rel, lang);
+  const L = LB[lang];
   const title = T(c.title, lang), cat = T(c.cat, lang);
-  const relVi = `columns/${colFile(c)}.html`, canonical = `${SITE}/${langFile(relVi, lang)}`;
+  const relVi = `columns/${colFile(c)}.html`, canonical = pageUrl(relVi, lang);
   const useSeo = lang === 'ko' && typeof c.seoDesc === 'string';
   const desc = clip((useSeo && c.seoDesc) || T(c.excerpt, lang) || stripHtml(T(c.body, lang)), 155);
   const jsonld = [{ '@context':'https://schema.org', '@type':'Article', headline:title,
       alternativeHeadline: LANGS.map(l => T(c.title, l)).find(x => x && x !== title), description:desc, image:absUrl(c.img),
       datePublished:c.date, dateModified:c.date, inLanguage:lang, mainEntityOfPage:canonical,
-      author:{ '@type':'Organization', name:'MAKENOV', url:SITE + '/' },
-      publisher:{ '@type':'Organization', name:'MAKENOV', url:SITE + '/', logo:{ '@type':'ImageObject', url:SITE + '/assets/img/logo.png' } },
+      author:{ '@type':'Organization', name:'MAKENOV', url:HOST.vi + '/' },
+      publisher:{ '@type':'Organization', name:'MAKENOV', url:HOST.vi + '/', logo:{ '@type':'ImageObject', url:SITE + '/assets/img/logo.png' } },
       isAccessibleForFree:true, articleSection:cat },
     { '@context':'https://schema.org', '@type':'BreadcrumbList', itemListElement:[
-      { '@type':'ListItem', position:1, name:'MAKENOV', item:SITE + '/' },
-      { '@type':'ListItem', position:2, name:L.post, item:`${SITE}/${langFile('columns.html', lang)}` },
+      { '@type':'ListItem', position:1, name:'MAKENOV', item:HOST.vi + '/' },
+      { '@type':'ListItem', position:2, name:L.post, item:pageUrl('columns.html', lang) },
       { '@type':'ListItem', position:3, name:title, item:canonical } ] }];
   if(colFaqs.length) jsonld.push({ '@context':'https://schema.org', '@type':'FAQPage',
     mainEntity: colFaqs.map(q => ({ '@type':'Question', name:T(q.q, lang), acceptedAnswer:{ '@type':'Answer', text:T(q.a, lang) } })) });
@@ -113,7 +121,7 @@ ${FAVICON}
 <div id="mk-topbar" class="topbar"><div class="wrap"><span></span><button class="x" onclick="sessionStorage.setItem('mk_topbar_off','1');this.closest('.topbar').remove()">✕</button></div></div><header class="mk-header" id="mk-header"></header>
 <main class="wrap">
 <article class="blog-single" id="col-root">
-  <nav class="blog-breadcrumb"><a href="${f('index.html')}">${esc(L.home)}</a> - <a href="${f('columns.html')}">${esc(L.post)}</a> - <span>${esc(title)}</span></nav>
+  <nav class="blog-breadcrumb"><a href="index.html">${esc(L.home)}</a> - <a href="columns.html">${esc(L.post)}</a> - <span>${esc(title)}</span></nav>
   <span class="blog-single-cat">${esc(cat)}</span>
   <h1>${esc(title)}</h1>
   <div class="blog-single-meta"><span>${esc(c.date)}</span></div>
@@ -179,14 +187,19 @@ ${PAGE_COL}
   const bj2 = bj.replace(/("columns":\s*)\{[^}]*\}/, `$1${JSON.stringify(map, null, 4).replace(/\n/g, '\n  ')}`);
   if(!/"columns":\s*\{/.test(bj)) console.log('⚠ baked.js columns 블록을 못 찾음'); else { write('assets/js/baked.js', bj2); console.log('baked.js columns 갱신:', Object.keys(map).length); }
 
-  /* sitemap.xml — 칼럼 <url> 전부 교체, 루트·칼럼 목록 lastmod 갱신 */
-  let sm = read('sitemap.xml');
-  sm = sm.replace(/\s*<url>\s*<loc>https:\/\/makenov\.com\/(?:ko\/|en\/)?columns\/[^<]+<\/loc>[\s\S]*?<\/url>/g, '');
-  const entry = (relVi, lang, lastmod) => `  <url>\n    <loc>${SITE}/${langFile(relVi, lang)}</loc>\n    <lastmod>${lastmod}</lastmod>\n${LANGS.map(l => `      <xhtml:link rel="alternate" hreflang="${l}" href="${SITE}/${langFile(relVi, l)}"/>`).join('\n')}\n      <xhtml:link rel="alternate" hreflang="x-default" href="${SITE}/${relVi}"/>\n  </url>`;
-  const add = columns.flatMap(c => LANGS.map(l => entry(`columns/${colFile(c)}.html`, l, c.date || today))).join('\n');
-  sm = sm.replace(/<\/urlset>\s*$/, add + '\n</urlset>\n');
-  /* 목록 페이지(columns.html) 와 루트 lastmod 는 오늘로 */
-  sm = sm.replace(/(<loc>https:\/\/makenov\.com\/(?:ko\/|en\/)?(?:columns\.html|index\.html)?<\/loc>\s*<lastmod>)[^<]+/g, `$1${today}`);
-  write('sitemap.xml', sm);
-  console.log('sitemap.xml 갱신: 칼럼', columns.length * LANGS.length, '건');
+  /* sitemaps/{vn,kr,en}.xml — 호스트별로 칼럼 <url> 전부 교체, 칼럼 목록 lastmod 갱신
+     (구 public/sitemap.xml 은 서브도메인 전환 때 없어졌다 — Seo.php 가 호스트별 파일을 서빙,
+      build-sites.js 가 각 사이트 루트에 sitemap.xml 로 복사) */
+  const SMFILE = { vi: 'vn', ko: 'kr', en: 'en' };
+  const entry = (relVi, lang, lastmod) => `  <url>\n    <loc>${pageUrl(relVi, lang)}</loc>\n    <lastmod>${lastmod}</lastmod>\n${LANGS.map(l => `      <xhtml:link rel="alternate" hreflang="${l}" href="${pageUrl(relVi, l)}"/>`).join('\n')}\n      <xhtml:link rel="alternate" hreflang="x-default" href="${pageUrl(relVi, 'vi')}"/>\n  </url>`;
+  LANGS.forEach(lang => {
+    const file = `sitemaps/${SMFILE[lang]}.xml`;
+    let sm = read(file);
+    sm = sm.replace(/\s*<url>\s*<loc>https:\/\/(?:vn|kr|en)\.makenov\.com\/columns\/[^<]+<\/loc>[\s\S]*?<\/url>/g, '');
+    const add = columns.map(c => entry(`columns/${colFile(c)}.html`, lang, c.date || today)).join('\n');
+    sm = sm.replace(/<\/urlset>\s*$/, add + '\n</urlset>\n');
+    sm = sm.replace(/(<loc>https:\/\/(?:vn|kr|en)\.makenov\.com\/columns\.html<\/loc>\s*<lastmod>)[^<]+/, `$1${today}`);
+    write(file, sm);
+  });
+  console.log('sitemaps/{vn,kr,en}.xml 갱신: 칼럼 각', columns.length, '건');
 })().catch(e => { console.error(e); process.exit(1); });
