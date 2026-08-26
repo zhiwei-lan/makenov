@@ -59,10 +59,14 @@ const PAGES = [
 ].filter(e => fs.existsSync(path.join(ROOT, typeof e === 'string' ? e : e.page)));
 
 const CHROME = [
+  process.env.CHROME_PATH || '',
   'C:/Program Files/Google/Chrome/Application/chrome.exe',
   'C:/Program Files (x86)/Google/Chrome/Application/chrome.exe',
   path.join(process.env.LOCALAPPDATA || '', 'Google/Chrome/Application/chrome.exe'),
-].find(p => { try { return fs.existsSync(p); } catch (e) { return false; } });
+  '/usr/bin/google-chrome',            // GitHub Actions(ubuntu) — 자동 굽기 워크플로
+  '/usr/bin/google-chrome-stable',
+  '/usr/bin/chromium-browser',
+].filter(Boolean).find(p => { try { return fs.existsSync(p); } catch (e) { return false; } });
 
 if (!CHROME) {
   console.error('크롬을 찾지 못했습니다. 설치 경로를 CHROME 목록에 추가하세요.');

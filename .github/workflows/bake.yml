@@ -1,0 +1,60 @@
+# ============================================================
+# 자동 굽기 — 관리자 수정분(칼럼·제품·카피·랜딩)을 정적 페이지에 반영
+# ------------------------------------------------------------
+# 왜: 관리자 저장은 DB 에만 반영되고, 정적 페이지(SEO·첫 페인트)는
+#     bake 스크립트를 돌려야 따라온다. 안 돌리면 페이지 진입 때
+#     "옛 내용 → 새 내용" 깜빡임이 생긴다 (2026-08-26 정리).
+#     이 워크플로가 6시간마다(+수동 버튼) 대신 돌린다 —
+#     관리자에서 수정만 하면 별도 요청 없이 반영된다.
+# 흐름: 굽기 → 변경 있으면 커밋·푸시 → deploy.yml 이 서버 반영
+# 수동 실행: GitHub → Actions → bake → Run workflow
+# ============================================================
+name: bake
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'    # 6시간마다
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bake
+  cancel-in-progress: false
+
+jobs:
+  bake:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 굽기 (카피·랜딩·칼럼·제품·사전렌더·서브도메인)
+        run: |
+          node bake-copy.js
+          node bake-landing.js
+          node bake-columns.js
+          node bake-products.js
+          node prerender.js
+          node build-sites.js
+
+      - name: 변경 있으면 커밋·푸시
+        run: |
+          git config user.name  "makenov-bake-bot"
+          git config user.email "actions@users.noreply.github.com"
+          # 사이트맵 lastmod 만 바뀐 경우(콘텐츠 무변경)는 커밋하지 않는다
+          CHANGED=$(git status --porcelain | awk '{print $2}')
+          MEANINGFUL=$(echo "$CHANGED" | grep -v -E '(^|/)sitemaps?(/|\.xml$)' || true)
+          if [ -z "$MEANINGFUL" ]; then
+            git checkout -- . 2>/dev/null || true
+            echo "콘텐츠 변경 없음 — 커밋 생략"
+            exit 0
+          fi
+          git add -A
+          git commit -m "자동 굽기: 관리자 수정분 정적 반영"
+          git push
