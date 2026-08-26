@@ -71,15 +71,54 @@ async function rteImage(quill){
   inp.click();
 }
 
+/* 붙여넣은 문서의 CSS 셀렉터를 칼럼 본문(.blog-body) 안에서만 먹게 좁힌다.
+   html·body·:root 는 .blog-body 자신으로, 나머지는 앞에 .blog-body 를 붙인다.
+   @media·@supports 는 안쪽을 재귀 처리, @font-face·@keyframes·@import 는 그대로 둔다. */
+function scopeCss(css, scope){
+  css = String(css || '').replace(/\/\*[\s\S]*?\*\//g, '');
+  let out = '', i = 0;
+  while(i < css.length){
+    const open = css.indexOf('{', i);
+    if(open < 0){ out += css.slice(i); break; }
+    const chunk = css.slice(i, open), cut = chunk.lastIndexOf(';');
+    if(cut >= 0) out += chunk.slice(0, cut + 1);          // @import·@charset 등 중괄호 없는 문장
+    const sel = chunk.slice(cut + 1).trim();
+    let depth = 1, j = open + 1;
+    while(j < css.length && depth){ if(css[j] === '{') depth++; else if(css[j] === '}') depth--; j++; }
+    if(/^@(media|supports|layer)/i.test(sel)){
+      out += sel + '{' + scopeCss(css.slice(open + 1, j - 1), scope) + '}';
+    }else if(sel.charAt(0) === '@'){                       // @font-face·@keyframes 등
+      out += sel + css.slice(open, j);
+    }else{
+      const scoped = sel.split(',').map(s => {
+        s = s.trim(); if(!s) return '';
+        const m = s.match(/^(html|body|:root)(?![\w-])([\s\S]*)$/i);
+        if(!m) return scope + ' ' + s;
+        const rest = m[2].trim();
+        if(!rest) return scope;
+        return /^[\s>+~]/.test(m[2]) ? scope + ' ' + rest : scope + rest;   // body .x → 자손, body.x → 자기
+      }).filter(Boolean).join(', ');
+      out += scoped + css.slice(open, j);
+    }
+    i = j;
+  }
+  return out;
+}
+
 /* 붙여넣은 HTML 이 완성된 문서(<!DOCTYPE>·<html>·<head> 포함)면 본문만 추출한다.
    문서 전체를 그대로 저장하면 페이지 안에 title·meta·canonical 이 중복돼 SEO 를 오염시키고,
-   문서용 <style>·<script> 가 사이트 전체 스타일을 깨뜨린다. 조각(fragment)이면 손대지 않는다. */
+   문서용 <style>·<script> 가 사이트 전체 스타일을 깨뜨린다. 조각(fragment)이면 손대지 않는다.
+   ★디자인은 보존한다 — <style> 은 버리지 않고 .blog-body 로 스코핑해 본문 머리에 다시 붙이고,
+   웹폰트 <link>(fonts.googleapis 계열)도 살린다. 나머지 title·meta·link·script 만 제거. */
 function cleanBodyHtml(html){
   let s = String(html || '');
   if(!/<!DOCTYPE|<html[\s>]|<body[\s>]/i.test(s)) return s;   // 일반 조각은 원본 유지
+  /* head 를 잘라내기 전에 문서 전체에서 디자인 재료(스타일·웹폰트)를 먼저 걷는다 */
+  const styles = [...s.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)].map(x => x[1]).join('\n');
+  const fontLinks = (s.match(/<link[^>]*>/gi) || []).filter(l => /fonts\.googleapis\.com|fonts\.gstatic\.com/i.test(l));
   const m = s.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
   if(m) s = m[1];
-  return s
+  s = s
     .replace(/<!DOCTYPE[^>]*>/gi, '')
     .replace(/<\/?(?:html|head|body)[^>]*>/gi, '')
     .replace(/<title>[\s\S]*?<\/title>/gi, '')
@@ -88,6 +127,9 @@ function cleanBodyHtml(html){
     .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
     .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
     .trim();
+  const scoped = scopeCss(styles, '.blog-body').trim();
+  const head = (fontLinks.join('\n') + (scoped ? '\n<style>\n' + scoped + '\n</style>' : '')).trim();
+  return head ? head + '\n' + s : s;
 }
 
 /* 소스 모드 textarea 의 커서 위치에 텍스트 삽입 */
