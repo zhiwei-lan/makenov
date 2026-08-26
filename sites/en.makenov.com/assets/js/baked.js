@@ -31,29 +31,29 @@ window.MK_BAKED = {
    없으면 브라우저가 DB 응답을 기다리는 1초 동안 옛 문구가 보였다가 바뀐다. */
 window.MK_COPY_BAKED = {
   "ui.mk_f3": {
-    "en": "Prices and transaction terms are disclosed only to certified distribution partners.",
-    "ko": "가격·거래조건은 인증 유통 파트너에게만 공개",
-    "vi": "Giá cả và điều khoản giao dịch chỉ được tiết lộ cho người mua được chứng nhận."
+    "vi": "Chỉ hiển thị giá và điều kiện giao dịch cho người mua đã xác minh",
+    "ko": "가격·거래조건은 인증 바이어에게만 공개",
+    "en": "Prices and transaction terms are disclosed only to certified buyers."
   },
   "hero.0.sub": {
-    "en": "Explore innovative products from around the world 365 days a year from your office.",
+    "vi": "Khám phá các sản phẩm đổi mới toàn cầu 365 ngày ngay tại văn phòng.",
     "ko": "사무실에서 전 세계 혁신제품을 365일 탐색하세요.",
-    "vi": "Khám phá các sản phẩm sáng tạo từ khắp nơi trên thế giới 365 ngày một năm từ văn phòng của bạn."
+    "en": "Explore innovative products from around the world 365 days a year from your office."
   },
   "hero.1.sub": {
-    "en": "Compare product and manufacturer information and quickly find the partner you need.",
+    "vi": "So sánh thông tin sản phẩm và nhà cung cấp, nhanh chóng tìm kiếm đối tác phù hợp.",
     "ko": "제품과 제조사 정보를 비교하고 필요한 파트너를 빠르게 찾으세요.",
-    "vi": "So sánh thông tin sản phẩm, nhà sản xuất và nhanh chóng tìm được đối tác mình cần."
+    "en": "Compare product and manufacturer information and quickly find the partner you need."
   },
   "hero.2.sub": {
-    "en": "After verifying your business, check the key conditions required for the transaction on one screen.",
+    "vi": "Sau khi xác minh doanh nghiệp, xem toàn bộ thông tin giao dịch quan trọng trên một màn hình.",
     "ko": "사업자 인증 후 거래에 필요한 핵심 조건을 한 화면에서 확인하세요.",
-    "vi": "Sau khi xác minh doanh nghiệp của bạn, hãy kiểm tra các điều kiện chính cần thiết cho giao dịch trên một màn hình."
+    "en": "After verifying your business, check the key conditions required for the transaction on one screen."
   },
   "hero.3.sub": {
-    "en": "If you select multiple products, your quote request will be sent directly to each manufacturer.",
+    "vi": "Chọn nhiều sản phẩm và yêu cầu báo giá sẽ được gửi trực tiếp đến từng nhà cung cấp.",
     "ko": "여러 제품을 선택하면 견적 요청이 각 제조사에 직접 전달됩니다.",
-    "vi": "Nếu bạn chọn nhiều sản phẩm, yêu cầu báo giá của bạn sẽ được gửi trực tiếp đến từng nhà sản xuất."
+    "en": "If you select multiple products, your quote request will be sent directly to each manufacturer."
   },
   "ui.ab_s1_l": {
     "en": "Supports Korean, Vietnamese, and English",
@@ -66,9 +66,9 @@ window.MK_COPY_BAKED = {
     "vi": "3 ngôn ngữ"
   },
   "ui.ft_desc": {
-    "en": "A global innovation platform that connects the world’s products and distribution partners",
-    "ko": "세계의 제품과 유통 파트너를 하나로 잇는 글로벌 혁신 플랫폼",
-    "vi": "Nền tảng đổi mới toàn cầu kết nối sản phẩm và người mua trên thế giới"
+    "vi": "Nền tảng toàn cầu kết nối sản phẩm và đối tác mua hàng trên toàn thế giới",
+    "ko": "세계의 제품과 바이어를 하나로 잇는 글로벌 혁신 플랫폼",
+    "en": "A global innovation platform that connects the world’s products and buyers"
   },
   "ui.gd_b1_t": {
     "en": "join the membership",
@@ -86,9 +86,9 @@ window.MK_COPY_BAKED = {
     "vi": "Thông tin chuyên sâu về thị trường để tìm nguồn cung ứng và xuất khẩu toàn cầu"
   },
   "ui.dir_desc": {
-    "en": "Meet global innovative products",
+    "vi": "Khám phá các sản phẩm sáng tạo toàn cầu.",
     "ko": "글로벌 혁신 제품들을 만나보세요",
-    "vi": "Gặp gỡ các sản phẩm sáng tạo toàn cầu"
+    "en": "Meet global innovative products"
   },
   "ui.promo_f2": {
     "en": "Request a quote directly from the supplier",
@@ -101,24 +101,24 @@ window.MK_COPY_BAKED = {
     "vi": "Sự khác biệt trong phương pháp tìm nguồn cung ứng"
   },
   "hero.0.title": {
-    "en": "international sourcing,\nDon't stick to the exhibition schedule",
+    "vi": "Tìm nguồn cung ứng quốc tế, không còn phụ thuộc vào các kỳ triển lãm.",
     "ko": "해외 소싱,\n전시회 일정에 맞추지 마세요",
-    "vi": "tìm nguồn cung ứng quốc tế,\nĐừng bám sát lịch trình triển lãm"
+    "en": "international sourcing,\nDon't stick to the exhibition schedule"
   },
   "hero.1.title": {
-    "en": "Finding multiple manufacturers;\nGet it done in one place",
+    "vi": "Kết nối với nhiều nhà cung cấp chỉ trong một nền tảng.",
     "ko": "여러 제조사를 찾는 일,\n한곳에서 끝내세요",
-    "vi": "Tìm nhiều nhà sản xuất;\nHoàn thành công việc ở một nơi"
+    "en": "Finding multiple manufacturers;\nGet it done in one place"
   },
   "hero.2.title": {
-    "en": "Price, MOQ, delivery date,\nCheck before contacting us",
+    "vi": "Kiểm tra giá, MOQ và thời gian giao hàng trước khi yêu cầu tư vấn.",
     "ko": "가격·MOQ·납기,\n문의하기 전에 확인하세요",
-    "vi": "Giá, MOQ, ngày giao hàng,\nKiểm tra trước khi liên hệ với chúng tôi"
+    "en": "Price, MOQ, delivery date,\nCheck before contacting us"
   },
   "hero.3.title": {
-    "en": "Collect products of interest\nRequest a quote at once",
+    "vi": "Lưu các sản phẩm quan tâm và gửi yêu cầu báo giá chỉ với một lần.",
     "ko": "관심상품을 모아\n견적 요청은 한 번에",
-    "vi": "Thu thập sản phẩm quan tâm\nYêu cầu báo giá ngay lập tức"
+    "en": "Collect products of interest\nRequest a quote at once"
   },
   "about.hero.h1": {
     "en": "global sourcing,\nStart now in one place.",
@@ -126,19 +126,19 @@ window.MK_COPY_BAKED = {
     "vi": "tìm nguồn cung ứng toàn cầu,\nBắt đầu ngay bây giờ ở một nơi."
   },
   "about.lock.h2": {
-    "en": "Prices and terms of trade are disclosed only to verified distribution partners.",
-    "ko": "가격과 거래조건은 인증된 유통 파트너에게만 공개됩니다",
+    "en": "Prices and terms of trade are disclosed only to verified buyers.",
+    "ko": "가격과 거래조건은 인증된 바이어에게만 공개됩니다",
     "vi": "Giá cả và điều khoản giao dịch chỉ được tiết lộ cho người mua đã được xác minh."
   },
   "ui.kr_cta_btn": {
-    "en": "Supplier store opening inquiry",
+    "vi": "Đăng ký nhà cung cấp",
     "ko": "공급사 입점 문의",
-    "vi": "Nhà cung cấp yêu cầu mở cửa hàng"
+    "en": "Supplier store opening inquiry"
   },
   "ui.promo_desc": {
-    "en": "Certified distribution partners can check the price, MOQ, and delivery date, and request a quote for the desired product directly from the supplier.",
-    "ko": "인증된 유통 파트너는 가격·MOQ·납기를 확인하고, 원하는 제품의 견적을 공급사에 직접 요청할 수 있습니다.",
-    "vi": "Người mua được chứng nhận có thể kiểm tra giá, MOQ, ngày giao hàng và yêu cầu báo giá cho sản phẩm mong muốn trực tiếp từ nhà cung cấp."
+    "vi": "Người mua đã được xác minh có thể xem giá, MOQ và thời gian giao hàng, đồng thời gửi yêu cầu báo giá trực tiếp đến nhà cung cấp cho sản phẩm mong muốn.",
+    "ko": "인증된 바이어는 가격·MOQ·납기를 확인하고, 원하는 제품의 견적을 공급사에 직접 요청할 수 있습니다.",
+    "en": "Certified buyers can check the price, MOQ, and delivery date, and request a quote for the desired product directly from the supplier."
   },
   "about.lock.tag": {
     "en": "Transaction conditions disclosure method",
@@ -151,18 +151,18 @@ window.MK_COPY_BAKED = {
     "vi": "Từ đăng ký thành viên đến tìm hiểu nhà cung cấp, 4 bước"
   },
   "ui.kr_cta_desc": {
-    "en": "When you register a product on MAKENOV, it will be introduced to certified distribution partners, and quotation inquiries will be sent directly to the supplier.",
-    "ko": "MAKENOV에 제품을 등록하면 인증된 유통 파트너에게 소개되고, 견적 문의가 공급사에 직접 전달됩니다.",
-    "vi": "Khi bạn đăng ký một sản phẩm trên MAKENOV, sản phẩm đó sẽ được giới thiệu với những người mua được chứng nhận và yêu cầu báo giá sẽ được gửi trực tiếp đến nhà cung cấp."
+    "vi": "Khi bạn đăng ký một sản phẩm trên MAKENOV, sản phẩm đó sẽ được giới thiệu với những người mua được xác minh và yêu cầu báo giá sẽ được gửi trực tiếp đến nhà cung cấp.",
+    "ko": "MAKENOV에 제품을 등록하면 인증된 바이어에게 소개되고, 견적 문의가 공급사에 직접 전달됩니다.",
+    "en": "When you register a product on MAKENOV, it will be introduced to certified buyers, and quotation inquiries will be sent directly to the supplier."
   },
   "ui.promo_title": {
-    "en": "With one business verification\nFrom price confirmation to quote request",
+    "vi": "Xác minh doanh nghiệp một lần – Dễ dàng xem giá và yêu cầu báo giá",
     "ko": "사업자 인증 한 번으로\n가격 확인부터 견적 요청까지",
-    "vi": "Với một lần xác minh doanh nghiệp\nTừ xác nhận giá đến yêu cầu báo giá"
+    "en": "With one business verification\nFrom price confirmation to quote request"
   },
   "about.hero.kick": {
-    "en": "What if you are a distribution partner?",
-    "ko": "유통 파트너라면?",
+    "en": "What if you are a buyer?",
+    "ko": "바이어라면?",
     "vi": "Nếu bạn là người mua thì sao?"
   },
   "about.hero.lead": {
@@ -171,8 +171,8 @@ window.MK_COPY_BAKED = {
     "vi": "Khám phá các sản phẩm và nhà cung cấp trên khắp thế giới,\nSau khi xác minh doanh nghiệp của bạn, hãy kiểm tra giá, MOQ, ngày giao hàng và yêu cầu báo giá."
   },
   "about.lock.desc": {
-    "en": "Price, minimum order quantity (MOQ), delivery date, and supply conditions can only be checked on accounts that have completed business verification. We protect the supplier's transaction information while providing the necessary information to distribution partners for actual purchase purposes.",
-    "ko": "가격·최소주문수량(MOQ)·납기·공급조건은 사업자 인증을 완료한 계정에서만 확인할 수 있습니다. 공급사의 거래정보를 보호하면서 실제 구매 목적의 유통 파트너에게 필요한 정보를 제공합니다.",
+    "en": "Price, minimum order quantity (MOQ), delivery date, and supply conditions can only be checked on accounts that have completed business verification. We protect the supplier's transaction information while providing the necessary information to buyers for actual purchase purposes.",
+    "ko": "가격·최소주문수량(MOQ)·납기·공급조건은 사업자 인증을 완료한 계정에서만 확인할 수 있습니다. 공급사의 거래정보를 보호하면서 실제 구매 목적의 바이어에게 필요한 정보를 제공합니다.",
     "vi": "Giá, số lượng đặt hàng tối thiểu (MOQ), ngày giao hàng và điều kiện cung cấp chỉ có thể được kiểm tra trên các tài khoản đã hoàn tất xác minh doanh nghiệp. Chúng tôi bảo vệ thông tin giao dịch của nhà cung cấp đồng thời cung cấp thông tin cần thiết cho người mua vì mục đích mua hàng thực tế."
   },
   "about.lock.note": {
@@ -181,9 +181,9 @@ window.MK_COPY_BAKED = {
     "vi": "Kiểm tra các điều khoản giao dịch được nhà cung cấp đăng ký ngay sau khi xác minh."
   },
   "ui.kr_cta_title": {
-    "en": "Are you looking for overseas distribution partners?",
-    "ko": "해외 유통 파트너를 찾고 계신가요?",
-    "vi": "Bạn đang tìm kiếm người mua ở nước ngoài?"
+    "vi": "Bạn đang tìm kiếm người mua hàng ở nước ngoài?",
+    "ko": "해외 바이어를 찾고 계신가요?",
+    "en": "Are you looking for overseas buyers?"
   },
   "about.problem.h2": {
     "en": "It's easy to miss out on new products at trade shows alone.",
@@ -364,5 +364,150 @@ window.MK_COPY_BAKED = {
     "en": "Connection after consultation is difficult",
     "ko": "상담 이후의 연결이 어렵습니다",
     "vi": "Kết nối sau khi tư vấn khó khăn"
+  },
+  "ui.inquiries_count": {
+    "vi": " yêu cầu",
+    "ko": "건 문의",
+    "en": "inquiries"
+  },
+  "ui.co_dir_title": {
+    "vi": "Danh sách nhà cung cấp",
+    "ko": "공급사 디렉토리",
+    "en": "Supplier Directory"
+  },
+  "ui.nav_companies": {
+    "vi": "Nhà cung cấp",
+    "ko": "공급사",
+    "en": "Makers"
+  },
+  "ui.nav_about_buyer": {
+    "vi": "Bạn là người mua hàng?",
+    "ko": "바이어라면?",
+    "en": "Are you a buyer?"
+  },
+  "ui.nav_about_maker": {
+    "vi": "Bạn là nhà cung cấp?",
+    "ko": "공급사라면?",
+    "en": "Are you a manufacturer?"
+  },
+  "ui.nav_support": {
+    "vi": "Chăm sóc khách hàng",
+    "ko": "고객센터",
+    "en": "Support"
+  },
+  "ui.nav_sp_ask": {
+    "vi": "Tư vấn 1:1",
+    "ko": "1:1 문의하기",
+    "en": "Send an enquiry"
+  },
+  "ui.nav_columns": {
+    "vi": "Blog",
+    "ko": "칼럼",
+    "en": "Insights"
+  },
+  "ui.co_dir_desc": {
+    "vi": "Kiểm tra năng lực sản xuất, chứng nhận và kinh nghiệm xuất khẩu, kết nối trực tiếp với đối tác phù hợp.",
+    "ko": "생산 능력·인증·수출 실적을 확인하고 바로 문의하세요.",
+    "en": "Check production capacity, certifications and export record before you inquire."
+  },
+  "ui.promo_f1": {
+    "vi": "Xem giá · MOQ · Thời gian giao hàng",
+    "ko": "가격 · MOQ · 납기 열람",
+    "en": "Unlock price · MOQ · lead time"
+  },
+  "ui.mk_f1": {
+    "vi": "Không mất phí đăng ký",
+    "ko": "등록비 없음",
+    "en": "No listing fee"
+  },
+  "ui.mk_f2": {
+    "vi": "Đăng bằng 3 ngôn ngữ",
+    "ko": "3개 국어 등록",
+    "en": "Listed in three languages"
+  },
+  "landing.hero.h1b": {
+    "vi": "của sản phẩm tiên phong toàn cầu",
+    "ko": "공식 유통사가 될 수 있습니다",
+    "en": "of a global innovative product"
+  },
+  "landing.steps.kick": {
+    "vi": "Đừng mãi trăn trở một mình về bài toán phân phối chính hãng thương hiệu quốc tế",
+    "ko": "막막했던 해외 브랜드 공식 유통, 이제 혼자 고민하지 마세요",
+    "en": "Official distribution of overseas brands, without figuring it out alone"
+  },
+  "landing.steps.s1h": {
+    "vi": "Không cần ra nước ngoài, vẫn có thể tiếp cận các sản phẩm tiên phong trên thế giới",
+    "ko": "해외로 가지 않아도 세계의\n혁신 제품을 만날 수 있어요",
+    "en": "Meet the world's innovative products\nwithout leaving your desk"
+  },
+  "landing.steps.s1p": {
+    "vi": "Không cần trực tiếp đến các triển lãm hay thị trường nước ngoài, bạn vẫn có thể khám phá đa dạng sản phẩm tiên phong toàn cầu và tìm kiếm cơ hội phân phối chính thức.",
+    "ko": "전시회나 해외 현장을 직접 찾아다니지 않아도 다양한 글로벌 혁신 제품을 살펴보고 공식 유통 기회를 발견할 수 있습니다.",
+    "en": "Browse innovative products from around the world and find official distribution opportunities — no trade shows or overseas trips required."
+  },
+  "landing.steps.s3k": {
+    "vi": "Hỗ trợ toàn bộ quá trình kết nối",
+    "ko": "연결 전 과정 지원",
+    "en": "Support at every step"
+  },
+  "landing.steps.s3h": {
+    "vi": "Khi gặp khó khăn trong việc kết nối với nhà cung cấp, MAKENOV sẽ đồng hành cùng bạn",
+    "ko": "공급사와의 연결이 어려울 때\n메이크노브가 함께할게요",
+    "en": "When reaching a supplier is hard,\nMAKENOV works alongside you"
+  },
+  "landing.steps.s3p": {
+    "vi": "Chỉ cần để lại yêu cầu, chúng tôi sẽ hỗ trợ kết nối với nhà cung cấp, phiên dịch, đồng thời phối hợp các nội dung trao đổi và lịch trình cần thiết, từ các cuộc gặp trực tuyến đến trực tiếp.",
+    "ko": "문의만 남겨주시면 공급사 연결과 통역부터 온·오프라인 미팅까지 필요한 소통과 일정을 함께 조율해 드립니다.",
+    "en": "Leave an inquiry and we coordinate everything needed — supplier connection, interpretation, and online or in-person meetings."
+  },
+  "landing.pain.h1": {
+    "vi": "Năng lực cạnh tranh trong phân phối",
+    "ko": "유통의 경쟁력은",
+    "en": "Competitive distribution starts with"
+  },
+  "landing.pain.h2": {
+    "vi": " bắt đầu từ việc bạn bán sản phẩm nào",
+    "ko": "무엇을 파느냐에서 시작됩니다",
+    "en": "what you choose to sell"
+  },
+  "landing.pain.p": {
+    "vi": "MAKENOV tìm kiếm những sản phẩm tiên phong toàn cầu chưa được phân phối chính thức tại Việt Nam. Hãy chủ động khám phá tiềm năng của sản phẩm và chuẩn bị cho những cơ hội thị trường mới.",
+    "ko": "메이크노브는 아직 베트남에 공식 유통되지 않은 글로벌 혁신 제품을 발굴합니다.\n제품이 가진 가능성을 먼저 살펴보고 새로운 시장을 준비해 보세요.",
+    "en": "MAKENOV discovers global innovative products not yet officially distributed in Vietnam.\nSee a product's potential first and get ready for a new market."
+  },
+  "landing.cost.kick": {
+    "vi": "Chi phí dịch vụ",
+    "ko": "비용 안내",
+    "en": "Pricing"
+  },
+  "landing.cost.h1": {
+    "vi": "Từ tìm kiếm sản phẩm đến kết nối với nhà cung cấp",
+    "ko": "제품을 찾고 연결되는 과정까지",
+    "en": "The process of finding and connecting to a product"
+  },
+  "landing.cost.h2": {
+    "vi": "MAKENOV hỗ trợ hoàn toàn miễn phí",
+    "ko": "메이크노브는 무료입니다",
+    "en": "MAKENOV is free"
+  },
+  "landing.cost.p": {
+    "vi": "Từ khám phá sản phẩm toàn cầu, xem điều kiện giao dịch đến gửi yêu cầu báo giá cho nhà cung cấp — tất cả đều không mất phí sử dụng.\nKhi cần, MAKENOV cũng hỗ trợ miễn phí việc kết nối, trao đổi với nhà cung cấp và sắp xếp lịch gặp.",
+    "ko": "글로벌 제품 탐색부터 거래 조건 확인, 공급사 견적 문의까지 별도의 이용료 없이 이용할 수 있습니다.\n필요한 경우 공급사 연결과 소통, 미팅 조율까지 무료로 지원합니다.",
+    "en": "Product discovery, trade-term checks and supplier quote requests come with no usage fee.\nWhen needed, supplier connection, communication and meeting coordination are also supported for free."
+  },
+  "landing.cta.p": {
+    "vi": "Gặp gỡ những sản phẩm tiên phong toàn cầu đang tìm nhà phân phối chính thức tại Việt Nam.",
+    "ko": "베트남 공식 유통 파트너를 찾고 있는 글로벌 혁신 제품을 만나보세요.",
+    "en": "Meet global innovative products looking for their official distribution partner in Vietnam."
+  },
+  "landing.float.btn": {
+    "vi": "Khám phá sản phẩm tiên phong",
+    "ko": "혁신 제품 둘러보기",
+    "en": "Browse innovative products"
+  },
+  "landing.steps.h": {
+    "vi": "Đã có MAKENOV thay bạn kết nối với các thương hiệu toàn cầu",
+    "ko": "메이크노브가 전 세계 브랜드와의 연결을 대신합니다",
+    "en": "MAKENOV handles the connection with brands worldwide"
   }
 };
