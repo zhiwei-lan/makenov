@@ -20,7 +20,7 @@ const LND = {
    "en": "Anyone can become the official distributor"
   },
   "h1b": {
-   "vi": "của sản phẩm đổi mới toàn cầu",
+   "vi": "của sản phẩm tiên phong toàn cầu",
    "ko": "공식 유통사가 될 수 있습니다",
    "en": "of a global innovative product"
   },
@@ -87,12 +87,12 @@ const LND = {
  },
  "steps": {
   "kick": {
-   "vi": "Phân phối chính thức thương hiệu nước ngoài từng là bài toán khó, giờ bạn không phải tự xoay xở nữa",
+   "vi": "Đừng mãi trăn trở một mình về bài toán phân phối chính hãng thương hiệu quốc tế",
    "ko": "막막했던 해외 브랜드 공식 유통, 이제 혼자 고민하지 마세요",
    "en": "Official distribution of overseas brands, without figuring it out alone"
   },
   "h": {
-   "vi": "MAKENOV thay bạn kết nối với các thương hiệu trên toàn thế giới",
+   "vi": "Đã có MAKENOV thay bạn kết nối với các thương hiệu toàn cầu",
    "ko": "메이크노브가 전 세계 브랜드와의 연결을 대신합니다",
    "en": "MAKENOV handles the connection with brands worldwide"
   },
@@ -102,12 +102,13 @@ const LND = {
    "en": "Global product discovery"
   },
   "s1h": {
-   "vi": "Không cần ra nước ngoài\nvẫn gặp được sản phẩm đổi mới thế giới",
+   "vi": "Không cần ra nước ngoài, vẫn có thể tiếp cận các sản phẩm tiên phong trên thế giới",
    "ko": "해외로 가지 않아도 세계의\n혁신 제품을 만날 수 있어요",
-   "en": "Meet the world's innovative products\nwithout leaving your desk"
+   "en": "Meet the world's innovative products\nwithout leaving your desk",
+   "_br": 1
   },
   "s1p": {
-   "vi": "Không phải tự tìm đến hội chợ hay thị trường nước ngoài, bạn vẫn có thể xem đa dạng sản phẩm đổi mới toàn cầu và phát hiện cơ hội phân phối chính thức.",
+   "vi": "Không cần trực tiếp đến các triển lãm hay thị trường nước ngoài, bạn vẫn có thể khám phá đa dạng sản phẩm tiên phong toàn cầu và tìm kiếm cơ hội phân phối chính thức.",
    "ko": "전시회나 해외 현장을 직접 찾아다니지 않아도 다양한 글로벌 혁신 제품을 살펴보고 공식 유통 기회를 발견할 수 있습니다.",
    "en": "Browse innovative products from around the world and find official distribution opportunities — no trade shows or overseas trips required."
   },
@@ -127,17 +128,18 @@ const LND = {
    "en": "Quickly check the trade terms that decide a deal — supply price, minimum order quantity and lead time for each product."
   },
   "s3k": {
-   "vi": "Hỗ trợ trọn quá trình kết nối",
+   "vi": "Hỗ trợ toàn bộ quá trình kết nối",
    "ko": "연결 전 과정 지원",
    "en": "Support at every step"
   },
   "s3h": {
-   "vi": "Khi kết nối với nhà cung cấp còn khó khăn\nMAKENOV sẽ đồng hành cùng bạn",
+   "vi": "Khi gặp khó khăn trong việc kết nối với nhà cung cấp, MAKENOV sẽ đồng hành cùng bạn",
    "ko": "공급사와의 연결이 어려울 때\n메이크노브가 함께할게요",
-   "en": "When reaching a supplier is hard,\nMAKENOV works alongside you"
+   "en": "When reaching a supplier is hard,\nMAKENOV works alongside you",
+   "_br": 1
   },
   "s3p": {
-   "vi": "Chỉ cần để lại yêu cầu, MAKENOV cùng bạn điều phối mọi giao tiếp và lịch trình — từ kết nối nhà cung cấp, phiên dịch đến họp online·offline.",
+   "vi": "Chỉ cần để lại yêu cầu, chúng tôi sẽ hỗ trợ kết nối với nhà cung cấp, phiên dịch, đồng thời phối hợp các nội dung trao đổi và lịch trình cần thiết, từ các cuộc gặp trực tuyến đến trực tiếp.",
    "ko": "문의만 남겨주시면 공급사 연결과 통역부터 온·오프라인 미팅까지 필요한 소통과 일정을 함께 조율해 드립니다.",
    "en": "Leave an inquiry and we coordinate everything needed — supplier connection, interpretation, and online or in-person meetings."
   }
@@ -156,36 +158,38 @@ const LND = {
    "en": "Competitive distribution starts with"
   },
   "h2": {
-   "vi": "bắt đầu từ việc bạn bán gì",
+   "vi": " bắt đầu từ việc bạn bán sản phẩm nào",
    "ko": "무엇을 파느냐에서 시작됩니다",
    "en": "what you choose to sell"
   },
   "p": {
-   "vi": "MAKENOV phát hiện những sản phẩm đổi mới toàn cầu chưa được phân phối chính thức tại Việt Nam.\nHãy xem trước tiềm năng của sản phẩm và chuẩn bị cho một thị trường mới.",
+   "vi": "MAKENOV tìm kiếm những sản phẩm tiên phong toàn cầu chưa được phân phối chính thức tại Việt Nam. Hãy chủ động khám phá tiềm năng của sản phẩm và chuẩn bị cho những cơ hội thị trường mới.",
    "ko": "메이크노브는 아직 베트남에 공식 유통되지 않은 글로벌 혁신 제품을 발굴합니다.\n제품이 가진 가능성을 먼저 살펴보고 새로운 시장을 준비해 보세요.",
-   "en": "MAKENOV discovers global innovative products not yet officially distributed in Vietnam.\nSee a product's potential first and get ready for a new market."
+   "en": "MAKENOV discovers global innovative products not yet officially distributed in Vietnam.\nSee a product's potential first and get ready for a new market.",
+   "_br": 1
   }
  },
  "cost": {
   "kick": {
-   "vi": "Chi phí",
+   "vi": "Chi phí dịch vụ",
    "ko": "비용 안내",
    "en": "Pricing"
   },
   "h1": {
-   "vi": "Từ tìm sản phẩm đến khi được kết nối",
+   "vi": "Từ tìm kiếm sản phẩm đến kết nối với nhà cung cấp",
    "ko": "제품을 찾고 연결되는 과정까지",
-   "en": "From finding a product to getting connected,"
+   "en": "The process of finding and connecting to a product"
   },
   "h2": {
-   "vi": "MAKENOV hoàn toàn miễn phí",
+   "vi": "MAKENOV hỗ trợ hoàn toàn miễn phí",
    "ko": "메이크노브는 무료입니다",
    "en": "MAKENOV is free"
   },
   "p": {
-   "vi": "Từ khám phá sản phẩm toàn cầu, xem điều kiện giao dịch đến gửi yêu cầu báo giá cho nhà cung cấp — tất cả đều không mất phí sử dụng.\nKhi cần, chúng tôi còn hỗ trợ miễn phí kết nối nhà cung cấp, giao tiếp và điều phối cuộc họp.",
+   "vi": "Từ khám phá sản phẩm toàn cầu, xem điều kiện giao dịch đến gửi yêu cầu báo giá cho nhà cung cấp — tất cả đều không mất phí sử dụng.\nKhi cần, MAKENOV cũng hỗ trợ miễn phí việc kết nối, trao đổi với nhà cung cấp và sắp xếp lịch gặp.",
    "ko": "글로벌 제품 탐색부터 거래 조건 확인, 공급사 견적 문의까지 별도의 이용료 없이 이용할 수 있습니다.\n필요한 경우 공급사 연결과 소통, 미팅 조율까지 무료로 지원합니다.",
-   "en": "Product discovery, trade-term checks and supplier quote requests come with no usage fee.\nWhen needed, supplier connection, communication and meeting coordination are also supported for free."
+   "en": "Product discovery, trade-term checks and supplier quote requests come with no usage fee.\nWhen needed, supplier connection, communication and meeting coordination are also supported for free.",
+   "_br": 1
   }
  },
  "faq": {
@@ -301,7 +305,7 @@ const LND = {
    "en": "discover it first"
   },
   "p": {
-   "vi": "Gặp gỡ những sản phẩm đổi mới toàn cầu đang tìm nhà phân phối chính thức tại Việt Nam.",
+   "vi": "Gặp gỡ những sản phẩm tiên phong toàn cầu đang tìm nhà phân phối chính thức tại Việt Nam.",
    "ko": "베트남 공식 유통 파트너를 찾고 있는 글로벌 혁신 제품을 만나보세요.",
    "en": "Meet global innovative products looking for their official distribution partner in Vietnam."
   },
@@ -313,7 +317,7 @@ const LND = {
  },
  "float": {
   "btn": {
-   "vi": "Khám phá sản phẩm đổi mới",
+   "vi": "Khám phá sản phẩm tiên phong",
    "ko": "혁신 제품 둘러보기",
    "en": "Browse innovative products"
   }

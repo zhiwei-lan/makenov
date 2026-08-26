@@ -71,8 +71,13 @@ if (!CHROME) {
 
 const PROFILE = path.join(require('os').tmpdir(), 'makenov-prerender-profile');
 
+/* ★랜딩(index.html 3벌)은 본문이 이미 정적 HTML 이라 사본을 뜨면 페이지가 통째로
+   중복된다(2026-08-26 사고 — 105KB 사본이 박혀 카피 깜빡임까지 유발).
+   구 레포 규칙대로 헤더·푸터 사본만, display:none 으로 심는다. */
+const isLanding = p => /^(?:ko\/|en\/)?index\.html$/.test(p);
+
 /* ---------- 1. 헤드리스 렌더 ---------- */
-function renderMain(page, hash) {
+function renderMain(page, hash, chromeOnly) {
   let dom;
   try {
     dom = execFileSync(CHROME, [
@@ -87,7 +92,7 @@ function renderMain(page, hash) {
   }
 
   const m = dom.match(/<main[^>]*>([\s\S]*?)<\/main>/);
-  if (!m) return null;
+  if (!m && !chromeOnly) return null;
 
   /* 헤더·푸터 사본도 넣는다 — 크롤러가 받는 HTML 에 내비게이션이 있어야 한다 */
   const chrome = ['mk-header', 'mk-footer']
@@ -96,7 +101,7 @@ function renderMain(page, hash) {
       return b ? `<nav class="mk-static-${id}">${b}</nav>` : '';
     }).join('\n');
 
-  return (m[1] + '\n' + chrome)
+  return (chromeOnly ? chrome : m[1] + '\n' + chrome)
     .replace(/<script[\s\S]*?<\/script>/gi, '')
     .replace(/\sid="[^"]*"/g, '')
     .replace(/<!--[\s\S]*?-->/g, '')
@@ -132,13 +137,13 @@ function extractBlock(html, cls, id) {
 const OPEN = '<!-- mk:pre (prerender.js가 관리 — 직접 수정 금지) -->';
 const CLOSE = '<!-- /mk:pre -->';
 
-function inject(page, html) {
+function inject(page, html, hidden) {
   const file = path.join(ROOT, page);
   let src = fs.readFileSync(file, 'utf8');
   const rx = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const old = new RegExp('\\n*' + rx(OPEN) + '[\\s\\S]*?' + rx(CLOSE) + '\\n*', 'g');
   src = src.replace(old, '\n');
-  const block = `${OPEN}\n<div id="mk-prerender">${html}</div>\n${CLOSE}`;
+  const block = `${OPEN}\n<div id="mk-prerender"${hidden ? ' style="display:none"' : ''}>${html}</div>\n${CLOSE}`;
   const mainOpen = src.match(/<main[^>]*>/);
   if (!mainOpen) throw new Error(`${page}: <main> 을 찾지 못했습니다`);
   const at = src.indexOf(mainOpen[0]) + mainOpen[0].length;
@@ -160,7 +165,8 @@ child.stdout.once('data', () => {
     const extras = (typeof entry === 'string' ? [] : entry.extraHashes) || [];
     process.stdout.write(`  ${page} … `);
     try {
-      let html = renderMain(page);
+      const landing = isLanding(page);
+      let html = renderMain(page, undefined, landing);
       for (const h of extras) {
         const alt = renderMain(page, h);
         const pane = alt && extractBlock(alt, 'nb-body');
@@ -171,7 +177,7 @@ child.stdout.once('data', () => {
         failed++;
         continue;
       }
-      inject(page, html);
+      inject(page, html, landing);
       console.log(`${text(html)}자`);
       report.push({ 페이지: page, 텍스트: text(html), HTML: html.length });
     } catch (e) {
