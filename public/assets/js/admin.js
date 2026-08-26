@@ -9,10 +9,23 @@ function ac(id){ const el=document.getElementById(id); return el ? el.checked : 
    덕분에 tri()·autoTranslate() 가 에디터든 텍스트박스든 똑같이 동작한다. */
 const RTE = {};
 const RTESRC = {};   // id → true면 'HTML 소스' 모드 (Quill 대신 textarea를 읽고 쓴다)
+const RTEHEAD = {};  // id → 에디터 전환 때 떼어둔 디자인 머리(<style>·웹폰트 <link>) — Quill 이 못 담아서 따로 보관
+/* 본문에서 디자인 머리(<style> 전부 + 웹폰트 <link>)를 떼어낸다 — Quill 은 이 태그들을 버리므로
+   에디터로 넘기기 전에 분리해 두고, 읽을 때(rteGet)·소스로 돌아올 때 다시 붙인다. */
+function splitDesignHead(html){
+  let s = String(html || ''), head = [];
+  s = s.replace(/<link[^>]*(?:fonts\.googleapis\.com|fonts\.gstatic\.com)[^>]*>/gi, m => { head.push(m); return ''; });
+  s = s.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, m => { head.push(m); return ''; });
+  return { head: head.join('\n'), rest: s.trim() };
+}
 function rteGet(id){
   if(RTESRC[id]){ const ta = document.getElementById('src-'+id); if(ta) return ta.value.trim(); }
   const q = RTE[id];
-  if(q){ const html = q.root.innerHTML; return html.replace(/<[^>]*>/g,'').replace(/&nbsp;/g,'').trim() ? html : ''; }
+  if(q){
+    const html = q.root.innerHTML;
+    if(!html.replace(/<[^>]*>/g,'').replace(/&nbsp;/g,'').trim()) return '';
+    return RTEHEAD[id] ? RTEHEAD[id] + '\n' + html : html;   // 에디터 모드여도 떼어둔 디자인은 저장에 포함
+  }
   const el = document.getElementById(id); return el ? el.value.trim() : '';
 }
 function rteSet(id, html){
@@ -29,14 +42,20 @@ function rteToggleSrc(id, btn){
   const box = document.getElementById('rte-'+id);
   if(!ta || !box) return;
   const tb = box.parentElement.querySelector('.ql-toolbar');
-  if(!RTESRC[id]){                       // 위지윅 → 소스
+  if(!RTESRC[id]){                       // 위지윅 → 소스 (rteGet 이 떼어둔 디자인 머리까지 되붙여 준다)
     ta.value = q ? rteGet(id) : ta.value;
+    delete RTEHEAD[id];                  // 머리는 다시 소스 안으로 들어갔다
     RTESRC[id] = true;
     ta.classList.remove('hidden'); box.classList.add('hidden'); if(tb) tb.classList.add('hidden');
     if(btn) btn.textContent = '에디터로';
   } else {                               // 소스 → 위지윅
+    const sp = splitDesignHead(ta.value);
+    if(sp.head && !confirm('이 본문에는 디자인(<style> 스타일)이 들어 있습니다.\n'
+      + '에디터는 class·레이아웃 태그를 지원하지 않아 전환하면 디자인 구조가 단순해질 수 있습니다.\n'
+      + '(스타일 규칙 자체는 저장할 때 자동으로 보존됩니다)\n\n그래도 에디터로 전환할까요?')) return;
+    RTEHEAD[id] = sp.head;               // Quill 이 버리기 전에 떼어 보관
     RTESRC[id] = false;
-    if(q){ q.setContents([]); q.clipboard.dangerouslyPasteHTML(ta.value); }
+    if(q){ q.setContents([]); q.clipboard.dangerouslyPasteHTML(sp.rest); }
     ta.classList.add('hidden'); box.classList.remove('hidden'); if(tb) tb.classList.remove('hidden');
     if(btn) btn.textContent = 'HTML 소스';
   }
@@ -175,6 +194,7 @@ function bodyInsertImage(id){
 function initColumnEditors(body){
   const html = cleanBodyHtml(body ? (body.ko || body.vi || body.en || '') : '');
   RTESRC['c-body-ko'] = true;
+  delete RTEHEAD['c-body-ko'];   // 이전에 열었던 칼럼의 보관분이 넘어오지 않게
   const ta = document.getElementById('src-c-body-ko');
   if(ta) ta.value = html;
   if(typeof Quill === 'undefined') return;
