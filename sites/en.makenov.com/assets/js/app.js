@@ -93,23 +93,30 @@ function renderChrome(active){
   const mobileLangMenu = `<details class="mk-lang-mobile"><summary><span class="flag">${currentLangUi.flag}</span><b>${currentLangUi.code}</b></summary><div class="menu">${Object.entries(langUi).map(([lang,item]) => `<a class="${lang===MK_LANG?'on':''}" href="${esc(mkLangHref(lang) || location.href)}" onclick="localStorage.setItem('mk_lang','${lang}')"><span class="flag">${item.flag}</span><span>${item.name}</span></a>`).join('')}</div></details>`;
   const tbMsg = L(cfg.topbar) || t('topbar_msg');
   const tbOn  = cfg.topbarOn !== false && !!tbMsg;
+  /* 탑바 몸통 — 관리자가 링크를 지정했으면 그 주소로, 없으면 문구 클릭 = 가입 모달
+     (로그인 상태면 마이페이지 인증 절차로). "인증하면 가격·MOQ 열림" 문구의 목적지. */
+  const tbBody = () => cfg.topbarLink
+    ? `<a href="${esc(cfg.topbarLink)}">${esc(tbMsg)}</a>`
+    : `<a href="mypage.html" onclick="return mkTopbarGo(event)">${esc(tbMsg)}</a>`;
 
   const old = document.getElementById('mk-topbar');
   if(old && !tbOn) old.remove();                       // 관리자에서 껐다가 언어 전환 시 반영
   if(tbOn && !old && !sessionStorage.getItem('mk_topbar_off')){
     const tb = document.createElement('div');
     tb.id = 'mk-topbar'; tb.className = 'topbar';
-    const body = cfg.topbarLink
-      ? `<a href="${esc(cfg.topbarLink)}">${esc(tbMsg)}</a>`
-      : `<span>${esc(tbMsg)}</span>`;
-    tb.innerHTML = `<div class="wrap">${body}<button class="x" onclick="sessionStorage.setItem('mk_topbar_off','1');this.closest('.topbar').remove()">✕</button></div>`;
+    tb.innerHTML = `<div class="wrap">${tbBody()}<button class="x" onclick="sessionStorage.setItem('mk_topbar_off','1');this.closest('.topbar').remove()">✕</button></div>`;
     hdr.parentNode.insertBefore(tb, hdr);
   }else if(old && (!tbOn || sessionStorage.getItem('mk_topbar_off'))){
     old.remove();                                      // 정적 자리표시자(CLS 방지용)였는데 꺼진 상태면 제거
   }else if(tbOn && old){
     const slot = old.querySelector('.wrap > a, .wrap > span');
-    if(slot) slot.textContent = tbMsg;                 // 언어 전환 시 문구만 교체
+    if(slot) slot.outerHTML = tbBody();                // 언어 전환·정적 자리표시자 → 클릭 가능한 몸통으로
   }
+  /* 탑바 문구 클릭 — 비로그인은 가입 모달, 로그인은 href(마이페이지 인증 절차) 그대로 */
+  window.mkTopbarGo = function(e){
+    if(Store.session()) return true;
+    e.preventDefault(); openAuth('signup'); return false;
+  };
 
   /* 헤더 = 상단행(로고 · 알약 검색 · 유틸 아이콘) + 메뉴행. addwel.co.kr 구조를 따랐다. */
   const doSearch = `if(this.value===undefined){var el=document.getElementById('mk-search-input')}else{var el=this}

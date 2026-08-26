@@ -17,7 +17,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 class DeployCheck extends Controller
 {
     /** 배포 확인용 마커. 배포를 검증할 때마다 숫자를 올린다. */
-    private const MARKER = 'deploy-check-90';
+    private const MARKER = 'deploy-check-91';
 
     public function index(): ResponseInterface
     {

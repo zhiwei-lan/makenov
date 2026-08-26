@@ -80,6 +80,7 @@ button{font-family:var(--font-body);cursor:pointer;border:none;background:none;c
 .topbar{background:var(--mk-navy);color:#fff;font-size:15px;font-weight:600;position:relative}
 .topbar .wrap{display:flex;align-items:center;justify-content:center;gap:10px;height:46px;text-align:center}
 .topbar b{color:var(--mk-yellow);font-weight:700}
+.topbar .wrap>a{color:#fff;text-decoration:none;cursor:pointer}
 .topbar .x{position:absolute;right:18px;top:50%;transform:translateY(-50%);font-size:17px;color:rgba(255,255,255,.85)}
 @media(max-width:640px){.topbar{font-size:13px}.topbar .wrap{height:42px;padding-right:38px}}
 

@@ -190,6 +190,24 @@ const MkData = {
 };
 window.MkData = MkData;
 
+/* 세션이 갱신·교체되면(토큰 회전, 다른 탭 로그인/로그아웃 포함) 캐시를 따라간다.
+   부팅 때 잡아둔 세션을 계속 쓰면 실제 토큰 주인과 buyer_id 가 어긋나
+   문의·관심제품 저장이 RLS 403 에 걸린다 (2026-08-26 문의 실패 원인 ②). */
+SB.auth.onAuthStateChange(async (event, session) => {
+  const prev = MkData.session && MkData.session.user && MkData.session.user.id;
+  MkData.session = session;
+  const now = session && session.user && session.user.id;
+  if(!session){ MkData.profile = null; MkData.admin = false; return; }
+  if(now && now !== prev){
+    const [{ data:prof }, { data:adm }] = await Promise.all([
+      SB.from('profiles').select('*').eq('id', now).maybeSingle(),
+      SB.from('admins').select('user_id').eq('user_id', now).maybeSingle(),
+    ]);
+    MkData.profile = prof || null;
+    MkData.admin   = !!adm;
+  }
+});
+
 /* ---------- Store 치환 ---------- */
 const _cartMem = { list:null };
 
