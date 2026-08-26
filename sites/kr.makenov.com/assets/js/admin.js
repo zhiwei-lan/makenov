@@ -9,7 +9,8 @@ function ac(id){ const el=document.getElementById(id); return el ? el.checked : 
    덕분에 tri()·autoTranslate() 가 에디터든 텍스트박스든 똑같이 동작한다. */
 const RTE = {};
 const RTESRC = {};   // id → true면 'HTML 소스' 모드 (Quill 대신 textarea를 읽고 쓴다)
-const RTEHEAD = {};  // id → 에디터 전환 때 떼어둔 디자인 머리(<style>·웹폰트 <link>) — Quill 이 못 담아서 따로 보관
+const RTEHEAD = {};  // id → 에디터 전환 때 떼어둔 디자인 머리(<style>·웹폰트 <link>)
+const RTECE = {};    // id → true면 contenteditable 디자인 에디터 사용(칼럼 본문) — 브라우저 네이티브 편집이라 태그를 안 깎는다
 /* 본문에서 디자인 머리(<style> 전부 + 웹폰트 <link>)를 떼어낸다 — Quill 은 이 태그들을 버리므로
    에디터로 넘기기 전에 분리해 두고, 읽을 때(rteGet)·소스로 돌아올 때 다시 붙인다. */
 function splitDesignHead(html){
@@ -20,6 +21,16 @@ function splitDesignHead(html){
 }
 function rteGet(id){
   if(RTESRC[id]){ const ta = document.getElementById('src-'+id); if(ta) return ta.value.trim(); }
+  if(RTECE[id]){                         // 디자인 에디터 모드 — 편집 DOM 그대로 + 떼어둔 디자인 머리 재부착
+    const ce = document.getElementById('ce-'+id);
+    if(ce){
+      const html = ce.innerHTML.trim();
+      const hasContent = html.replace(/<[^>]*>/g,'').replace(/&nbsp;/g,'').trim() || /<(img|table|iframe|video)[\s>]/i.test(html);
+      const body = hasContent ? html : '';
+      if(!body && !RTEHEAD[id]) return '';
+      return RTEHEAD[id] ? RTEHEAD[id] + '\n' + body : body;
+    }
+  }
   const q = RTE[id];
   if(q){
     const html = q.root.innerHTML;
@@ -71,23 +82,44 @@ function tri(base){ return { vi:rteGet(base+'-vi'), ko:rteGet(base+'-ko'), en:rt
 /* 다국어 객체·과거 평문·잠김 표식을 한 줄 표시용 텍스트로 */
 function triText(v){ if(v==null) return ''; if(typeof v==='string') return v; return v.ko||v.vi||v.en||''; }
 
-/* 에디터 이미지 버튼 → 기존 업로드 파이프라인(Supabase Storage 공개 URL / 로컬 dataUrl) */
-async function rteImage(quill){
-  const inp = document.createElement('input');
-  inp.type = 'file'; inp.accept = 'image/*';
-  inp.onchange = async () => {
-    const f = inp.files && inp.files[0]; if(!f) return;
-    try{
-      toastA('이미지 업로드 중…');
-      const r = await MkImg.save(f);
-      const src = /^https?:/.test(r.ref) ? r.ref : (r.dataUrl || r.ref);
-      const range = quill.getSelection(true);
-      quill.insertEmbed(range.index, 'image', src, 'user');
-      quill.setSelection(range.index + 1);
-      toastA('이미지 삽입 완료');
-    }catch(e){ toastA('이미지 업로드 실패: ' + (e.message || e)); }
-  };
-  inp.click();
+/* ---------- 칼럼 본문 디자인 에디터 (contenteditable) ----------
+   Quill 은 <style>·class·표 등 지원 밖 태그를 지워 디자인이 깎였다(2026-08-26 사고 두 번).
+   그래서 브라우저 네이티브 contenteditable 로 교체 — 디자인이 입혀진 미리보기 자체를 편집하므로
+   무엇을 붙여넣었든 태그·클래스·스타일이 그대로 보존된다.
+   구조: 소스 textarea ↔ 편집 div(#ce-…, class=blog-body) 전환.
+   전환 때 splitDesignHead 로 <style>·웹폰트 <link>를 떼어 #cehead-… 에 살아있는 DOM 으로 꽂아
+   미리보기에 디자인이 실제로 입혀지고, 저장·소스 복귀 때 다시 앞에 붙인다. */
+function colBodyToggle(id, btn){
+  const ta = document.getElementById('src-'+id), ce = document.getElementById('ce-'+id);
+  const bar = document.getElementById('cebar-'+id), holder = document.getElementById('cehead-'+id);
+  if(!ta || !ce) return;
+  if(RTESRC[id]){                        // 소스 → 디자인 에디터
+    const sp = splitDesignHead(ta.value);
+    RTEHEAD[id] = sp.head;
+    if(holder) holder.innerHTML = sp.head;   // 스타일·폰트를 실제 DOM 으로 — 편집 화면에 디자인이 입혀진다
+    ce.innerHTML = sp.rest;
+    RTESRC[id] = false;
+    ta.classList.add('hidden'); ce.classList.remove('hidden'); if(bar) bar.classList.remove('hidden');
+    if(btn) btn.textContent = 'HTML 소스로';
+  } else {                               // 디자인 에디터 → 소스
+    ta.value = (RTEHEAD[id] ? RTEHEAD[id] + '\n' : '') + ce.innerHTML.trim();
+    delete RTEHEAD[id];
+    if(holder) holder.innerHTML = '';
+    RTESRC[id] = true;
+    ce.classList.add('hidden'); if(bar) bar.classList.add('hidden'); ta.classList.remove('hidden');
+    if(btn) btn.textContent = '디자인 에디터로';
+  }
+}
+/* 디자인 에디터 서식 버튼 — execCommand 는 contenteditable 의 표준 편집 명령이라 태그를 안 깎는다 */
+function ceCmd(id, cmd, val){
+  const ce = document.getElementById('ce-'+id); if(!ce) return;
+  ce.focus();
+  if(cmd === 'formatBlock' && val && val.charAt(0) !== '<') val = '<'+val+'>';   // Firefox 는 <h2> 형식만 받는다
+  document.execCommand(cmd, false, val || null);
+}
+function ceLink(id){
+  const url = prompt('링크 주소(URL)를 입력하세요', 'https://');
+  if(url && url !== 'https://') ceCmd(id, 'createLink', url);
 }
 
 /* 붙여넣은 문서의 CSS 셀렉터를 칼럼 본문(.blog-body) 안에서만 먹게 좁힌다.
@@ -172,13 +204,18 @@ function bodyInsertImage(id){
         toastA('이미지 업로드 중… (' + f.name + ')');
         const r = await MkImg.save(f);
         const src = /^https?:/.test(r.ref) ? r.ref : (r.dataUrl || r.ref);
+        const tag = `<img src="${src}" alt="" loading="lazy">`;
         if(RTESRC[id]){
           const ta = document.getElementById('src-' + id);
-          if(ta) insertAtCursor(ta, `\n<img src="${src}" alt="" loading="lazy">\n`);
-        }else if(RTE[id]){
-          const q = RTE[id], range = q.getSelection(true);
-          q.insertEmbed(range.index, 'image', src, 'user');
-          q.setSelection(range.index + 1);
+          if(ta) insertAtCursor(ta, '\n' + tag + '\n');
+        }else if(RTECE[id]){
+          const ce = document.getElementById('ce-' + id);
+          if(ce){
+            const sel = window.getSelection();
+            const inside = sel && sel.rangeCount && ce.contains(sel.getRangeAt(0).startContainer);
+            if(inside){ ce.focus(); document.execCommand('insertHTML', false, tag); }
+            else ce.insertAdjacentHTML('beforeend', tag);   // 커서가 밖이면 본문 끝에
+          }
         }
         toastA('이미지 삽입 완료 — alt="" 에 사진 설명을 넣어주면 검색에 좋습니다');
       }catch(e){ toastA('이미지 업로드 실패: ' + (e.message || e)); }
@@ -189,37 +226,15 @@ function bodyInsertImage(id){
 
 /* 칼럼 본문 에디터 초기화 — columnForm 렌더 직후 호출
    게시판식: 언어 구분 없이 한 벌(ko 키), HTML 소스 입력이 기본.
-   위지윅이 필요하면 '에디터로' 버튼으로 전환한다.
-   (Quill 은 지원하지 않는 태그를 지우므로, 붙여넣은 HTML 보존을 위해 소스 모드가 기본) */
+   보기 좋게 고치고 싶으면 '디자인 에디터로' 버튼 — contenteditable 미리보기 편집이라 태그를 안 깎는다. */
 function initColumnEditors(body){
   const html = cleanBodyHtml(body ? (body.ko || body.vi || body.en || '') : '');
   RTESRC['c-body-ko'] = true;
-  delete RTEHEAD['c-body-ko'];   // 이전에 열었던 칼럼의 보관분이 넘어오지 않게
+  RTECE['c-body-ko'] = true;             // 칼럼 본문은 Quill 대신 디자인 에디터를 쓴다
+  delete RTE['c-body-ko'];
+  delete RTEHEAD['c-body-ko'];           // 이전에 열었던 칼럼의 보관분이 넘어오지 않게
   const ta = document.getElementById('src-c-body-ko');
   if(ta) ta.value = html;
-  if(typeof Quill === 'undefined') return;
-  const el = document.getElementById('rte-c-body-ko');
-  if(!el) return;
-  const q = new Quill(el, {
-    theme: 'snow',
-    placeholder: '여기에 본문을 작성하세요…',
-    modules: { toolbar: {
-      container: [
-        [{ header:[2,3,false] }],
-        ['bold','italic','underline'],
-        [{ list:'ordered' }, { list:'bullet' }],
-        ['blockquote','link','image'],
-        ['clean'],
-      ],
-      handlers: { image: function(){ rteImage(this.quill); } },
-    } },
-  });
-  if(html) q.clipboard.dangerouslyPasteHTML(html);
-  RTE['c-body-ko'] = q;
-  /* 기본이 소스 모드 — 에디터·툴바는 숨겨두고 전환 버튼으로만 연다 */
-  el.classList.add('hidden');
-  const tb = el.parentElement.querySelector('.ql-toolbar');
-  if(tb) tb.classList.add('hidden');
 }
 function today(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function toastA(msg){
@@ -1047,7 +1062,7 @@ function columnForm(id){
   const g = o => (o && (o.ko || o.vi || o.en)) || '';
   const ti=c?c.title:{}, ca=c?c.cat:{}, ex=c?c.excerpt:{};
   return `
-    <div class="card"><div class="bar"><h3 style="margin:0">${c?'칼럼 수정':'새 칼럼 작성'}</h3><span class="grow"></span><button class="btn btn-ghost btn-sm" onclick="cEditing=null;renderColumns()">취소</button><button class="btn btn-primary btn-sm" onclick="saveColumn('${id}')">저장</button></div><div class="sect" style="border-top:0;margin-top:0;padding-top:0"><h4>대표 이미지</h4>${uploader('c-img', c?c.img:'', {hint:'칼럼 카드와 상세 상단에 쓰입니다. 16:9 비율을 권장합니다.'})}</div><div class="fgrid two"><div class="fld"><label>발행일</label><input id="c-date" value="${esc(c?c.date:today())}"></div><div class="fld"><label>분류</label><input id="c-cat-ko" value="${esc(g(ca))}" placeholder="트렌드"></div></div><div class="fld"><label>제목</label><input id="c-title-ko" value="${esc(g(ti))}" placeholder="글 제목"></div><div class="fld"><label>요약 (목록 카드에 표시)</label><textarea id="c-ex-ko" rows="3">${esc(g(ex))}</textarea></div><div class="sect"><h4>SEO · 주소</h4><div class="fld"><label>주소 슬러그 (영문) — <code>columns/슬러그.html</code> 로 구워집니다</label><input id="c-slug" value="${esc(c&&c.slug?c.slug:'')}" placeholder="vietnam-import-guide"><p class="hint">영문 소문자·숫자·하이픈만. 비워두면 <code>${esc(id||'c#')}</code> 같은 번호 주소가 됩니다. 발행 후에는 바꾸지 않는 것이 좋습니다(주소가 바뀌면 기존 링크가 깨짐).</p></div><div class="fgrid two"><div class="fld"><label>SEO 제목 (검색결과·공유 카드용, 비우면 제목 사용)</label><input id="c-seo-title" value="${esc(c&&c.seoTitle?c.seoTitle:'')}" placeholder="예: 베트남 첫 수입 가이드 — MOQ·결제조건 총정리"></div><div class="fld"><label>SEO 설명 (비우면 요약 사용, 100~155자 권장)</label><input id="c-seo-desc" value="${esc(c&&c.seoDesc?c.seoDesc:'')}" placeholder="검색결과에 표시될 설명"></div></div></div><div class="sect"><h4>본문 (HTML)<button type="button" class="btn btn-primary btn-sm" style="margin-left:10px" onclick="bodyInsertImage('c-body-ko')">📷 사진 넣기</button><button type="button" class="btn btn-ghost btn-sm" style="margin-left:6px" onclick="rteToggleSrc('c-body-ko',this)">에디터로</button></h4><div class="fld"><div class="rte hidden" id="rte-c-body-ko"></div><textarea id="src-c-body-ko" rows="22" style="width:100%;font-family:monospace;font-size:13px" placeholder="<p>HTML을 직접 붙여넣으세요</p>"></textarea><p class="hint">게시판처럼 HTML을 그대로 붙여넣으면 됩니다 (<code>&lt;p&gt;</code>, <code>&lt;h2&gt;</code>, <code>&lt;table&gt;</code> 등 원본 유지). 언어 구분 없이 한 벌만 쓰면 모든 언어 페이지에 그대로 나갑니다. 사진은 <b>📷 사진 넣기</b>로 올리면 커서 위치에 <code>&lt;img&gt;</code> 태그가 들어갑니다 — 본문에 <code>images/…</code> 같은 컴퓨터 경로를 직접 쓰면 사이트에 파일이 없어 깨집니다. 서식 툴바가 필요하면 <b>에디터로</b> 버튼으로 전환하세요 — 단, 표 등 에디터가 지원하지 않는 태그는 지워질 수 있습니다.</p></div></div><div class="sect"><h4>이 칼럼의 FAQ <span style="color:var(--adm-sub);font-size:11px"> 본문 아래에 붙고, 검색·AI용 FAQPage 스키마로도 나갑니다</span></h4><div id="cfaq-list"></div><div class="bar" style="margin:12px 0 0"><button type="button" class="btn btn-ghost btn-sm" onclick="addColFaq()">+ 질문 추가</button><span class="hint" style="margin:0">칼럼과 함께 저장됩니다. 메인페이지 FAQ는 FAQ 탭에서 관리하세요.</span></div></div><div class="bar" style="margin-top:22px"><span class="grow"></span><button class="btn btn-ghost" onclick="cEditing=null;renderColumns()">취소</button><button class="btn btn-primary" onclick="saveColumn('${id}')">저장</button></div></div>`;
+    <div class="card"><div class="bar"><h3 style="margin:0">${c?'칼럼 수정':'새 칼럼 작성'}</h3><span class="grow"></span><button class="btn btn-ghost btn-sm" onclick="cEditing=null;renderColumns()">취소</button><button class="btn btn-primary btn-sm" onclick="saveColumn('${id}')">저장</button></div><div class="sect" style="border-top:0;margin-top:0;padding-top:0"><h4>대표 이미지</h4>${uploader('c-img', c?c.img:'', {hint:'칼럼 카드와 상세 상단에 쓰입니다. 16:9 비율을 권장합니다.'})}</div><div class="fgrid two"><div class="fld"><label>발행일</label><input id="c-date" value="${esc(c?c.date:today())}"></div><div class="fld"><label>분류</label><input id="c-cat-ko" value="${esc(g(ca))}" placeholder="트렌드"></div></div><div class="fld"><label>제목</label><input id="c-title-ko" value="${esc(g(ti))}" placeholder="글 제목"></div><div class="fld"><label>요약 (목록 카드에 표시)</label><textarea id="c-ex-ko" rows="3">${esc(g(ex))}</textarea></div><div class="sect"><h4>SEO · 주소</h4><div class="fld"><label>주소 슬러그 (영문) — <code>columns/슬러그.html</code> 로 구워집니다</label><input id="c-slug" value="${esc(c&&c.slug?c.slug:'')}" placeholder="vietnam-import-guide"><p class="hint">영문 소문자·숫자·하이픈만. 비워두면 <code>${esc(id||'c#')}</code> 같은 번호 주소가 됩니다. 발행 후에는 바꾸지 않는 것이 좋습니다(주소가 바뀌면 기존 링크가 깨짐).</p></div><div class="fgrid two"><div class="fld"><label>SEO 제목 (검색결과·공유 카드용, 비우면 제목 사용)</label><input id="c-seo-title" value="${esc(c&&c.seoTitle?c.seoTitle:'')}" placeholder="예: 베트남 첫 수입 가이드 — MOQ·결제조건 총정리"></div><div class="fld"><label>SEO 설명 (비우면 요약 사용, 100~155자 권장)</label><input id="c-seo-desc" value="${esc(c&&c.seoDesc?c.seoDesc:'')}" placeholder="검색결과에 표시될 설명"></div></div></div><div class="sect"><h4>본문 (HTML)<button type="button" class="btn btn-primary btn-sm" style="margin-left:10px" onclick="bodyInsertImage('c-body-ko')">📷 사진 넣기</button><button type="button" class="btn btn-ghost btn-sm" style="margin-left:6px" onclick="colBodyToggle('c-body-ko',this)">디자인 에디터로</button></h4><div class="fld"><div id="cehead-c-body-ko"></div><div class="hidden" id="cebar-c-body-ko" style="margin-bottom:8px"><button type="button" class="btn btn-ghost btn-sm" onclick="ceCmd('c-body-ko','bold')"><b>B</b></button> <button type="button" class="btn btn-ghost btn-sm" onclick="ceCmd('c-body-ko','italic')"><i>I</i></button> <button type="button" class="btn btn-ghost btn-sm" onclick="ceCmd('c-body-ko','underline')"><u>U</u></button> <button type="button" class="btn btn-ghost btn-sm" onclick="ceCmd('c-body-ko','formatBlock','h2')">H2</button> <button type="button" class="btn btn-ghost btn-sm" onclick="ceCmd('c-body-ko','formatBlock','h3')">H3</button> <button type="button" class="btn btn-ghost btn-sm" onclick="ceCmd('c-body-ko','formatBlock','p')">문단</button> <button type="button" class="btn btn-ghost btn-sm" onclick="ceCmd('c-body-ko','insertUnorderedList')">• 목록</button> <button type="button" class="btn btn-ghost btn-sm" onclick="ceLink('c-body-ko')">링크</button> <button type="button" class="btn btn-ghost btn-sm" onclick="ceCmd('c-body-ko','removeFormat')">서식 지우기</button></div><style>:where(#ce-c-body-ko){background:#fff;color:#111}</style><div class="blog-body hidden" id="ce-c-body-ko" contenteditable="true" spellcheck="false" style="border:1px solid #d9d9d9;border-radius:10px;padding:20px 22px;min-height:340px;max-height:72vh;overflow:auto;outline:none"></div><textarea id="src-c-body-ko" rows="22" style="width:100%;font-family:monospace;font-size:13px" placeholder="<p>HTML을 직접 붙여넣으세요</p>"></textarea><p class="hint">게시판처럼 HTML을 그대로 붙여넣으면 됩니다 (<code>&lt;p&gt;</code>, <code>&lt;h2&gt;</code>, <code>&lt;table&gt;</code> 등 원본 유지). 언어 구분 없이 한 벌만 쓰면 모든 언어 페이지에 그대로 나갑니다. 사진은 <b>📷 사진 넣기</b>로 올리면 커서 위치에 <code>&lt;img&gt;</code> 태그가 들어갑니다 — 본문에 <code>images/…</code> 같은 컴퓨터 경로를 직접 쓰면 사이트에 파일이 없어 깨집니다. <b>디자인 에디터로</b> 전환하면 디자인이 입혀진 미리보기 상태에서 글을 바로 고칠 수 있고, 태그·스타일·표가 그대로 보존됩니다.</p></div></div><div class="sect"><h4>이 칼럼의 FAQ <span style="color:var(--adm-sub);font-size:11px"> 본문 아래에 붙고, 검색·AI용 FAQPage 스키마로도 나갑니다</span></h4><div id="cfaq-list"></div><div class="bar" style="margin:12px 0 0"><button type="button" class="btn btn-ghost btn-sm" onclick="addColFaq()">+ 질문 추가</button><span class="hint" style="margin:0">칼럼과 함께 저장됩니다. 메인페이지 FAQ는 FAQ 탭에서 관리하세요.</span></div></div><div class="bar" style="margin-top:22px"><span class="grow"></span><button class="btn btn-ghost" onclick="cEditing=null;renderColumns()">취소</button><button class="btn btn-primary" onclick="saveColumn('${id}')">저장</button></div></div>`;
 }
 
 /* ---------- 칼럼 안 FAQ 편집기 ----------
