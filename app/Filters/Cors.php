@@ -19,7 +19,10 @@ class Cors implements FilterInterface
             return service('response')
                 ->setStatusCode(204)
                 ->setHeader('Access-Control-Allow-Origin', '*')
-                ->setHeader('Access-Control-Allow-Headers', 'authorization, apikey, content-type, x-client-info, x-supabase-api-version, prefer, accept-profile, accept, x-retry-count')
+                /* ⚠ content-profile 은 supabase-js 가 쓰기(POST/PATCH/DELETE)에만 붙이는 헤더.
+                   목록에 없으면 프리플라이트가 거부돼 서브도메인에서 조회는 되는데 쓰기만
+                   TypeError: Failed to fetch 로 죽는다 (2026-08-26 문의 제출 실패 원인). */
+                ->setHeader('Access-Control-Allow-Headers', 'authorization, apikey, content-type, content-profile, x-client-info, x-supabase-api-version, prefer, accept-profile, accept, range, x-retry-count')
                 ->setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS')
                 ->setHeader('Access-Control-Max-Age', '86400');
         }
