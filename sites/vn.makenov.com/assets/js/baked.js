@@ -3,11 +3,11 @@
    정식 주소(products/…html)로 링크하고, 없으면 ?id= 뷰어로 보낸다. */
 window.MK_BAKED = {
   "products": [
-    "p12",
-    "p11",
-    "p10",
-    "p9",
-    "p0"
+      "p10",
+      "p11",
+      "p12",
+      "p9",
+      "p0"
   ],
   "companies": [
     "lgind",
@@ -15,6 +15,8 @@ window.MK_BAKED = {
     "wellbeing"
   ],
   "columns": {
+      "c1": "c1",
+      "c3": "c3",
       "c-margin": "why-innovative-products",
       "c-verify": "supplier-verification",
       "c-exclusive": "exclusive-rights-checklist",
