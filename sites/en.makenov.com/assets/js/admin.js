@@ -71,12 +71,67 @@ async function rteImage(quill){
   inp.click();
 }
 
+/* 붙여넣은 HTML 이 완성된 문서(<!DOCTYPE>·<html>·<head> 포함)면 본문만 추출한다.
+   문서 전체를 그대로 저장하면 페이지 안에 title·meta·canonical 이 중복돼 SEO 를 오염시키고,
+   문서용 <style>·<script> 가 사이트 전체 스타일을 깨뜨린다. 조각(fragment)이면 손대지 않는다. */
+function cleanBodyHtml(html){
+  let s = String(html || '');
+  if(!/<!DOCTYPE|<html[\s>]|<body[\s>]/i.test(s)) return s;   // 일반 조각은 원본 유지
+  const m = s.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+  if(m) s = m[1];
+  return s
+    .replace(/<!DOCTYPE[^>]*>/gi, '')
+    .replace(/<\/?(?:html|head|body)[^>]*>/gi, '')
+    .replace(/<title>[\s\S]*?<\/title>/gi, '')
+    .replace(/<meta[^>]*>/gi, '')
+    .replace(/<link[^>]*>/gi, '')
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '')
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '')
+    .trim();
+}
+
+/* 소스 모드 textarea 의 커서 위치에 텍스트 삽입 */
+function insertAtCursor(ta, text){
+  const s = ta.selectionStart ?? ta.value.length, e = ta.selectionEnd ?? s;
+  ta.value = ta.value.slice(0, s) + text + ta.value.slice(e);
+  ta.selectionStart = ta.selectionEnd = s + text.length;
+  ta.focus();
+}
+
+/* 본문 사진 넣기 — 파일을 올리고(스토리지 업로드, 대표 이미지와 같은 파이프라인)
+   소스 모드면 <img> 태그를 커서 위치에, 에디터 모드면 Quill 에 삽입한다.
+   HTML 소스가 기본이 되면서 Quill 툴바의 이미지 버튼을 못 쓰게 된 것의 대체 입구. */
+function bodyInsertImage(id){
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*'; inp.multiple = true;
+  inp.onchange = async () => {
+    const files = [...(inp.files || [])]; if(!files.length) return;
+    for(const f of files){
+      try{
+        toastA('이미지 업로드 중… (' + f.name + ')');
+        const r = await MkImg.save(f);
+        const src = /^https?:/.test(r.ref) ? r.ref : (r.dataUrl || r.ref);
+        if(RTESRC[id]){
+          const ta = document.getElementById('src-' + id);
+          if(ta) insertAtCursor(ta, `\n<img src="${src}" alt="" loading="lazy">\n`);
+        }else if(RTE[id]){
+          const q = RTE[id], range = q.getSelection(true);
+          q.insertEmbed(range.index, 'image', src, 'user');
+          q.setSelection(range.index + 1);
+        }
+        toastA('이미지 삽입 완료 — alt="" 에 사진 설명을 넣어주면 검색에 좋습니다');
+      }catch(e){ toastA('이미지 업로드 실패: ' + (e.message || e)); }
+    }
+  };
+  inp.click();
+}
+
 /* 칼럼 본문 에디터 초기화 — columnForm 렌더 직후 호출
    게시판식: 언어 구분 없이 한 벌(ko 키), HTML 소스 입력이 기본.
    위지윅이 필요하면 '에디터로' 버튼으로 전환한다.
    (Quill 은 지원하지 않는 태그를 지우므로, 붙여넣은 HTML 보존을 위해 소스 모드가 기본) */
 function initColumnEditors(body){
-  const html = body ? (body.ko || body.vi || body.en || '') : '';
+  const html = cleanBodyHtml(body ? (body.ko || body.vi || body.en || '') : '');
   RTESRC['c-body-ko'] = true;
   const ta = document.getElementById('src-c-body-ko');
   if(ta) ta.value = html;
@@ -930,7 +985,7 @@ function columnForm(id){
   const g = o => (o && (o.ko || o.vi || o.en)) || '';
   const ti=c?c.title:{}, ca=c?c.cat:{}, ex=c?c.excerpt:{};
   return `
-    <div class="card"><div class="bar"><h3 style="margin:0">${c?'칼럼 수정':'새 칼럼 작성'}</h3><span class="grow"></span><button class="btn btn-ghost btn-sm" onclick="cEditing=null;renderColumns()">취소</button><button class="btn btn-primary btn-sm" onclick="saveColumn('${id}')">저장</button></div><div class="sect" style="border-top:0;margin-top:0;padding-top:0"><h4>대표 이미지</h4>${uploader('c-img', c?c.img:'', {hint:'칼럼 카드와 상세 상단에 쓰입니다. 16:9 비율을 권장합니다.'})}</div><div class="fgrid two"><div class="fld"><label>발행일</label><input id="c-date" value="${esc(c?c.date:today())}"></div><div class="fld"><label>분류</label><input id="c-cat-ko" value="${esc(g(ca))}" placeholder="트렌드"></div></div><div class="fld"><label>제목</label><input id="c-title-ko" value="${esc(g(ti))}" placeholder="글 제목"></div><div class="fld"><label>요약 (목록 카드에 표시)</label><textarea id="c-ex-ko" rows="3">${esc(g(ex))}</textarea></div><div class="sect"><h4>SEO · 주소</h4><div class="fld"><label>주소 슬러그 (영문) — <code>columns/슬러그.html</code> 로 구워집니다</label><input id="c-slug" value="${esc(c&&c.slug?c.slug:'')}" placeholder="vietnam-import-guide"><p class="hint">영문 소문자·숫자·하이픈만. 비워두면 <code>${esc(id||'c#')}</code> 같은 번호 주소가 됩니다. 발행 후에는 바꾸지 않는 것이 좋습니다(주소가 바뀌면 기존 링크가 깨짐).</p></div><div class="fgrid two"><div class="fld"><label>SEO 제목 (검색결과·공유 카드용, 비우면 제목 사용)</label><input id="c-seo-title" value="${esc(c&&c.seoTitle?c.seoTitle:'')}" placeholder="예: 베트남 첫 수입 가이드 — MOQ·결제조건 총정리"></div><div class="fld"><label>SEO 설명 (비우면 요약 사용, 100~155자 권장)</label><input id="c-seo-desc" value="${esc(c&&c.seoDesc?c.seoDesc:'')}" placeholder="검색결과에 표시될 설명"></div></div></div><div class="sect"><h4>본문 (HTML)<button type="button" class="btn btn-ghost btn-sm" style="margin-left:10px" onclick="rteToggleSrc('c-body-ko',this)">에디터로</button></h4><div class="fld"><div class="rte hidden" id="rte-c-body-ko"></div><textarea id="src-c-body-ko" rows="22" style="width:100%;font-family:monospace;font-size:13px" placeholder="<p>HTML을 직접 붙여넣으세요</p>"></textarea><p class="hint">게시판처럼 HTML을 그대로 붙여넣으면 됩니다 (<code>&lt;p&gt;</code>, <code>&lt;h2&gt;</code>, <code>&lt;table&gt;</code> 등 원본 유지). 언어 구분 없이 한 벌만 쓰면 모든 언어 페이지에 그대로 나갑니다. 서식 툴바가 필요하면 <b>에디터로</b> 버튼으로 전환하세요 — 단, 에디터로 전환하면 표 등 에디터가 지원하지 않는 태그는 지워질 수 있습니다.</p></div></div><div class="sect"><h4>이 칼럼의 FAQ <span style="color:var(--adm-sub);font-size:11px"> 본문 아래에 붙고, 검색·AI용 FAQPage 스키마로도 나갑니다</span></h4><div id="cfaq-list"></div><div class="bar" style="margin:12px 0 0"><button type="button" class="btn btn-ghost btn-sm" onclick="addColFaq()">+ 질문 추가</button><span class="hint" style="margin:0">칼럼과 함께 저장됩니다. 메인페이지 FAQ는 FAQ 탭에서 관리하세요.</span></div></div><div class="bar" style="margin-top:22px"><span class="grow"></span><button class="btn btn-ghost" onclick="cEditing=null;renderColumns()">취소</button><button class="btn btn-primary" onclick="saveColumn('${id}')">저장</button></div></div>`;
+    <div class="card"><div class="bar"><h3 style="margin:0">${c?'칼럼 수정':'새 칼럼 작성'}</h3><span class="grow"></span><button class="btn btn-ghost btn-sm" onclick="cEditing=null;renderColumns()">취소</button><button class="btn btn-primary btn-sm" onclick="saveColumn('${id}')">저장</button></div><div class="sect" style="border-top:0;margin-top:0;padding-top:0"><h4>대표 이미지</h4>${uploader('c-img', c?c.img:'', {hint:'칼럼 카드와 상세 상단에 쓰입니다. 16:9 비율을 권장합니다.'})}</div><div class="fgrid two"><div class="fld"><label>발행일</label><input id="c-date" value="${esc(c?c.date:today())}"></div><div class="fld"><label>분류</label><input id="c-cat-ko" value="${esc(g(ca))}" placeholder="트렌드"></div></div><div class="fld"><label>제목</label><input id="c-title-ko" value="${esc(g(ti))}" placeholder="글 제목"></div><div class="fld"><label>요약 (목록 카드에 표시)</label><textarea id="c-ex-ko" rows="3">${esc(g(ex))}</textarea></div><div class="sect"><h4>SEO · 주소</h4><div class="fld"><label>주소 슬러그 (영문) — <code>columns/슬러그.html</code> 로 구워집니다</label><input id="c-slug" value="${esc(c&&c.slug?c.slug:'')}" placeholder="vietnam-import-guide"><p class="hint">영문 소문자·숫자·하이픈만. 비워두면 <code>${esc(id||'c#')}</code> 같은 번호 주소가 됩니다. 발행 후에는 바꾸지 않는 것이 좋습니다(주소가 바뀌면 기존 링크가 깨짐).</p></div><div class="fgrid two"><div class="fld"><label>SEO 제목 (검색결과·공유 카드용, 비우면 제목 사용)</label><input id="c-seo-title" value="${esc(c&&c.seoTitle?c.seoTitle:'')}" placeholder="예: 베트남 첫 수입 가이드 — MOQ·결제조건 총정리"></div><div class="fld"><label>SEO 설명 (비우면 요약 사용, 100~155자 권장)</label><input id="c-seo-desc" value="${esc(c&&c.seoDesc?c.seoDesc:'')}" placeholder="검색결과에 표시될 설명"></div></div></div><div class="sect"><h4>본문 (HTML)<button type="button" class="btn btn-primary btn-sm" style="margin-left:10px" onclick="bodyInsertImage('c-body-ko')">📷 사진 넣기</button><button type="button" class="btn btn-ghost btn-sm" style="margin-left:6px" onclick="rteToggleSrc('c-body-ko',this)">에디터로</button></h4><div class="fld"><div class="rte hidden" id="rte-c-body-ko"></div><textarea id="src-c-body-ko" rows="22" style="width:100%;font-family:monospace;font-size:13px" placeholder="<p>HTML을 직접 붙여넣으세요</p>"></textarea><p class="hint">게시판처럼 HTML을 그대로 붙여넣으면 됩니다 (<code>&lt;p&gt;</code>, <code>&lt;h2&gt;</code>, <code>&lt;table&gt;</code> 등 원본 유지). 언어 구분 없이 한 벌만 쓰면 모든 언어 페이지에 그대로 나갑니다. 사진은 <b>📷 사진 넣기</b>로 올리면 커서 위치에 <code>&lt;img&gt;</code> 태그가 들어갑니다 — 본문에 <code>images/…</code> 같은 컴퓨터 경로를 직접 쓰면 사이트에 파일이 없어 깨집니다. 서식 툴바가 필요하면 <b>에디터로</b> 버튼으로 전환하세요 — 단, 표 등 에디터가 지원하지 않는 태그는 지워질 수 있습니다.</p></div></div><div class="sect"><h4>이 칼럼의 FAQ <span style="color:var(--adm-sub);font-size:11px"> 본문 아래에 붙고, 검색·AI용 FAQPage 스키마로도 나갑니다</span></h4><div id="cfaq-list"></div><div class="bar" style="margin:12px 0 0"><button type="button" class="btn btn-ghost btn-sm" onclick="addColFaq()">+ 질문 추가</button><span class="hint" style="margin:0">칼럼과 함께 저장됩니다. 메인페이지 FAQ는 FAQ 탭에서 관리하세요.</span></div></div><div class="bar" style="margin-top:22px"><span class="grow"></span><button class="btn btn-ghost" onclick="cEditing=null;renderColumns()">취소</button><button class="btn btn-primary" onclick="saveColumn('${id}')">저장</button></div></div>`;
 }
 
 /* ---------- 칼럼 안 FAQ 편집기 ----------
@@ -989,7 +1044,7 @@ function saveColumn(id){
     await Admin.upsertColumn({
       id: colId,
       cat: { ko: av('c-cat-ko') }, date: av('c-date')||today(), img: av('c-img'),
-      title, excerpt: { ko: av('c-ex-ko') }, body: { ko: rteGet('c-body-ko') },
+      title, excerpt: { ko: av('c-ex-ko') }, body: { ko: cleanBodyHtml(rteGet('c-body-ko')) },
       slug, seoTitle: av('c-seo-title'), seoDesc: av('c-seo-desc'),
     });
     await faqJobs();
