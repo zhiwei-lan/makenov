@@ -141,8 +141,10 @@ function scopeCss(css, scope){
     }else if(sel.charAt(0) === '@'){                       // @font-face·@keyframes 등
       out += sel + css.slice(open, j);
     }else{
+      const already = new RegExp('^' + scope.replace(/\./g, '\\.') + '(?![\\w-])');   // 재스코핑 방지(멱등)
       const scoped = sel.split(',').map(s => {
         s = s.trim(); if(!s) return '';
+        if(already.test(s)) return s;
         const m = s.match(/^(html|body|:root)(?![\w-])([\s\S]*)$/i);
         if(!m) return scope + ' ' + s;
         const rest = m[2].trim();
@@ -163,7 +165,16 @@ function scopeCss(css, scope){
    웹폰트 <link>(fonts.googleapis 계열)도 살린다. 나머지 title·meta·link·script 만 제거. */
 function cleanBodyHtml(html){
   let s = String(html || '');
-  if(!/<!DOCTYPE|<html[\s>]|<body[\s>]/i.test(s)) return s;   // 일반 조각은 원본 유지
+  const isDoc = /<!DOCTYPE|<html[\s>]|<body[\s>]/i.test(s);
+  /* ★조각(fragment)이라도 <style> 이 있으면 스코핑한다.
+     조각을 그대로 두면 안의 body·.wrap 광역 규칙이 사이트 컨테이너까지 줄인다
+     (2026-08-26 c1 사고 — main.wrap 이 780px 로 좁아짐). scopeCss 는 멱등이라
+     이미 스코핑된 본문을 다시 저장해도 변형이 없다. */
+  if(!isDoc){
+    if(!/<style[\s>]/i.test(s)) return s;               // 스타일 없는 조각은 원본 유지
+    return s.replace(/(<style[^>]*>)([\s\S]*?)(<\/style>)/gi,
+      (m0, open, css, close) => open + scopeCss(css, '.blog-body') + close);
+  }
   /* head 를 잘라내기 전에 문서 전체에서 디자인 재료(스타일·웹폰트)를 먼저 걷는다 */
   const styles = [...s.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)].map(x => x[1]).join('\n');
   const fontLinks = (s.match(/<link[^>]*>/gi) || []).filter(l => /fonts\.googleapis\.com|fonts\.gstatic\.com/i.test(l));

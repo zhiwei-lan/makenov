@@ -28,6 +28,43 @@ const LANGS = ['vi', 'ko', 'en'];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const T = (v, lang) => (v && typeof v === 'object') ? (v[lang] || v.vi || v.ko || v.en || '') : String(v ?? '');
 const stripHtml = s => String(s ?? '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+/* 본문 안 <style> 을 .blog-body 범위로 좁힌다 — admin.js scopeCss 와 같은 알고리즘(멱등).
+   조각 디자인의 body·.wrap 광역 규칙이 컨테이너까지 줄이던 사고(2026-08-26 c1) 방지 안전망 */
+function scopeCss(css, scope){
+  scope = scope || '.blog-body';
+  css = String(css || '').replace(/\/\*[\s\S]*?\*\//g, '');
+  const already = new RegExp('^' + scope.replace(/\./g, '\\.') + '(?![\\w-])');
+  let out = '', i = 0;
+  while(i < css.length){
+    const open = css.indexOf('{', i);
+    if(open < 0){ out += css.slice(i); break; }
+    const chunk = css.slice(i, open), cut = chunk.lastIndexOf(';');
+    if(cut >= 0) out += chunk.slice(0, cut + 1);
+    const sel = chunk.slice(cut + 1).trim();
+    let depth = 1, j = open + 1;
+    while(j < css.length && depth){ if(css[j] === '{') depth++; else if(css[j] === '}') depth--; j++; }
+    if(/^@(media|supports|layer)/i.test(sel)){
+      out += sel + '{' + scopeCss(css.slice(open + 1, j - 1), scope) + '}';
+    }else if(sel.charAt(0) === '@'){
+      out += sel + css.slice(open, j);
+    }else{
+      const scoped = sel.split(',').map(s => {
+        s = s.trim(); if(!s) return '';
+        if(already.test(s)) return s;
+        const m = s.match(/^(html|body|:root)(?![\w-])([\s\S]*)$/i);
+        if(!m) return scope + ' ' + s;
+        const rest = m[2].trim();
+        if(!rest) return scope;
+        return /^[\s>+~]/.test(m[2]) ? scope + ' ' + rest : scope + rest;
+      }).filter(Boolean).join(', ');
+      out += scoped + css.slice(open, j);
+    }
+    i = j;
+  }
+  return out;
+}
+const scopeBody = html => String(html || '').replace(/(<style[^>]*>)([\s\S]*?)(<\/style>)/gi,
+  (m, open, css, close) => open + scopeCss(css) + close);
 const clip = (s, n) => { s = String(s ?? '').trim(); return s.length > n ? s.slice(0, n - 1).trim() + '…' : s; };
 const absUrl = u => /^https?:\/\//.test(u || '') ? u : SITE + '/' + String(u || '').replace(/^\.?\//, '');
 const read = f => fs.readFileSync(path.join(PUB, f), 'utf8');
@@ -126,7 +163,7 @@ ${FAVICON}
   <h1>${esc(title)}</h1>
   <div class="blog-single-meta"><span>${esc(c.date)}</span></div>
   <div class="blog-cover"><img src="${esc(c.img)}" alt="${esc(title)}"></div>
-  <div class="blog-body">${T(c.body, lang)}</div>
+  <div class="blog-body">${scopeBody(T(c.body, lang))}</div>
 ${colFaqs.fromBody ? '' : staticColFaq(colFaqs, lang)}${staticColNav(prev, next, lang)}
 </article>
 ${staticColOthers(others, lang)}
