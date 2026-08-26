@@ -101,7 +101,7 @@ const MkData = {
       id:c.id, brand:c.brand, cat:c.cat, name:c.name, tagline:c.tagline, intro:c.intro,
       location:c.location, since:c.since, staff:c.staff, export:c.export, brn:c.brn,
       ceo:c.ceo, tel:c.tel, site:c.site, certs:c.certs||[], moqPolicy:c.moq_policy,
-      logo:c.logo, cover:c.cover,
+      logo:c.logo, cover:c.cover, sort:c.sort,
     }));
 
     MK_PRODUCTS.length = 0;
@@ -544,6 +544,24 @@ Object.assign(Admin, {
     let n = 1; const ids = new Set(MK_PRODUCTS.map(p=>p.id));
     while(ids.has('p'+n)) n++;
     return 'p'+n;
+  },
+
+  /* ---- 공급사(기업) CRUD — 관리자 공급사 탭 (2026-08-26 신설) ---- */
+  async upsertCompany(c){
+    const { error } = await SB.from('companies').upsert({
+      id:c.id, brand:c.brand, cat:c.cat, sort:c.sort||0,
+      name:c.name, tagline:c.tagline, intro:c.intro, location:c.location,
+      since:c.since, staff:c.staff, export:c.export, brn:c.brn,
+      ceo:c.ceo, tel:c.tel, site:c.site, certs:c.certs||[],
+      moq_policy:c.moqPolicy||'', logo:c.logo||'', cover:c.cover||'',
+    });
+    if(error) throw error;
+    await MkData.loadContent();
+  },
+  async deleteCompany(id){
+    const { error } = await SB.from('companies').delete().eq('id', id);
+    if(error) throw error;
+    await MkData.loadContent();
   },
 
   async upsertColumn(c){
