@@ -563,6 +563,11 @@ Object.assign(Admin, {
     if(error) throw error;
     await MkData.loadContent();
   },
+  /* 제품-공급사 연결만 바꾼다 — upsertProduct 는 거래조건까지 다시 쓰므로 여기선 안 쓴다 */
+  async setProductCompany(pid, companyId){
+    const { error } = await SB.from('products').update({ company_id: companyId || null }).eq('id', pid);
+    if(error) throw error;
+  },
 
   async upsertColumn(c){
     const row = {

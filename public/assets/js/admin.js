@@ -919,6 +919,11 @@ function companyForm(id){
     ${tri3('co-intro','회사 소개',it,'ta')}
     ${tri3('co-loc','소재지 (예: Incheon, Korea)',lc)}
     <div class="sect"><h4>기본 정보</h4><div class="fgrid"><div class="fld"><label>설립연도</label><input id="co-since" value="${esc(c?c.since||'':'')}" placeholder="2015"></div><div class="fld"><label>임직원 수</label><input id="co-staff" value="${esc(c?c.staff||'':'')}" placeholder="20+"></div><div class="fld"><label>수출 실적·국가</label><input id="co-export" value="${esc(c?c.export||'':'')}" placeholder="VN · JP · US"></div></div><div class="fgrid"><div class="fld"><label>사업자등록번호</label><input id="co-brn" value="${esc(c?c.brn||'':'')}"></div><div class="fld"><label>대표자</label><input id="co-ceo" value="${esc(c?c.ceo||'':'')}"></div><div class="fld"><label>대표 전화</label><input id="co-tel" value="${esc(c?c.tel||'':'')}"></div></div><div class="fgrid two"><div class="fld"><label>웹사이트</label><input id="co-site" value="${esc(c?c.site||'':'')}" placeholder="https://..."></div><div class="fld"><label>인증·허가 (쉼표로 구분)</label><input id="co-certs" value="${esc(c?(c.certs||[]).join(', '):'')}" placeholder="화장품 제조판매업, ISO 22716"></div></div><div class="fld"><label>MOQ 정책 메모</label><input id="co-moq" value="${esc(c?c.moqPolicy||'':'')}" placeholder="소량 협의 가능"></div></div>
+    <div class="sect"><h4>연결 제품 <span style="color:var(--adm-sub);font-size:11px"> 체크하면 이 공급사의 제품이 됩니다. 제품 상세에 회사 소개가 붙습니다</span></h4>${MK_PRODUCTS.length ? `<div class="fgrid two">${MK_PRODUCTS.map(p=>{
+      const mine = id && p.companyId===id;
+      const other = p.companyId && p.companyId!==id ? (MK_COMPANIES.find(x=>x.id===p.companyId)||{}) : null;
+      return `<label class="chk" style="align-items:flex-start"><input type="checkbox" class="co-prod" value="${esc(p.id)}" ${mine?'checked':''}><span>${esc(triText(p.name))}<span style="color:var(--adm-sub);font-size:11px"> ${esc(p.id)} · ${esc(p.brand)}${other?` · 현재 ${esc(triText(other.name)||other.id)} 소속`:''}</span></span></label>`;
+    }).join('')}</div><p class="hint" style="margin-top:8px">다른 공급사 소속 제품을 체크하면 이 공급사로 옮겨집니다. 체크를 풀면 연결이 해제됩니다.</p>` : `<p class="hint" style="margin:0">등록된 제품이 없습니다. 제품 탭에서 먼저 등록하세요.</p>`}</div>
     <div class="sect"><h4>로고</h4>${uploader('co-logo', c?c.logo||'':'', {hint:'회사 카드·제품 상세의 로고. 정사각형 권장.'})}</div>
     <div class="sect"><h4>커버 이미지</h4>${uploader('co-cover', c?c.cover||'':'', {hint:'회사 목록 카드 상단의 넓은 사진 (16:9 권장).'})}</div>
     <div class="bar" style="margin-top:22px"><span class="grow"></span><button class="btn btn-ghost" onclick="coEditing=null;renderCompanies()">취소</button><button class="btn btn-primary" onclick="saveCompany('${id}')">저장</button></div></div>`;
@@ -930,15 +935,25 @@ function saveCompany(id){
   const cid = id || slugify(av('co-id')) || slugify(av('co-brand') || name.en || '');
   if(!cid){ toastA('회사 ID(영문)를 입력하세요'); return; }
   if(!id && MK_COMPANIES.some(c=>c.id===cid)){ toastA('이미 있는 회사 ID입니다: ' + cid); return; }
+  /* 연결 제품 체크박스 → 바뀐 것만 제품의 company_id 를 고친다 */
+  const checked = new Set([...document.querySelectorAll('.co-prod:checked')].map(el=>el.value));
+  const jobs = [];
+  MK_PRODUCTS.forEach(p=>{
+    if(checked.has(p.id) && p.companyId !== cid) jobs.push([p.id, cid]);          // 이 공급사로 연결(이관 포함)
+    else if(!checked.has(p.id) && p.companyId === cid) jobs.push([p.id, null]);   // 연결 해제
+  });
   toastA(id ? '공급사를 저장하는 중…' : '공급사를 등록하는 중…');
-  admDo(Admin.upsertCompany({
-    id: cid, brand: av('co-brand'), cat: av('co-cat'), sort: Number(av('co-sort'))||0,
-    name, tagline: tri('co-tag'), intro: tri('co-intro'), location: tri('co-loc'),
-    since: av('co-since'), staff: av('co-staff'), export: av('co-export'),
-    brn: av('co-brn'), ceo: av('co-ceo'), tel: av('co-tel'), site: av('co-site'),
-    certs: av('co-certs').split(',').map(s=>s.trim()).filter(Boolean),
-    moqPolicy: av('co-moq'), logo: av('co-logo'), cover: av('co-cover'),
-  }));
+  admDo((async ()=>{
+    await Admin.upsertCompany({
+      id: cid, brand: av('co-brand'), cat: av('co-cat'), sort: Number(av('co-sort'))||0,
+      name, tagline: tri('co-tag'), intro: tri('co-intro'), location: tri('co-loc'),
+      since: av('co-since'), staff: av('co-staff'), export: av('co-export'),
+      brn: av('co-brn'), ceo: av('co-ceo'), tel: av('co-tel'), site: av('co-site'),
+      certs: av('co-certs').split(',').map(s=>s.trim()).filter(Boolean),
+      moqPolicy: av('co-moq'), logo: av('co-logo'), cover: av('co-cover'),
+    });
+    for(const [pid, co] of jobs) await Admin.setProductCompany(pid, co);
+  })());
 }
 
 /* ============================================================
