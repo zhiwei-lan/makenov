@@ -261,18 +261,26 @@ ${PAGE_COL}
   const columns = cl.map(c => ({ id:c.id, cat:c.cat, title:c.title, excerpt:c.excerpt, body:c.body, img:c.img,
     date:String(c.date || '').slice(0, 10), slug:c.slug || '', seoTitle:c.seo_title || '', seoDesc:c.seo_desc || '' }));
   /* 칼럼 FAQ 출처 3단: ① DB faqs(page=칼럼 id) ② data/column-faqs.json(이관 때 유실된 초기 2편 복구본)
-     ③ 본문 안의 <h2>FAQ</h2> 뒤 <p><b>질문</b><br>답</p> 묶음(새 칼럼 5편 형식) */
+     ③ 본문 안 FAQ 절 — 제목 <h2>(id·수식어가 붙어도 된다) 뒤부터 다음 <h2> 앞까지에서
+        <details><summary>질문</summary>답</details> 또는 <p><b>질문</b><br>답</p> 묶음을 읽는다.
+        (2026-08-28: c1~c4 가 <h2 id="faq"> + <details> 형식이라 옛 규칙에 안 걸려 FAQPage 가 통째로 빠져 있었다) */
   let localFaqs = []; try { localFaqs = JSON.parse(fs.readFileSync(path.join(__dirname, 'data', 'column-faqs.json'), 'utf8')); } catch (e) {}
+  const FAQ_SEC = /<h2[^>]*>[^<]*(?:FAQ|자주 묻는 질문|Câu hỏi thường gặp|Frequently asked)[^<]*<\/h2>([\s\S]*?)(?=<h2[^>]*>|$)/i;
   const bodyFaqs = c => {
     const out = [];
     LANGS.forEach(l => {
-      const b = T(c.body, l); const m = b.match(/<h2>\s*(?:FAQ|자주 묻는 질문|Câu hỏi thường gặp)\s*<\/h2>([\s\S]*?)(?=<h2>|$)/i);
+      const m = T(c.body, l).match(FAQ_SEC);
       if(!m) return;
-      [...m[1].matchAll(/<p><b>(.*?)<\/b><br\s*\/?>(.*?)<\/p>/g)].forEach((x, i) => {
-        out[i] = out[i] || { q:{}, a:{} }; out[i].q[l] = stripHtml(x[1]); out[i].a[l] = stripHtml(x[2]);
+      /* 묶음 정규식은 /g 라 한 번 쓰고 버린다 (lastIndex 오염 방지) */
+      let pairs = [...m[1].matchAll(/<details[^>]*>\s*<summary[^>]*>([\s\S]*?)<\/summary>([\s\S]*?)<\/details>/gi)];
+      if(!pairs.length) pairs = [...m[1].matchAll(/<p><b>(.*?)<\/b><br\s*\/?>(.*?)<\/p>/g)];
+      pairs.forEach((x, i) => {
+        const q = stripHtml(x[1]), a = stripHtml(x[2]);
+        if(!q || !a) return;
+        out[i] = out[i] || { q:{}, a:{} }; out[i].q[l] = q; out[i].a[l] = a;
       });
     });
-    return out;
+    return out.filter(Boolean);
   };
   const faqsFor = (page, c) => {
     const db = (fq || []).filter(f => (f.page || 'home') === page);
