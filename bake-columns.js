@@ -27,7 +27,9 @@ const HOST = { vi: 'https://vn.makenov.com', ko: 'https://kr.makenov.com', en: '
 const LANGS = ['vi', 'ko', 'en'];
 const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 const T = (v, lang) => (v && typeof v === 'object') ? (v[lang] || v.vi || v.ko || v.en || '') : String(v ?? '');
-const stripHtml = s => String(s ?? '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+const stripHtml = s => String(s ?? '')
+  .replace(/<(style|script)[^>]*>[\s\S]*?<\/>/gi, ' ')   /* 태그 안 내용까지 — 본문 첫 <style> 의 CSS 가 요약으로 새던 사고(2026-08-28 c1) 방지 */
+  .replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 /* 본문 안 <style> 을 .blog-body 범위로 좁힌다 — admin.js scopeCss 와 같은 알고리즘(멱등).
    조각 디자인의 body·.wrap 광역 규칙이 컨테이너까지 줄이던 사고(2026-08-26 c1) 방지 안전망 */
 function scopeCss(css, scope){
@@ -65,6 +67,76 @@ function scopeCss(css, scope){
 }
 const scopeBody = html => String(html || '').replace(/(<style[^>]*>)([\s\S]*?)(<\/style>)/gi,
   (m, open, css, close) => open + scopeCss(css) + close);
+
+/* ── 본문 살균 ────────────────────────────────────────────────────────────
+   원고를 "완결 HTML 문서" 째로 붙여넣으면 <head> 가 통째로 본문에 딸려 들어온다.
+   2026-08-28 c1·c3 사고: title·canonical·JSON-LD 가 각각 2벌, body 쪽 canonical 은
+   존재하지 않는 URL(404), 본문 첫 요소가 <style> 이라 meta description 이 CSS 로 구워짐.
+   여기서는 "굽기가 어차피 다시 만드는 것"만 걷어낸다. 지운 항목은 마지막에 로그로 뿌린다.
+   ───────────────────────────────────────────────────────────────────────── */
+const CLEANED = new Map();   /* 칼럼 id → Set(지운 항목) — 언어 3벌 중복 로그 방지 */
+const note = (cid, msg) => { if(!cid) return; if(!CLEANED.has(cid)) CLEANED.set(cid, new Set()); CLEANED.get(cid).add(msg); };
+
+/* 여는 태그를 찾아 같은 태그의 중첩을 세며 닫는 태그까지의 범위를 돌려준다 */
+function findEl(html, openRe){
+  openRe.lastIndex = 0;
+  const m = openRe.exec(html);
+  if(!m) return null;
+  const tag = m[1].toLowerCase(), from = m.index + m[0].length;
+  if(/\/>$/.test(m[0])) return { start:m.index, innerStart:from, innerEnd:from, end:from };
+  const open = new RegExp('<' + tag + '(?=[\s/>])', 'gi'), close = new RegExp('</' + tag + '\s*>', 'gi');
+  let depth = 1, i = from;
+  while(depth){
+    open.lastIndex = i; close.lastIndex = i;
+    const o = open.exec(html), c = close.exec(html);
+    if(!c) return { start:m.index, innerStart:from, innerEnd:html.length, end:html.length };
+    if(o && o.index < c.index){ depth++; i = o.index + o[0].length; continue; }
+    depth--; i = c.index + c[0].length;
+    if(!depth) return { start:m.index, innerStart:from, innerEnd:c.index, end:i };
+  }
+}
+const hasEl    = (html, re) => !!findEl(html, re);
+const dropEl   = (html, re) => { const e = findEl(html, re); return e ? html.slice(0, e.start) + html.slice(e.end) : html; };
+const unwrapEl = (html, re) => { const e = findEl(html, re); return e ? html.slice(0, e.start) + html.slice(e.innerStart, e.innerEnd) + html.slice(e.end) : html; };
+/* 굽기가 이미 만드는 본문 요소들 (한 번 쓰고 버리는 정규식 — lastIndex 오염 방지) */
+const RE = {
+  h1:      () => /<(h1)(?=[\s>])[^>]*>/i,
+  wrap:    () => /<(div|article|section|main)[^>]*class="[^"]*\bwrap\b[^"]*"[^>]*>/i,
+  crumb:   () => /<(nav|div|p)[^>]*class="[^"]*\bbreadcrumb\b[^"]*"[^>]*>/i,
+  eyebrow: () => /<(span|div|p)[^>]*class="[^"]*\beyebrow\b[^"]*"[^>]*>/i,
+  byline:  () => /<(p|div|span)[^>]*class="[^"]*\bbyline\b[^"]*"[^>]*>/i,
+};
+
+function sanitizeBody(html, cid, opt){
+  opt = opt || {};
+  let s = String(html || '');
+  /* 지우기 전에 원고가 써 둔 설명문을 건져 둔다 — excerpt 가 비었을 때 요약 후보로 쓴다 */
+  const m = s.match(/<meta[^>]*name=["']description["'][^>]*content=["']([^"']*)["'][^>]*>/i);
+  const desc = m ? m[1] : '';
+
+  const cut = (re, msg) => { const b = s; s = s.replace(re, ''); if(s !== b) note(cid, msg); };
+  cut(/<!DOCTYPE[^>]*>/gi,                                'DOCTYPE');
+  cut(/<\/?(?:html|head|body)(?=[\s>])[^>]*>/gi,          'html/head/body 태그');
+  cut(/<title[^>]*>[\s\S]*?<\/title>/gi,                  '<title>');
+  cut(/<meta(?=[\s/>])[^>]*>/gi,                          '<meta> (description·og·twitter·charset·viewport)');
+  cut(/<base(?=[\s/>])[^>]*>/gi,                          '<base>');
+  cut(/<link(?=[\s/>])[^>]*>/gi,                          '<link> (canonical·hreflang)');
+  cut(/<script[^>]*type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/gi, 'JSON-LD (Article·Breadcrumb·FAQPage)');
+
+  if(hasEl(s, RE.crumb()))   { s = dropEl(s, RE.crumb());   note(cid, '브레드크럼'); }
+  /* 카테고리 칩은 DB cat 이 채워졌을 때만 중복이다. 비어 있으면 원고 칩이 유일한 라벨이라 남긴다. */
+  if(hasEl(s, RE.eyebrow())){
+    if(opt.hasCat){ s = dropEl(s, RE.eyebrow()); note(cid, '카테고리 칩(eyebrow)'); }
+    else note(cid, '⚠ eyebrow 남겨 둠 — 관리자 카테고리가 비어 있다');
+  }
+  if(hasEl(s, RE.byline()))  { s = dropEl(s, RE.byline());  note(cid, 'byline(작성자·수정일·읽는시간)'); }
+  while(hasEl(s, RE.h1()))   { s = dropEl(s, RE.h1());      note(cid, '<h1> (제목은 굽기가 출력)'); }
+  if(hasEl(s, RE.wrap()))    { s = unwrapEl(s, RE.wrap());  note(cid, '.wrap 이중 래퍼'); }
+
+  return { html: s.replace(/^\s+/, ''), desc };
+}
+/* 살균 → CSS 스코핑 순서. 요약 후보(desc)도 같이 돌려준다. */
+const prepBody = (html, cid, opt) => { const r = sanitizeBody(html, cid, opt); return { html: scopeBody(r.html), desc: r.desc }; };
 const clip = (s, n) => { s = String(s ?? '').trim(); return s.length > n ? s.slice(0, n - 1).trim() + '…' : s; };
 const absUrl = u => /^https?:\/\//.test(u || '') ? u : SITE + '/' + String(u || '').replace(/^\.?\//, '');
 const read = f => fs.readFileSync(path.join(PUB, f), 'utf8');
@@ -129,7 +201,9 @@ function columnPage(c, colFaqs, prev, next, others, lang){
   const title = T(c.title, lang), cat = T(c.cat, lang);
   const relVi = `columns/${colFile(c)}.html`, canonical = pageUrl(relVi, lang);
   const useSeo = lang === 'ko' && typeof c.seoDesc === 'string';
-  const desc = clip((useSeo && c.seoDesc) || T(c.excerpt, lang) || stripHtml(T(c.body, lang)), 155);
+  const body = prepBody(T(c.body, lang), c.id, { hasCat: !!cat });
+  /* 요약 우선순위: seo_desc → excerpt → 원고가 써 둔 meta description → 본문 앞부분 */
+  const desc = clip((useSeo && c.seoDesc) || T(c.excerpt, lang) || body.desc || stripHtml(body.html), 155);
   const jsonld = [{ '@context':'https://schema.org', '@type':'Article', headline:title,
       alternativeHeadline: LANGS.map(l => T(c.title, l)).find(x => x && x !== title), description:desc, image:absUrl(c.img),
       datePublished:c.date, dateModified:c.date, inLanguage:lang, mainEntityOfPage:canonical,
@@ -163,7 +237,7 @@ ${FAVICON}
   <h1>${esc(title)}</h1>
   <div class="blog-single-meta"><span>${esc(c.date)}</span></div>
   <div class="blog-cover"><img src="${esc(c.img)}" alt="${esc(title)}"></div>
-  <div class="blog-body">${scopeBody(T(c.body, lang))}</div>
+  <div class="blog-body">${body.html}</div>
 ${colFaqs.fromBody ? '' : staticColFaq(colFaqs, lang)}${staticColNav(prev, next, lang)}
 </article>
 ${staticColOthers(others, lang)}
@@ -217,6 +291,10 @@ ${PAGE_COL}
     LANGS.forEach(l => { write(langFile(`columns/${colFile(c)}.html`, l), columnPage(c, cf, columns[i - 1], columns[i + 1], others, l)); n++; });
   });
   console.log(`columns/*.html ${n}개 생성`);
+  if(CLEANED.size){
+    console.log('본문 살균 — 원고에 들어오면 안 되는 요소를 걷어냈다 (원고 쪽도 고쳐 두면 좋다):');
+    CLEANED.forEach((set, id) => console.log(`  ${id}: ${[...set].join(', ')}`));
+  }
 
   /* baked.js — columns 맵만 교체 */
   const bj = read('assets/js/baked.js');

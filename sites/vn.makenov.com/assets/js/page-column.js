@@ -37,8 +37,58 @@ function colScopeCss(css, scope){
   }
   return out;
 }
-function colScopeBody(html){
-  return String(html || '').replace(/(<style[^>]*>)([\s\S]*?)(<\/style>)/gi,
+/* ── 본문 살균 (bake-columns.js sanitizeBody 와 같은 규칙) ───────────────────
+   원고를 완결 HTML 문서째 붙여넣으면 <head> 가 통째로 본문에 딸려 온다.
+   2026-08-28 c1·c3: title·canonical·JSON-LD 가 2벌, canonical 은 404 URL.
+   굽기에서만 걷어내면 반쪽이다 — 이 파일이 런타임에 DB 원본을 다시 주입하므로
+   실제 방문자와 JS 를 실행하는 크롤러는 그대로 중복을 보게 된다.
+   여기서는 "이 렌더러가 어차피 다시 만드는 것"만 지운다.
+   ───────────────────────────────────────────────────────────────────────── */
+function colFindEl(html, openRe){
+  openRe.lastIndex = 0;
+  const m = openRe.exec(html);
+  if(!m) return null;
+  const tag = m[1].toLowerCase(), from = m.index + m[0].length;
+  if(/\/>$/.test(m[0])) return { start:m.index, innerStart:from, innerEnd:from, end:from };
+  const open = new RegExp('<' + tag + '(?=[\s/>])', 'gi'), close = new RegExp('</' + tag + '\s*>', 'gi');
+  let depth = 1, i = from;
+  while(depth){
+    open.lastIndex = i; close.lastIndex = i;
+    const o = open.exec(html), c = close.exec(html);
+    if(!c) return { start:m.index, innerStart:from, innerEnd:html.length, end:html.length };
+    if(o && o.index < c.index){ depth++; i = o.index + o[0].length; continue; }
+    depth--; i = c.index + c[0].length;
+    if(!depth) return { start:m.index, innerStart:from, innerEnd:c.index, end:i };
+  }
+}
+const colHasEl  = (h, re) => !!colFindEl(h, re);
+const colDropEl = (h, re) => { const e = colFindEl(h, re); return e ? h.slice(0, e.start) + h.slice(e.end) : h; };
+const colUnwrap = (h, re) => { const e = colFindEl(h, re); return e ? h.slice(0, e.start) + h.slice(e.innerStart, e.innerEnd) + h.slice(e.end) : h; };
+const COL_RE = {
+  h1:      () => /<(h1)(?=[\s>])[^>]*>/i,
+  wrap:    () => /<(div|article|section|main)[^>]*class="[^"]*\bwrap\b[^"]*"[^>]*>/i,
+  crumb:   () => /<(nav|div|p)[^>]*class="[^"]*\bbreadcrumb\b[^"]*"[^>]*>/i,
+  eyebrow: () => /<(span|div|p)[^>]*class="[^"]*\beyebrow\b[^"]*"[^>]*>/i,
+  byline:  () => /<(p|div|span)[^>]*class="[^"]*\bbyline\b[^"]*"[^>]*>/i,
+};
+function colSanitizeBody(html, hasCat){
+  let s = String(html || '');
+  s = s.replace(/<!DOCTYPE[^>]*>/gi, '')
+       .replace(/<\/?(?:html|head|body)(?=[\s>])[^>]*>/gi, '')
+       .replace(/<title[^>]*>[\s\S]*?<\/title>/gi, '')
+       .replace(/<meta(?=[\s/>])[^>]*>/gi, '')
+       .replace(/<base(?=[\s/>])[^>]*>/gi, '')
+       .replace(/<link(?=[\s/>])[^>]*>/gi, '')
+       .replace(/<script[^>]*type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/gi, '');
+  if(colHasEl(s, COL_RE.crumb()))            s = colDropEl(s, COL_RE.crumb());
+  if(hasCat && colHasEl(s, COL_RE.eyebrow())) s = colDropEl(s, COL_RE.eyebrow());
+  if(colHasEl(s, COL_RE.byline()))           s = colDropEl(s, COL_RE.byline());
+  while(colHasEl(s, COL_RE.h1()))            s = colDropEl(s, COL_RE.h1());
+  if(colHasEl(s, COL_RE.wrap()))             s = colUnwrap(s, COL_RE.wrap());
+  return s.replace(/^\s+/, '');
+}
+function colScopeBody(html, hasCat){
+  return colSanitizeBody(html, hasCat).replace(/(<style[^>]*>)([\s\S]*?)(<\/style>)/gi,
     (m, open, css, close) => open + colScopeCss(css) + close);
 }
 /* 칼럼별 FAQ — 관리자 FAQ 탭에서 '위치'를 이 칼럼으로 지정한 항목만 모은다.
@@ -67,7 +117,7 @@ function pageInit(){
   document.getElementById('col-root').innerHTML = `
     <nav class="blog-breadcrumb"><a href="index.html" data-i18n="col_home"></a> -
       <a href="columns.html" data-i18n="nav_columns"></a> -
-      <span>${esc(L(c.title))}</span></nav><span class="blog-single-cat">${esc(L(c.cat))}</span><h1>${esc(L(c.title))}</h1><div class="blog-single-meta"><span>${esc(c.date)}</span><i></i><span>${readTime(L(c.body))}</span></div><div class="blog-cover"><img src="${c.img}" alt=""></div><div class="blog-body">${colScopeBody(L(c.body))}</div><div class="blog-nav">
+      <span>${esc(L(c.title))}</span></nav><span class="blog-single-cat">${esc(L(c.cat))}</span><h1>${esc(L(c.title))}</h1><div class="blog-single-meta"><span>${esc(c.date)}</span><i></i><span>${readTime(L(c.body))}</span></div><div class="blog-cover"><img src="${c.img}" alt=""></div><div class="blog-body">${colScopeBody(L(c.body), !!L(c.cat))}</div><div class="blog-nav">
       ${prev ? `<a href="${mkDocUrl('column',prev.id)}"><div class="dir" data-i18n="col_prev"></div><b>${esc(L(prev.title))}</b></a>` : '<span></span>'}
       ${next ? `<a class="next" href="${mkDocUrl('column',next.id)}"><div class="dir" data-i18n="col_next"></div><b>${esc(L(next.title))}</b></a>` : '<span></span>'}
     </div>${colFaq(c.id)}<div class="blog-cta"><h3 data-i18n="promo_title"></h3><p data-i18n="promo_desc"></p><button class="btn btn-primary btn-lg" onclick="openAuth('signup')" data-i18n="promo_btn"></button></div>`;
