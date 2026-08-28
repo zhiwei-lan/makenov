@@ -34,7 +34,7 @@ const ROOT_SKIP = new Set(['admin', 'index.php', 'uploads', 'sitemaps', 'ko', 'e
 /* 검색엔진 소유확인 파일 — 원본은 public/ 에 두고(ROOT_SKIP 으로 일괄복사 제외),
    실제 등록한 속성의 호스트에만 복사한다. 새 속성을 등록하면 여기에 파일명을 추가할 것 */
 const VERIFY = {
-  'vn.makenov.com': ['google28ab2b08be07d6c0.html', 'naver275b123d9640d96c00f54d8f0d0da9a1.html'],
+  'vn.makenov.com': ['google28ab2b08be07d6c0.html', 'naver275b123d9640d96c00f54d8f0d0da9a1.html', 'google17861e0b4b6f5a98.html'],
   'kr.makenov.com': [],   // 속성 등록 시 발급받는 확인파일명을 여기에
   'en.makenov.com': [],   // 속성 등록 시 발급받는 확인파일명을 여기에
 };
@@ -102,6 +102,20 @@ function repairMissingDetailLinks(html, dst){
   });
 }
 
+/* 언어 사이트(kr/en)는 해당 언어 폴더를 루트로 올리므로, 본문에 남은
+   href="ko/..." / href="en/..." 접두는 그대로 두면 /ko/... 404 가 된다 */
+function stripLangPrefix(html, dir){
+  if(!dir) return html;
+  return html.replace(new RegExp('href="' + dir + '/', 'g'), 'href="');
+}
+
+/* 언어 전환 링크는 makenov.com 의 /ko /en 경로 기준이라 서브도메인에서 전부 깨진다.
+   각 언어의 호스트 절대주소로 바꾼다 */
+function absolutizeLangSwitch(html){
+  return html.replace(/(<a data-lang=")(vi|ko|en)(" href=")\/(?:ko\/|en\/)?([^"]*)"/g,
+    (m, a, lang, b, rest) => a + lang + b + 'https://' + HOSTS[lang] + '/' + rest + '"');
+}
+
 function writeLegacyHomeRedirects(dst){
   const LEGACY = { ko: { host: HOSTS.ko, lang: 'ko' }, en: { host: HOSTS.en, lang: 'en' },
                    vi: { host: HOSTS.vi, lang: 'vi' }, vn: { host: HOSTS.vi, lang: 'vi' } };  // vn 은 옛 경로, 문서 언어는 vi
@@ -155,7 +169,10 @@ for(const [host, cfg] of Object.entries(SITES)){
   }
 
   for(const f of walk(dst).filter(f => f.endsWith('.html'))){
-    fs.writeFileSync(f, repairMissingDetailLinks(fs.readFileSync(f, 'utf8'), dst));
+    let h = repairMissingDetailLinks(fs.readFileSync(f, 'utf8'), dst);
+    h = stripLangPrefix(h, cfg.dir);
+    h = absolutizeLangSwitch(h);
+    fs.writeFileSync(f, h);
   }
 
   writeLegacyHomeRedirects(dst);
