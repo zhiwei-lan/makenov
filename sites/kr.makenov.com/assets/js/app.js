@@ -14,7 +14,10 @@ function timeAgo(iso){
 }
 /* 읽기 시간 추정 — HTML 제거 후 글자수 기준 (한국어 약 450자/분) */
 function readTime(html){
-  const txt = String(html||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
+  /* 본문 안 <style> 의 CSS 까지 글자수로 세고 있었다 — 2분짜리 글이 43분으로 나오던 원인.
+     bake-columns.js stripHtml 과 같은 규칙(2026-08-28). */
+  const txt = String(html||'').replace(/<(style|script)[^>]*>[\s\S]*?<\/\1\s*>/gi,' ')
+    .replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
   const min = Math.max(1, Math.round(txt.length / 450));
   return min + t('read_min');
 }

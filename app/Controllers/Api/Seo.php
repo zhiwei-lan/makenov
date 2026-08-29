@@ -40,11 +40,32 @@ class Seo extends Controller
             ->setBody($body);
     }
 
+    /**
+     * robots.txt 본문 — build-sites.js 가 정적 사이트에 써 넣는 것과 같은 내용이어야 한다.
+     * 와일드카드만으로도 AI 크롤러는 이미 허용되지만, 명시해 두면 의도가 기록으로 남고
+     * 나중에 특정 봇만 막을 때 이 자리에서 끝난다(2026-08-28 GEO 진단).
+     */
+    public static function robotsBody(string $host): string
+    {
+        $bots = [
+            'GPTBot', 'OAI-SearchBot', 'ChatGPT-User',
+            'ClaudeBot', 'Claude-User', 'Claude-SearchBot',
+            'PerplexityBot', 'Perplexity-User',
+            'Google-Extended', 'Applebot-Extended', 'meta-externalagent', 'CCBot',
+        ];
+        $body = "User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /mypage.html\n";
+        foreach ($bots as $b) {
+            $body .= "\nUser-agent: {$b}\nAllow: /\nDisallow: /admin/\nDisallow: /mypage.html\n";
+        }
+
+        return $body . "\nSitemap: https://{$host}/sitemap.xml\n";
+    }
+
     public function robots(): ResponseInterface
     {
         $lang = $this->langOfHost();
         $host = $lang ? array_search($lang, self::HOSTS, true) : 'makenov.com';
-        $body = "User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /mypage.html\n\nSitemap: https://{$host}/sitemap.xml\n";
+        $body = self::robotsBody($host);
         return $this->response
             ->setContentType('text/plain')
             ->setHeader('Cache-Control', 'public, max-age=3600')

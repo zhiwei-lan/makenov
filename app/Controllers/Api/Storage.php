@@ -82,19 +82,54 @@ class Storage extends BaseApiController
             $sib = preg_replace('/\.(jpe?g|png)$/i', '.webp', $file);
             $webp = ($sib !== $file && is_file($sib)) ? $sib : $this->webpVariant($file);
             if ($webp !== null) {
-                return $this->response
-                    ->setHeader('Content-Type', 'image/webp')
-                    ->setHeader('Vary', 'Accept')
-                    ->setHeader('Cache-Control', 'public, max-age=31536000')
-                    ->setBody(file_get_contents($webp));
+                return $this->sendImage($webp, 'image/webp');
             }
         }
 
-        return $this->response
+        return $this->sendImage($file, $mime);
+    }
+
+    /**
+     * 이미지 응답 한 곳 — 캐시 헤더·조건부 요청·HEAD 를 여기서 통일한다.
+     *
+     * ⚠ CI4 Response 는 생성자에서 noCache() 로 `no-store, max-age=0, no-cache` 를 먼저 넣는다.
+     *   removeHeader 없이 setHeader 만 하면 두 값이 합쳐져 `no-store … public, max-age=31536000`
+     *   이 되고 no-store 가 이겨 캐시가 통째로 죽는다(2026-08-28 진단: 칼럼 이미지 6.3MB 매 방문 재다운로드).
+     *   Seo::home 이 같은 이유로 removeHeader 를 먼저 부른다.
+     */
+    private function sendImage(string $file, string $mime): ResponseInterface
+    {
+        $mtime = (int) @filemtime($file);
+        $size  = (int) @filesize($file);
+        $etag  = '"' . md5($file . '-' . $mtime . '-' . $size) . '"';
+        $last  = gmdate('D, d M Y H:i:s', $mtime) . ' GMT';
+
+        $this->response->removeHeader('Cache-Control');
+        $this->response
             ->setHeader('Content-Type', $mime)
             ->setHeader('Vary', 'Accept')
-            ->setHeader('Cache-Control', 'public, max-age=31536000')
-            ->setBody(file_get_contents($file));
+            ->setHeader('Cache-Control', 'public, max-age=31536000, immutable')
+            ->setHeader('ETag', $etag)
+            ->setHeader('Last-Modified', $last)
+            /* 브라우저 RUM(PerformanceResourceTiming)이 교차 출처 이미지의 크기·구간을
+               읽을 수 있게 — 언어 서브도메인에서 makenov.com 이미지를 부른다 */
+            ->setHeader('Timing-Allow-Origin', '*');
+
+        /* 조건부 요청 — 바뀐 게 없으면 본문 없이 304 */
+        $inm = trim((string) $this->request->getHeaderLine('If-None-Match'));
+        $ims = strtotime((string) $this->request->getHeaderLine('If-Modified-Since')) ?: 0;
+        if (($inm !== '' && $inm === $etag) || ($ims && $mtime && $ims >= $mtime)) {
+            return $this->response->setStatusCode(304)->setBody('');
+        }
+
+        $this->response->setHeader('Content-Length', (string) $size);
+
+        /* HEAD 는 헤더만 — 본문을 실어 보내면 안 된다 */
+        if (strtoupper($this->request->getMethod()) === 'HEAD') {
+            return $this->response->setBody('');
+        }
+
+        return $this->response->setBody(file_get_contents($file));
     }
 
     /** 원본 → 최대 1600px WebP(q80). 캐시 파일 경로를 돌려주고, 못 만들면 null */

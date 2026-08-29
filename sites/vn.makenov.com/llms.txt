@@ -23,6 +23,22 @@ Languages: Vietnamese, Korean, English
 - For suppliers (list a product, Korean): https://kr.makenov.com/maker.html
 - Sitemaps: https://vn.makenov.com/sitemap.xml · https://kr.makenov.com/sitemap.xml · https://en.makenov.com/sitemap.xml · RSS (columns, ko): https://makenov.com/rss.xml
 
+## Articles
+Guides for distributors sourcing from Korea — importing, contracts, MOQ, exclusivity, samples, quotations.
+- Khi gửi yêu cầu báo giá cho nhà cung cấp, cần ghi rõ những thông tin gì để nhận được báo giá chính xác? (vi): https://vn.makenov.com/columns/c5.html
+- OEM và ODM khác nhau ra sao, và người muốn làm thương hiệu riêng nên chọn cái nào? (vi): https://vn.makenov.com/columns/c6.html
+- Tổng phân phối, đại lý và nhà phân phối khác nhau ở đâu? Quy mô nhỏ nên chọn vai trò nào? (vi): https://vn.makenov.com/columns/c2.html
+- Tại sao nhà phân phối nên tìm sản phẩm đổi mới, chưa có ở Việt Nam thay vì hàng đã phổ biến? (vi): https://vn.makenov.com/columns/c4.html
+- Muốn trở thành nhà phân phối chính thức mỹ phẩm Hàn Quốc tại Việt Nam? Bắt đầu từ 5 bước này (vi): https://vn.makenov.com/columns/c1.html
+- MOQ là gì, vì sao nhà cung cấp Hàn Quốc đặt MOQ và con số đó được tính từ đâu? (vi): https://vn.makenov.com/columns/c3.html
+- Cùng một sản phẩm nhiều nơi bán, vì sao biên lợi nhuận của tôi cứ giảm? (vi, ko, en): https://vn.makenov.com/columns/why-innovative-products.html
+- Làm sao biết nhà cung cấp có đáng tin không? (vi, ko, en): https://vn.makenov.com/columns/supplier-verification.html
+- Đàm phán quyền phân phối độc quyền cần kiểm tra những gì? (vi, ko, en): https://vn.makenov.com/columns/exclusive-rights-checklist.html
+- MOQ quá nặng thì đàm phán thế nào? (vi, ko, en): https://vn.makenov.com/columns/moq-negotiation.html
+- Có thể xin nhà cung cấp hỗ trợ marketing những gì? (vi, ko, en): https://vn.makenov.com/columns/marketing-support.html
+- Gửi yêu cầu báo giá cho nhà cung cấp nước ngoài: cần ghi những gì? (vi, ko, en): https://vn.makenov.com/columns/quote-request-checklist.html
+- Trước khi xin hàng mẫu, cần quyết những gì? (vi, ko, en): https://vn.makenov.com/columns/sample-request-checklist.html
+
 ## Frequently asked
 - Is it free? Yes — signup, browsing, business verification and quote inquiries are free.
 - Why are price and MOQ locked? They are B2B trade terms shown only to verified businesses; verification takes about a minute.

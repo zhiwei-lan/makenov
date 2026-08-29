@@ -62,7 +62,9 @@ $routes->post('functions/v1/admin-users', '\App\Controllers\Api\AdminUsers::hand
 /* ── Storage (버킷 product-images) ───────────────────────── */
 $routes->group('storage/v1', ['namespace' => 'App\Controllers\Api'], static function ($routes) {
     $routes->post('object/product-images/(:any)', 'Storage::upload/$1');
-    $routes->get('object/public/product-images/(:any)', 'Storage::serve/$1');
+    /* HEAD 도 함께 — og:image 를 HEAD 로 먼저 확인하는 SNS·AI 스크래퍼가
+       GET 전용 라우트에서 404 를 받아 "대표 이미지 없음"으로 판정하던 문제(2026-08-28) */
+    $routes->match(['GET', 'HEAD'], 'object/public/product-images/(:any)', 'Storage::serve/$1');
 });
 
 /* ── CORS OPTIONS 프리플라이트 ─────────────────────────────

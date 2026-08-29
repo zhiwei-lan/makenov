@@ -57,6 +57,16 @@ const NEUTRAL_META = {
   },
 };
 
+/* robots.txt 본문 — app/Controllers/Api/Seo.php 의 robotsBody() 와 같은 내용을 유지한다.
+   와일드카드만으로도 AI 크롤러는 허용되지만, 명시해 두면 의도가 기록으로 남는다. */
+const AI_BOTS = ['GPTBot', 'OAI-SearchBot', 'ChatGPT-User',
+  'ClaudeBot', 'Claude-User', 'Claude-SearchBot',
+  'PerplexityBot', 'Perplexity-User',
+  'Google-Extended', 'Applebot-Extended', 'meta-externalagent', 'CCBot'];
+const robotsBody = host =>
+  ['*', ...AI_BOTS].map(ua => `User-agent: ${ua}\nAllow: /\nDisallow: /admin/\nDisallow: /mypage.html\n`).join('\n')
+  + `\nSitemap: https://${host}/sitemap.xml\n`;
+
 function rmrf(p){ fs.rmSync(p, { recursive: true, force: true }); }
 function cp(src, dst){
   const st = fs.statSync(src);
@@ -204,8 +214,7 @@ for(const [host, cfg] of Object.entries(SITES)){
   /* 3) sitemap.xml / robots.txt — 호스트별 정적 파일 */
   const sm = path.join(PUB, 'sitemaps', cfg.sitemap + '.xml');
   if(fs.existsSync(sm)) fs.copyFileSync(sm, path.join(dst, 'sitemap.xml'));
-  fs.writeFileSync(path.join(dst, 'robots.txt'),
-    `User-agent: *\nAllow: /\nDisallow: /mypage.html\n\nSitemap: https://${host}/sitemap.xml\n`);
+  fs.writeFileSync(path.join(dst, 'robots.txt'), robotsBody(host));
 
   /* 4) 점검: 언어 폴더 접두가 남은 링크가 없어야 한다 */
   let bad = 0;

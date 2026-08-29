@@ -1,0 +1,58 @@
+{
+  "_note": "칼럼 본문 자동 내부링크 맵. 키 = 대상 칼럼 id(또는 slug), 값 = 언어별 표현. 본문 <p> 안 첫 등장 한 번만 링크가 걸리고, 자기 자신·이미 링크가 있는 문단·제목·FAQ 요약은 건너뛴다. 표현은 긴 것부터 먼저 잡는다. bake-columns.js 가 읽는다.",
+  "c1": {
+    "vi": ["nhà phân phối chính thức", "mỹ phẩm Hàn Quốc"],
+    "ko": ["공식 유통사", "한국 화장품"],
+    "en": ["official distributor", "Korean cosmetics"]
+  },
+  "c2": {
+    "vi": ["đại lý thương mại", "tổng phân phối"],
+    "ko": ["상사 대리점", "총판"],
+    "en": ["commercial agency", "master distributor"]
+  },
+  "c3": {
+    "vi": ["MOQ"],
+    "ko": ["MOQ"],
+    "en": ["MOQ"]
+  },
+  "c4": {
+    "vi": ["sản phẩm đổi mới"],
+    "ko": ["혁신 제품"],
+    "en": ["innovative product"]
+  },
+  "moq-negotiation": {
+    "vi": ["đàm phán MOQ", "thương lượng MOQ", "giảm MOQ", "MOQ thấp"],
+    "ko": ["MOQ 협상", "MOQ 낮추"],
+    "en": ["negotiate the MOQ", "lower MOQ"]
+  },
+  "exclusive-rights-checklist": {
+    "vi": ["quyền phân phối độc quyền", "độc quyền phân phối", "xin độc quyền"],
+    "ko": ["독점 판매권", "독점 유통권", "독점권"],
+    "en": ["exclusive distribution rights", "exclusive rights"]
+  },
+  "supplier-verification": {
+    "vi": ["nhà cung cấp có đáng tin", "thẩm định nhà cung cấp"],
+    "ko": ["공급사 검증", "믿을 만한 공급사"],
+    "en": ["verify a supplier", "trustworthy supplier"]
+  },
+  "c-sample": {
+    "vi": ["xin hàng mẫu", "hàng mẫu"],
+    "ko": ["샘플 요청", "샘플"],
+    "en": ["request samples", "product samples"]
+  },
+  "c-quote": {
+    "vi": ["yêu cầu báo giá", "báo giá"],
+    "ko": ["견적 요청", "견적서"],
+    "en": ["request a quote", "quotation"]
+  },
+  "marketing-support": {
+    "vi": ["hỗ trợ marketing", "ngân sách marketing"],
+    "ko": ["마케팅 지원", "마케팅 예산"],
+    "en": ["marketing support", "marketing budget"]
+  },
+  "why-innovative-products": {
+    "vi": ["biên lợi nhuận"],
+    "ko": ["마진", "수익률"],
+    "en": ["profit margin"]
+  }
+}

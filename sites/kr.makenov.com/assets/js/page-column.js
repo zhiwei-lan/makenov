@@ -109,6 +109,16 @@ function colFaq(cid){
 function pageInit(){
   const id = window.MK_CID || new URLSearchParams(location.search).get('id');
   if(!MK_COLUMNS.length) return;       // 데이터가 없으면 정적 내용을 그대로 둔다
+
+  /* ★구운 페이지는 다시 그리지 않는다 (2026-08-28).
+     굽기가 고쳐 둔 것 — 목차 앵커, 안 닫힌 도입 상자, 본문 내부 링크, 이미지 width/height,
+     짧게 다듬은 <title> — 을 이 렌더러가 DB 원본으로 통째로 되돌리고 있었다.
+     결과적으로 정적 HTML(=AI 크롤러가 보는 것)과 실제 화면이 서로 다른 페이지였다.
+     다시 그리는 경우는 둘뿐이다: 동적 ?id= 뷰어로 들어왔거나, 보는 언어가 구운 언어와 다를 때. */
+  const root = document.getElementById('col-root');
+  const bakedLang = (document.documentElement.getAttribute('lang') || 'vi').toLowerCase();
+  if(window.MK_CID && root && root.querySelector('.blog-body') && bakedLang === MK_LANG) return;
+
   const idx = Math.max(0, MK_COLUMNS.findIndex(x=>x.id===id));
   const c = MK_COLUMNS[idx];
   const prev = MK_COLUMNS[idx-1], next = MK_COLUMNS[idx+1];
@@ -117,7 +127,7 @@ function pageInit(){
   document.getElementById('col-root').innerHTML = `
     <nav class="blog-breadcrumb"><a href="index.html" data-i18n="col_home"></a> -
       <a href="columns.html" data-i18n="nav_columns"></a> -
-      <span>${esc(L(c.title))}</span></nav><span class="blog-single-cat">${esc(L(c.cat))}</span><h1>${esc(L(c.title))}</h1><div class="blog-single-meta"><span>${esc(c.date)}</span><i></i><span>${readTime(L(c.body))}</span></div><div class="blog-cover"><img src="${c.img}" alt=""></div><div class="blog-body">${colScopeBody(L(c.body), !!L(c.cat))}</div><div class="blog-nav">
+      <span>${esc(L(c.title))}</span></nav><span class="blog-single-cat">${esc(L(c.cat))}</span><h1>${esc(L(c.title))}</h1><div class="blog-single-meta"><span>${esc(c.date)}</span><i></i><span>${readTime(L(c.body))}</span></div><div class="blog-cover"><img src="${c.img}" alt="${esc(L(c.title))}" fetchpriority="high" decoding="async"></div><div class="blog-body">${colScopeBody(L(c.body), !!L(c.cat))}</div><div class="blog-nav">
       ${prev ? `<a href="${mkDocUrl('column',prev.id)}"><div class="dir" data-i18n="col_prev"></div><b>${esc(L(prev.title))}</b></a>` : '<span></span>'}
       ${next ? `<a class="next" href="${mkDocUrl('column',next.id)}"><div class="dir" data-i18n="col_next"></div><b>${esc(L(next.title))}</b></a>` : '<span></span>'}
     </div>${colFaq(c.id)}<div class="blog-cta"><h3 data-i18n="promo_title"></h3><p data-i18n="promo_desc"></p><button class="btn btn-primary btn-lg" onclick="openAuth('signup')" data-i18n="promo_btn"></button></div>`;
@@ -132,7 +142,7 @@ function pageInit(){
     el.id = 'col-others';
     el.style.marginTop = '56px';
     el.innerHTML = `<div class="sec-head"><h2 data-i18n="col_related"></h2><a class="more" href="columns.html" data-i18n="view_more"></a></div><div class="blog-list">${others.map(o=>`
-        <div class="blog-item"><a class="blog-item-link" href="${mkDocUrl('column',o.id)}"><div class="blog-item-thumb"><img src="${o.img}" alt="" loading="lazy"></div><div class="blog-item-info"><div class="blog-item-cat">${esc(L(o.cat))}</div><h3 class="blog-item-tit">${esc(L(o.title))}</h3><div class="blog-item-meta"><span>${esc(o.date)}</span><i></i><span>${readTime(L(o.body))}</span></div></div></a></div>`).join('')}</div>`;
+        <div class="blog-item"><a class="blog-item-link" href="${mkDocUrl('column',o.id)}"><div class="blog-item-thumb"><img src="${o.img}" alt="${esc(L(o.title))}" loading="lazy" decoding="async"></div><div class="blog-item-info"><div class="blog-item-cat">${esc(L(o.cat))}</div><h3 class="blog-item-tit">${esc(L(o.title))}</h3><div class="blog-item-meta"><span>${esc(o.date)}</span><i></i><span>${readTime(L(o.body))}</span></div></div></a></div>`).join('')}</div>`;
     document.querySelector('main').appendChild(el);
     applyI18n(el);
   }
