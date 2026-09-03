@@ -10,7 +10,7 @@
   </url>
   <url>
     <loc>https://vn.makenov.com/directory.html</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-03</lastmod>
       <xhtml:link rel="alternate" hreflang="vi" href="https://vn.makenov.com/directory.html"/>
       <xhtml:link rel="alternate" hreflang="ko" href="https://kr.makenov.com/directory.html"/>
       <xhtml:link rel="alternate" hreflang="en" href="https://en.makenov.com/directory.html"/>
@@ -26,7 +26,7 @@
   </url>
   <url>
     <loc>https://vn.makenov.com/columns.html</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-03</lastmod>
       <xhtml:link rel="alternate" hreflang="vi" href="https://vn.makenov.com/columns.html"/>
       <xhtml:link rel="alternate" hreflang="ko" href="https://kr.makenov.com/columns.html"/>
       <xhtml:link rel="alternate" hreflang="en" href="https://en.makenov.com/columns.html"/>
@@ -75,6 +75,18 @@
   <url><loc>https://vn.makenov.com/sitemap.html</loc><lastmod>2026-08-06</lastmod></url>
   <url><loc>https://vn.makenov.com/products.html</loc></url>
   <url>
+    <loc>https://vn.makenov.com/columns/c7.html</loc>
+    <lastmod>2026-09-03</lastmod>
+      <xhtml:link rel="alternate" hreflang="vi" href="https://vn.makenov.com/columns/c7.html"/>
+      <xhtml:link rel="alternate" hreflang="x-default" href="https://vn.makenov.com/columns/c7.html"/>
+  </url>
+  <url>
+    <loc>https://vn.makenov.com/columns/c8.html</loc>
+    <lastmod>2026-09-03</lastmod>
+      <xhtml:link rel="alternate" hreflang="vi" href="https://vn.makenov.com/columns/c8.html"/>
+      <xhtml:link rel="alternate" hreflang="x-default" href="https://vn.makenov.com/columns/c8.html"/>
+  </url>
+  <url>
     <loc>https://vn.makenov.com/columns/c5.html</loc>
     <lastmod>2026-08-28</lastmod>
       <xhtml:link rel="alternate" hreflang="vi" href="https://vn.makenov.com/columns/c5.html"/>
@@ -111,64 +123,8 @@
       <xhtml:link rel="alternate" hreflang="x-default" href="https://vn.makenov.com/columns/c3.html"/>
   </url>
   <url>
-    <loc>https://vn.makenov.com/columns/why-innovative-products.html</loc>
-    <lastmod>2026-08-19</lastmod>
-      <xhtml:link rel="alternate" hreflang="vi" href="https://vn.makenov.com/columns/why-innovative-products.html"/>
-      <xhtml:link rel="alternate" hreflang="ko" href="https://kr.makenov.com/columns/why-innovative-products.html"/>
-      <xhtml:link rel="alternate" hreflang="en" href="https://en.makenov.com/columns/why-innovative-products.html"/>
-      <xhtml:link rel="alternate" hreflang="x-default" href="https://vn.makenov.com/columns/why-innovative-products.html"/>
-  </url>
-  <url>
-    <loc>https://vn.makenov.com/columns/supplier-verification.html</loc>
-    <lastmod>2026-08-19</lastmod>
-      <xhtml:link rel="alternate" hreflang="vi" href="https://vn.makenov.com/columns/supplier-verification.html"/>
-      <xhtml:link rel="alternate" hreflang="ko" href="https://kr.makenov.com/columns/supplier-verification.html"/>
-      <xhtml:link rel="alternate" hreflang="en" href="https://en.makenov.com/columns/supplier-verification.html"/>
-      <xhtml:link rel="alternate" hreflang="x-default" href="https://vn.makenov.com/columns/supplier-verification.html"/>
-  </url>
-  <url>
-    <loc>https://vn.makenov.com/columns/exclusive-rights-checklist.html</loc>
-    <lastmod>2026-08-19</lastmod>
-      <xhtml:link rel="alternate" hreflang="vi" href="https://vn.makenov.com/columns/exclusive-rights-checklist.html"/>
-      <xhtml:link rel="alternate" hreflang="ko" href="https://kr.makenov.com/columns/exclusive-rights-checklist.html"/>
-      <xhtml:link rel="alternate" hreflang="en" href="https://en.makenov.com/columns/exclusive-rights-checklist.html"/>
-      <xhtml:link rel="alternate" hreflang="x-default" href="https://vn.makenov.com/columns/exclusive-rights-checklist.html"/>
-  </url>
-  <url>
-    <loc>https://vn.makenov.com/columns/moq-negotiation.html</loc>
-    <lastmod>2026-08-19</lastmod>
-      <xhtml:link rel="alternate" hreflang="vi" href="https://vn.makenov.com/columns/moq-negotiation.html"/>
-      <xhtml:link rel="alternate" hreflang="ko" href="https://kr.makenov.com/columns/moq-negotiation.html"/>
-      <xhtml:link rel="alternate" hreflang="en" href="https://en.makenov.com/columns/moq-negotiation.html"/>
-      <xhtml:link rel="alternate" hreflang="x-default" href="https://vn.makenov.com/columns/moq-negotiation.html"/>
-  </url>
-  <url>
-    <loc>https://vn.makenov.com/columns/marketing-support.html</loc>
-    <lastmod>2026-08-19</lastmod>
-      <xhtml:link rel="alternate" hreflang="vi" href="https://vn.makenov.com/columns/marketing-support.html"/>
-      <xhtml:link rel="alternate" hreflang="ko" href="https://kr.makenov.com/columns/marketing-support.html"/>
-      <xhtml:link rel="alternate" hreflang="en" href="https://en.makenov.com/columns/marketing-support.html"/>
-      <xhtml:link rel="alternate" hreflang="x-default" href="https://vn.makenov.com/columns/marketing-support.html"/>
-  </url>
-  <url>
-    <loc>https://vn.makenov.com/columns/quote-request-checklist.html</loc>
-    <lastmod>2026-08-05</lastmod>
-      <xhtml:link rel="alternate" hreflang="vi" href="https://vn.makenov.com/columns/quote-request-checklist.html"/>
-      <xhtml:link rel="alternate" hreflang="ko" href="https://kr.makenov.com/columns/quote-request-checklist.html"/>
-      <xhtml:link rel="alternate" hreflang="en" href="https://en.makenov.com/columns/quote-request-checklist.html"/>
-      <xhtml:link rel="alternate" hreflang="x-default" href="https://vn.makenov.com/columns/quote-request-checklist.html"/>
-  </url>
-  <url>
-    <loc>https://vn.makenov.com/columns/sample-request-checklist.html</loc>
-    <lastmod>2026-08-04</lastmod>
-      <xhtml:link rel="alternate" hreflang="vi" href="https://vn.makenov.com/columns/sample-request-checklist.html"/>
-      <xhtml:link rel="alternate" hreflang="ko" href="https://kr.makenov.com/columns/sample-request-checklist.html"/>
-      <xhtml:link rel="alternate" hreflang="en" href="https://en.makenov.com/columns/sample-request-checklist.html"/>
-      <xhtml:link rel="alternate" hreflang="x-default" href="https://vn.makenov.com/columns/sample-request-checklist.html"/>
-  </url>
-  <url>
     <loc>https://vn.makenov.com/products/p10.html</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-03</lastmod>
       <xhtml:link rel="alternate" hreflang="vi" href="https://vn.makenov.com/products/p10.html"/>
       <xhtml:link rel="alternate" hreflang="ko" href="https://kr.makenov.com/products/p10.html"/>
       <xhtml:link rel="alternate" hreflang="en" href="https://en.makenov.com/products/p10.html"/>
@@ -176,7 +132,7 @@
   </url>
   <url>
     <loc>https://vn.makenov.com/products/p11.html</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-03</lastmod>
       <xhtml:link rel="alternate" hreflang="vi" href="https://vn.makenov.com/products/p11.html"/>
       <xhtml:link rel="alternate" hreflang="ko" href="https://kr.makenov.com/products/p11.html"/>
       <xhtml:link rel="alternate" hreflang="en" href="https://en.makenov.com/products/p11.html"/>
@@ -184,7 +140,7 @@
   </url>
   <url>
     <loc>https://vn.makenov.com/products/p12.html</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-03</lastmod>
       <xhtml:link rel="alternate" hreflang="vi" href="https://vn.makenov.com/products/p12.html"/>
       <xhtml:link rel="alternate" hreflang="ko" href="https://kr.makenov.com/products/p12.html"/>
       <xhtml:link rel="alternate" hreflang="en" href="https://en.makenov.com/products/p12.html"/>
@@ -192,7 +148,7 @@
   </url>
   <url>
     <loc>https://vn.makenov.com/products/p9.html</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-03</lastmod>
       <xhtml:link rel="alternate" hreflang="vi" href="https://vn.makenov.com/products/p9.html"/>
       <xhtml:link rel="alternate" hreflang="ko" href="https://kr.makenov.com/products/p9.html"/>
       <xhtml:link rel="alternate" hreflang="en" href="https://en.makenov.com/products/p9.html"/>
@@ -200,7 +156,7 @@
   </url>
   <url>
     <loc>https://vn.makenov.com/products/p0.html</loc>
-    <lastmod>2026-08-29</lastmod>
+    <lastmod>2026-09-03</lastmod>
       <xhtml:link rel="alternate" hreflang="vi" href="https://vn.makenov.com/products/p0.html"/>
       <xhtml:link rel="alternate" hreflang="ko" href="https://kr.makenov.com/products/p0.html"/>
       <xhtml:link rel="alternate" hreflang="en" href="https://en.makenov.com/products/p0.html"/>
