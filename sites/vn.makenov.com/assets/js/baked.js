@@ -16,6 +16,7 @@ window.MK_BAKED = {
   ],
   "columns": {
       "c9": "c9",
+      "c10": "c10",
       "c7": "c7",
       "c8": "c8",
       "c5": "c5",
