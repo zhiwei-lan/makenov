@@ -3,6 +3,10 @@ name: Deploy PHP Website to 1Panel
 on:
   push:
     branches: [main]
+  # bake.yml(자동 굽기)이 굽기 커밋을 푸시한 뒤 직접 호출한다.
+  # 왜: GITHUB_TOKEN 으로 한 푸시는 on:push 를 깨우지 않아
+  #     구운 칼럼이 레포에만 있고 서버에 안 올라가던 사고(2026-09-04).
+  workflow_call: {}
 
 jobs:
   deploy:

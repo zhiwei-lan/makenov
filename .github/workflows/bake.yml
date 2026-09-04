@@ -6,7 +6,9 @@
 #     "옛 내용 → 새 내용" 깜빡임이 생긴다 (2026-08-26 정리).
 #     이 워크플로가 6시간마다(+수동 버튼) 대신 돌린다 —
 #     관리자에서 수정만 하면 별도 요청 없이 반영된다.
-# 흐름: 굽기 → 변경 있으면 커밋·푸시 → deploy.yml 이 서버 반영
+# 흐름: 굽기 → 변경 있으면 커밋·푸시 → deploy 잡이 deploy.yml 을 직접 호출해 서버 반영
+#       (⚠️ 봇 푸시는 GITHUB_TOKEN 이라 on:push 배포가 자동으로 안 뜬다 — 그래서 직접 호출.
+#        2026-09-04: c7·c8 이 레포에만 구워지고 라이브 404 였던 원인)
 # 수동 실행: GitHub → Actions → bake → Run workflow
 # ============================================================
 name: bake
@@ -27,6 +29,8 @@ jobs:
   bake:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    outputs:
+      pushed: ${{ steps.push.outputs.pushed }}
     steps:
       - uses: actions/checkout@v4
 
@@ -44,7 +48,9 @@ jobs:
           node build-sites.js
 
       - name: 변경 있으면 커밋·푸시
+        id: push
         run: |
+          echo "pushed=false" >> "$GITHUB_OUTPUT"
           git config user.name  "makenov-bake-bot"
           git config user.email "actions@users.noreply.github.com"
           # 사이트맵 lastmod 만 바뀐 경우(콘텐츠 무변경)는 커밋하지 않는다
@@ -58,3 +64,11 @@ jobs:
           git add -A
           git commit -m "자동 굽기: 관리자 수정분 정적 반영"
           git push
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+  # 굽기 커밋이 있었을 때만 서버 배포 — deploy.yml 을 재사용 워크플로로 호출
+  deploy:
+    needs: bake
+    if: needs.bake.outputs.pushed == 'true'
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit
