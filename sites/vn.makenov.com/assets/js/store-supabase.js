@@ -78,9 +78,15 @@ const MkData = {
 
   /* 공개 콘텐츠를 전역 배열에 그대로 채운다 (기존 렌더 코드가 그대로 동작하도록) */
   async loadContent(){
+    /* 제품 published 필터 — 공개 화면은 항상 노출 제품만.
+       관리자 화면(/admin/)에서 관리자로 로그인했을 때만 숨김 제품까지 받는다.
+       (세션 쿠키가 서브도메인 전역이라, 관리자가 공개 사이트를 볼 때도 일반 방문자와 같은 목록을 봐야 한다) */
+    const adminView = this.admin && /\/admin(\/|$)/.test(location.pathname);
+    let prq = SB.from('products').select('*');
+    if(!adminView) prq = prq.eq('published', true);
     const [co, pr, cl, he] = await Promise.all([
       SB.from('companies').select('*').order('sort'),
-      SB.from('products').select('*').eq('published', true).order('created_at', {ascending:false}),
+      prq.order('created_at', {ascending:false}),
       SB.from('columns_post').select('*').eq('published', true).order('date', {ascending:false}),
       SB.from('hero_slides').select('*').eq('active', true).order('sort'),
     ]);
@@ -114,6 +120,7 @@ const MkData = {
         inquiries:p.inquiries||0, views:p.views||0, wish:p.wish_count||0,
         featured:!!p.featured, isNew:!!p.is_new, createdAt:String(p.created_at||'').slice(0,10),
         negotiable:!!p.negotiable,
+        published: p.published == null ? true : !!Number(p.published),   // 없으면 노출(구 행 호환)
         price:t.price ?? LOCKED, moq:t.moq ?? LOCKED, lead:t.lead ?? LOCKED, terms:t.terms ?? LOCKED,
       });
     });
@@ -517,6 +524,7 @@ Object.assign(Admin, {
       img:p.img, gallery:p.gallery, video:p.video, detail:p.detail,
       featured:p.featured, is_new:p.isNew, created_at:p.createdAt,
       inquiries:p.inquiries, views:p.views, negotiable:!!p.negotiable,
+      published: p.published !== false,   // 폼 체크 해제 = 사이트에서 잠깐 숨김(행은 유지)
     };
     const { error } = await SB.from('products').upsert(row);
     if(error) throw error;

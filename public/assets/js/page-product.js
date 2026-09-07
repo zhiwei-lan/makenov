@@ -13,8 +13,16 @@ function setShot(i){
 
 function pageInit(){
   const id = window.MK_PID || new URLSearchParams(location.search).get('id');
-  const p = mkProduct(id) || MK_PRODUCTS[0];
-  if(!p) return;                       // 부팅 실패 등으로 데이터가 없으면 정적 내용을 그대로 둔다
+  /* id 가 있는데 목록에 없으면(숨김·삭제된 제품) 첫 제품으로 바꿔치기하지 않는다.
+     구워진 정적 페이지(MK_PID)는 정적 내용을 그대로 두고, 동적 뷰어(product.html?id=)만 안내문을 띄운다. */
+  const p = mkProduct(id) || (id ? null : MK_PRODUCTS[0]);
+  if(!p){
+    if(id && !window.MK_PID){
+      const root = document.getElementById('pd-root');
+      if(root) root.innerHTML = `<div class="pd-row"><div class="pd-main" style="padding:64px 0;text-align:center"><p style="font-size:16px;margin:0 0 18px">${t('pd_not_found')}</p><a class="btn btn-primary" href="${mkUrl('products.html')}">${t('nav_directory')}</a></div></div>`;
+    }
+    return;                            // 부팅 실패 등으로 데이터가 없으면 정적 내용을 그대로 둔다
+  }
   const co = mkCompanyOf(p);
   const inCart = Store.cartHas(p.id);
   gImgs = (p.gallery && p.gallery.length) ? p.gallery : [p.img];

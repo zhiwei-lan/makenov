@@ -36,8 +36,11 @@ const baseTag = rel => { const d = (rel.match(/\//g) || []).length; return d ? `
 const altTags = relVi => [...LANGS.map(l => `<link rel="alternate" hreflang="${l}" href="${pageUrl(relVi, l)}">`),
   `<link rel="alternate" hreflang="x-default" href="${pageUrl(relVi, 'vi')}">`].join('\n');
 
-/* 기존 구운 제품 페이지에서 머리·꼬리 조각을 물려받는다 */
-const TPL = read('products/p9.html');
+/* 기존 구운 제품 페이지에서 머리·꼬리 조각을 물려받는다.
+   p9 가 숨김 처리돼 지워졌을 수도 있으므로, 없으면 남아 있는 아무 제품 페이지나 쓴다. */
+const TPL_FILE = fs.existsSync(path.join(PUB, 'products/p9.html')) ? 'products/p9.html'
+  : 'products/' + fs.readdirSync(path.join(PUB, 'products')).filter(f => f.endsWith('.html')).sort()[0];
+const TPL = read(TPL_FILE);
 const CSS_LINK = (TPL.match(/<link rel="stylesheet" href="[^"]*style\.css[^"]*">/) || [''])[0];
 const FAVICON = (TPL.match(/<link rel="icon"[^>]*>/) || [''])[0];
 const TAIL = (() => {   // </footer> 다음부터 MK_PID 직전까지 = 스크립트 목록
@@ -205,6 +208,20 @@ ${PAGE_PROD}
     LANGS.forEach(l => { write(langFile(`products/${p.id}.html`, l), productPage(p, companies[p.companyId], related, l)); n++; });
   });
   console.log(`products/*.html ${n}개 생성`);
+
+  /* 숨김(published=0)·삭제된 제품의 옛 정적 페이지 제거 — 안 지우면 직접 URL 로 계속 열린다.
+     vi/ko/en 세 폴더 모두. build-sites 가 public 을 통째로 다시 복사하므로 sites/ 도 함께 정리된다. */
+  const keep = new Set(products.map(p => `${p.id}.html`));
+  let removed = 0;
+  LANGS.forEach(l => {
+    const dir = path.join(PUB, langFile('products', l));
+    if(!fs.existsSync(dir)) return;
+    fs.readdirSync(dir).filter(f => f.endsWith('.html') && !keep.has(f)).forEach(f => {
+      fs.unlinkSync(path.join(dir, f)); removed++;
+      console.log('  숨김/삭제 제품 페이지 제거:', langFile(`products/${f}`, l));
+    });
+  });
+  if(removed) console.log(`옛 제품 페이지 ${removed}개 제거`);
 
   /* baked.js — products 배열만 교체 */
   const bj = read('assets/js/baked.js');
