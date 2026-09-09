@@ -28,7 +28,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 class Aff extends BaseApiController
 {
     private const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    private const DEFAULT_SETTINGS = ['minWithdraw' => 500000, 'cookieDays' => 30, 'zalo' => '', 'email' => ''];
+    private const DEFAULT_SETTINGS = ['minWithdraw' => 500000, 'cookieDays' => 30, 'zalo' => '', 'email' => '', 'rankReward' => ''];
 
     private ?array $marketer = null;   // aff_tokens 로 식별된 마케터 행
     /** 마이그레이션을 추가하면 올린다 — writable/aff_schema_ok 에 적힌 값과 다르면 latest() 를 다시 돈다 */
@@ -385,15 +385,28 @@ class Aff extends BaseApiController
     {
         $db = db_connect();
         $ms = date('Y-m-01 00:00:00');
-        $top = $db->table('aff_leads l')->select('l.marketer_id, m.name, SUM(l.amount_vnd) vnd')
+        $all = $db->table('aff_leads l')->select('l.marketer_id, m.name, SUM(l.amount_vnd) vnd, COUNT(*) n')
             ->join('aff_marketers m', 'm.id = l.marketer_id', 'left')
             ->where('l.status', 'approved')->where('l.decided_at >=', $ms)
-            ->groupBy('l.marketer_id')->orderBy('vnd', 'DESC')->limit(10)->get()->getResultArray();
-        $marketers = [];
-        foreach ($top as $i => $r) {
-            $n = trim((string) $r['name']);
-            $marketers[] = ['rank' => $i + 1, 'name' => mb_substr($n, 0, 2) . '***', 'vnd' => (int) $r['vnd']];
+            ->groupBy('l.marketer_id')->orderBy('vnd', 'DESC')->get()->getResultArray();
+        /* 전체 승인률(누적) — 랭킹 카드에 같이 보여준다 */
+        $rates = [];
+        foreach ($db->table('aff_leads')->select("marketer_id, SUM(status='approved') ok, SUM(status='rejected') rej")->groupBy('marketer_id')->get()->getResultArray() as $r) {
+            $rates[$r['marketer_id']] = self::rate((int) $r['ok'], (int) $r['rej']);
         }
+        $marketers = []; $me = null;
+        foreach ($all as $i => $r) {
+            $n = trim((string) $r['name']);
+            $row = ['rank' => $i + 1, 'name' => mb_substr($n, 0, 2) . '***', 'vnd' => (int) $r['vnd'], 'leads' => (int) $r['n'], 'rate' => $rates[$r['marketer_id']] ?? null];
+            if ($i < 10) $marketers[] = $row;
+            if ($this->marketer && $r['marketer_id'] === $this->marketer['id']) {
+                $me = $row + ['gap' => $i > 0 ? (int) $all[$i - 1]['vnd'] - (int) $r['vnd'] : 0, 'total' => count($all)];
+            }
+        }
+        if ($this->marketer && ! $me) $me = ['rank' => null, 'vnd' => 0, 'leads' => 0, 'rate' => $rates[$this->marketer['id']] ?? null, 'gap' => $all ? (int) end($all)['vnd'] : 0, 'total' => count($all)];
+        $imgs = []; foreach ($this->campaignRows(false, false) as $c) $imgs[$c['product_id']] = ['img' => $c['img'], 'cpa' => $c['cpa_vnd']];
+        $daysLeft = (int) date('t') - (int) date('j');
+        $reward = (string) ($this->settings()['rankReward'] ?? '');
         $names = []; $namesKo = [];
         foreach ($this->campaignRows(false, false) as $c) { $names[$c['product_id']] = $c['name']; $namesKo[$c['product_id']] = $c['name_ko']; }
         $byC = $db->table('aff_leads')->select("product_id, COUNT(*) n, SUM(status='approved') ok, SUM(status='rejected') rej")
@@ -401,15 +414,15 @@ class Aff extends BaseApiController
         usort($byC, fn ($x, $y) => $y['n'] <=> $x['n']);
         $campaigns = [];
         foreach (array_slice($byC, 0, 10) as $i => $r) {
-            $campaigns[] = ['rank' => $i + 1, 'product_id' => $r['product_id'], 'name' => $names[$r['product_id']] ?? $r['product_id'], 'name_ko' => $namesKo[$r['product_id']] ?? '', 'leads' => (int) $r['n']];
+            $campaigns[] = ['rank' => $i + 1, 'product_id' => $r['product_id'], 'name' => $names[$r['product_id']] ?? $r['product_id'], 'name_ko' => $namesKo[$r['product_id']] ?? '', 'leads' => (int) $r['n'], 'img' => $imgs[$r['product_id']]['img'] ?? '', 'cpa_vnd' => $imgs[$r['product_id']]['cpa'] ?? 0];
         }
         $ap = array_values(array_filter($byC, fn ($r) => ((int) $r['ok'] + (int) $r['rej']) >= 3));
         usort($ap, fn ($x, $y) => ($y['ok'] / ($y['ok'] + $y['rej'])) <=> ($x['ok'] / ($x['ok'] + $x['rej'])));
         $approval = [];
         foreach (array_slice($ap, 0, 10) as $i => $r) {
-            $approval[] = ['rank' => $i + 1, 'product_id' => $r['product_id'], 'name' => $names[$r['product_id']] ?? $r['product_id'], 'name_ko' => $namesKo[$r['product_id']] ?? '', 'rate' => round($r['ok'] / ($r['ok'] + $r['rej']), 3)];
+            $approval[] = ['rank' => $i + 1, 'product_id' => $r['product_id'], 'name' => $names[$r['product_id']] ?? $r['product_id'], 'name_ko' => $namesKo[$r['product_id']] ?? '', 'rate' => round($r['ok'] / ($r['ok'] + $r['rej']), 3), 'img' => $imgs[$r['product_id']]['img'] ?? '', 'cpa_vnd' => $imgs[$r['product_id']]['cpa'] ?? 0];
         }
-        return $this->json(['marketers' => $marketers, 'campaigns' => $campaigns, 'approval' => $approval]);
+        return $this->json(['marketers' => $marketers, 'campaigns' => $campaigns, 'approval' => $approval, 'me' => $me, 'days_left' => $daysLeft, 'reward' => $reward]);
     }
 
     /* ================= 클릭 ================= */
@@ -755,7 +768,7 @@ class Aff extends BaseApiController
         $s = $this->settings();
         if (isset($b['minWithdraw'])) $s['minWithdraw'] = max(0, (int) $b['minWithdraw']);
         if (isset($b['cookieDays']))  $s['cookieDays']  = max(1, min(365, (int) $b['cookieDays']));
-        foreach (['zalo', 'email'] as $k) if (array_key_exists($k, $b)) $s[$k] = trim((string) $b[$k]);
+        foreach (['zalo', 'email', 'rankReward'] as $k) if (array_key_exists($k, $b)) $s[$k] = trim((string) $b[$k]);
         $db = db_connect();
         $val = json_encode($s, JSON_UNESCAPED_UNICODE);
         $now = date('Y-m-d H:i:s');

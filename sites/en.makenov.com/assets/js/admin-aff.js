@@ -213,6 +213,7 @@ async function affSettingsView(){
   AffAdmin.call('GET', 'demo').then(r => { const el = document.getElementById('aff-demo-cnt'); if(el) el.textContent = r.count ? `현재 데모 마케터 ${r.count}명` : '데모 데이터 없음'; }).catch(() => {});
   return `<div class="fgrid two"><div class="fld"><label>최소 출금액 (VND)</label><input id="afs-min" type="number" step="10000" value="${s.minWithdraw}"></div><div class="fld"><label>링크 유효기간 (일) — 마지막 클릭 후 며칠까지 문의를 CTV 것으로 볼지</label><input id="afs-days" type="number" value="${s.cookieDays}"></div></div>
   <div class="fgrid two"><div class="fld"><label>CTV 지원 Zalo</label><input id="afs-zalo" value="${esc(s.zalo || '')}"></div><div class="fld"><label>CTV 지원 이메일</label><input id="afs-email" value="${esc(s.email || '')}"></div></div>
+  <div class="fld"><label>랭킹 페이지 상단 문구 — 이달 TOP 3 혜택 (베트남어, 비우면 숨김)</label><input id="afs-reward" value="${esc(s.rankReward || '')}" placeholder="Top 3 tháng này nhận thêm 500.000 ₫ và được ưu tiên chiến dịch mới"></div>
   <div class="bar"><button class="btn btn-primary btn-sm" onclick="affSaveSettings()">저장</button></div>
   <div class="sect"><h4>데모 데이터</h4><p class="note">사이트를 채워 보려고 넣어 둔 가짜 마케터(DEMO01~08, 이메일 demo*@makenov.com)·리드·클릭·출금입니다. 실제 운영 시작할 때 지우세요. 캠페인(단가·문구)은 남습니다.</p><div class="bar"><span class="note" id="aff-demo-cnt" style="margin:0">…</span><span class="grow"></span><button class="btn btn-ghost btn-sm" onclick="affDeleteDemo()">데모 데이터 삭제</button></div></div>`;
 }
@@ -221,7 +222,7 @@ async function affDeleteDemo(){
   try{ const r = await AffAdmin.call('DELETE', 'demo'); toastA('데모 데이터 ' + r.deleted + '명분을 지웠습니다'); renderAff(); }catch(e){ affFail(e); }
 }
 async function affSaveSettings(){
-  try{ await AffAdmin.saveSettings({ minWithdraw:Number(av('afs-min')) || 0, cookieDays:Number(av('afs-days')) || 30, zalo:av('afs-zalo'), email:av('afs-email') }); toastA('설정을 저장했습니다'); }
+  try{ await AffAdmin.saveSettings({ minWithdraw:Number(av('afs-min')) || 0, cookieDays:Number(av('afs-days')) || 30, zalo:av('afs-zalo'), email:av('afs-email'), rankReward:av('afs-reward') }); toastA('설정을 저장했습니다'); }
   catch(e){ affFail(e); }
 }
 

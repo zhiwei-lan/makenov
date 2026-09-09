@@ -4,8 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bảng xếp hạng | Cộng tác viên MAKENOV</title>
+<meta name="description" content="Top cộng tác viên, chiến dịch nhiều khách hàng và tỷ lệ duyệt cao trong tháng trên MAKENOV.">
 <link rel="stylesheet" href="../assets/css/style.css?v=20260909b">
-<link rel="stylesheet" href="affiliate.css?v=20260909m">
+<link rel="stylesheet" href="affiliate.css?v=20260909n">
 <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
 </head>
 <body class="aff-body">
@@ -14,26 +15,59 @@
   <div class="aff-main">
     <div class="aff-top" id="aff-top"></div>
     <main class="aff-content">
-      <div class="aff-sec-head"><h2 data-i18n="rank_h"></h2><span class="more" id="rank-month"></span></div>
-      <div class="aff-rank" id="rank-boxes"></div>
+      <div class="rk-head"><h2 data-i18n="rank_h"></h2><span class="days" id="rk-days"></span></div>
+      <div id="rk-reward" class="rk-reward" style="display:none"></div>
+      <div id="rk-me"></div>
+
+      <div class="aff-sec-head" style="margin-top:8px"><h2 data-i18n="rk_podium"></h2></div>
+      <div class="rk-podium" id="rk-podium"></div>
+      <div class="aff-box" id="rk-rest" style="margin-top:14px"></div>
+
+      <div class="aff-two" style="margin-top:8px">
+        <div class="aff-box"><h3 data-i18n="rank_camp"></h3><div id="rk-camp"></div></div>
+        <div class="aff-box"><h3 data-i18n="rank_rate"></h3><div id="rk-rate"></div></div>
+      </div>
       <p class="aff-note" data-i18n="rank_note"></p>
     </main>
     <footer class="aff-foot" id="aff-foot"></footer>
   </div>
 </div>
 <script src="../assets/js/config.js?v=20260817b"></script>
-<script src="aff-i18n.js?v=20260909m"></script>
-<script src="aff-api.js?v=20260909m"></script>
-<script src="aff.js?v=20260909m"></script>
+<script src="aff-i18n.js?v=20260909n"></script>
+<script src="aff-api.js?v=20260909n"></script>
+<script src="aff.js?v=20260909n"></script>
 <script>
 affBoot('rank', { titleKey:'rank_title' }, async () => {
-  const d = new Date(); document.getElementById('rank-month').textContent = t('rank_month', { m: d.getMonth() + 1, y: d.getFullYear() });
+  const d = new Date(), m = AffApi.session();
   const rk = await AffApi.rankings();
-  const box = (title, rows) => `<div class="box"><h3>${title}</h3>${rows.length ? `<ol>${rows.join('')}</ol>` : `<p class="aff-note">${t('no_data')}</p>`}</div>`;
-  document.getElementById('rank-boxes').innerHTML =
-    box(t('rank_top'), rk.marketers.map(r => `<li><span class="r">${r.rank}</span><span class="nm">${esc(r.name)}</span><span class="v">${vnd(r.vnd)}</span></li>`)) +
-    box(t('rank_camp'), rk.campaigns.map(r => `<li><span class="r">${r.rank}</span><a class="nm" href="campaign.html?id=${esc(r.product_id)}">${esc(cName(r))}</a><span class="v">${r.leads}</span></li>`)) +
-    box(t('rank_rate'), rk.approval.map(r => `<li><span class="r">${r.rank}</span><a class="nm" href="campaign.html?id=${esc(r.product_id)}">${esc(cName(r))}</a><span class="v">${Math.round(r.rate * 100)}%</span></li>`));
+  document.getElementById('rk-days').innerHTML = t('rk_days', { m: d.getMonth() + 1, d: rk.days_left ?? 0 });
+  if(rk.reward){ const r = document.getElementById('rk-reward'); r.style.display = ''; r.innerHTML = `<b>★ ${t('rk_reward_h')}</b><span>${esc(rk.reward)}</span>`; }
+
+  /* 내 순위 카드 */
+  const meBox = document.getElementById('rk-me');
+  if(m && rk.me){
+    const me = rk.me;
+    meBox.innerHTML = `<div class="rk-me">
+      <div class="rank"><span class="lb">${t('rk_me_h')}</span><b>${me.rank ? t('rk_me_rank', { r: me.rank }) : t('rk_me_none')}</b><span class="of">${t('rk_me_of', { n: me.total })}</span></div>
+      <div class="st"><span class="lb">${t('rk_me_vnd')}</span><b>${vnd(me.vnd)}</b></div>
+      <div class="st"><span class="lb">${t('rk_me_leads')}</span><b>${me.leads}</b></div>
+      <div class="st"><span class="lb">${t('rate')}</span><b>${me.rate == null ? '—' : Math.round(me.rate * 100) + '%'}</b></div>
+      <div class="gap">${me.rank === 1 ? t('rk_me_gap0') : me.rank ? t('rk_me_gap', { v: vnd(me.gap) }) : t('rk_me_first')}<a class="btn btn-primary" href="campaigns.html">${t('rk_go')} →</a></div></div>`;
+  } else {
+    meBox.innerHTML = `<div class="rk-me guest"><div><b>${t('rk_guest_h')}</b><span>${t('rk_guest_p')}</span></div><div class="cta"><a class="btn btn-primary" href="join.html">${t('lp_cta')}</a><a class="btn btn-ghost" href="login.html?next=rank.html">${t('login')}</a></div></div>`;
+  }
+
+  /* 포디움 (2·1·3) + 4~10 */
+  const top = rk.marketers;
+  const card = (r, cls) => r ? `<div class="pd ${cls}"><span class="medal">${r.rank}</span><span class="av">${esc(r.name.slice(0, 1))}</span><b class="nm">${esc(r.name)}</b><span class="vnd">${vnd(r.vnd)}</span><span class="sub">${t('rk_leads_n', { n: r.leads })}${r.rate != null ? ` · ${t('rate')} ${Math.round(r.rate * 100)}%` : ''}</span></div>` : `<div class="pd ${cls} empty"></div>`;
+  document.getElementById('rk-podium').innerHTML = card(top[1], 'p2') + card(top[0], 'p1') + card(top[2], 'p3');
+  const rest = top.slice(3);
+  document.getElementById('rk-rest').innerHTML = rest.length ? `<h3>${t('rk_rest')}</h3><ol class="rk-list">${rest.map(r => `<li><span class="r">${r.rank}</span><span class="nm">${esc(r.name)}</span><span class="sub">${t('rk_leads_n', { n: r.leads })}</span><span class="v">${vnd(r.vnd)}</span></li>`).join('')}</ol>` : `<p class="aff-note" style="margin:0">${top.length ? '' : t('no_data')}</p>`;
+
+  /* 캠페인 보드 — 썸네일 + 링크 받기 */
+  const board = (rows, valFn) => rows.length ? `<div class="rk-camps">${rows.map(r => `<a class="rc" href="campaign.html?id=${esc(r.product_id)}"><span class="r">${r.rank}</span><img src="${esc(r.img)}" alt=""><span class="bd"><b>${esc(cName(r))}</b><span>${vnd(r.cpa_vnd)}${t('per_lead')}</span></span><span class="val">${valFn(r)}</span><span class="btn btn-ghost btn-sm">${t('rk_get')}</span></a>`).join('')}</div>` : `<p class="aff-note" style="margin:0">${t('no_data')}</p>`;
+  document.getElementById('rk-camp').innerHTML = board(rk.campaigns.slice(0, 5), r => r.leads);
+  document.getElementById('rk-rate').innerHTML = board(rk.approval.slice(0, 5), r => Math.round(r.rate * 100) + '%');
 });
 </script>
 </body>

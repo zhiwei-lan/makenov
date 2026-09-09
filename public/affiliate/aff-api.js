@@ -41,7 +41,7 @@
     session(){ const s = sess(); return s && s.me ? s.me : null; },
     campaigns: o => call('GET', 'campaigns' + q(o)),
     campaign: pid => call('GET', 'campaigns/' + encodeURIComponent(pid)),
-    rankings: () => call('GET', 'rankings'),
+    rankings: () => call('GET', 'rankings', undefined, !!sess()),
     settings: () => call('GET', 'settings'),
     async signup(o){ const s = await call('POST', 'signup', o); setSess(s); return s.me; },
     async login(email, password){ const s = await call('POST', 'login', { email, password }); setSess(s); return s.me; },

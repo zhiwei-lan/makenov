@@ -368,3 +368,54 @@ body.aff-body{background:#fff}
 .aff-chs{display:grid;gap:8px;margin-bottom:8px}
 .aff-chs .row{display:flex;gap:6px}
 .aff-chs .row input{flex:1;min-width:0}
+
+/* ===== 랭킹 v2 ===== */
+.rk-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 12px}
+.rk-head h2{font-size:22px;font-weight:800;letter-spacing:-.02em;margin:0}
+.rk-head .days{font-size:13px;color:var(--aff-sub)}
+.rk-head .days b{color:#D9534F}
+.rk-reward{display:flex;gap:12px;align-items:center;background:#FFF4DE;border:1px solid #F5DEB3;border-radius:10px;padding:12px 16px;font-size:14px;color:#7A4A1F;margin-bottom:12px}
+.rk-reward b{white-space:nowrap;color:#B76E00}
+.rk-me{display:grid;grid-template-columns:1.2fr 1fr 1fr 1fr 1.6fr;gap:14px;align-items:center;background:var(--aff-ink);color:#fff;border-radius:14px;padding:20px 24px;margin-bottom:22px}
+.rk-me .lb{display:block;font-size:12px;color:rgba(255,255,255,.6);margin-bottom:4px}
+.rk-me b{font-size:22px;font-weight:800;letter-spacing:-.02em}
+.rk-me .rank b{font-size:30px;color:var(--aff-mint)}
+.rk-me .of{display:block;font-size:12px;color:rgba(255,255,255,.55);margin-top:2px}
+.rk-me .gap{display:flex;flex-direction:column;gap:8px;font-size:13px;color:rgba(255,255,255,.8);align-items:flex-start}
+.rk-me .gap b{font-size:15px;color:var(--aff-mint)}
+.rk-me.guest{grid-template-columns:1fr auto}
+.rk-me.guest b{display:block;font-size:18px;margin-bottom:4px}
+.rk-me.guest span{font-size:13px;color:rgba(255,255,255,.7)}
+.rk-me.guest .cta{display:flex;gap:8px}
+.rk-podium{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;align-items:end}
+.rk-podium .pd{position:relative;background:#fff;border:1px solid var(--aff-line);border-radius:14px;padding:26px 18px 18px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:4px}
+.rk-podium .pd.p1{padding-top:34px;border-color:#F3D27A;background:linear-gradient(180deg,#FFFBEE,#fff)}
+.rk-podium .pd.empty{visibility:hidden}
+.rk-podium .medal{position:absolute;top:-12px;left:50%;transform:translateX(-50%);width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:13px;color:#fff;background:#9AA3AE}
+.rk-podium .p1 .medal{background:#E6B325;width:34px;height:34px;font-size:15px;top:-16px}
+.rk-podium .p3 .medal{background:#B8804C}
+.rk-podium .av{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#27CAA1,#13A583);color:#fff;font-size:22px;font-weight:800;display:grid;place-items:center}
+.rk-podium .p1 .av{width:68px;height:68px;font-size:26px}
+.rk-podium .nm{font-size:15px;margin-top:6px}
+.rk-podium .vnd{font-size:20px;font-weight:800;color:var(--aff-mint-dark);letter-spacing:-.02em}
+.rk-podium .p1 .vnd{font-size:24px}
+.rk-podium .sub{font-size:12px;color:var(--aff-sub)}
+.rk-list{list-style:none;margin:0;padding:0}
+.rk-list li{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--aff-line);font-size:14px}
+.rk-list li:last-child{border-bottom:0}
+.rk-list .r{width:24px;font-weight:800;color:var(--aff-sub);text-align:center}
+.rk-list .nm{flex:1;font-weight:600}
+.rk-list .sub{font-size:12px;color:var(--aff-sub)}
+.rk-list .v{font-weight:700}
+.rk-camps{display:grid;gap:8px}
+.rk-camps .rc{display:grid;grid-template-columns:22px 48px minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:8px;border-radius:10px;text-decoration:none;color:inherit;border:1px solid transparent}
+.rk-camps .rc:hover{background:var(--aff-bg);border-color:var(--aff-line)}
+.rk-camps .r{font-weight:800;color:var(--aff-sub);text-align:center}
+.rk-camps .rc:nth-child(-n+3) .r{color:var(--aff-mint-dark)}
+.rk-camps img{width:48px;height:48px;object-fit:cover;border-radius:8px;background:var(--aff-bg)}
+.rk-camps .bd{display:flex;flex-direction:column;min-width:0}
+.rk-camps .bd b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rk-camps .bd span{font-size:12px;color:var(--aff-mint-dark);font-weight:700}
+.rk-camps .val{font-size:15px;font-weight:800}
+@media(max-width:1100px){ .rk-me{grid-template-columns:1fr 1fr;gap:12px} .rk-me .gap{grid-column:1/3} }
+@media(max-width:640px){ .rk-podium{grid-template-columns:1fr;align-items:stretch} .rk-podium .pd.empty{display:none} .rk-me{grid-template-columns:1fr} .rk-me.guest{grid-template-columns:1fr} .rk-camps .rc{grid-template-columns:22px 44px minmax(0,1fr) auto} .rk-camps .rc .btn{display:none} }
