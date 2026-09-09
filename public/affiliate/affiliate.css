@@ -530,7 +530,8 @@ body.aff-body{background:#fff}
 .lp-flow li small{margin-left:auto;font-size:12px;font-weight:600;color:var(--aff-mint-dark);white-space:nowrap;padding-left:10px}
 .lp-flow li:last-child small{color:var(--aff-ink);background:#EEFBF7;border-radius:999px;padding:3px 9px}
 .lp-hero p{margin-bottom:16px}
-.lp-proof{margin:14px 0 0;font-size:13px;color:var(--aff-sub);display:flex;align-items:center;gap:8px}
+.lp-proof{margin:14px 0 0;font-size:13px;color:var(--aff-sub);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.lp-proof b{white-space:nowrap}
 .lp-proof::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--aff-mint);flex:none}
 .lp-proof b{color:var(--aff-ink);font-weight:800}
 @media(max-width:640px){.lp-flow li{font-size:13px;padding:8px 10px}.lp-flow li small{display:none}.lp-flow li:last-child small{display:inline-block}}
