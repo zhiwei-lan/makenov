@@ -302,6 +302,7 @@ class Aff extends BaseApiController
             $name = json_decode($r['p_name'] ?? '', true);
             $approved = $stats[$r['product_id']]['approved'] ?? 0;
             $pending  = $stats[$r['product_id']]['pending'] ?? 0;
+            $rejected = $stats[$r['product_id']]['rejected'] ?? 0;
             $cap = $r['cap'] === null ? null : (int) $r['cap'];
             $out[] = [
                 'product_id' => $r['product_id'],
@@ -312,12 +313,19 @@ class Aff extends BaseApiController
                 'headline' => $r['headline'] ?? '', 'materials' => json_decode($r['materials'] ?? '[]', true) ?: [],
                 'copy_text' => $r['copy_text'] ?? '', 'keywords' => json_decode($r['keywords'] ?? '[]', true) ?: [], 'rules' => $r['rules'] ?? '',
                 'featured' => (bool) $r['featured'], 'active' => (bool) $r['active'], 'sort' => (int) $r['sort'],
-                'approved' => $approved, 'pending' => $pending,
+                'approved' => $approved, 'pending' => $pending, 'rejected' => $rejected,
+                'approval_rate' => self::rate($approved, $rejected),
                 'remaining' => $cap === null ? null : max(0, $cap - $approved - $pending),
                 'published' => (bool) ($r['p_published'] ?? 0),
             ];
         }
         return $out;
+    }
+
+    /** 승인률 = 승인 ÷ (승인+반려). 판정 3건 미만이면 null(표시 안 함) */
+    private static function rate(int $ok, int $rej): ?float
+    {
+        return ($ok + $rej) >= 3 ? round($ok / ($ok + $rej), 3) : null;
     }
 
     private function campaigns(): ResponseInterface
@@ -352,20 +360,20 @@ class Aff extends BaseApiController
             $n = trim((string) $r['name']);
             $marketers[] = ['rank' => $i + 1, 'name' => mb_substr($n, 0, 2) . '***', 'vnd' => (int) $r['vnd']];
         }
-        $names = [];
-        foreach ($this->campaignRows(false, false) as $c) $names[$c['product_id']] = $c['name'];
-        $byC = $db->table('aff_leads')->select("product_id, COUNT(*) n, SUM(status='approved') ok")
+        $names = []; $namesKo = [];
+        foreach ($this->campaignRows(false, false) as $c) { $names[$c['product_id']] = $c['name']; $namesKo[$c['product_id']] = $c['name_ko']; }
+        $byC = $db->table('aff_leads')->select("product_id, COUNT(*) n, SUM(status='approved') ok, SUM(status='rejected') rej")
             ->groupBy('product_id')->get()->getResultArray();
         usort($byC, fn ($x, $y) => $y['n'] <=> $x['n']);
         $campaigns = [];
         foreach (array_slice($byC, 0, 10) as $i => $r) {
-            $campaigns[] = ['rank' => $i + 1, 'product_id' => $r['product_id'], 'name' => $names[$r['product_id']] ?? $r['product_id'], 'leads' => (int) $r['n']];
+            $campaigns[] = ['rank' => $i + 1, 'product_id' => $r['product_id'], 'name' => $names[$r['product_id']] ?? $r['product_id'], 'name_ko' => $namesKo[$r['product_id']] ?? '', 'leads' => (int) $r['n']];
         }
-        $ap = array_values(array_filter($byC, fn ($r) => (int) $r['n'] >= 3));
-        usort($ap, fn ($x, $y) => ($y['ok'] / $y['n']) <=> ($x['ok'] / $x['n']));
+        $ap = array_values(array_filter($byC, fn ($r) => ((int) $r['ok'] + (int) $r['rej']) >= 3));
+        usort($ap, fn ($x, $y) => ($y['ok'] / ($y['ok'] + $y['rej'])) <=> ($x['ok'] / ($x['ok'] + $x['rej'])));
         $approval = [];
         foreach (array_slice($ap, 0, 10) as $i => $r) {
-            $approval[] = ['rank' => $i + 1, 'product_id' => $r['product_id'], 'name' => $names[$r['product_id']] ?? $r['product_id'], 'rate' => round($r['ok'] / $r['n'], 3)];
+            $approval[] = ['rank' => $i + 1, 'product_id' => $r['product_id'], 'name' => $names[$r['product_id']] ?? $r['product_id'], 'name_ko' => $namesKo[$r['product_id']] ?? '', 'rate' => round($r['ok'] / ($r['ok'] + $r['rej']), 3)];
         }
         return $this->json(['marketers' => $marketers, 'campaigns' => $campaigns, 'approval' => $approval]);
     }
@@ -455,19 +463,19 @@ class Aff extends BaseApiController
         }
         $clicks30 = $db->table('aff_clicks')->where('code', $this->marketer['code'])->where('day >=', date('Y-m-d', strtotime('-29 days')))->countAllResults();
         $s = $this->settings();
-        return $this->json(array_merge(['clicks30' => $clicks30, 'leads' => $cnt, 'min_withdraw' => (int) $s['minWithdraw']], $this->balanceOf($mid)));
+        return $this->json(array_merge(['clicks30' => $clicks30, 'leads' => $cnt, 'approval_rate' => self::rate($cnt['approved'], $cnt['rejected']), 'min_withdraw' => (int) $s['minWithdraw']], $this->balanceOf($mid)));
     }
 
     private function myLeads(): ResponseInterface
     {
-        $names = [];
-        foreach ($this->campaignRows(false, false) as $c) $names[$c['product_id']] = $c['name'];
+        $names = []; $namesKo = [];
+        foreach ($this->campaignRows(false, false) as $c) { $names[$c['product_id']] = $c['name']; $namesKo[$c['product_id']] = $c['name_ko']; }
         $b = db_connect()->table('aff_leads')->where('marketer_id', $this->marketer['id']);
         $st = service('request')->getGet('status');
         if ($st) $b->where('status', $st);
         $rows = $b->orderBy('created_at', 'DESC')->limit(500)->get()->getResultArray();
         return $this->json(array_map(fn ($l) => [
-            'id' => $l['id'], 'product_id' => $l['product_id'], 'product_name' => $names[$l['product_id']] ?? $l['product_id'],
+            'id' => $l['id'], 'product_id' => $l['product_id'], 'product_name' => $names[$l['product_id']] ?? $l['product_id'], 'product_name_ko' => $namesKo[$l['product_id']] ?? '',
             'status' => $l['status'], 'amount_vnd' => (int) $l['amount_vnd'], 'ch' => $l['ch'],
             'created_at' => $l['created_at'], 'decided_at' => $l['decided_at'], 'reject_reason' => $l['reject_reason'],
         ], $rows));
@@ -651,6 +659,7 @@ class Aff extends BaseApiController
                 'leads' => $total, 'pending' => $L['pending']['n'] ?? 0, 'approved' => $L['approved']['n'] ?? 0, 'rejected' => $L['rejected']['n'] ?? 0,
                 'approved_vnd' => $ok, 'balance_vnd' => $ok - ($wd[$m['id']] ?? 0),
                 'conv' => ($clicks[$m['code']] ?? 0) > 0 ? round($total / $clicks[$m['code']], 3) : null,
+                'approval_rate' => self::rate($L['approved']['n'] ?? 0, $L['rejected']['n'] ?? 0),
             ]);
         }
         usort($out, fn ($a, $b) => $b['approved_vnd'] <=> $a['approved_vnd']);

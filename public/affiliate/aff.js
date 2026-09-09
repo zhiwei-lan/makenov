@@ -38,6 +38,8 @@ function affLink(code, pid, ch){ const c = ch ? `&ch=${ch}` : ''; return pid ? `
 function qs(k){ return new URLSearchParams(location.search).get(k) || ''; }
 function fmtDate(s){ return String(s || '').slice(0, 10); }
 function stBadge(st){ return `<span class="aff-status ${esc(st)}">${esc(t('st_' + st + '_b'))}</span>`; }
+function rateChip(r){ return r == null ? `<span class="aff-rate na">${t('rate_na')}</span>` : `<span class="aff-rate ${r >= .8 ? 'good' : r >= .5 ? 'ok' : 'warn'}">${t('rate_short', { p: Math.round(r * 100) })}</span>`; }
+function gradeOf(r){ return r == null ? '' : r >= .8 ? t('grade_good') : r >= .5 ? t('grade_ok') : t('grade_warn'); }
 function chName(k){ return t('ch_' + (k || 'other')) === 'ch_' + (k || 'other') ? k : t('ch_' + (k || 'other')); }
 
 function toast(msg){
@@ -78,7 +80,7 @@ function shareIcons(pid){
 }
 
 /* ---------- 틀 ---------- */
-const AFF_MENU = [['index.html', 'home', 'menu_home'], ['rank.html', 'rank', 'menu_rank'], ['guide.html', 'guide', 'menu_guide'], ['guide.html#calc', 'calc', 'menu_calc'], ['guide.html#rules', 'rules', 'menu_rules']];
+const AFF_MENU = [['index.html', 'home', 'menu_home'], ['campaigns.html', 'campaigns', 'menu_campaigns'], ['rank.html', 'rank', 'menu_rank'], ['guide.html', 'guide', 'menu_guide'], ['guide.html#calc', 'calc', 'menu_calc'], ['guide.html#rules', 'rules', 'menu_rules']];
 function affSidebar(active){
   const m = AffApi.session();
   const side = document.getElementById('aff-side'); if(!side) return;
@@ -93,6 +95,7 @@ function affSidebar(active){
              <div class="acts"><a class="btn btn-primary btn-sm" href="login.html">${t('login')}</a><a class="btn btn-ghost btn-sm" href="join.html">${t('join')}</a></div>`}
     </div>
     <nav class="aff-menu">${AFF_MENU.map(([h, k, key]) => `<a href="${h}" class="${active === k ? 'on' : ''}">${t(key)}</a>`).join('')}</nav>
+    ${window.AFF_DEMO ? `<div class="aff-demo">${t('demo')} <a href="?demo=0">${t('demo_off')}</a></div>` : ''}
     <div class="aff-side-links"><a href="${AFF_HOST}/" target="_blank" rel="noopener">${t('side_about')}</a><a href="https://zalo.me/${AFF_ZALO}" target="_blank" rel="noopener">${t('side_zalo')}</a></div>`;
   if(m) AffApi.summary().then(s => { const el = document.getElementById('aff-side-bal'); if(el) el.textContent = vnd(s.balance_vnd); }).catch(() => {});
 }
@@ -124,5 +127,12 @@ function campaignRow(c){
   return `<a class="aff-row" href="campaign.html?id=${esc(c.product_id)}">
     <span class="th"><img src="${esc(c.img)}" alt="${esc(c.name)}" loading="lazy"></span>
     <span class="bd"><span class="meta"><b>${esc(catName(c.cat))}</b><i>|</i>${esc(c.brand)}</span><span class="nm">${esc(cName(c))}</span><span class="hl">${esc(c.headline || '')}</span></span>
-    <span class="rt"><span class="cpa">${vnd(c.cpa_vnd)}<small>${t('per_lead')}</small></span><span class="left">${left}</span><span class="go">${t('detail')} →</span></span></a>`;
+    <span class="rt"><span class="cpa">${vnd(c.cpa_vnd)}<small>${t('per_lead')}</small></span><span class="left">${rateChip(c.approval_rate)} · ${left}</span><span class="go">${t('detail')} →</span></span></a>`;
+}
+
+/* ---------- 캠페인 카드 (랜딩 그리드) ---------- */
+function campaignCard(c){
+  return `<a class="aff-card" href="campaign.html?id=${esc(c.product_id)}"><span class="th"><img src="${esc(c.img)}" alt="${esc(cName(c))}" loading="lazy"></span>
+    <span class="bd"><span class="meta">${esc(c.brand)}</span><span class="nm">${esc(cName(c))}</span>
+    <span class="row"><span class="cpa">${vnd(c.cpa_vnd)}<small>${t('per_lead')}</small></span>${rateChip(c.approval_rate)}</span></span></a>`;
 }

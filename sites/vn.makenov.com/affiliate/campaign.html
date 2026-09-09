@@ -6,7 +6,7 @@
 <title>Chia sẻ | Cộng tác viên MAKENOV</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="../assets/css/style.css?v=20260909b">
-<link rel="stylesheet" href="affiliate.css?v=20260909g">
+<link rel="stylesheet" href="affiliate.css?v=20260909h">
 <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
 </head>
 <body class="aff-body">
@@ -19,9 +19,10 @@
   </div>
 </div>
 <script src="../assets/js/config.js?v=20260817b"></script>
-<script src="aff-i18n.js?v=20260909g"></script>
-<script src="aff-api.js?v=20260909g"></script>
-<script src="aff.js?v=20260909g"></script>
+<script src="aff-i18n.js?v=20260909h"></script>
+<script src="aff-api.js?v=20260909h"></script>
+<script src="aff-demo.js?v=20260909h"></script>
+<script src="aff.js?v=20260909h"></script>
 <script>
 /* 텐핑 '소문내기' 구조: 요약 카드 → 공유 → 큰 CTA → [이미지·예시 글 | 주의사항] */
 let C = null;
@@ -47,7 +48,7 @@ affBoot('home', { titleKey:'cd_title', back:'index.html' }, async () => {
   <section class="aff-cd-head">
     <div class="th"><img src="${esc(C.img)}" alt="${esc(C.name)}"></div>
     <div>
-      <div class="meta"><b>${esc(catName(C.cat))}</b><i>|</i>${esc(C.brand)}</div>
+      <div class="meta"><b>${esc(catName(C.cat))}</b><i>|</i>${esc(C.brand)} <span style="margin-left:8px">${rateChip(C.approval_rate)}</span></div>
       <h1>${esc(cName(C))}</h1>
       <p>${esc(C.headline || C.copy_text)}</p>
       <div class="bar"><a class="home" href="index.html">‹ ${t('back_list')}</a>${shareIcons(C.product_id)}<span class="sp"></span><a class="btn btn-ghost btn-sm" href="${AFF_HOST}/products/${esc(C.product_id)}.html" target="_blank" rel="noopener">${t('product_page')} ↗</a></div>
@@ -66,7 +67,7 @@ affBoot('home', { titleKey:'cd_title', back:'index.html' }, async () => {
         <div class="aff-cd-info">
           <div><div class="lb">${t('info_cpa')}</div><div class="v mint">${vnd(C.cpa_vnd)}</div></div>
           <div><div class="lb">${t('info_left')}</div><div class="v">${left}</div></div>
-          <div><div class="lb">${t('info_stat')}</div><div class="v">${C.approved} · ${C.pending}</div></div>
+          <div><div class="lb">${t('rate')}</div><div class="v">${C.approval_rate == null ? '—' : Math.round(C.approval_rate * 100) + '%'}</div></div>
         </div>
       </div>
     </div>

@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chiến dịch | Cộng tác viên MAKENOV</title>
-<meta name="description" content="Chương trình cộng tác viên MAKENOV: chọn chiến dịch sản phẩm Hàn Quốc, lấy link riêng, đăng lên TikTok, Facebook, Zalo và nhận hoa hồng cho mỗi khách hàng được duyệt.">
+<title>Cộng tác viên MAKENOV | Một link, hoa hồng mỗi khách hàng</title>
+<meta name="description" content="Chương trình cộng tác viên MAKENOV: đăng link sản phẩm Hàn Quốc lên TikTok, Facebook, Zalo. Nhận 150.000–250.000 ₫ cho mỗi cửa hàng, đại lý gửi yêu cầu báo giá và được duyệt. Không cần vốn.">
 <link rel="canonical" href="https://vn.makenov.com/affiliate/">
-<meta property="og:title" content="Cộng tác viên MAKENOV — kiếm hoa hồng khi giới thiệu sản phẩm Hàn Quốc">
+<meta property="og:title" content="Cộng tác viên MAKENOV — một link, hoa hồng mỗi khách hàng">
 <meta property="og:description" content="Đăng link lên TikTok, Facebook, Zalo. Nhận hoa hồng cho mỗi khách hàng được duyệt. Không cần vốn.">
 <meta property="og:image" content="https://makenov.com/assets/img/og.png">
 <link rel="stylesheet" href="../assets/css/style.css?v=20260909b">
-<link rel="stylesheet" href="affiliate.css?v=20260909g">
+<link rel="stylesheet" href="affiliate.css?v=20260909h">
 <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
 </head>
 <body class="aff-body">
@@ -19,45 +19,151 @@
   <div class="aff-main">
     <div class="aff-top" id="aff-top"></div>
     <main class="aff-content">
-      <section class="aff-banner">
-        <div><h2 data-i18n="banner_h"></h2><p data-i18n="banner_p"></p></div>
-        <div class="cta" id="banner-cta"></div>
+
+      <!-- 1. 히어로 -->
+      <section class="lp-hero">
+        <div>
+          <p class="kick" data-i18n="lp_kick"></p>
+          <h1 data-i18n="lp_h1"></h1>
+          <p data-i18n="lp_p"></p>
+          <div class="cta" id="hero-cta"></div>
+        </div>
+        <div class="visual"><div class="pill" id="hero-pill"></div><div class="aff-sample"><div class="post" id="post-card"></div></div></div>
       </section>
-      <div class="aff-tabs" id="tabs"></div>
-      <div class="aff-list" id="list"></div>
+
+      <!-- 2. 숫자 4개 -->
+      <div class="lp-kpis" id="kpis"></div>
+
+      <!-- 3. 진행 순서 -->
+      <section class="aff-sec">
+        <div class="aff-sec-head"><h2 data-i18n="lp_how"></h2></div>
+        <div class="aff-stats three">
+          <div class="aff-stat step"><span class="n">1</span><h3 data-i18n="g_s1"></h3><p data-i18n="g_s1p"></p></div>
+          <div class="aff-stat step"><span class="n">2</span><h3 data-i18n="g_s2"></h3><p data-i18n="g_s2p"></p></div>
+          <div class="aff-stat step"><span class="n">3</span><h3 data-i18n="g_s3"></h3><p data-i18n="g_s3p"></p></div>
+        </div>
+      </section>
+
+      <!-- 4. 열린 캠페인 -->
+      <section class="aff-sec">
+        <div class="aff-sec-head"><h2 data-i18n="lp_feat"></h2><a class="more" href="campaigns.html" data-i18n="lp_all"></a></div>
+        <div class="aff-cards" id="featured"></div>
+      </section>
+
+      <!-- 5. 승인률 -->
+      <section class="aff-sec">
+        <div class="lp-rate">
+          <div>
+            <h2 data-i18n="lp_rate_h"></h2>
+            <p data-i18n="lp_rate_p"></p>
+            <div class="bar"><i class="g"></i><i class="r"></i></div>
+            <div class="bar-lb"><span id="rate-lb-a"></span><span id="rate-lb-r"></span></div>
+          </div>
+          <div class="steps">
+            <div class="st ok"><span class="ic">✓</span><div><b class="t" data-i18n="lp_rate_1"></b><span data-i18n="lp_rate_1p"></span></div></div>
+            <div class="st no"><span class="ic">✕</span><div><b class="t" data-i18n="lp_rate_2"></b><span data-i18n="lp_rate_2p"></span></div></div>
+            <div class="st gr"><span class="ic">★</span><div><b class="t" data-i18n="lp_rate_3"></b><span data-i18n="lp_rate_3p"></span></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. 계산기 -->
+      <section class="aff-sec" id="calc">
+        <div class="aff-calc">
+          <div>
+            <h2 data-i18n="lp_calc"></h2>
+            <p data-i18n="g_calc_p"></p>
+            <label class="calc-row"><span data-i18n="g_calc_n"></span><b id="calc-n">10</b></label>
+            <input type="range" id="calc-range" min="1" max="60" value="10" oninput="calc()">
+            <label class="calc-row"><span data-i18n="g_calc_cpa"></span><select id="calc-cpa" onchange="calc()"><option value="200000" selected>200.000 ₫</option></select></label>
+          </div>
+          <div class="calc-out">
+            <div class="lb" data-i18n="g_month"></div>
+            <div class="v" id="calc-month">2.000.000 ₫</div>
+            <div class="lb2" id="calc-year"></div>
+            <a class="btn btn-primary btn-lg" href="join.html" id="calc-cta" data-i18n="g_start"></a>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. 랭킹 -->
+      <section class="aff-sec">
+        <div class="aff-sec-head"><h2 data-i18n="lp_rank"></h2><a class="more" href="rank.html" data-i18n="see_all"></a></div>
+        <div class="aff-rank" id="rank-boxes"></div>
+      </section>
+
+      <!-- 8. FAQ -->
+      <section class="aff-sec">
+        <div class="aff-sec-head"><h2 data-i18n="lp_faq"></h2><a class="more" href="guide.html" data-i18n="menu_guide"></a></div>
+        <div class="faq-list">
+          <details class="faq-item"><summary data-i18n="q1"></summary><div class="a" data-i18n="a1"></div></details>
+          <details class="faq-item"><summary data-i18n="q2"></summary><div class="a" data-i18n="a2"></div></details>
+          <details class="faq-item"><summary data-i18n="q4"></summary><div class="a" data-i18n="a4"></div></details>
+          <details class="faq-item"><summary data-i18n="q5"></summary><div class="a" data-i18n="a5"></div></details>
+        </div>
+      </section>
+
+      <!-- 9. CTA -->
+      <section class="aff-final">
+        <h2 data-i18n="lp_final"></h2>
+        <p data-i18n="lp_final_p"></p>
+        <div class="cta" id="final-cta"></div>
+      </section>
     </main>
     <footer class="aff-foot" id="aff-foot"></footer>
   </div>
 </div>
 <script src="../assets/js/config.js?v=20260817b"></script>
-<script src="aff-i18n.js?v=20260909g"></script>
-<script src="aff-api.js?v=20260909g"></script>
-<script src="aff.js?v=20260909g"></script>
+<script src="aff-i18n.js?v=20260909h"></script>
+<script src="aff-api.js?v=20260909h"></script>
+<script src="aff-demo.js?v=20260909h"></script>
+<script src="aff.js?v=20260909h"></script>
 <script>
-let cat = qs('cat') || '', sort = 'cpa', q = '', ALL = [];
-function setCat(c){ cat = c; draw(); }
-function setSort(s){ sort = s; draw(); }
-function setQ(v){ q = v.trim().toLowerCase(); draw(); }
-function draw(){
-  const all = ALL.slice().sort((a, b) => sort === 'new' ? b.sort - a.sort : b.cpa_vnd - a.cpa_vnd);
-  const cats = AFF_CATS.filter(c => all.some(x => x.cat === c));
-  document.getElementById('tabs').innerHTML =
-    `<button class="${!cat ? 'on' : ''}" onclick="setCat('')">${t('all')} <span class="n">${all.length}</span></button>` +
-    cats.map(c => `<button class="${cat === c ? 'on' : ''}" onclick="setCat('${c}')">${esc(catName(c))}</button>`).join('') +
-    `<span class="sp"></span><select onchange="setSort(this.value)"><option value="cpa" ${sort === 'cpa' ? 'selected' : ''}>${t('sort_cpa')}</option><option value="new" ${sort === 'new' ? 'selected' : ''}>${t('sort_new')}</option></select>`;
-  let list = cat ? all.filter(c => c.cat === cat) : all;
-  if(q) list = list.filter(c => (c.name + ' ' + c.brand + ' ' + (c.headline || '')).toLowerCase().includes(q));
-  document.getElementById('list').innerHTML = list.length ? list.map(campaignRow).join('') : `<div class="aff-empty">${t('empty_list')}</div>`;
+function calc(){
+  const n = Number(document.getElementById('calc-range').value), cpa = Number(document.getElementById('calc-cpa').value);
+  document.getElementById('calc-n').textContent = n;
+  document.getElementById('calc-month').textContent = vnd(n * cpa);
+  document.getElementById('calc-year').textContent = t('g_year', { v: vnd(n * cpa * 12) });
 }
-affBoot('home', { titleKey:'home_title', mid:`<div class="aff-search"><input type="search" placeholder="${t('search_ph')}" oninput="setQ(this.value)"></div>` }, async () => {
+affBoot('home', { titleKey:'lp_kick' }, async () => {
   const m = AffApi.session();
-  document.getElementById('banner-cta').innerHTML = m
-    ? `<a class="btn btn-primary" href="my.html">${t('my')}</a>`
-    : `<a class="btn btn-primary" href="join.html">${t('banner_cta')}</a><a class="btn btn-ghost" href="guide.html">${t('banner_cta2')}</a>`;
-  ALL = await AffApi.campaigns({});
-  if(ALL.length){ const cpas = ALL.map(c => c.cpa_vnd), lo = Math.min(...cpas), hi = Math.max(...cpas);
-    const r = document.getElementById('banner-range'); if(r) r.textContent = lo === hi ? vnd(hi) : `${lo.toLocaleString('vi-VN')}–${hi.toLocaleString('vi-VN')} ₫`; }
-  draw();
+  const ctas = m ? `<a class="btn btn-primary btn-lg" href="my.html">${t('lp_login_cta')}</a><a class="btn btn-ghost btn-lg" href="campaigns.html">${t('lp_cta2')}</a>`
+                 : `<a class="btn btn-primary btn-lg" href="join.html">${t('lp_cta')}</a><a class="btn btn-ghost btn-lg" href="campaigns.html">${t('lp_cta2')}</a>`;
+  document.getElementById('hero-cta').innerHTML = ctas; document.getElementById('final-cta').innerHTML = ctas;
+  if(m) document.getElementById('calc-cta').href = 'campaigns.html';
+  document.getElementById('rate-lb-a').textContent = t('lp_rate_1') + ' 82%'; document.getElementById('rate-lb-r').textContent = t('lp_rate_2') + ' 18%';
+  calc();
+
+  const [all, rk] = await Promise.all([AffApi.campaigns({}), AffApi.rankings().catch(() => ({ marketers:[], campaigns:[], approval:[] }))]);
+  const cpas = all.map(c => c.cpa_vnd), hi = cpas.length ? Math.max(...cpas) : 0;
+  const rated = all.filter(c => c.approval_rate != null);
+  const avgRate = rated.length ? Math.round(rated.reduce((a, c) => a + c.approval_rate, 0) / rated.length * 100) : null;
+  document.getElementById('kpis').innerHTML = `
+    <div class="lp-kpi"><div class="v">${all.length}<small>${t('lp_k1')}</small></div><div class="lb">${t('lp_feat')}</div></div>
+    <div class="lp-kpi"><div class="v">${hi ? vnd(hi) : '—'}</div><div class="lb">${t('lp_k2')}</div></div>
+    <div class="lp-kpi"><div class="v">${avgRate == null ? '—' : avgRate + '%'}</div><div class="lb">${t('lp_k3')}</div></div>
+    <div class="lp-kpi"><div class="v" style="font-size:18px;padding-top:4px">${t('lp_k4v')}</div><div class="lb">${t('lp_k4')}</div></div>`;
+  document.getElementById('hero-pill').innerHTML = hi ? `+ <b>${vnd(hi)}</b> ${t('per_lead').replace('/', '')}` : '';
+
+  const feat = (all.filter(c => c.featured).length ? all.filter(c => c.featured) : all).slice(0, 3);
+  document.getElementById('featured').innerHTML = feat.length ? feat.map(campaignCard).join('') : `<div class="aff-empty" style="grid-column:1/-1">${t('empty_list')}</div>`;
+
+  if(all.length){
+    const sel = document.getElementById('calc-cpa'), uniq = [...new Set(cpas)].sort((a, b) => a - b);
+    sel.innerHTML = uniq.map(v => `<option value="${v}">${vnd(v)}</option>`).join(''); sel.value = String(uniq[Math.floor(uniq.length / 2)]); calc();
+    const c = feat[0] || all[0], link = affLink(m ? m.code : 'XXXXXX', c.product_id), text = `${c.copy_text}\n\n${t('view_price')} ${link}`;
+    document.getElementById('post-card').innerHTML = `
+      <div class="ph"><span class="av"></span><div><b>${esc(m ? m.name : t('your_name'))}</b><span>${t('just_now')}</span></div></div>
+      <div class="pt">${esc(c.copy_text)}<br><br>${t('view_price')} <a>${esc(link)}</a></div>
+      <img src="${esc(c.img)}" alt="${esc(cName(c))}" loading="lazy">
+      <div class="pf"><span>${esc(c.brand)} · ${esc(cName(c))}</span><button class="btn btn-primary btn-sm" onclick="copyText(${JSON.stringify(text)})">${t('copy_post')}</button></div>`;
+  } else { document.querySelector('.lp-hero .visual').style.display = 'none'; }
+
+  const box = (title, rows) => `<div class="box"><h3>${title}</h3>${rows.length ? `<ol>${rows.join('')}</ol>` : `<p class="aff-note">${t('no_data')}</p>`}</div>`;
+  document.getElementById('rank-boxes').innerHTML =
+    box(t('rank_top'), rk.marketers.slice(0, 5).map(r => `<li><span class="r">${r.rank}</span><span class="nm">${esc(r.name)}</span><span class="v">${vnd(r.vnd)}</span></li>`)) +
+    box(t('rank_camp'), rk.campaigns.slice(0, 5).map(r => `<li><span class="r">${r.rank}</span><a class="nm" href="campaign.html?id=${esc(r.product_id)}">${esc(cName(r))}</a><span class="v">${r.leads}</span></li>`)) +
+    box(t('rank_rate'), rk.approval.slice(0, 5).map(r => `<li><span class="r">${r.rank}</span><a class="nm" href="campaign.html?id=${esc(r.product_id)}">${esc(cName(r))}</a><span class="v">${Math.round(r.rate * 100)}%</span></li>`));
 });
 </script>
 </body>

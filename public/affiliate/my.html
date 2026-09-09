@@ -6,7 +6,7 @@
 <title>Trang của tôi | Cộng tác viên MAKENOV</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="../assets/css/style.css?v=20260909b">
-<link rel="stylesheet" href="affiliate.css?v=20260909g">
+<link rel="stylesheet" href="affiliate.css?v=20260909h">
 <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
 </head>
 <body class="aff-body">
@@ -31,9 +31,10 @@
   </div>
 </div>
 <script src="../assets/js/config.js?v=20260817b"></script>
-<script src="aff-i18n.js?v=20260909g"></script>
-<script src="aff-api.js?v=20260909g"></script>
-<script src="aff.js?v=20260909g"></script>
+<script src="aff-i18n.js?v=20260909h"></script>
+<script src="aff-api.js?v=20260909h"></script>
+<script src="aff-demo.js?v=20260909h"></script>
+<script src="aff.js?v=20260909h"></script>
 <script>
 let ME = null, SUM = null, leadFilter = '';
 const v = id => document.getElementById(id).value.trim();
@@ -64,6 +65,8 @@ async function drawDash(){
       <div class="aff-stat"><div class="lb">${t('st_approved')}</div><div class="v">${SUM.leads.approved}<small>/ ${SUM.leads.approved + SUM.leads.pending + SUM.leads.rejected}</small></div></div>
       <div class="aff-stat"><div class="lb">${t('st_balance')}</div><div class="v" style="color:#13A583">${vnd(SUM.balance_vnd)}</div></div>
     </div>
+    <div class="aff-box aff-ratebox"><div><h3>${t('st_rate')}</h3><p class="aff-note" style="margin:0">${t('st_rate_note')}</p></div>
+      <div class="big">${SUM.approval_rate == null ? `<span class="na">${t('rate_na')}</span>` : `<b>${Math.round(SUM.approval_rate * 100)}%</b>${rateChip(SUM.approval_rate).replace(t('rate_short', { p: Math.round(SUM.approval_rate * 100) }), gradeOf(SUM.approval_rate))}`}</div></div>
     <div class="aff-box"><h3>${t('clicks_h')}</h3>
       <div class="aff-bars">${clicks.map(c => `<i style="height:${Math.round(c.clicks / max * 100)}%" data-v="${c.clicks}" title="${c.day}: ${c.clicks}"></i>`).join('')}</div>
       <div class="aff-bars-lb"><span>${clicks.length ? clicks[0].day : ''}</span><span>${clicks.length ? clicks[clicks.length - 1].day : ''}</span></div>
@@ -74,7 +77,7 @@ async function drawDash(){
 function leadTable(rows){
   if(!rows.length) return `<div class="aff-empty">${t('no_leads')}</div>`;
   return `<div class="aff-table-wrap"><table class="aff-table"><thead><tr><th>${t('th_date')}</th><th>${t('th_product')}</th><th>${t('th_status')}</th><th class="num">${t('th_amount')}</th></tr></thead><tbody>
-    ${rows.map(l => `<tr><td style="white-space:nowrap">${fmtDate(l.created_at)}</td><td><a href="campaign.html?id=${esc(l.product_id)}">${esc(l.product_name)}</a>${l.reject_reason ? `<span class="sub">${t('reason')} ${esc(l.reject_reason)}</span>` : ''}</td><td>${stBadge(l.status)}</td><td class="num">${l.status === 'rejected' ? '—' : vnd(l.amount_vnd)}</td></tr>`).join('')}
+    ${rows.map(l => `<tr><td style="white-space:nowrap">${fmtDate(l.created_at)}</td><td><a href="campaign.html?id=${esc(l.product_id)}">${esc(AFF_LANG === 'ko' && l.product_name_ko ? l.product_name_ko : l.product_name)}</a>${l.reject_reason ? `<span class="sub">${t('reason')} ${esc(l.reject_reason)}</span>` : ''}</td><td>${stBadge(l.status)}</td><td class="num">${l.status === 'rejected' ? '—' : vnd(l.amount_vnd)}</td></tr>`).join('')}
   </tbody></table></div>`;
 }
 async function drawLeads(){

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bảng xếp hạng | Cộng tác viên MAKENOV</title>
 <link rel="stylesheet" href="../assets/css/style.css?v=20260909b">
-<link rel="stylesheet" href="affiliate.css?v=20260909g">
+<link rel="stylesheet" href="affiliate.css?v=20260909h">
 <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
 </head>
 <body class="aff-body">
@@ -22,9 +22,10 @@
   </div>
 </div>
 <script src="../assets/js/config.js?v=20260817b"></script>
-<script src="aff-i18n.js?v=20260909g"></script>
-<script src="aff-api.js?v=20260909g"></script>
-<script src="aff.js?v=20260909g"></script>
+<script src="aff-i18n.js?v=20260909h"></script>
+<script src="aff-api.js?v=20260909h"></script>
+<script src="aff-demo.js?v=20260909h"></script>
+<script src="aff.js?v=20260909h"></script>
 <script>
 affBoot('rank', { titleKey:'rank_title' }, async () => {
   const d = new Date(); document.getElementById('rank-month').textContent = t('rank_month', { m: d.getMonth() + 1, y: d.getFullYear() });
@@ -32,8 +33,8 @@ affBoot('rank', { titleKey:'rank_title' }, async () => {
   const box = (title, rows) => `<div class="box"><h3>${title}</h3>${rows.length ? `<ol>${rows.join('')}</ol>` : `<p class="aff-note">${t('no_data')}</p>`}</div>`;
   document.getElementById('rank-boxes').innerHTML =
     box(t('rank_top'), rk.marketers.map(r => `<li><span class="r">${r.rank}</span><span class="nm">${esc(r.name)}</span><span class="v">${vnd(r.vnd)}</span></li>`)) +
-    box(t('rank_camp'), rk.campaigns.map(r => `<li><span class="r">${r.rank}</span><a class="nm" href="campaign.html?id=${esc(r.product_id)}">${esc(r.name)}</a><span class="v">${r.leads}</span></li>`)) +
-    box(t('rank_rate'), rk.approval.map(r => `<li><span class="r">${r.rank}</span><a class="nm" href="campaign.html?id=${esc(r.product_id)}">${esc(r.name)}</a><span class="v">${Math.round(r.rate * 100)}%</span></li>`));
+    box(t('rank_camp'), rk.campaigns.map(r => `<li><span class="r">${r.rank}</span><a class="nm" href="campaign.html?id=${esc(r.product_id)}">${esc(cName(r))}</a><span class="v">${r.leads}</span></li>`)) +
+    box(t('rank_rate'), rk.approval.map(r => `<li><span class="r">${r.rank}</span><a class="nm" href="campaign.html?id=${esc(r.product_id)}">${esc(cName(r))}</a><span class="v">${Math.round(r.rate * 100)}%</span></li>`));
 });
 </script>
 </body>
