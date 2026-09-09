@@ -34,8 +34,10 @@ class Aff extends BaseApiController
 
     /* ================= 진입점 ================= */
 
-    public function handle(string $path = ''): ResponseInterface
+    /** CI4 는 (:any) 뒤 세그먼트를 인자 여러 개로 쪼개 넘긴다 — 다시 이어 붙인다 */
+    public function handle(string ...$segs): ResponseInterface
     {
+        $path = implode('/', $segs);
         if ($fail = $this->requirePublic()) {
             return $fail;
         }
