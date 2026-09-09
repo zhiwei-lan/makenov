@@ -554,3 +554,91 @@ body.aff-body{background:#fff}
 .g2-logos .face{position:absolute;inset:6px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(25,31,40,.08)}
 .g2-logos svg{width:36px;height:36px}
 .g2-logos b{font-size:12px;font-weight:700;color:var(--aff-sub)}
+
+/* ===== 랜딩 전용 틀 (ld-) — messeze.com 문법: 상단 내비, 풀블리드 섹션, 가운데 정렬, 섹션당 메시지 하나 ===== */
+.ld-body{background:#fff}
+.ld-wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+.ld-nav{position:sticky;top:0;z-index:60;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--aff-line)}
+.ld-nav .ld-wrap{display:flex;align-items:center;gap:30px;height:64px}
+.ld-menu{display:flex;gap:24px}
+.ld-menu a{font-size:14px;font-weight:600;color:var(--aff-body);text-decoration:none}
+.ld-menu a:hover{color:var(--aff-ink)}
+.ld-nav-r{margin-left:auto;display:flex;align-items:center;gap:14px}
+.ld-nav-r .nm{font-size:14px;font-weight:600;color:var(--aff-body);text-decoration:none}
+.btn-dark{background:var(--aff-ink);color:#fff;border:1px solid var(--aff-ink)}
+.btn-dark:hover{background:#000;color:#fff}
+
+.ld-hero{background:radial-gradient(1100px 560px at 50% -12%,#2A3650 0%,#171D2A 52%,#0F131B 100%);color:#fff;text-align:center;padding:92px 0 0;overflow:hidden}
+.ld-hero .kick{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--aff-mint);margin:0 0 16px}
+.ld-hero h1{font-size:52px;font-weight:800;letter-spacing:-.035em;line-height:1.2;margin:0 0 18px;color:#fff}
+.ld-hero .sub{font-size:17px;line-height:1.75;color:rgba(255,255,255,.72);max-width:640px;margin:0 auto 30px}
+.ld-hero .cta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.ld-hero .btn-ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.35)}
+.ld-hero .btn-ghost:hover{background:rgba(255,255,255,.1);color:#fff}
+.ld-hero .hero-tiles{grid-template-columns:repeat(4,124px);gap:34px;justify-content:center;padding:64px 10px 96px;perspective:1100px}
+.ld-hero .hero-tiles .tile{box-shadow:0 30px 44px -18px rgba(0,0,0,.6),0 10px 18px -8px rgba(0,0,0,.35),inset 0 1px 0 #fff,inset 0 -4px 0 rgba(25,31,40,.08)}
+.ld-hero .hero-tiles .t2,.ld-hero .hero-tiles .t4{margin-top:30px}
+
+.ld-kpis .lp-kpis{margin:-48px auto 0;position:relative;z-index:2}
+.ld-kpis .lp-kpi{box-shadow:0 18px 40px -18px rgba(25,31,40,.28);padding:20px 22px}
+.ld-kpis .lp-kpi .v{font-size:26px}
+
+.ld-sec{padding:96px 0}
+.ld-sec.alt{background:var(--aff-bg)}
+.ld-head{text-align:center;margin:0 0 40px}
+.ld-head h2{font-size:36px;font-weight:800;letter-spacing:-.03em;line-height:1.25;margin:0 0 12px;color:var(--aff-ink)}
+.ld-head p{font-size:16px;line-height:1.7;color:var(--aff-sub);margin:0}
+.ld-more{text-align:center;margin-top:30px}
+.ld .aff-stats{margin:0}
+.ld .aff-stat.step{padding:26px 24px}
+.ld .lp-rate{padding:40px}
+
+.ld-band{background:var(--aff-ink);color:#fff;text-align:center;padding:64px 0}
+.ld-band .lb{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.6)}
+.ld-band .v{font-size:56px;font-weight:800;letter-spacing:-.03em;color:var(--aff-mint);margin:10px 0 8px;line-height:1.1}
+.ld-band .sub{font-size:15px;color:rgba(255,255,255,.8);margin-bottom:20px}
+.ld-band .btn{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.3)}
+.ld-band .btn:hover{background:rgba(255,255,255,.18)}
+
+.ld-faq{max-width:780px;margin:0 auto;background:#fff;border:1px solid var(--aff-line);border-radius:16px;overflow:hidden;box-shadow:0 14px 34px -20px rgba(25,31,40,.2)}
+.ld-faq details{border-top:1px solid var(--aff-line)}
+.ld-faq details:first-child{border-top:0}
+.ld-faq summary{display:flex;align-items:center;gap:20px;padding:20px 26px;cursor:pointer;list-style:none;font-size:16px;font-weight:600;color:var(--aff-ink)}
+.ld-faq summary::-webkit-details-marker{display:none}
+.ld-faq summary .n{font-size:13px;font-weight:800;color:var(--aff-mint-dark);width:26px;flex:none}
+.ld-faq summary::after{content:"+";margin-left:auto;font-size:22px;font-weight:300;color:var(--aff-sub);flex:none;line-height:1}
+.ld-faq details[open] summary::after{content:"−"}
+.ld-faq details[open] summary{background:#FAFBFC}
+.ld-faq .a{padding:4px 26px 22px 72px;font-size:15px;line-height:1.75;color:var(--aff-body)}
+
+.ld-final{background:linear-gradient(180deg,#171D2A 0%,#0F131B 100%);color:#fff;text-align:center;padding:96px 0}
+.ld-final h2{font-size:38px;font-weight:800;letter-spacing:-.03em;margin:0 0 12px;color:#fff}
+.ld-final p{font-size:16px;color:rgba(255,255,255,.7);margin:0 0 26px}
+.ld-final .cta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.ld-final .btn-ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.35)}
+.ld-final .btn-ghost:hover{background:rgba(255,255,255,.1);color:#fff}
+
+.ld-foot{padding:26px 0;font-size:13px;color:var(--aff-sub);border-top:1px solid var(--aff-line);background:#fff}
+.ld-foot.aff-foot{display:block}
+.ld-foot span{display:inline-block;margin:0 24px}
+
+@media(max-width:1000px){
+  .ld-menu{display:none}
+  .ld-hero{padding-top:64px}
+  .ld-hero h1{font-size:34px}
+  .ld-hero .sub{font-size:15px}
+  .ld-hero .hero-tiles{grid-template-columns:repeat(4,72px);gap:16px;padding:44px 0 70px}
+  .ld-hero .hero-tiles .tile{width:72px;height:72px;border-radius:20px}
+  .ld-hero .hero-tiles .tile .face{inset:6px;border-radius:15px}
+  .ld-hero .hero-tiles .tile svg{width:34px;height:34px}
+  .ld-hero .hero-tiles .tile.t4 svg{width:40px;height:40px}
+  .ld-hero .hero-tiles .t2,.ld-hero .hero-tiles .t4{margin-top:16px}
+  .ld-kpis .lp-kpis{margin-top:-36px;grid-template-columns:1fr 1fr}
+  .ld-sec{padding:60px 0}
+  .ld-head h2{font-size:26px}
+  .ld-band .v{font-size:38px}
+  .ld-final h2{font-size:28px}
+  .ld .lp-rate{padding:22px}
+  .ld-faq summary{padding:16px 18px;font-size:15px;gap:14px}
+  .ld-faq .a{padding:0 18px 18px 58px}
+}
