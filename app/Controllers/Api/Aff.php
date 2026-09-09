@@ -32,7 +32,7 @@ class Aff extends BaseApiController
 
     private ?array $marketer = null;   // aff_tokens 로 식별된 마케터 행
     /** 마이그레이션을 추가하면 올린다 — writable/aff_schema_ok 에 적힌 값과 다르면 latest() 를 다시 돈다 */
-    private const SCHEMA_VER = '3';
+    private const SCHEMA_VER = '4';
 
     /* ================= 진입점 ================= */
 
@@ -150,7 +150,34 @@ class Aff extends BaseApiController
     private function pub(array $m): array
     {
         unset($m['password_hash'], $m['memo']);
+        $m['channels'] = self::channelsOf($m['channel'] ?? '');
+        unset($m['channel']);
         return $m;
+    }
+
+    /** DB 의 channel(JSON 배열 또는 옛 평문 URL 하나) → 배열 */
+    private static function channelsOf($raw): array
+    {
+        $raw = trim((string) $raw);
+        if ($raw === '') return [];
+        $d = json_decode($raw, true);
+        if (is_array($d)) return array_values(array_filter(array_map('strval', $d), 'strlen'));
+        return [$raw];
+    }
+
+    /** 요청의 channels[] (또는 channel 문자열) → 저장용 JSON. http(s) URL 만, 최대 6개 */
+    private static function channelsJson($in): string
+    {
+        $arr = is_array($in) ? $in : [(string) $in];
+        $out = [];
+        foreach ($arr as $u) {
+            $u = trim((string) $u);
+            if ($u === '') continue;
+            if (! preg_match('#^https?://#i', $u)) $u = 'https://' . $u;
+            $out[] = substr($u, 0, 255);
+            if (count($out) >= 6) break;
+        }
+        return json_encode(array_values(array_unique($out)), JSON_UNESCAPED_SLASHES);
     }
 
     private function newCode(): string
@@ -198,7 +225,7 @@ class Aff extends BaseApiController
         $m = [
             'id' => $this->uuid(), 'code' => $this->newCode(), 'email' => $email,
             'password_hash' => password_hash($pw, PASSWORD_DEFAULT), 'name' => $name,
-            'phone' => trim((string) ($b['phone'] ?? '')), 'zalo' => trim((string) ($b['zalo'] ?? '')), 'channel' => substr(trim((string) ($b['channel'] ?? '')), 0, 255),
+            'phone' => trim((string) ($b['phone'] ?? '')), 'zalo' => trim((string) ($b['zalo'] ?? '')), 'channel' => self::channelsJson($b['channels'] ?? ($b['channel'] ?? [])),
             'bank_name' => '', 'bank_account' => '', 'bank_holder' => '', 'status' => 'active',
             'created_at' => $now, 'updated_at' => $now,
         ];
@@ -245,9 +272,10 @@ class Aff extends BaseApiController
     {
         $b = $this->bodyJson() ?? [];
         $row = [];
-        foreach (['name', 'phone', 'zalo', 'channel', 'bank_name', 'bank_account', 'bank_holder'] as $k) {
+        foreach (['name', 'phone', 'zalo', 'bank_name', 'bank_account', 'bank_holder'] as $k) {
             if (array_key_exists($k, $b)) $row[$k] = trim((string) $b[$k]);
         }
+        if (array_key_exists('channels', $b)) $row['channel'] = self::channelsJson($b['channels']);
         if (isset($row['name']) && $row['name'] === '') return $this->err('Vui lòng nhập họ tên', 422);
         $row['updated_at'] = date('Y-m-d H:i:s');
         db_connect()->table('aff_marketers')->where('id', $this->marketer['id'])->update($row);

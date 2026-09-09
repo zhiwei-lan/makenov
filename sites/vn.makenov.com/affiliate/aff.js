@@ -135,3 +135,15 @@ function campaignCard(c){
     <span class="bd"><span class="meta">${esc(c.brand)}</span><span class="nm">${esc(cName(c))}</span>
     <span class="row"><span class="cpa">${vnd(c.cpa_vnd)}<small>${t('per_lead')}</small></span>${rateChip(c.approval_rate)}</span></span></a>`;
 }
+
+/* ---------- 채널 링크 목록 편집 (가입·계정 탭 공용) ---------- */
+function channelsEditor(id, list, firstRequired){
+  const rows = (list && list.length ? list : ['']);
+  return `<div class="aff-chs" id="${id}">${rows.map((u, i) => channelRow(id, u, i === 0 && firstRequired)).join('')}</div>
+    <button type="button" class="btn btn-ghost btn-sm" onclick="channelAdd('${id}')">${t('channel_add')}</button>`;
+}
+function channelRow(id, u, req){
+  return `<div class="row"><input type="url" value="${esc(u || '')}" placeholder="${esc(t('channel_ph'))}" ${req ? 'required' : ''}><button type="button" class="btn btn-ghost btn-sm" onclick="this.parentNode.remove()" title="${t('channel_rm')}">✕</button></div>`;
+}
+function channelAdd(id){ const box = document.getElementById(id); if(box.querySelectorAll('.row').length >= 6) return; box.insertAdjacentHTML('beforeend', channelRow(id, '', false)); box.lastElementChild.querySelector('input').focus(); }
+function channelsRead(id){ return [...document.querySelectorAll('#' + id + ' input')].map(i => i.value.trim()).filter(Boolean); }

@@ -6,7 +6,7 @@
 <title>Trang của tôi | Cộng tác viên MAKENOV</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="../assets/css/style.css?v=20260909b">
-<link rel="stylesheet" href="affiliate.css?v=20260909j">
+<link rel="stylesheet" href="affiliate.css?v=20260909k">
 <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
 </head>
 <body class="aff-body">
@@ -31,9 +31,9 @@
   </div>
 </div>
 <script src="../assets/js/config.js?v=20260817b"></script>
-<script src="aff-i18n.js?v=20260909j"></script>
-<script src="aff-api.js?v=20260909j"></script>
-<script src="aff.js?v=20260909j"></script>
+<script src="aff-i18n.js?v=20260909k"></script>
+<script src="aff-api.js?v=20260909k"></script>
+<script src="aff.js?v=20260909k"></script>
 <script>
 let ME = null, SUM = null, leadFilter = '';
 const v = id => document.getElementById(id).value.trim();
@@ -111,7 +111,7 @@ function drawAccount(){
       <div>
         <div class="aff-box"><h3>${t('acc_info')}</h3>
           <div class="f-row"><label>${t('email')}</label><input value="${esc(ME.email)}" readonly></div>
-          ${f('ac-name', t('name'), ME.name)}${f('ac-phone', t('phone'), ME.phone, 'tel')}${f('ac-zalo', t('zalo'), ME.zalo)}${f('ac-channel', t('channel'), ME.channel, 'url')}
+          ${f('ac-name', t('name'), ME.name)}${f('ac-phone', t('phone'), ME.phone, 'tel')}${f('ac-zalo', t('zalo'), ME.zalo)}<div class="f-row"><label>${t('channel')}</label>${channelsEditor('ac-channels', ME.channels || [], false)}</div>
           <button class="btn btn-primary" onclick="saveInfo()">${t('save')}</button></div>
         <div class="aff-box"><h3>${t('pw_change')}</h3>
           ${f('pw-old', t('pw_old'), '', 'password')}${f('pw-new', t('pw_new'), '', 'password')}
@@ -123,7 +123,7 @@ function drawAccount(){
         <p class="aff-note">${t('bank_note')}</p></div>
     </div>`;
 }
-async function saveInfo(){ try{ ME = await AffApi.updateMe({ name:v('ac-name'), phone:v('ac-phone'), zalo:v('ac-zalo'), channel:v('ac-channel') }); toast(t('saved')); drawTop(); affSidebar('account'); }catch(e){ toast(e.message); } }
+async function saveInfo(){ try{ ME = await AffApi.updateMe({ name:v('ac-name'), phone:v('ac-phone'), zalo:v('ac-zalo'), channels:channelsRead('ac-channels') }); toast(t('saved')); drawTop(); affSidebar('account'); }catch(e){ toast(e.message); } }
 async function saveBank(){ try{ ME = await AffApi.updateMe({ bank_name:v('bk-name'), bank_account:v('bk-acc'), bank_holder:v('bk-holder').toUpperCase() }); toast(t('bank_saved')); drawMoney(); }catch(e){ toast(e.message); } }
 async function savePw(){ try{ await AffApi.changePassword(v('pw-old'), v('pw-new')); toast(t('pw_changed')); drawAccount(); }catch(e){ toast(e.message); } }
 affBoot('account', { titleKey:'my_title' }, async () => {

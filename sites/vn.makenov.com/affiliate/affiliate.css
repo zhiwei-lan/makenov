@@ -360,3 +360,7 @@ body.aff-body{background:#fff}
 .rl-ok{border-color:#CDE9E0}
 .rl-no{border-color:#F5C6C6}
 @media(max-width:860px){ .gd-step{grid-template-columns:34px 1fr;padding:16px} .gd-step .n{width:28px;height:28px;font-size:13px} .gd-step .aff-channels{grid-template-columns:1fr} }
+
+.aff-chs{display:grid;gap:8px;margin-bottom:8px}
+.aff-chs .row{display:flex;gap:6px}
+.aff-chs .row input{flex:1;min-width:0}
