@@ -403,7 +403,10 @@ class Aff extends BaseApiController
                 $me = $row + ['gap' => $i > 0 ? (int) $all[$i - 1]['vnd'] - (int) $r['vnd'] : 0, 'total' => count($all)];
             }
         }
-        if ($this->marketer && ! $me) $me = ['rank' => null, 'vnd' => 0, 'leads' => 0, 'rate' => $rates[$this->marketer['id']] ?? null, 'gap' => $all ? (int) end($all)['vnd'] : 0, 'total' => count($all)];
+        /* 전체 인원은 활성 마케터 수. 이달 승인이 없는 사람은 승인자 다음 순위(공동 꼴찌)로 표시 — "순위 없음"이 아니라 몇 위인지 보여준다 */
+        $totalActive = (int) $db->table('aff_marketers')->where('status', 'active')->countAllResults();
+        if ($me) $me['total'] = $totalActive;
+        if ($this->marketer && ! $me) $me = ['rank' => count($all) + 1, 'vnd' => 0, 'leads' => 0, 'rate' => $rates[$this->marketer['id']] ?? null, 'gap' => $all ? max(1, (int) end($all)['vnd']) : 0, 'total' => $totalActive, 'unranked' => true];
         $imgs = []; foreach ($this->campaignRows(false, false) as $c) $imgs[$c['product_id']] = ['img' => $c['img'], 'cpa' => $c['cpa_vnd']];
         $daysLeft = (int) date('t') - (int) date('j');
         $reward = (string) ($this->settings()['rankReward'] ?? '');

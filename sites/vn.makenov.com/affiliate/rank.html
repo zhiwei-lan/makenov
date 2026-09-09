@@ -6,7 +6,7 @@
 <title>Bảng xếp hạng | Cộng tác viên MAKENOV</title>
 <meta name="description" content="Top cộng tác viên, chiến dịch nhiều khách hàng và tỷ lệ duyệt cao trong tháng trên MAKENOV.">
 <link rel="stylesheet" href="../assets/css/style.css?v=20260909b">
-<link rel="stylesheet" href="affiliate.css?v=20260909n">
+<link rel="stylesheet" href="affiliate.css?v=20260909o">
 <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
 </head>
 <body class="aff-body">
@@ -33,9 +33,9 @@
   </div>
 </div>
 <script src="../assets/js/config.js?v=20260817b"></script>
-<script src="aff-i18n.js?v=20260909n"></script>
-<script src="aff-api.js?v=20260909n"></script>
-<script src="aff.js?v=20260909n"></script>
+<script src="aff-i18n.js?v=20260909o"></script>
+<script src="aff-api.js?v=20260909o"></script>
+<script src="aff.js?v=20260909o"></script>
 <script>
 affBoot('rank', { titleKey:'rank_title' }, async () => {
   const d = new Date(), m = AffApi.session();
@@ -48,11 +48,11 @@ affBoot('rank', { titleKey:'rank_title' }, async () => {
   if(m && rk.me){
     const me = rk.me;
     meBox.innerHTML = `<div class="rk-me">
-      <div class="rank"><span class="lb">${t('rk_me_h')}</span><b>${me.rank ? t('rk_me_rank', { r: me.rank }) : t('rk_me_none')}</b><span class="of">${t('rk_me_of', { n: me.total })}</span></div>
+      <div class="rank"><span class="lb">${t('rk_me_h')}</span><b>${t('rk_me_rank', { r: me.rank })}</b><span class="of">${t('rk_me_of', { n: me.total })}</span></div>
       <div class="st"><span class="lb">${t('rk_me_vnd')}</span><b>${vnd(me.vnd)}</b></div>
       <div class="st"><span class="lb">${t('rk_me_leads')}</span><b>${me.leads}</b></div>
       <div class="st"><span class="lb">${t('rate')}</span><b>${me.rate == null ? '—' : Math.round(me.rate * 100) + '%'}</b></div>
-      <div class="gap">${me.rank === 1 ? t('rk_me_gap0') : me.rank ? t('rk_me_gap', { v: vnd(me.gap) }) : t('rk_me_first')}<a class="btn btn-primary" href="campaigns.html">${t('rk_go')} →</a></div></div>`;
+      <div class="gap">${me.rank === 1 && !me.unranked ? t('rk_me_gap0') : me.unranked ? (me.gap ? t('rk_me_first2', { v: vnd(me.gap), r: me.rank - 1 }) : t('rk_me_first')) : t('rk_me_gap', { v: vnd(me.gap) })}<a class="btn btn-primary" href="campaigns.html">${t('rk_go')} →</a></div></div>`;
   } else {
     meBox.innerHTML = `<div class="rk-me guest"><div><b>${t('rk_guest_h')}</b><span>${t('rk_guest_p')}</span></div><div class="cta"><a class="btn btn-primary" href="join.html">${t('lp_cta')}</a><a class="btn btn-ghost" href="login.html?next=rank.html">${t('login')}</a></div></div>`;
   }
