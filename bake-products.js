@@ -114,7 +114,7 @@ function distHtml(lang){
   const items = (d.items || []).map(it => T(it, lang)).filter(x => String(x).trim());
   if(!title && !items.length) return '';
   return `<section class="pd-sec pd-dist">${title ? `<h2>${esc(title)}</h2>` : ''}${items.length
-    ? `<ul class="pd-checks">${items.map(x => `<li><span class="ck">✅</span><span>${esc(x)}</span></li>`).join('')}</ul>` : ''}</section>`;
+    ? `<ul class="pd-checks">${items.map(x => `<li><span class="ck">✓</span><span>${esc(x)}</span></li>`).join('')}</ul>` : ''}</section>`;
 }
 
 function card(o, lang){

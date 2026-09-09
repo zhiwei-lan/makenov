@@ -2192,10 +2192,10 @@ function pddPreview(d, lang){
   const title = (d.title || {})[lang] || '';
   const items = (d.items || []).map(it => it[lang] || '').filter(x => x.trim());
   const empty = !title && !items.length;
-  return `<div style="border:1px solid #E9ECEF;border-radius:8px;background:#F8F9FA;padding:22px 24px${d.on===false?';opacity:.45':''}">
+  return `<div style="border-radius:10px;background:#EEFBF7;padding:20px 22px 8px${d.on===false?';opacity:.45':''}">
     ${empty ? `<p style="margin:0;color:#8B95A1;font-size:13px">이 언어(${PDD_LN[lang]})에는 아직 문구가 없습니다 — 사이트에서는 섹션이 표시되지 않습니다</p>` : ''}
     ${title ? `<h2 style="font-size:18px;font-weight:700;letter-spacing:-.02em;margin:0 0 ${items.length?14:0}px;color:#191F28">${esc(title)}</h2>` : ''}
-    ${items.length ? `<ul style="list-style:none;margin:0;padding:0;display:grid;gap:9px">${items.map(x => `<li style="display:flex;gap:9px;align-items:flex-start;font-size:15px;line-height:1.65;color:#495057"><span style="flex:none">✅</span><span>${esc(x)}</span></li>`).join('')}</ul>` : ''}
+    ${items.length ? `<ul style="list-style:none;margin:0;padding:0">${items.map(x => `<li style="display:flex;gap:10px;align-items:flex-start;font-size:15px;line-height:1.65;color:#37424E;padding:9px 0;border-bottom:1px solid rgba(19,165,131,.16)"><span style="flex:none;color:#13A583;font-weight:800">✓</span><span>${esc(x)}</span></li>`).join('')}</ul>` : ''}
   </div>`;
 }
 
