@@ -10,7 +10,7 @@
 <meta property="og:description" content="Đăng link lên TikTok, Facebook, Zalo. Nhận hoa hồng cho mỗi khách hàng được duyệt. Không cần vốn.">
 <meta property="og:image" content="https://makenov.com/assets/img/og.png">
 <link rel="stylesheet" href="../assets/css/style.css?v=20260909b">
-<link rel="stylesheet" href="affiliate.css?v=20260910d">
+<link rel="stylesheet" href="affiliate.css?v=20260910e">
 <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
 </head>
 <body class="aff-body">
@@ -26,7 +26,13 @@
           <p class="kick" data-i18n="lp_kick"></p>
           <h1 data-i18n="lp_h1"></h1>
           <p data-i18n="lp_p"></p>
+          <ol class="lp-flow">
+            <li><b>1</b><span data-i18n="lp_f1"></span><small data-i18n="lp_f1s"></small></li>
+            <li><b>2</b><span data-i18n="lp_f2"></span><small data-i18n="lp_f2s"></small></li>
+            <li><b>3</b><span data-i18n="lp_f3"></span><small data-i18n="lp_f3s"></small></li>
+          </ol>
           <div class="cta" id="hero-cta"></div>
+          <p class="lp-proof" id="hero-proof" hidden></p>
         </div>
         <div class="visual">
           <div class="hero-tiles" aria-hidden="true">
@@ -101,9 +107,9 @@
   </div>
 </div>
 <script src="../assets/js/config.js?v=20260817b"></script>
-<script src="aff-i18n.js?v=20260910d"></script>
-<script src="aff-api.js?v=20260910d"></script>
-<script src="aff.js?v=20260910d"></script>
+<script src="aff-i18n.js?v=20260910e"></script>
+<script src="aff-api.js?v=20260910e"></script>
+<script src="aff.js?v=20260910e"></script>
 <script>
 affBoot('home', { titleKey:'lp_kick' }, async () => {
   const m = AffApi.session();
@@ -120,6 +126,9 @@ affBoot('home', { titleKey:'lp_kick' }, async () => {
     <div class="lp-kpi"><div class="v">${hi ? vnd(hi) : '—'}</div><div class="lb">${t('lp_k2')}</div></div>
     <div class="lp-kpi"><div class="v">${avgRate == null ? '—' : avgRate + '%'}</div><div class="lb">${t('lp_k3')}</div></div>
     <div class="lp-kpi"><div class="v" style="font-size:18px;padding-top:4px">${t('lp_k4v')}</div><div class="lb">${t('lp_k4')}</div></div>`;
+
+  const top = rk.marketers && rk.marketers[0];
+  if(top && top.vnd){ const pr = document.getElementById('hero-proof'); pr.innerHTML = t('lp_proof', { vnd:vnd(top.vnd), n:top.leads || 0 }); pr.hidden = false; }
 
   const feat = (all.filter(c => c.featured).length ? all.filter(c => c.featured) : all).slice(0, 3);
   document.getElementById('featured').innerHTML = feat.length ? feat.map(campaignCard).join('') : `<div class="aff-empty" style="grid-column:1/-1">${t('empty_list')}</div>`;

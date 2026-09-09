@@ -522,3 +522,15 @@ body.aff-body{background:#fff}
 @media(prefers-reduced-motion:reduce){.hero-tiles .tile{animation:none}}
 @media(max-width:1100px){.lp-hero .visual{max-width:none}}
 @media(max-width:640px){.hero-tiles{grid-template-columns:repeat(2,96px);gap:18px 22px}.hero-tiles .tile{width:96px;height:96px;border-radius:26px}.hero-tiles .tile .face{inset:7px;border-radius:20px}.hero-tiles .tile svg{width:44px;height:44px}.hero-tiles .tile.t4 svg{width:54px;height:54px}.hero-tiles .t2,.hero-tiles .t4{margin-top:24px}}
+
+/* 히어로 3단계 흐름 칩 + 이달 1위 한 줄 */
+.lp-flow{list-style:none;margin:0 0 22px;padding:0;display:flex;flex-direction:column;gap:8px}
+.lp-flow li{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:var(--aff-ink);background:#fff;border:1px solid var(--aff-line);border-radius:12px;padding:9px 12px;max-width:520px}
+.lp-flow li b{flex:none;width:22px;height:22px;border-radius:50%;background:var(--aff-mint);color:#fff;font-size:12px;font-weight:800;display:grid;place-items:center}
+.lp-flow li small{margin-left:auto;font-size:12px;font-weight:600;color:var(--aff-mint-dark);white-space:nowrap;padding-left:10px}
+.lp-flow li:last-child small{color:var(--aff-ink);background:#EEFBF7;border-radius:999px;padding:3px 9px}
+.lp-hero p{margin-bottom:16px}
+.lp-proof{margin:14px 0 0;font-size:13px;color:var(--aff-sub);display:flex;align-items:center;gap:8px}
+.lp-proof::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--aff-mint);flex:none}
+.lp-proof b{color:var(--aff-ink);font-weight:800}
+@media(max-width:640px){.lp-flow li{font-size:13px;padding:8px 10px}.lp-flow li small{display:none}.lp-flow li:last-child small{display:inline-block}}
