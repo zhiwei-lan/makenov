@@ -106,7 +106,8 @@
 @media(max-width:640px){
   .aff-hero{padding:30px 20px;margin:16px 0 40px}
   .aff-hero h1{font-size:26px}
-  .aff-stats,.aff-stats.three{grid-template-columns:1fr 1fr;gap:10px}
+  .aff-stats{grid-template-columns:1fr 1fr;gap:10px}
+  .aff-stats.three{grid-template-columns:1fr;gap:10px}
   .aff-stat{padding:16px}
   .aff-stat .v{font-size:22px}
   .aff-mats{grid-template-columns:1fr 1fr}
@@ -126,4 +127,65 @@
   .mk-header .mk-head-top{height:60px;gap:12px}
   .mk-header .mk-head-right > .btn{display:inline-flex;height:34px;padding:0 12px;font-size:13px}
   .mk-header .mk-head-right{gap:6px}
+}
+
+/* ===== 랜딩 v2 (2026-09-09) — 채널·계산기·게시글 샘플·마지막 CTA ===== */
+.aff-kick{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#13A583;margin:0 0 12px}
+.aff-hero h1{font-size:38px}
+.aff-hero p b{color:#13A583;font-weight:800}
+.aff-hero-note{font-size:13px;color:#6B7684;margin-top:14px}
+
+.aff-channels{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.aff-channels .ch{border:1px solid var(--mk-line);border-radius:12px;padding:22px 22px 20px;background:#fff}
+.aff-channels .lg{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.02em;color:#fff;border-radius:6px;padding:5px 9px;margin-bottom:14px}
+.aff-channels .lg.tiktok{background:#111}
+.aff-channels .lg.fb{background:#1877F2}
+.aff-channels .lg.zalo{background:#0068FF}
+.aff-channels .lg.yt{background:#E62117}
+.aff-channels h3{font-size:16px;font-weight:700;margin:0 0 6px}
+.aff-channels p{font-size:14px;line-height:1.65;color:#4E5968;margin:0}
+
+.aff-calc{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:40px;align-items:center;background:#191F28;color:#fff;border-radius:14px;padding:44px 48px}
+.aff-calc h2{font-size:26px;font-weight:800;letter-spacing:-.02em;margin:0 0 8px;color:#fff}
+.aff-calc > div > p{font-size:14px;color:rgba(255,255,255,.65);margin:0 0 26px}
+.aff-calc .calc-row{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:rgba(255,255,255,.8);margin:18px 0 8px}
+.aff-calc .calc-row b{font-size:20px;font-weight:800;color:#27CAA1}
+.aff-calc select{background:#2A313C;color:#fff;border:1px solid rgba(255,255,255,.15);border-radius:6px;padding:8px 10px;font-size:14px}
+.aff-calc input[type=range]{width:100%;accent-color:#27CAA1;margin:4px 0 6px}
+.aff-calc .calc-out{background:#fff;color:#191F28;border-radius:12px;padding:30px 30px 28px;text-align:center}
+.aff-calc .calc-out .lb{font-size:13px;color:#8B95A1;margin-bottom:6px}
+.aff-calc .calc-out .v{font-size:40px;font-weight:800;letter-spacing:-.03em;color:#13A583;line-height:1.1}
+.aff-calc .calc-out .lb2{font-size:14px;color:#4E5968;margin:10px 0 22px}
+.aff-calc .calc-out .btn{width:100%}
+
+.aff-sample{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:36px;align-items:center}
+.aff-sample .post{border:1px solid var(--mk-line);border-radius:12px;background:#fff;overflow:hidden;box-shadow:0 8px 30px rgba(25,31,40,.06)}
+.aff-sample .ph{display:flex;align-items:center;gap:10px;padding:14px 16px 10px}
+.aff-sample .ph .av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#27CAA1,#13A583)}
+.aff-sample .ph b{display:block;font-size:14px}
+.aff-sample .ph span{font-size:12px;color:#8B95A1}
+.aff-sample .pt{padding:0 16px 12px;font-size:14px;line-height:1.7;color:#191F28;white-space:pre-line}
+.aff-sample .pt a{color:#1877F2;word-break:break-all}
+.aff-sample img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:var(--mk-bg-soft)}
+.aff-sample .pf{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 16px;font-size:12px;color:#8B95A1;border-top:1px solid var(--mk-line)}
+.aff-sample .side h3{font-size:22px;font-weight:800;letter-spacing:-.02em;margin:0 0 12px}
+.aff-sample .side p{font-size:15px;line-height:1.75;color:#4E5968;margin:0 0 20px}
+.aff-stat.step code{font-size:12px;background:var(--mk-bg-soft);padding:2px 6px;border-radius:4px;color:#13A583}
+
+.aff-final{margin:20px 0 40px;padding:56px 32px;border-radius:14px;background:#EEFBF7;text-align:center}
+.aff-final h2{font-size:28px;font-weight:800;letter-spacing:-.02em;margin:0 0 8px}
+.aff-final p{font-size:15px;color:#4E5968;margin:0 0 22px}
+.aff-final .cta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+
+@media(max-width:960px){
+  .aff-channels{grid-template-columns:1fr 1fr}
+  .aff-calc{grid-template-columns:1fr;padding:32px 24px;gap:26px}
+  .aff-sample{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  .aff-hero h1{font-size:28px}
+  .aff-channels{grid-template-columns:1fr}
+  .aff-calc .calc-out .v{font-size:32px}
+  .aff-final{padding:36px 20px}
+  .aff-final h2{font-size:22px}
 }
