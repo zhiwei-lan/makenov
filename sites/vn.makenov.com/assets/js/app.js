@@ -726,12 +726,25 @@ function mkAffRef(){
   if(Date.now() - (a.ts || 0) > (a.days || MK_AFF_DAYS) * 86400000){ try{ localStorage.removeItem('mk_aff'); }catch(e){} return null; }
   return a;
 }
+/* 코드를 기억하는 동안은 주소창에도 ?ref= 를 다시 붙인다 — 사람이 보기에 "링크가 살아 있고",
+   그 주소를 복사해 넘겨도 코드가 따라간다. 새로고침 없이 주소만 바꾼다(replaceState). */
+function mkAffDecorateUrl(a){
+  try{
+    if(!a || !a.code || /\/admin\//.test(location.pathname)) return;
+    const u = new URL(location.href);
+    if(u.searchParams.get('ref') === a.code) return;
+    u.searchParams.set('ref', a.code);
+    if(a.ch) u.searchParams.set('ch', a.ch);
+    history.replaceState(history.state, '', u.toString());
+  }catch(e){}
+}
 function mkAffCapture(){
   const q = new URLSearchParams(location.search);
   const code = (q.get('ref') || '').toUpperCase();
   if(!/^[A-Z0-9]{4,8}$/.test(code)){
     /* ref 없이 왔어도 쿠키에 있으면 localStorage 로 옮겨 둔다(서브도메인 이동) */
     const c = mkAffCookie(); if(c && c.code){ try{ if(!localStorage.getItem('mk_aff')) localStorage.setItem('mk_aff', JSON.stringify(c)); }catch(e){} }
+    mkAffDecorateUrl(mkAffRef());
     return;
   }
   const ch = (q.get('ch') || '').toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 16);
