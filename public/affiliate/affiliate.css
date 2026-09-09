@@ -466,3 +466,7 @@ body.aff-body{background:#fff}
 .r2-pen div b{display:block;font-size:12px;color:var(--aff-sub);margin-bottom:4px;font-weight:700}
 .r2-pen div:last-child{border-color:#F5C6C6;background:#FFF7F7}
 @media(max-width:860px){ .g2-tl{padding-left:40px} .g2-step .n{left:-40px;width:30px;height:30px;font-size:13px} .g2-tl::before{left:15px} .g2-ch{grid-template-columns:1fr} .g2-ck{grid-template-columns:1fr} .r2-pen{grid-template-columns:1fr} }
+
+/* 규정 페이지 2단 박스 높이 맞춤 */
+.aff-two.eq{align-items:stretch}
+.aff-two.eq .aff-box{height:100%;margin-bottom:0;box-sizing:border-box}
