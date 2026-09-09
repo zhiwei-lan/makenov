@@ -658,6 +658,36 @@ ${PAGE_COL}
     const def = ok.includes('vi') ? 'vi' : ok[0];
     return `  <url>\n    <loc>${pageUrl(relVi, lang)}</loc>\n    <lastmod>${lastmod}</lastmod>\n${ok.map(l => `      <xhtml:link rel="alternate" hreflang="${l}" href="${pageUrl(relVi, l)}"/>`).join('\n')}\n      <xhtml:link rel="alternate" hreflang="x-default" href="${pageUrl(relVi, def)}"/>\n  </url>`;
   };
+  /* ── 홈 칼럼 슬라이드(index.html 3벌) — DB 최신 8편 ──────────────────────
+     랜딩 본문은 정적 HTML 이라 관리자에서 칼럼을 올려도 홈의 "Cẩm nang" 슬라이드는
+     8월 카드 7장에 멈춰 있었다(2026-09-09). 여기서 최신순 8편으로 갈아 끼운다.
+     카드 마크업·스타일은 원본 그대로, .mkcol-marq 안쪽 목록만 교체(멱등).
+     ko/en 판은 번역이 없으면 T() 폴백(원문)으로 보여주고 그 언어 폴더의 사본으로 잇는다. */
+  try {
+    const LAND = { vi:'index.html', ko:'ko/index.html', en:'en/index.html' };
+    const CHIP = { vi:'Hướng dẫn', ko:'가이드', en:'Guide' }, KIND = { vi:'Bài viết', ko:'칼럼', en:'Article' };
+    const latest = columns.slice()
+      .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')) || String(b.id).localeCompare(String(a.id), undefined, { numeric:true }))
+      .slice(0, 8);
+    const card = (c, lang) => {
+      const title = T(c.title, lang), chip = T(c.cat, lang) || CHIP[lang];
+      const href = (lang === 'vi' ? '' : lang + '/') + `columns/${colFile(c)}.html`;
+      return `<a href="${href}" style="flex:0 0 620px;max-width:86vw;margin-right:20px;background:#fff;border:1px solid #E7F0EC;border-radius:18px;overflow:hidden;text-decoration:none;display:block"><img src="${esc(c.img)}" alt="${esc(KIND[lang] + ': ' + title)}" loading="lazy" decoding="async" style="width:100%;height:230px;object-fit:cover;display:block"><span style="display:block;padding:22px 26px 26px"><span style="display:inline-block;background:#EAF7F2;color:#1E8F73;font:600 13px Pretendard,sans-serif;padding:5px 12px;border-radius:999px">${esc(chip)}</span><span style="display:block;font:700 20px/1.5 Pretendard,sans-serif;color:#1a1a1a;margin-top:12px">${esc(title)}</span><span style="display:block;margin-top:14px;color:#8CA09A;font:500 13px Pretendard,sans-serif">${esc(c.date)}</span></span></a>`;
+    };
+    LANGS.forEach(lang => {
+      const rel = LAND[lang];
+      if(!fs.existsSync(path.join(PUB, rel))) return;
+      let src = read(rel);
+      const cards = latest.map(c => card(c, lang)).join('');
+      const inner = `<!-- mk:landing-cols (bake-columns.js가 관리 — 직접 수정 금지) --><div style="display:flex">${cards}</div><div style="display:flex" aria-hidden="true">${cards}</div><!-- /mk:landing-cols -->`;
+      const rx = /(<div class="mkcol-marq"[^>]*>)[\s\S]*?(?=<\/div><\/div><\/div><style>@keyframes mkcolroll)/;
+      if(!rx.test(src)){ console.log(`⚠ ${rel}: 홈 칼럼 슬라이드(.mkcol-marq)를 못 찾음 — 건너뜀`); return; }
+      const next = src.replace(rx, (m, open) => open + inner);
+      if(next !== src) write(rel, next);
+      console.log(`${rel} — 홈 칼럼 슬라이드 ${latest.length}편 (최신 ${latest[0] ? latest[0].date : '-'})${next === src ? ' · 변경 없음' : ''}`);
+    });
+  } catch (e) { console.log('⚠ 홈 칼럼 슬라이드 갱신 실패:', e.message); }
+
   LANGS.forEach(lang => {
     const file = `sitemaps/${SMFILE[lang]}.xml`;
     let sm = read(file);

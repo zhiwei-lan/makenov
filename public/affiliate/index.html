@@ -10,7 +10,7 @@
 <meta property="og:description" content="Đăng link lên TikTok, Facebook, Zalo. Nhận hoa hồng cho mỗi khách hàng được duyệt. Không cần vốn.">
 <meta property="og:image" content="https://makenov.com/assets/img/og.png">
 <link rel="stylesheet" href="../assets/css/style.css?v=20260909b">
-<link rel="stylesheet" href="affiliate.css?v=20260909y">
+<link rel="stylesheet" href="affiliate.css?v=20260909z">
 <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
 </head>
 <body class="aff-body">
@@ -28,7 +28,13 @@
           <p data-i18n="lp_p"></p>
           <div class="cta" id="hero-cta"></div>
         </div>
-        <div class="visual"><div class="pill" id="hero-pill"></div><div class="aff-sample"><div class="post" id="post-card"></div></div></div>
+        <div class="visual"><div class="pill" id="hero-pill"></div>
+          <div class="hero-tiles" aria-hidden="true">
+            <div class="tile t1"><span class="face"><svg viewBox="0 0 24 24"><path fill="#1877F2" d="M13.6 21v-7.3h2.5l.4-2.9h-2.9V9c0-.8.3-1.4 1.4-1.4h1.6V5.1c-.3 0-1.2-.1-2.3-.1-2.3 0-3.9 1.4-3.9 4v2.1H7.9v2.9h2.5V21h3.2z"/></svg></span></div>
+            <div class="tile t2"><span class="face"><svg viewBox="0 0 24 24"><path fill="#161823" d="M13 2h3.1c.2 2 1.5 3.7 3.4 4.2v3.1c-1.2 0-2.4-.4-3.4-1v6.5c0 3.5-2.9 6.2-6.3 6.2S3.5 18.3 3.5 14.8s2.9-6.2 6.3-6.2c.3 0 .6 0 .9.1V12c-.3-.1-.6-.2-.9-.2-1.7 0-3.1 1.4-3.1 3s1.4 3 3.1 3 3.2-1.4 3.2-3V2z"/></svg></span></div>
+            <div class="tile t3"><span class="face"><svg viewBox="0 0 24 24"><path fill="none" stroke="#161823" stroke-width="2.1" stroke-linecap="round" d="M15.6 9.6C15.1 8.3 13.9 7.5 12.3 7.5c-2.4 0-4 1.7-4 4.5s1.6 4.5 4 4.5c1.9 0 3.5-1.1 3.5-2.7 0-1.5-1.3-2.4-3.3-2.4-1.4 0-2.7.4-3.6 1.1"/><path fill="none" stroke="#161823" stroke-width="2.1" stroke-linecap="round" d="M12 3.2c5.4 0 8.2 3.5 8.2 8.8S17.4 20.8 12 20.8 3.8 17.3 3.8 12 6.6 3.2 12 3.2z"/></svg></span></div>
+            <div class="tile t4"><span class="face"><svg viewBox="0 0 48 24"><text x="24" y="17.5" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="900" font-size="15" fill="#0068FF" letter-spacing="-.5">Zalo</text></svg></span></div>
+          </div></div>
       </section>
 
       <!-- 2. 숫자 4개 -->
@@ -95,9 +101,9 @@
   </div>
 </div>
 <script src="../assets/js/config.js?v=20260817b"></script>
-<script src="aff-i18n.js?v=20260909y"></script>
-<script src="aff-api.js?v=20260909y"></script>
-<script src="aff.js?v=20260909y"></script>
+<script src="aff-i18n.js?v=20260909z"></script>
+<script src="aff-api.js?v=20260909z"></script>
+<script src="aff.js?v=20260909z"></script>
 <script>
 affBoot('home', { titleKey:'lp_kick' }, async () => {
   const m = AffApi.session();
@@ -119,14 +125,6 @@ affBoot('home', { titleKey:'lp_kick' }, async () => {
   const feat = (all.filter(c => c.featured).length ? all.filter(c => c.featured) : all).slice(0, 3);
   document.getElementById('featured').innerHTML = feat.length ? feat.map(campaignCard).join('') : `<div class="aff-empty" style="grid-column:1/-1">${t('empty_list')}</div>`;
 
-  if(all.length){
-    const c = feat[0] || all[0], link = affLink(m ? m.code : 'XXXXXX', c.product_id), text = `${c.copy_text}\n\n${t('view_price')} ${link}`;
-    /* 히어로 오른쪽은 장식용 게시글 카드 — 버튼·링크 없이 모양만 */
-    document.getElementById('post-card').innerHTML = `
-      <div class="ph"><span class="av"></span><div><b>${esc(t('your_name'))}</b><span>${t('just_now')}</span></div></div>
-      <div class="pt">${esc(c.headline || cName(c))}</div>
-      <img src="${esc(c.img)}" alt="${esc(cName(c))}" loading="lazy">`;
-  } else { document.querySelector('.lp-hero .visual').style.display = 'none'; }
 
   const box = (title, rows) => `<div class="box"><h3>${title}</h3>${rows.length ? `<ol>${rows.join('')}</ol>` : `<p class="aff-note">${t('no_data')}</p>`}</div>`;
   document.getElementById('rank-boxes').innerHTML =
