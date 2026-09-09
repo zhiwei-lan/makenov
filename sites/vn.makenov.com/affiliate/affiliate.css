@@ -488,3 +488,9 @@ body.aff-body{background:#fff}
 .lp-hero .visual .post .pf span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .lp-hero .visual .post .pf .btn{flex:none}
 .lp-hero .visual .pill{right:-6px;top:-12px}
+
+.lp-hero .visual .post .ph b,.lp-hero .visual .post .pt{color:var(--aff-ink)}
+.lp-hero .visual .post .ph span{color:var(--aff-sub)}
+.lp-hero .visual .post .pt{-webkit-line-clamp:3;padding-bottom:6px}
+.lp-hero .visual .post .pl{padding:0 16px 12px;font-size:13px;color:var(--aff-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lp-hero .visual .post .pl a{color:#1877F2}
