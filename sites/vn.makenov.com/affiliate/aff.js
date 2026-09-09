@@ -120,13 +120,18 @@ function affBoot(active, opts, pageInit){
   });
 }
 
-/* ---------- 캠페인 행 (홈) — 썸네일 | 카테고리·브랜드 / 제품명 / 한 줄 | 단가·잔여 ---------- */
+/* ---------- 캠페인 행 (목록) — 썸네일 | 카테고리·브랜드 / 제품명 / 칩(승인률·남은·승인/대기) | 단가 카드 + 버튼 ---------- */
 function campaignRow(c){
   const left = c.remaining == null ? t('unlimited') : t('left', { n: c.remaining });
+  const hl = (AFF_LANG === 'vi' && c.headline) ? `<span class="hl">${esc(c.headline)}</span>` : '';
   return `<a class="aff-row" href="campaign.html?id=${esc(c.product_id)}">
-    <span class="th"><img src="${esc(c.img)}" alt="${esc(c.name)}" loading="lazy"></span>
-    <span class="bd"><span class="meta"><b>${esc(catName(c.cat))}</b><i>|</i>${esc(c.brand)}</span><span class="nm">${esc(cName(c))}</span><span class="hl">${esc(c.headline || '')}</span></span>
-    <span class="rt"><span class="cpa">${vnd(c.cpa_vnd)}<small>${t('per_lead')}</small></span><span class="left">${rateChip(c.approval_rate)} · ${left}</span><span class="go">${t('detail')} →</span></span></a>`;
+    <span class="th"><img src="${esc(c.img)}" alt="${esc(cName(c))}" loading="lazy"></span>
+    <span class="bd">
+      <span class="meta"><b>${esc(catName(c.cat))}</b><i>·</i>${esc(c.brand)}</span>
+      <span class="nm">${esc(cName(c))}</span>${hl}
+      <span class="stats">${rateChip(c.approval_rate)}<span class="pill">${esc(left)}</span><span class="pill muted">${t('info_stat')} ${c.approved} · ${c.pending}</span></span>
+    </span>
+    <span class="rt"><span class="cpa">${vnd(c.cpa_vnd)}</span><span class="lb">${t('info_cpa')}</span><span class="btn btn-primary btn-sm">${t('detail')} →</span></span></a>`;
 }
 
 /* ---------- 캠페인 카드 (랜딩 그리드) ---------- */
