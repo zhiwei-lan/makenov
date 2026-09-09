@@ -80,6 +80,7 @@ ko: {
   wd_note:'{bank} {acc} ({holder}) 계좌로 송금. 최소 {min}, 매주 금요일 송금.', wd_need_bank:'출금하려면 먼저 <a href="#account" onclick="showTab(\'account\');return false">계정</a> 탭에서 계좌를 등록하세요.',
   wd_hist:'출금 내역', wd_paid:'송금 {d}', th_amt:'금액', no_wd:'출금 신청 내역이 없습니다', wd_sent:'출금을 신청했습니다',
   acc_info:'내 정보', save:'저장', saved:'저장했습니다', pw_change:'비밀번호 변경', pw_old:'현재 비밀번호', pw_new:'새 비밀번호 (8자 이상)', pw_changed:'비밀번호를 바꿨습니다',
+  bank_other:'기타 (직접 입력)', bank_other_ph:'은행 이름',
   bank_h:'수익 받을 계좌', bank_name:'은행', bank_acc:'계좌번호', bank_holder:'예금주 (영문 대문자)', bank_save:'계좌 저장', bank_saved:'계좌를 저장했습니다', bank_note:'수익은 본인 명의 계좌로만 송금합니다.',
   st_pending_b:'승인 대기', st_approved_b:'승인', st_rejected_b:'반려', st_requested_b:'처리 중', st_paid_b:'송금 완료',
   /* v5: 시작 가이드(새 내용) · 홍보 규정 페이지 */
@@ -183,6 +184,7 @@ vi: {
   wd_note:'Chuyển vào {bank} {acc} ({holder}). Tối thiểu {min}, chuyển khoản thứ Sáu hằng tuần.', wd_need_bank:'Bạn cần thêm tài khoản ngân hàng trong tab <a href="#account" onclick="showTab(\'account\');return false">Tài khoản</a> trước khi rút.',
   wd_hist:'Lịch sử rút tiền', wd_paid:'Đã chuyển {d}', th_amt:'Số tiền', no_wd:'Chưa có yêu cầu rút tiền.', wd_sent:'Đã gửi yêu cầu rút tiền',
   acc_info:'Thông tin', save:'Lưu', saved:'Đã lưu', pw_change:'Đổi mật khẩu', pw_old:'Mật khẩu hiện tại', pw_new:'Mật khẩu mới (tối thiểu 8 ký tự)', pw_changed:'Đã đổi mật khẩu',
+  bank_other:'Ngân hàng khác (tự nhập)', bank_other_ph:'Tên ngân hàng',
   bank_h:'Tài khoản ngân hàng nhận hoa hồng', bank_name:'Ngân hàng', bank_acc:'Số tài khoản', bank_holder:'Chủ tài khoản (viết không dấu)', bank_save:'Lưu tài khoản', bank_saved:'Đã lưu tài khoản ngân hàng', bank_note:'Hoa hồng chỉ chuyển vào tài khoản đứng tên bạn.',
   st_pending_b:'Chờ duyệt', st_approved_b:'Đã duyệt', st_rejected_b:'Từ chối', st_requested_b:'Đang xử lý', st_paid_b:'Đã chuyển',
   gd_h1:'Hướng dẫn bắt đầu', gd_p:'Từ đăng ký đến lần rút tiền đầu tiên, làm theo thứ tự là được.',

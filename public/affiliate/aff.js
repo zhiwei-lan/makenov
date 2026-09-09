@@ -147,3 +147,19 @@ function channelRow(id, u, req){
 }
 function channelAdd(id){ const box = document.getElementById(id); if(box.querySelectorAll('.row').length >= 6) return; box.insertAdjacentHTML('beforeend', channelRow(id, '', false)); box.lastElementChild.querySelector('input').focus(); }
 function channelsRead(id){ return [...document.querySelectorAll('#' + id + ' input')].map(i => i.value.trim()).filter(Boolean); }
+
+/* ---------- 베트남 은행 목록 (출금 계좌) — 표시명, 저장도 이 이름 그대로 ---------- */
+const AFF_BANKS = [
+  'Vietcombank', 'VietinBank', 'BIDV', 'Agribank', 'Techcombank', 'MB Bank', 'ACB', 'VPBank', 'Sacombank', 'TPBank',
+  'HDBank', 'VIB', 'SHB', 'OCB', 'MSB', 'SeABank', 'LPBank', 'Eximbank', 'Nam A Bank', 'Bac A Bank',
+  'PVcomBank', 'VietABank', 'ABBANK', 'KienlongBank', 'NCB', 'SCB', 'BaoViet Bank', 'Saigonbank', 'BVBank', 'DongA Bank',
+  'PGBank', 'CBBank', 'OceanBank', 'GPBank', 'Shinhan Bank', 'Woori Bank', 'HSBC', 'Standard Chartered', 'UOB', 'Public Bank', 'CIMB', 'Hong Leong Bank',
+];
+function bankSelect(id, cur){
+  const known = AFF_BANKS.includes(cur || '');
+  const other = cur && !known;
+  return `<select id="${id}" onchange="bankToggle('${id}')"><option value="">—</option>${AFF_BANKS.map(b => `<option value="${esc(b)}" ${cur === b ? 'selected' : ''}>${esc(b)}</option>`).join('')}<option value="__other" ${other ? 'selected' : ''}>${t('bank_other')}</option></select>
+    <input id="${id}-other" value="${other ? esc(cur) : ''}" placeholder="${esc(t('bank_other_ph'))}" style="margin-top:8px;${other ? '' : 'display:none'}">`;
+}
+function bankToggle(id){ const sel = document.getElementById(id), o = document.getElementById(id + '-other'); o.style.display = sel.value === '__other' ? '' : 'none'; if(sel.value === '__other') o.focus(); }
+function bankValue(id){ const sel = document.getElementById(id); return sel.value === '__other' ? document.getElementById(id + '-other').value.trim() : sel.value; }
