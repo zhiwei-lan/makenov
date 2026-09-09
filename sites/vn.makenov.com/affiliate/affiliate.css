@@ -496,3 +496,6 @@ body.aff-body{background:#fff}
 .lp-hero .visual .post .pl a{color:#1877F2}
 
 .lp-hero .visual .post-label{font-size:12px;font-weight:700;color:var(--aff-sub);letter-spacing:.02em;margin:0 0 8px 2px}
+
+.lp-hero .visual .post img{border-radius:0 0 14px 14px;max-height:230px;aspect-ratio:4/3}
+.lp-hero .visual .post .pt{-webkit-line-clamp:2;padding-bottom:12px;font-size:14px}
