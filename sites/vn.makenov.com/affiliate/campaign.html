@@ -6,7 +6,7 @@
 <title>Chia sẻ | Cộng tác viên MAKENOV</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="../assets/css/style.css?v=20260909b">
-<link rel="stylesheet" href="affiliate.css?v=20260909q">
+<link rel="stylesheet" href="affiliate.css?v=20260909r">
 <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
 </head>
 <body class="aff-body">
@@ -19,9 +19,9 @@
   </div>
 </div>
 <script src="../assets/js/config.js?v=20260817b"></script>
-<script src="aff-i18n.js?v=20260909q"></script>
-<script src="aff-api.js?v=20260909q"></script>
-<script src="aff.js?v=20260909q"></script>
+<script src="aff-i18n.js?v=20260909r"></script>
+<script src="aff-api.js?v=20260909r"></script>
+<script src="aff.js?v=20260909r"></script>
 <script>
 /* 텐핑 '소문내기' 구조: 요약 카드 → 공유 → 큰 CTA → [이미지·예시 글 | 주의사항] */
 let C = null;
@@ -50,7 +50,7 @@ affBoot('home', { titleKey:'cd_title', back:'index.html' }, async () => {
       <div class="meta"><b>${esc(catName(C.cat))}</b><i>|</i>${esc(C.brand)} <span style="margin-left:8px">${rateChip(C.approval_rate)}</span></div>
       <h1>${esc(cName(C))}</h1>
       <p>${esc(C.headline || C.copy_text)}</p>
-      <div class="bar"><a class="home" href="index.html">‹ ${t('back_list')}</a>${shareIcons(C.product_id)}<span class="sp"></span><a class="btn btn-ghost btn-sm" href="${AFF_HOST}/products/${esc(C.product_id)}.html" target="_blank" rel="noopener">${t('product_page')} ↗</a></div>
+      <div class="bar"><a class="home" href="campaigns.html">‹ ${t('back_list')}</a><span class="sp"></span><a class="btn btn-ghost btn-sm" href="${AFF_HOST}/products/${esc(C.product_id)}.html" target="_blank" rel="noopener">${t('product_page')} ↗</a></div>
     </div>
   </section>
   <section class="aff-cd-cta">${ctaBlock()}</section>
