@@ -67,25 +67,6 @@
         </div>
       </section>
 
-      <!-- 6. 계산기 -->
-      <section class="aff-sec" id="calc">
-        <div class="aff-calc">
-          <div>
-            <h2 data-i18n="lp_calc"></h2>
-            <p data-i18n="g_calc_p"></p>
-            <label class="calc-row"><span data-i18n="g_calc_n"></span><b id="calc-n">10</b></label>
-            <input type="range" id="calc-range" min="1" max="60" value="10" oninput="calc()">
-            <label class="calc-row"><span data-i18n="g_calc_cpa"></span><select id="calc-cpa" onchange="calc()"><option value="200000" selected>200.000 ₫</option></select></label>
-          </div>
-          <div class="calc-out">
-            <div class="lb" data-i18n="g_month"></div>
-            <div class="v" id="calc-month">2.000.000 ₫</div>
-            <div class="lb2" id="calc-year"></div>
-            <a class="btn btn-primary btn-lg" href="join.html" id="calc-cta" data-i18n="g_start"></a>
-          </div>
-        </div>
-      </section>
-
       <!-- 7. 랭킹 -->
       <section class="aff-sec">
         <div class="aff-sec-head"><h2 data-i18n="lp_rank"></h2><a class="more" href="rank.html" data-i18n="see_all"></a></div>
@@ -118,21 +99,12 @@
 <script src="aff-api.js?v=20260909i"></script>
 <script src="aff.js?v=20260909i"></script>
 <script>
-function calc(){
-  const n = Number(document.getElementById('calc-range').value), cpa = Number(document.getElementById('calc-cpa').value);
-  document.getElementById('calc-n').textContent = n;
-  document.getElementById('calc-month').textContent = vnd(n * cpa);
-  document.getElementById('calc-year').textContent = t('g_year', { v: vnd(n * cpa * 12) });
-}
 affBoot('home', { titleKey:'lp_kick' }, async () => {
   const m = AffApi.session();
   const ctas = m ? `<a class="btn btn-primary btn-lg" href="my.html">${t('lp_login_cta')}</a><a class="btn btn-ghost btn-lg" href="campaigns.html">${t('lp_cta2')}</a>`
                  : `<a class="btn btn-primary btn-lg" href="join.html">${t('lp_cta')}</a><a class="btn btn-ghost btn-lg" href="campaigns.html">${t('lp_cta2')}</a>`;
   document.getElementById('hero-cta').innerHTML = ctas; document.getElementById('final-cta').innerHTML = ctas;
-  if(m) document.getElementById('calc-cta').href = 'campaigns.html';
   document.getElementById('rate-lb-a').textContent = t('lp_rate_1') + ' 82%'; document.getElementById('rate-lb-r').textContent = t('lp_rate_2') + ' 18%';
-  calc();
-
   const [all, rk] = await Promise.all([AffApi.campaigns({}), AffApi.rankings().catch(() => ({ marketers:[], campaigns:[], approval:[] }))]);
   const cpas = all.map(c => c.cpa_vnd), hi = cpas.length ? Math.max(...cpas) : 0;
   const rated = all.filter(c => c.approval_rate != null);
@@ -148,8 +120,6 @@ affBoot('home', { titleKey:'lp_kick' }, async () => {
   document.getElementById('featured').innerHTML = feat.length ? feat.map(campaignCard).join('') : `<div class="aff-empty" style="grid-column:1/-1">${t('empty_list')}</div>`;
 
   if(all.length){
-    const sel = document.getElementById('calc-cpa'), uniq = [...new Set(cpas)].sort((a, b) => a - b);
-    sel.innerHTML = uniq.map(v => `<option value="${v}">${vnd(v)}</option>`).join(''); sel.value = String(uniq[Math.floor(uniq.length / 2)]); calc();
     const c = feat[0] || all[0], link = affLink(m ? m.code : 'XXXXXX', c.product_id), text = `${c.copy_text}\n\n${t('view_price')} ${link}`;
     document.getElementById('post-card').innerHTML = `
       <div class="ph"><span class="av"></span><div><b>${esc(m ? m.name : t('your_name'))}</b><span>${t('just_now')}</span></div></div>
