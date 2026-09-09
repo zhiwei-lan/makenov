@@ -468,10 +468,14 @@ body.aff-body{background:#fff}
 .r2-table tr.g1 td:first-child{color:var(--aff-mint-dark)}
 .r2-table tr.g2 td:first-child{color:#B76E00}
 .r2-table tr.g3 td:first-child{color:#D9534F}
+/* 위반 시: 번호 배지 | 제목 + 한 줄 (번호가 따로 한 줄 차지하던 레이아웃 수정) */
 .r2-pen{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.r2-pen div{border:1px solid var(--aff-line);border-radius:10px;padding:14px 16px;font-size:13px;line-height:1.6;color:var(--aff-body);background:#fff}
-.r2-pen div b{display:block;font-size:12px;color:var(--aff-sub);margin-bottom:4px;font-weight:700}
-.r2-pen div:last-child{border-color:#F5C6C6;background:#FFF7F7}
+.r2-pen > div{display:grid;grid-template-columns:34px 1fr;column-gap:12px;align-items:start;border:1px solid var(--aff-line);border-radius:12px;padding:16px 18px;background:#fff}
+.r2-pen > div > b{width:34px;height:34px;border-radius:50%;background:var(--aff-bg);color:var(--aff-body);font-size:14px;font-weight:800;display:grid;place-items:center}
+.r2-pen > div > span{font-size:13px;line-height:1.6;color:var(--aff-body)}
+.r2-pen > div > span b{display:block;font-size:14px;font-weight:700;color:var(--aff-ink);margin:6px 0 4px}
+.r2-pen > div:last-child{border-color:#F5C6C6;background:#FFF7F7}
+.r2-pen > div:last-child > b{background:#D9534F;color:#fff}
 @media(max-width:860px){ .g2-tl{padding-left:40px} .g2-step .n{left:-40px;width:30px;height:30px;font-size:13px} .g2-tl::before{left:15px} .g2-ch{grid-template-columns:1fr} .g2-ck{grid-template-columns:1fr} .r2-pen{grid-template-columns:1fr} }
 
 /* 규정 페이지 2단 박스 높이 맞춤 */
