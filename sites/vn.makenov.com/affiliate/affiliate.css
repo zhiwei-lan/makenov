@@ -642,3 +642,9 @@ body.aff-body{background:#fff}
   .ld-faq summary{padding:16px 18px;font-size:15px;gap:14px}
   .ld-faq .a{padding:0 18px 18px 58px}
 }
+
+/* 가이드 4단계 예시 글 (채널 무관 한 개) */
+.g2-ex{margin-top:22px;padding-top:18px;border-top:1px dashed var(--aff-line)}
+.g2-ex .lb{font-size:13px;font-weight:700;color:var(--aff-sub);margin:0 0 10px}
+.aff-sample.one{display:block;max-width:420px}
+.aff-sample.one .post{box-shadow:0 12px 30px -16px rgba(25,31,40,.25)}
