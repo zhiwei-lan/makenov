@@ -86,7 +86,7 @@ async function affRefreshCounts(){
 async function affCampaignsView(){
   const rows = await AffAdmin.products();
   if(affEditPid){ const r = rows.find(x => x.product_id === affEditPid); if(r) return affCampaignForm(r); }
-  return `<p class="note">제품마다 CTV 캠페인을 켜고 리드 단가(VND)·상한을 정합니다. 켠 캠페인만 CTV 사이트에 보입니다. 단가·상한·추천은 표에서 바로 고치고 <b>저장</b>, 소재·문구·키워드·규정은 <b>수정</b>에서.</p>
+  return `<p class="note">따로 등록하는 게 아닙니다. <b>제품 탭에 있는 제품이 자동으로 이 표에 뜨고</b>, 캠페인은 여기서 <b>노출</b>을 켜고 단가(VND)를 넣으면 시작됩니다. 켠 캠페인만 CTV 사이트에 보입니다. 단가·상한·추천은 표에서 바로 고치고 <b>저장</b>, 소재·문구·키워드·규정은 <b>수정</b>에서.</p>
   <div class="tbl-wrap"><table><thead><tr><th style="width:48px"></th><th>제품</th><th style="width:70px">노출</th><th style="width:130px">단가(₫)</th><th style="width:90px">상한</th><th style="width:60px">추천</th><th>승인/대기</th><th style="width:150px"></th></tr></thead><tbody>
   ${rows.map(r => { const c = r.campaign; return `<tr class="row-hover"${c.active ? '' : ' style="opacity:.6"'}><td><img class="thumb-sm" src="${esc(imgSrc(r.img))}" alt=""></td><td><b>${esc(r.name)}</b><div class="sub">${esc(r.brand)} · ${esc(r.product_id)}</div></td>
     <td><input type="checkbox" id="afc-on-${r.product_id}" ${c.active ? 'checked' : ''}></td>
