@@ -69,7 +69,7 @@ window.MK_COPY_BAKED = {
     "vi": "3 ngôn ngữ"
   },
   "ui.ft_desc": {
-    "vi": "Nền tảng toàn cầu kết nối sản phẩm và đối tác mua hàng trên toàn thế giới",
+    "vi": "Nền tảng B2B kết nối nhà cung cấp & nhà phân phối",
     "ko": "세계의 제품과 바이어를 하나로 잇는 글로벌 혁신 플랫폼",
     "en": "A global innovation platform that connects the world’s products and buyers"
   },
@@ -469,7 +469,7 @@ window.MK_COPY_BAKED = {
     "en": "Competitive distribution starts with"
   },
   "landing.pain.h2": {
-    "vi": " bắt đầu từ việc bạn bán sản phẩm nào",
+    "vi": " Bắt đầu từ việc bạn bán sản phẩm nào",
     "ko": "무엇을 파느냐에서 시작됩니다",
     "en": "what you choose to sell"
   },
@@ -512,5 +512,10 @@ window.MK_COPY_BAKED = {
     "vi": "Đã có MAKENOV thay bạn kết nối với các thương hiệu toàn cầu",
     "ko": "메이크노브가 전 세계 브랜드와의 연결을 대신합니다",
     "en": "MAKENOV handles the connection with brands worldwide"
+  },
+  "landing.hero.sub": {
+    "vi": "Xem điều kiện phân phối của những sản phẩm chưa có mặt tại Việt Nam\nvà trao đổi trực tiếp với nhà cung cấp. \nChưa có kinh nghiệm nhập khẩu vẫn bắt đầu được",
+    "ko": "아직 베트남에 들어오지 않은 제품의 유통 조건을 확인하고\n공급사와 직접 상담하세요. 수입 경험이 없어도 시작할 수 있습니다",
+    "en": "Check the trade terms of products that have not entered Vietnam yet\nand talk directly with suppliers. No import experience needed."
   }
 };

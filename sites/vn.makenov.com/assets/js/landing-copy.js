@@ -25,9 +25,10 @@ const LND = {
    "en": "of a global innovative product"
   },
   "sub": {
-   "vi": "Xem điều kiện phân phối của những sản phẩm chưa có mặt tại Việt Nam\nvà trao đổi trực tiếp với nhà cung cấp. Chưa có kinh nghiệm nhập khẩu vẫn bắt đầu được",
+   "vi": "Xem điều kiện phân phối của những sản phẩm chưa có mặt tại Việt Nam\nvà trao đổi trực tiếp với nhà cung cấp. \nChưa có kinh nghiệm nhập khẩu vẫn bắt đầu được",
    "ko": "아직 베트남에 들어오지 않은 제품의 유통 조건을 확인하고\n공급사와 직접 상담하세요. 수입 경험이 없어도 시작할 수 있습니다",
-   "en": "Check the trade terms of products that have not entered Vietnam yet\nand talk directly with suppliers. No import experience needed."
+   "en": "Check the trade terms of products that have not entered Vietnam yet\nand talk directly with suppliers. No import experience needed.",
+   "_br": 1
   },
   "cta1": {
    "vi": "Khám phá sản phẩm",
@@ -158,7 +159,7 @@ const LND = {
    "en": "Competitive distribution starts with"
   },
   "h2": {
-   "vi": " bắt đầu từ việc bạn bán sản phẩm nào",
+   "vi": " Bắt đầu từ việc bạn bán sản phẩm nào",
    "ko": "무엇을 파느냐에서 시작됩니다",
    "en": "what you choose to sell"
   },
