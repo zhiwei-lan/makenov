@@ -107,9 +107,11 @@ function detailHtml(p, lang){
 /* 제품 상세 공통 섹션(유통 파트너 모집) — page-product.js 의 mkPdDistHtml 과 같은 마크업.
    값은 settings(key='site').pdDist, 없으면 data.js 의 MK_SETTINGS 시드. */
 let PD_DIST = null;
-function distHtml(lang){
-  const d = PD_DIST;
-  if(!d || d.on === false) return '';
+function distHtml(lang, p){
+  const pd = p && p.dist && typeof p.dist === 'object' ? p.dist : null;   // 제품별 (null=공통)
+  if(pd && pd.mode === 'off') return '';
+  const d = (pd && pd.mode === 'custom') ? pd : PD_DIST;
+  if(!d || (d.on === false && !(pd && pd.mode === 'custom'))) return '';
   const title = T(d.title, lang);
   const items = (d.items || []).map(it => T(it, lang)).filter(x => String(x).trim());
   if(!title && !items.length) return '';
@@ -158,7 +160,7 @@ ${FAVICON}
   <div class="pd-row">
     <div class="pd-main">
       <div class="pd-gallery"><div class="main"><img src="${p.img}" alt="${esc(name)}"></div></div>
-      ${distHtml(lang)}
+      ${distHtml(lang, p)}
       <div class="pd-sec">
         <h2>${esc(L.detail)}</h2>
         <div class="pd-body">${detailHtml(p, lang)}</div>

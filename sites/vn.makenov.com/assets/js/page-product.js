@@ -53,7 +53,7 @@ function pageInit(){
 
   /* 유통 파트너 모집 — 모든 제품 공통(MK_SETTINGS.pdDist), 관리자 > 제품 탭에서 편집.
      bake-products.js 의 distHtml 과 같은 마크업이어야 하이드레이션 교체가 안 보인다. */
-  const distSec = mkPdDistHtml();
+  const distSec = mkPdDistHtml(p);
 
   /* 대표 영상 — 등록된 제품만 노출 */
   const mainVideo = p.video
@@ -152,9 +152,12 @@ function pdCartLabel(pid){
 
 /* 제품 상세 공통 섹션(유통 파트너 모집) 마크업 — 제목 + ✅ 항목 목록.
    꺼져 있거나(on:false) 현재 언어 문구가 하나도 없으면 아예 그리지 않는다. */
-function mkPdDistHtml(){
-  const d = (typeof MK_SETTINGS !== 'undefined' && MK_SETTINGS.pdDist) || null;
-  if(!d || d.on === false) return '';
+function mkPdDistHtml(p){
+  /* 제품별 설정(p.dist)이 있으면 그것, 없으면 공통(MK_SETTINGS.pdDist) */
+  const pd = p && p.dist;
+  if(pd && pd.mode === 'off') return '';
+  const d = (pd && pd.mode === 'custom') ? pd : ((typeof MK_SETTINGS !== 'undefined' && MK_SETTINGS.pdDist) || null);
+  if(!d || (d.on === false && !(pd && pd.mode === 'custom'))) return '';
   const title = L(d.title);
   const items = (d.items || []).map(it => L(it)).filter(x => String(x).trim());
   if(!title && !items.length) return '';

@@ -117,6 +117,7 @@ const MkData = {
         id:p.id, companyId:p.company_id, cat:p.cat, brand:p.brand, origin:p.origin,
         name:p.name, tagline:p.tagline, brandStory:p.brand_story,
         img:p.img, gallery:p.gallery||[], video:p.video||'', detail:p.detail||[],
+        dist:(p.dist && typeof p.dist==='object') ? p.dist : null,   // 제품별 유통 파트너 섹션 (null=공통)
         inquiries:p.inquiries||0, views:p.views||0, wish:p.wish_count||0,
         featured:!!p.featured, isNew:!!p.is_new, createdAt:String(p.created_at||'').slice(0,10),
         negotiable:!!p.negotiable,
@@ -524,6 +525,7 @@ Object.assign(Admin, {
       id:p.id, company_id:p.companyId||null, cat:p.cat, brand:p.brand, origin:p.origin,
       name:p.name, tagline:p.tagline, brand_story:p.brandStory,
       img:p.img, gallery:p.gallery, video:p.video, detail:p.detail,
+      dist:p.dist||null,
       featured:p.featured, is_new:p.isNew, created_at:p.createdAt,
       inquiries:p.inquiries, views:p.views, negotiable:!!p.negotiable,
       published: p.published !== false,   // 폼 체크 해제 = 사이트에서 잠깐 숨김(행은 유지)
