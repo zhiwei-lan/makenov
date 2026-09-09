@@ -32,7 +32,7 @@ class Aff extends BaseApiController
 
     private ?array $marketer = null;   // aff_tokens 로 식별된 마케터 행
     /** 마이그레이션을 추가하면 올린다 — writable/aff_schema_ok 에 적힌 값과 다르면 latest() 를 다시 돈다 */
-    private const SCHEMA_VER = '5';
+    private const SCHEMA_VER = '6';
 
     /* ================= 진입점 ================= */
 
