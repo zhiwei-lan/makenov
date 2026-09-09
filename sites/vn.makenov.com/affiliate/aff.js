@@ -80,7 +80,7 @@ function shareIcons(pid){
 }
 
 /* ---------- 틀 ---------- */
-const AFF_MENU = [['index.html', 'home', 'menu_home'], ['campaigns.html', 'campaigns', 'menu_campaigns'], ['rank.html', 'rank', 'menu_rank'], ['guide.html', 'guide', 'menu_guide'], ['guide.html#calc', 'calc', 'menu_calc'], ['guide.html#rules', 'rules', 'menu_rules']];
+const AFF_MENU = [['index.html', 'home', 'menu_home'], ['campaigns.html', 'campaigns', 'menu_campaigns'], ['rank.html', 'rank', 'menu_rank'], ['guide.html', 'guide', 'menu_guide'], ['rules.html', 'rules', 'menu_rules']];
 function affSidebar(active){
   const m = AffApi.session();
   const side = document.getElementById('aff-side'); if(!side) return;
@@ -95,7 +95,6 @@ function affSidebar(active){
              <div class="acts"><a class="btn btn-primary btn-sm" href="login.html">${t('login')}</a><a class="btn btn-ghost btn-sm" href="join.html">${t('join')}</a></div>`}
     </div>
     <nav class="aff-menu">${AFF_MENU.map(([h, k, key]) => `<a href="${h}" class="${active === k ? 'on' : ''}">${t(key)}</a>`).join('')}</nav>
-    ${window.AFF_DEMO ? `<div class="aff-demo">${t('demo')} <a href="?demo=0">${t('demo_off')}</a></div>` : ''}
     <div class="aff-side-links"><a href="${AFF_HOST}/" target="_blank" rel="noopener">${t('side_about')}</a><a href="https://zalo.me/${AFF_ZALO}" target="_blank" rel="noopener">${t('side_zalo')}</a></div>`;
   if(m) AffApi.summary().then(s => { const el = document.getElementById('aff-side-bal'); if(el) el.textContent = vnd(s.balance_vnd); }).catch(() => {});
 }
@@ -111,7 +110,7 @@ function affTopbar(opts){
 }
 function affFooter(){
   const f = document.getElementById('aff-foot'); if(!f) return;
-  f.innerHTML = `<span>© 2026 MAKENOV · ${t('foot_prog')}</span><span><a href="${AFF_HOST}/" target="_blank" rel="noopener">makenov.com</a> · <a href="guide.html#rules">${t('side_rules')}</a> · <a href="https://zalo.me/${AFF_ZALO}" target="_blank" rel="noopener">Zalo</a></span>`;
+  f.innerHTML = `<span>© 2026 MAKENOV · ${t('foot_prog')}</span><span><a href="${AFF_HOST}/" target="_blank" rel="noopener">makenov.com</a> · <a href="rules.html">${t('side_rules')}</a> · <a href="https://zalo.me/${AFF_ZALO}" target="_blank" rel="noopener">Zalo</a></span>`;
 }
 function affBoot(active, opts, pageInit){
   document.addEventListener('DOMContentLoaded', async () => {

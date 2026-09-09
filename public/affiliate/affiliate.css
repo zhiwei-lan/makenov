@@ -342,3 +342,21 @@ body.aff-body{background:#fff}
 .lp-rate .bar-lb{display:flex;justify-content:space-between;font-size:12px;color:var(--aff-sub)}
 @media(max-width:1100px){ .lp-hero{grid-template-columns:1fr;padding:30px 26px} .lp-hero .visual{max-width:460px} .lp-kpis{grid-template-columns:1fr 1fr} .aff-cards{grid-template-columns:1fr 1fr} .lp-rate{grid-template-columns:1fr} }
 @media(max-width:640px){ .lp-hero h1{font-size:27px} .lp-hero{padding:22px 18px} .aff-cards{grid-template-columns:1fr} .lp-rate{padding:22px 18px} .aff-ratebox{flex-direction:column;align-items:flex-start} }
+
+/* ===== v5: 시작 가이드 단계 · 규정 페이지 ===== */
+.gd-steps{display:grid;gap:14px;margin-bottom:28px}
+.gd-step{display:grid;grid-template-columns:44px minmax(0,1fr);gap:16px;background:#fff;border:1px solid var(--aff-line);border-radius:12px;padding:22px 24px}
+.gd-step .n{width:36px;height:36px;border-radius:50%;background:var(--aff-mint);color:#fff;font-weight:800;font-size:16px;display:grid;place-items:center}
+.gd-step h2{font-size:17px;font-weight:800;margin:6px 0 8px;letter-spacing:-.01em}
+.gd-step p{font-size:14px;line-height:1.75;color:var(--aff-body);margin:0 0 12px}
+.gd-step p:last-child{margin-bottom:0}
+.gd-step code{font-size:12px;background:var(--aff-bg);padding:2px 6px;border-radius:4px;color:var(--aff-mint-dark)}
+.gd-step .aff-channels{grid-template-columns:repeat(3,1fr)}
+.gd-step .aff-channels p{margin:0}
+.rl-ok h3,.rl-no h3{display:flex;align-items:center;gap:10px}
+.rl-ok .ic,.rl-no .ic{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:13px;font-weight:800}
+.rl-ok .ic{background:var(--aff-mint-dark)}
+.rl-no .ic{background:#D9534F}
+.rl-ok{border-color:#CDE9E0}
+.rl-no{border-color:#F5C6C6}
+@media(max-width:860px){ .gd-step{grid-template-columns:34px 1fr;padding:16px} .gd-step .n{width:28px;height:28px;font-size:13px} .gd-step .aff-channels{grid-template-columns:1fr} }

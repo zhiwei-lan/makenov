@@ -31,6 +31,8 @@ class Aff extends BaseApiController
     private const DEFAULT_SETTINGS = ['minWithdraw' => 500000, 'cookieDays' => 30, 'zalo' => '', 'email' => ''];
 
     private ?array $marketer = null;   // aff_tokens 로 식별된 마케터 행
+    /** 마이그레이션을 추가하면 올린다 — writable/aff_schema_ok 에 적힌 값과 다르면 latest() 를 다시 돈다 */
+    private const SCHEMA_VER = '2';
 
     /* ================= 진입점 ================= */
 
@@ -92,6 +94,8 @@ class Aff extends BaseApiController
                     return $this->adminSetMarketer($c);
                 }
                 if ($b === 'settings')    return $method === 'GET' ? $this->json($this->settings()) : $this->adminSaveSettings();
+                if ($b === 'demo' && $method === 'DELETE') return $this->adminDeleteDemo();
+                if ($b === 'demo' && $method === 'GET')    return $this->json(['count' => db_connect()->table('aff_marketers')->where('memo', 'DEMO')->countAllResults()]);
             }
         } catch (\Throwable $e) {
             log_message('error', 'aff: ' . $e->getMessage());
@@ -105,20 +109,16 @@ class Aff extends BaseApiController
     private function ensureSchema(): ?ResponseInterface
     {
         $flag = WRITEPATH . 'aff_schema_ok';
-        if (is_file($flag)) {
+        if (is_file($flag) && trim((string) @file_get_contents($flag)) === self::SCHEMA_VER) {
             return null;
         }
         $db = db_connect();
-        if ($db->tableExists('aff_marketers') && in_array('aff_ref', $db->getFieldNames('inquiries') ?: [], true)) {
-            @file_put_contents($flag, date('c'));
-            return null;
-        }
         try {
             $m = service('migrations');
             $m->setNamespace('App');
             $m->latest();
             if ($db->tableExists('aff_marketers')) {
-                @file_put_contents($flag, date('c'));
+                @file_put_contents($flag, self::SCHEMA_VER);
                 return null;
             }
         } catch (\Throwable $e) {
@@ -698,6 +698,21 @@ class Aff extends BaseApiController
         $db->table('aff_marketers')->where('id', $id)->update($row);
         if (($row['status'] ?? '') === 'blocked') $db->table('aff_tokens')->where('marketer_id', $id)->delete();   // 즉시 로그아웃
         return $this->json(['ok' => true]);
+    }
+
+    /** 데모 데이터 삭제 — memo='DEMO' 마케터와 그 리드·클릭·출금·토큰. 캠페인은 남긴다(관리자가 고쳐 씀) */
+    private function adminDeleteDemo(): ResponseInterface
+    {
+        $db = db_connect();
+        $rows = $db->table('aff_marketers')->select('id, code')->where('memo', 'DEMO')->get()->getResultArray();
+        if (! $rows) return $this->json(['ok' => true, 'deleted' => 0]);
+        $ids = array_column($rows, 'id'); $codes = array_column($rows, 'code');
+        $db->table('aff_leads')->whereIn('marketer_id', $ids)->delete();
+        $db->table('aff_withdrawals')->whereIn('marketer_id', $ids)->delete();
+        $db->table('aff_tokens')->whereIn('marketer_id', $ids)->delete();
+        $db->table('aff_clicks')->whereIn('code', $codes)->delete();
+        $db->table('aff_marketers')->whereIn('id', $ids)->delete();
+        return $this->json(['ok' => true, 'deleted' => count($ids)]);
     }
 
     private function adminSaveSettings(): ResponseInterface
