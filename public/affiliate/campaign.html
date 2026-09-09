@@ -3,81 +3,96 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chiến dịch | Cộng tác viên MAKENOV</title>
+<title>Chia sẻ | Cộng tác viên MAKENOV</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="../assets/css/style.css?v=20260909b">
-<link rel="stylesheet" href="affiliate.css?v=20260909d">
+<link rel="stylesheet" href="affiliate.css?v=20260909e">
 <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
 </head>
-<body>
-<header class="mk-header" id="mk-header"></header>
+<body class="aff-body">
+<div class="aff-app">
+  <aside class="aff-side" id="aff-side"></aside>
+  <div class="aff-main">
+    <div class="aff-top" id="aff-top"></div>
+    <main class="aff-content" id="root"></main>
+    <footer class="aff-foot" id="aff-foot"></footer>
+  </div>
+</div>
 
-<main class="pd-wrap" id="root"></main>
-
-<footer class="mk-footer" id="mk-footer"></footer>
 <script src="../assets/js/config.js?v=20260817b"></script>
-<script src="aff-mock.js?v=20260909c"></script>
-<script src="aff.js?v=20260909c"></script>
+<script src="aff-mock.js?v=20260909e"></script>
+<script src="aff.js?v=20260909e"></script>
 <script>
-affBoot('campaigns', async () => {
-  const root = document.getElementById('root');
-  const c = await AffApi.campaign(qs('id'));
-  if(!c){
-    root.innerHTML = `<div class="empty" style="margin:40px 0"><p>Không tìm thấy chiến dịch này</p><a class="btn btn-primary" href="campaigns.html" style="margin-top:16px">Xem chiến dịch</a></div>`;
-    return;
-  }
-  document.title = `${c.name} | Cộng tác viên MAKENOV`;
+/* 텐핑 '소문내기' 페이지 구조: 요약 카드 → 공유 아이콘 → 큰 CTA → [이미지 크리에이티브 | 주의사항] */
+let C = null;
+function ctaBlock(){
   const m = AffApi.session();
-  const link = m ? affLink(m.code, c.product_id) : '';
-  const left = c.remaining == null ? 'Không giới hạn số suất' : `Còn ${c.remaining} / ${c.cap} suất`;
-  const next = encodeURIComponent('campaign.html?id=' + c.product_id);
+  if(!m) return `<a class="btn btn-primary" href="login.html?next=${encodeURIComponent('campaign.html?id=' + C.product_id)}">Đăng nhập để lấy link chia sẻ</a><span class="note">Chưa có tài khoản? <a href="join.html?next=${encodeURIComponent('campaign.html?id=' + C.product_id)}">Đăng ký miễn phí</a> — có link ngay sau 1 phút.</span>`;
+  const link = affLink(m.code, C.product_id);
+  return `<button class="btn btn-primary" onclick="copyText(${JSON.stringify(link)}, 'Đã sao chép link của bạn — dán vào bài đăng')">Sao chép link của bạn và chia sẻ ngay</button>
+    <div class="lk"><input readonly value="${esc(link)}" onclick="this.select()"><a class="btn btn-ghost" href="${esc(link)}" target="_blank" rel="noopener">Mở ↗</a></div>
+    <span class="note">Link đã gắn mã <b>${esc(m.code)}</b>. Khách hàng gửi yêu cầu qua link này trong 30 ngày được tính cho bạn.</span>`;
+}
+affBoot('home', { title:'Chia sẻ', back:'index.html' }, async () => {
+  const root = document.getElementById('root');
+  C = await AffApi.campaign(qs('id'));
+  if(!C){ root.innerHTML = `<div class="aff-empty">Không tìm thấy chiến dịch này<br><a class="btn btn-primary" href="index.html" style="margin-top:16px">Xem chiến dịch</a></div>`; return; }
+  document.title = `${C.name} | Cộng tác viên MAKENOV`;
+  const mats = C.materials.length ? C.materials : [C.img];
+  const left = C.remaining == null ? 'Không giới hạn' : `Còn ${C.remaining} / ${C.cap}`;
+  const m = AffApi.session();
+  const postText = `${C.copy_text}\n\n👉 Xem giá & MOQ: ${affLink(m ? m.code : 'MÃ-CỦA-BẠN', C.product_id)}`;
 
   root.innerHTML = `
-  <div class="pd-row">
-    <div class="pd-main">
-      <div class="pd-gallery"><div class="main"><img src="${esc(c.img)}" alt="${esc(c.name)}"></div></div>
+  <section class="aff-cd-head">
+    <div class="th"><img src="${esc(C.img)}" alt="${esc(C.name)}"></div>
+    <div>
+      <div class="meta"><b>${esc(catName(C.cat))}</b><i>|</i>${esc(C.brand)}</div>
+      <h1>${esc(C.name)}</h1>
+      <p>${esc(C.headline || '')}${C.headline ? ' — ' : ''}${esc(C.copy_text)}</p>
+      <div class="bar"><a class="home" href="index.html">Về danh sách ›</a>${shareIcons(C.product_id, 'lg')}<span class="sp"></span><a class="btn btn-ghost btn-sm" href="${AFF_HOST}/products/${esc(C.product_id)}.html" target="_blank" rel="noopener">Trang sản phẩm ↗</a></div>
+    </div>
+  </section>
 
-      <section class="pd-sec">
-        <h2>Tài liệu quảng bá</h2>
-        ${c.materials.length ? `<div class="aff-mats">${c.materials.map((u, i) => `<figure><img src="${esc(u)}" alt="${esc(c.name)} ${i + 1}" loading="lazy"><figcaption><span>Hình ${i + 1}</span><a class="btn btn-ghost btn-sm" href="${esc(u)}" download target="_blank" rel="noopener">Tải xuống</a></figcaption></figure>`).join('')}</div>`
-          : `<p class="aff-note">Chưa có tài liệu. Dùng hình sản phẩm phía trên.</p>`}
-      </section>
+  <section class="aff-cd-cta" id="cta">${ctaBlock()}</section>
 
-      <section class="pd-sec">
-        <h2>Nội dung gợi ý</h2>
-        <div class="aff-copybox" id="copybox">${esc(c.copy_text)}<button class="btn btn-ghost btn-sm" onclick="copyText(${JSON.stringify(c.copy_text)})">Sao chép</button></div>
-        <p class="aff-note">Bạn có thể sửa lại theo cách nói của mình. Chỉ cần giữ đúng thông tin sản phẩm và link có mã của bạn.</p>
-      </section>
-
-      <section class="pd-sec">
-        <h2>Quy định chiến dịch</h2>
-        <div class="aff-rules">${esc(c.rules)}</div>
-      </section>
+  <div class="aff-cd-cols">
+    <div class="aff-cd-col">
+      <h2>Hình ảnh quảng bá</h2>
+      <div class="aff-cd-box">
+        <p class="hint">Dùng các hình dưới đây khi chia sẻ. Tải về rồi chỉnh sửa tự do.</p>
+        <div class="aff-mats">${mats.map((u, i) => `<figure><img src="${esc(u)}" alt="${esc(C.name)} ${i + 1}" loading="lazy"><figcaption><span>Hình ${i + 1}</span><a href="${esc(u)}" download target="_blank" rel="noopener">Tải xuống ↓</a></figcaption></figure>`).join('')}</div>
+        <h3 style="margin-top:20px">Bài mẫu để dán</h3>
+        <div class="aff-copybox">${esc(postText)}<button class="btn btn-primary btn-sm" onclick="copyText(${JSON.stringify(postText)}, 'Đã sao chép bài mẫu')">Sao chép</button></div>
+        <p class="aff-note">Sửa theo cách nói của bạn cũng được — giữ đúng thông tin sản phẩm và giữ nguyên link có mã.</p>
+        <div class="aff-cd-info">
+          <div><div class="lb">Hoa hồng / khách hàng</div><div class="v mint">${vnd(C.cpa_vnd)}</div></div>
+          <div><div class="lb">Suất còn lại</div><div class="v">${left}</div></div>
+          <div><div class="lb">Đã duyệt · chờ</div><div class="v">${C.approved} · ${C.pending}</div></div>
+        </div>
+      </div>
     </div>
 
-    <aside class="pd-side">
-      <div class="box">
-        <div class="brand">${esc(c.brand)}</div>
-        <h1>${esc(c.name)}</h1>
-        <p class="tagline">${esc(c.headline)}</p>
-        <div class="aff-side-cpa">${vnd(c.cpa_vnd)}<small>/ khách hàng được duyệt</small></div>
-        <div class="aff-side-left">${left} · Đã duyệt ${c.approved} · Chờ ${c.pending}</div>
-        ${m ? `
-        <div style="font-size:13px;font-weight:600;color:#4E5968">Link của bạn</div>
-        <div class="aff-linkbox"><input readonly value="${esc(link)}" onclick="this.select()"><button class="btn btn-primary" onclick="copyText(${JSON.stringify(link)})">Sao chép</button></div>
-        <div class="pd-ctas" style="margin-top:14px">
-          <a class="btn btn-ghost" href="${esc(link)}" target="_blank" rel="noopener">Mở trang sản phẩm ↗</a>
-          <a class="btn btn-soft" href="my.html">Xem khách hàng của tôi</a>
-        </div>` : `
-        <div class="pd-ctas">
-          <a class="btn btn-primary" href="login.html?next=${next}">Đăng nhập để lấy link</a>
-          <a class="btn btn-ghost" href="join.html?next=${next}">Đăng ký cộng tác viên</a>
-        </div>
-        <p class="aff-note">Mỗi cộng tác viên có link riêng. Khách hàng gửi yêu cầu qua link của bạn mới được tính hoa hồng.</p>`}
+    <div class="aff-cd-col">
+      <h2>Lưu ý khi chia sẻ</h2>
+      <div class="aff-cd-box">
+        <h3>Tên sản phẩm</h3>
+        <div class="aff-chips"><span class="name">${esc(C.name)}</span></div>
+        <h3><span class="tip">TIP</span>Từ khóa gợi ý</h3>
+        <p class="hint" style="margin-bottom:8px">Dùng các từ này trong bài đăng, hashtag, tiêu đề video. Bấm để sao chép.</p>
+        <div class="aff-chips">${(C.keywords || []).map(k => `<span onclick="copyText(${JSON.stringify('#' + k.replace(/\s+/g, ''))})">${esc(k)}</span>`).join('') || '<span class="name">—</span>'}</div>
+        <h3>Quy định chiến dịch</h3>
+        <p class="aff-rules">${esc(C.rules)}</p>
+        <h3>Quy định chung</h3>
+        <p class="aff-rules">1. Chỉ "khách hàng" là cửa hàng, đại lý, spa, doanh nghiệp gửi yêu cầu báo giá mới được tính. Lượt xem, lượt bấm không tính.
+2. Không tự gửi yêu cầu, không nhờ người quen gửi cho có. Yêu cầu không có nhu cầu thật sẽ bị từ chối.
+3. Không thu thập số điện thoại qua form ngoài (Google Form, Facebook Lead…). Khách phải tự gửi trên MAKENOV.
+4. Không mạo danh nhân viên MAKENOV hay nhà sản xuất. Không hứa giá, quà tặng ngoài thông tin trên trang sản phẩm.
+5. Bài đăng có nhận hoa hồng cần ghi rõ là bài giới thiệu (ví dụ: #giớithiệu, #CTV).</p>
+        <div class="aff-warn"><b>Lưu ý:</b> Gian lận (yêu cầu giả, tự gửi, mạo danh) sẽ bị khóa tài khoản và <b>hủy toàn bộ hoa hồng chưa rút</b>. Hoa hồng chỉ chuyển sang "có thể rút" sau khi MAKENOV xác nhận khách hàng là thật.</div>
       </div>
-    </aside>
-  </div>
-  <nav class="pd-links"><a href="campaigns.html">Tất cả chiến dịch</a><a href="campaigns.html?cat=${esc(c.cat)}">${esc(catName(c.cat))}</a><a href="${AFF_HOST}/products/${esc(c.product_id)}.html" target="_blank" rel="noopener">Trang sản phẩm trên MAKENOV ↗</a></nav>`;
+    </div>
+  </div>`;
 });
 </script>
 </body>

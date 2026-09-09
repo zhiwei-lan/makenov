@@ -6,32 +6,35 @@
 <title>Đăng ký cộng tác viên | MAKENOV</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="../assets/css/style.css?v=20260909b">
-<link rel="stylesheet" href="affiliate.css?v=20260909d">
+<link rel="stylesheet" href="affiliate.css?v=20260909e">
 <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
 </head>
-<body>
-<header class="mk-header" id="mk-header"></header>
-
-<main class="wrap">
-  <form class="aff-form" id="f" onsubmit="return submitJoin(event)">
-    <h1>Đăng ký cộng tác viên</h1>
-    <p class="sub">Miễn phí. Sau khi đăng ký bạn có ngay link riêng cho từng chiến dịch.</p>
-    <div class="f-row"><label>Email</label><input id="email" type="email" required autocomplete="email" placeholder="ban@email.com"></div>
-    <div class="f-row"><label>Mật khẩu</label><input id="pw" type="password" required minlength="8" autocomplete="new-password" placeholder="Tối thiểu 8 ký tự"></div>
-    <div class="f-row"><label>Nhập lại mật khẩu</label><input id="pw2" type="password" required autocomplete="new-password"></div>
-    <div class="f-row"><label>Họ tên</label><input id="name" required placeholder="Nguyễn Văn A"></div>
-    <div class="f-row"><label>Số điện thoại</label><input id="phone" type="tel" required placeholder="09xx xxx xxx"></div>
-    <div class="f-row"><label>Zalo <span style="font-weight:400;color:#8B95A1">(không bắt buộc)</span></label><input id="zalo" placeholder="Số Zalo để nhận thông báo"></div>
-    <label class="agree"><input type="checkbox" id="agree" required> Tôi đồng ý với <a href="index.html#how">quy định cộng tác viên</a>: không quảng cáo sai sự thật, không tự tạo yêu cầu giả, giữ nguyên mã CTV trong link.</label>
-    <button class="btn btn-primary btn-block btn-lg" id="btn" type="submit">Đăng ký</button>
-    <p class="foot">Đã có tài khoản? <a href="login.html">Đăng nhập</a></p>
-  </form>
-</main>
-
-<footer class="mk-footer" id="mk-footer"></footer>
+<body class="aff-body">
+<div class="aff-app">
+  <aside class="aff-side" id="aff-side"></aside>
+  <div class="aff-main">
+    <div class="aff-top" id="aff-top"></div>
+    <main class="aff-content">
+      <form class="aff-form" id="f" onsubmit="return submitJoin(event)">
+        <h1>Đăng ký cộng tác viên</h1>
+        <p class="sub">Miễn phí. Sau khi đăng ký bạn có ngay link riêng cho từng chiến dịch.</p>
+        <div class="f-row"><label>Email</label><input id="email" type="email" required autocomplete="email" placeholder="ban@email.com"></div>
+        <div class="f-row"><label>Mật khẩu</label><input id="pw" type="password" required minlength="8" autocomplete="new-password" placeholder="Tối thiểu 8 ký tự"></div>
+        <div class="f-row"><label>Nhập lại mật khẩu</label><input id="pw2" type="password" required autocomplete="new-password"></div>
+        <div class="f-row"><label>Họ tên</label><input id="name" required placeholder="Nguyễn Văn A"></div>
+        <div class="f-row"><label>Số điện thoại</label><input id="phone" type="tel" required placeholder="09xx xxx xxx"></div>
+        <div class="f-row"><label>Zalo <span style="font-weight:400;color:#8B95A1">(không bắt buộc)</span></label><input id="zalo" placeholder="Số Zalo để nhận thông báo"></div>
+        <label class="agree"><input type="checkbox" id="agree" required> Tôi đồng ý với <a href="guide.html#rules" target="_blank">quy định chia sẻ</a>: không quảng cáo sai sự thật, không tự tạo yêu cầu giả, giữ nguyên mã CTV trong link.</label>
+        <button class="btn btn-primary btn-block btn-lg" id="btn" type="submit">Đăng ký</button>
+        <p class="foot">Đã có tài khoản? <a href="login.html" id="login-link">Đăng nhập</a></p>
+      </form>
+    </main>
+    <footer class="aff-foot" id="aff-foot"></footer>
+  </div>
+</div>
 <script src="../assets/js/config.js?v=20260817b"></script>
-<script src="aff-mock.js?v=20260909c"></script>
-<script src="aff.js?v=20260909c"></script>
+<script src="aff-mock.js?v=20260909e"></script>
+<script src="aff.js?v=20260909e"></script>
 <script>
 const v = id => document.getElementById(id).value.trim();
 async function submitJoin(e){
@@ -45,7 +48,10 @@ async function submitJoin(e){
   }catch(err){ toast(err.message); b.disabled = false; }
   return false;
 }
-affBoot('', () => { if(AffApi.session()) location.replace(qs('next') || 'my.html'); });
+affBoot('', { title:'Đăng ký', back:'index.html' }, () => {
+  if(AffApi.session()){ location.replace(qs('next') || 'my.html'); return; }
+  if(qs('next')) document.getElementById('login-link').href = 'login.html?next=' + encodeURIComponent(qs('next'));
+});
 </script>
 </body>
 </html>
