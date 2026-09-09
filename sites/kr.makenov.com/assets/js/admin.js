@@ -439,13 +439,18 @@ function imgSrc(v){
 /* ---------- 사이드바 · 탭 ---------- */
 /* ⚠ 탭을 새로 만들면 NAV 와 여기 둘 다에 넣어야 한다.
    여기 빠지면 메뉴는 보이는데 눌러도 화면이 hidden 인 채로 남는다 (SEO 탭에서 실제로 겪음) */
-const TABS = ['dash','inq','leads','buyers','aff','products','companies','columns','faq','notices','copy','seo','admins','settings'];
+const TABS = ['dash','inq','leads','buyers','aff_campaigns','aff_leads','aff_withdrawals','aff_marketers','aff_settings','products','companies','columns','faq','notices','copy','seo','admins','settings'];
 const NAV = [
   { id:'dash',     label:'대시보드', title:'대시보드',      desc:'플랫폼 현황 한눈에 보기' },
   { id:'inq',      label:'문의함',   title:'문의함',        desc:'유통 파트너가 보낸 견적 문의' },
   { id:'leads',    label:'입점문의', title:'입점 문의',      desc:'제품 등록 랜딩(maker.html)으로 들어온 공급사' },
   { id:'buyers',   label:'유통 파트너',   title:'유통 파트너 관리',    desc:'사업자 인증을 통과한 회원' },
-  { id:'aff',      label:'제휴',     title:'제휴 마케팅',     desc:'베트남 마케터(CTV) 캠페인·리드 승인·출금 처리 — vn.makenov.com/affiliate' },
+  /* 제휴(CTV) — 기능이 계속 붙을 곳이라 한 탭에 합치지 않고 페이지 하나씩. 새 페이지 = 여기 + TABS + index.html section + admin-aff.js renderAff 분기 */
+  { id:'aff_campaigns',   grp:'aff', label:'캠페인',   title:'제휴 · 캠페인',   desc:'제품별 CTV 캠페인 켜기·리드 단가(VND)·상한·홍보 소재. 켠 캠페인만 vn.makenov.com/affiliate 에 보입니다' },
+  { id:'aff_leads',       grp:'aff', label:'리드 승인', title:'제휴 · 리드 승인', desc:'CTV 링크로 들어온 유통 파트너 문의. 승인하면 CTV 잔액에 단가가 쌓입니다' },
+  { id:'aff_withdrawals', grp:'aff', label:'출금',     title:'제휴 · 출금',     desc:'CTV 출금 신청. 은행 송금 후 지급완료 처리' },
+  { id:'aff_marketers',   grp:'aff', label:'마케터',   title:'제휴 · 마케터',   desc:'가입한 CTV 목록 · 클릭/리드/승인률 · 채널 링크 · 정지' },
+  { id:'aff_settings',    grp:'aff', label:'설정',     title:'제휴 · 설정',     desc:'최소 출금액·링크 유효기간·지원 연락처·랭킹 혜택 문구·데모 데이터' },
   { id:'products', label:'제품',     title:'제품 관리',      desc:'등록·수정 시 사이트에 즉시 반영' },
   { id:'companies',label:'공급사',   title:'공급사(기업) 관리', desc:'제조사·브랜드 기업정보. 제품 수정 화면에서 이 공급사를 연결합니다' },
   { id:'columns',  label:'칼럼',     title:'칼럼 관리',      desc:'인사이트 글 작성 및 발행' },
@@ -466,14 +471,16 @@ function renderNav(){
                    products:MK_PRODUCTS.length, companies:MK_COMPANIES.length, columns:MK_COLUMNS.length,
                    faq:(typeof MK_FAQ!=='undefined'?MK_FAQ.length:''),
                    notices:(typeof MK_NOTICES!=='undefined'?MK_NOTICES.length:''), dash:'', settings:'',
-                   aff:(typeof affPendingCount==='function'?(affPendingCount()||''):'') };
+                   aff_leads:(typeof affCache!=='undefined'?(affCache.pending||''):''), aff_withdrawals:(typeof affCache!=='undefined'?(affCache.wd||''):'') };
   document.getElementById('sb-nav').innerHTML =
     `<div class="grp">운영</div>` +
-    NAV.slice(0,5).map(n=>navBtn(n,counts)).join('') +
+    NAV.slice(0,4).map(n=>navBtn(n,counts)).join('') +
+    `<div class="grp">제휴 <span class="grp-sub">CTV</span></div>` +
+    NAV.filter(n=>n.grp==='aff').map(n=>navBtn(n,counts)).join('') +
     `<div class="grp">콘텐츠</div>` +
-    NAV.slice(5,10).map(n=>navBtn(n,counts)).join('') +
+    NAV.slice(9,14).map(n=>navBtn(n,counts)).join('') +
     `<div class="grp">시스템</div>` +
-    NAV.slice(10).map(n=>navBtn(n,counts)).join('');
+    NAV.slice(14).map(n=>navBtn(n,counts)).join('');
 }
 function navBtn(n, counts){
   const c = counts[n.id];
@@ -483,6 +490,7 @@ function navBtn(n, counts){
 
 function showTab(name){
   curTab = name;
+  if(name.startsWith('aff_') && typeof renderAff==='function'){ affSub = name.slice(4); affEditPid = null; affDetailId = null; renderAff(); }
   TABS.forEach(x=>document.getElementById('tab-'+x).classList.toggle('hidden', x!==name));
   const n = NAV.find(x=>x.id===name) || NAV[0];
   document.getElementById('pg-title').textContent = n.title;

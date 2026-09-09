@@ -58,10 +58,11 @@ function affPendingCount(){ return affCache.pending; }
 function affFail(e){ toastA(e.message || String(e)); console.error(e); }
 
 async function renderAff(){
-  const el = document.getElementById('tab-aff'); if(!el) return;
-  if(!isSB()){ el.innerHTML = `<div class="card"><p class="note">제휴 탭은 서버 모드에서만 동작합니다.</p></div>`; return; }
-  const subs = [['campaigns', '캠페인'], ['leads', `리드 ${affCache.pending ? `<b>${affCache.pending}</b>` : ''}`], ['withdrawals', `출금 ${affCache.wd ? `<b>${affCache.wd}</b>` : ''}`], ['marketers', '마케터'], ['settings', '설정']];
-  el.innerHTML = `<div class="card"><div class="bar" style="margin:0 0 14px"><div class="bchips">${subs.map(([k, t]) => `<button class="bchip${affSub === k ? ' on' : ''}" onclick="affSub='${k}';affEditPid=null;affDetailId=null;renderAff()">${t}</button>`).join('')}</div><span class="grow"></span><a class="btn btn-ghost btn-sm" href="https://vn.makenov.com/affiliate/" target="_blank">CTV 사이트 열기 ↗</a></div><div id="aff-body"><p class="note">불러오는 중…</p></div></div>`;
+  /* 제휴는 페이지 하나씩(tab-aff_캠페인/리드/출금/마케터/설정). affSub 는 showTab 이 넣어 준다 */
+  const el = document.getElementById('tab-aff_' + affSub); if(!el) return;
+  if(!isSB()){ el.innerHTML = `<div class="card"><p class="note">제휴 메뉴는 서버 모드에서만 동작합니다.</p></div>`; return; }
+  const site = { campaigns:'campaigns.html', leads:'my.html', withdrawals:'my.html', marketers:'rank.html', settings:'' }[affSub] || '';
+  el.innerHTML = `<div class="card"><div class="bar" style="margin:0 0 14px"><span class="grow"></span><a class="btn btn-ghost btn-sm" href="https://vn.makenov.com/affiliate/${site}" target="_blank">CTV 사이트에서 보기 ↗</a></div><div id="aff-body-${affSub}"><p class="note">불러오는 중…</p></div></div>`;
   try{
     let body = '';
     if(affSub === 'campaigns') body = await affCampaignsView();
@@ -69,8 +70,8 @@ async function renderAff(){
     else if(affSub === 'withdrawals') body = await affWithdrawalsView();
     else if(affSub === 'marketers') body = affDetailId ? await affMarketerDetailView(affDetailId) : await affMarketersView();
     else body = await affSettingsView();
-    const b = document.getElementById('aff-body'); if(b) b.innerHTML = body;
-  }catch(e){ const b = document.getElementById('aff-body'); if(b) b.innerHTML = `<p class="note" style="color:#D9534F">${esc(e.message || e)}</p>`; }
+    const b = document.getElementById('aff-body-' + affSub); if(b) b.innerHTML = body;
+  }catch(e){ const b = document.getElementById('aff-body-' + affSub); if(b) b.innerHTML = `<p class="note" style="color:#D9534F">${esc(e.message || e)}</p>`; }
 }
 
 /* 나브 카운트용 — 부팅 후 한 번 (관리자 로그인 상태에서만) */
