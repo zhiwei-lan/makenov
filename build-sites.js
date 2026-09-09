@@ -64,7 +64,7 @@ const AI_BOTS = ['GPTBot', 'OAI-SearchBot', 'ChatGPT-User',
   'PerplexityBot', 'Perplexity-User',
   'Google-Extended', 'Applebot-Extended', 'meta-externalagent', 'CCBot'];
 const robotsBody = host =>
-  ['*', ...AI_BOTS].map(ua => `User-agent: ${ua}\nAllow: /\nDisallow: /admin/\nDisallow: /mypage.html\n`).join('\n')
+  ['*', ...AI_BOTS].map(ua => `User-agent: ${ua}\nAllow: /\nDisallow: /admin/\nDisallow: /mypage.html\nDisallow: /affiliate/my.html\nDisallow: /affiliate/login.html\nDisallow: /affiliate/join.html\n`).join('\n')
   + `\nSitemap: https://${host}/sitemap.xml\n`;
 
 function rmrf(p){ fs.rmSync(p, { recursive: true, force: true }); }

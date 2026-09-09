@@ -53,9 +53,9 @@ class Seo extends Controller
             'PerplexityBot', 'Perplexity-User',
             'Google-Extended', 'Applebot-Extended', 'meta-externalagent', 'CCBot',
         ];
-        $body = "User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /mypage.html\n";
+        $body = "User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /mypage.html\nDisallow: /affiliate/my.html\nDisallow: /affiliate/login.html\nDisallow: /affiliate/join.html\n";
         foreach ($bots as $b) {
-            $body .= "\nUser-agent: {$b}\nAllow: /\nDisallow: /admin/\nDisallow: /mypage.html\n";
+            $body .= "\nUser-agent: {$b}\nAllow: /\nDisallow: /admin/\nDisallow: /mypage.html\nDisallow: /affiliate/my.html\nDisallow: /affiliate/login.html\nDisallow: /affiliate/join.html\n";
         }
 
         return $body . "\nSitemap: https://{$host}/sitemap.xml\n";

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trang của tôi | Cộng tác viên MAKENOV</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="../assets/css/style.css?v=20260909b">
+<link rel="stylesheet" href="affiliate.css?v=20260909c">
+<link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
+</head>
+<body>
+<header class="mk-header" id="mk-header"></header>
+
+<main class="wrap">
+  <div class="my-top" id="my-top"></div>
+
+  <div class="tabs" id="my-tabs">
+    <button class="on" data-tab="dash" onclick="showTab('dash')">Tổng quan</button>
+    <button data-tab="leads" onclick="showTab('leads')">Khách hàng<i class="cnt" id="cnt-leads"></i></button>
+    <button data-tab="money" onclick="showTab('money')">Hoa hồng & rút tiền</button>
+    <button data-tab="account" onclick="showTab('account')">Tài khoản</button>
+  </div>
+
+  <section id="tab-dash"></section>
+  <section id="tab-leads" style="display:none"></section>
+  <section id="tab-money" style="display:none"></section>
+  <section id="tab-account" style="display:none"></section>
+</main>
+
+<footer class="mk-footer" id="mk-footer"></footer>
+<script src="../assets/js/config.js?v=20260817b"></script>
+<script src="aff-mock.js?v=20260909c"></script>
+<script src="aff.js?v=20260909c"></script>
+<script>
+let ME = null, SUM = null, leadFilter = '';
+const v = id => document.getElementById(id).value.trim();
+
+function showTab(name){
+  document.querySelectorAll('.tabs button').forEach(b => { b.classList.toggle('on', b.dataset.tab === name); b.blur(); });
+  ['dash','leads','money','account'].forEach(x => document.getElementById('tab-' + x).style.display = x === name ? 'block' : 'none');
+  history.replaceState(null, '', '#' + name);
+}
+
+async function drawTop(){
+  ME = await AffApi.me(); SUM = await AffApi.summary();
+  const link = affLink(ME.code);
+  document.getElementById('my-top').innerHTML = `
+    <div class="my-id"><h1>${esc(ME.name)}</h1><div class="my-meta">Mã CTV <b>${esc(ME.code)}</b> · ${esc(ME.email)} · Tham gia ${fmtDate(ME.created_at)}</div></div>
+    <div style="min-width:min(100%,420px)"><div style="font-size:13px;font-weight:600;color:#4E5968">Link giới thiệu chung</div>
+      <div class="aff-linkbox" style="margin-top:6px"><input readonly value="${esc(link)}" onclick="this.select()"><button class="btn btn-primary btn-sm" onclick="copyText(${JSON.stringify(link)})">Sao chép</button></div>
+      <p class="aff-note" style="margin-top:6px">Link theo từng sản phẩm lấy trong trang <a href="campaigns.html">Chiến dịch</a>.</p></div>`;
+  document.getElementById('cnt-leads').textContent = SUM.leads.pending || '';
+}
+
+async function drawDash(){
+  const [clicks, leads] = await Promise.all([AffApi.clicks(30), AffApi.leads({})]);
+  const max = Math.max(1, ...clicks.map(c => c.clicks));
+  document.getElementById('tab-dash').innerHTML = `
+    <div class="aff-stats">
+      <div class="aff-stat"><div class="lb">Lượt bấm link (30 ngày)</div><div class="v">${SUM.clicks30}</div></div>
+      <div class="aff-stat"><div class="lb">Khách hàng chờ duyệt</div><div class="v">${SUM.leads.pending}</div></div>
+      <div class="aff-stat"><div class="lb">Khách hàng đã duyệt</div><div class="v">${SUM.leads.approved}<small>/ ${SUM.leads.approved + SUM.leads.pending + SUM.leads.rejected}</small></div></div>
+      <div class="aff-stat"><div class="lb">Số dư có thể rút</div><div class="v" style="color:#13A583">${vnd(SUM.balance_vnd)}</div></div>
+    </div>
+    <div class="aff-box"><h3>Lượt bấm link theo ngày</h3>
+      <div class="aff-bars">${clicks.map(c => `<i style="height:${Math.round(c.clicks / max * 100)}%" data-v="${c.clicks}" title="${c.day}: ${c.clicks}"></i>`).join('')}</div>
+      <div class="aff-bars-lb"><span>${clicks[0].day}</span><span>${clicks[clicks.length - 1].day}</span></div></div>
+    <div class="aff-box"><h3>Khách hàng gần đây</h3>${leadTable(leads.slice(0, 5))}
+      <p class="aff-note"><a href="#leads" onclick="showTab('leads');return false">Xem tất cả →</a></p></div>`;
+}
+
+function leadTable(rows){
+  if(!rows.length) return `<div class="empty" style="padding:36px 0"><p>Chưa có khách hàng nào. Chia sẻ link của bạn để bắt đầu.</p></div>`;
+  return `<div class="aff-table-wrap"><table class="aff-table"><thead><tr><th>Ngày</th><th>Sản phẩm</th><th>Trạng thái</th><th class="num">Hoa hồng</th></tr></thead><tbody>
+    ${rows.map(l => `<tr><td style="white-space:nowrap">${fmtDate(l.created_at)}</td><td><a href="campaign.html?id=${esc(l.product_id)}">${esc(l.product_name)}</a>${l.reject_reason ? `<span class="sub">Lý do: ${esc(l.reject_reason)}</span>` : ''}</td><td>${stBadge(l.status)}</td><td class="num">${l.status === 'rejected' ? '—' : vnd(l.amount_vnd)}</td></tr>`).join('')}
+  </tbody></table></div>`;
+}
+
+async function drawLeads(){
+  const rows = await AffApi.leads({ status: leadFilter });
+  const chips = [['', 'Tất cả'], ['pending', 'Chờ duyệt'], ['approved', 'Đã duyệt'], ['rejected', 'Từ chối']];
+  document.getElementById('tab-leads').innerHTML = `
+    <div class="subtabs" style="margin-bottom:16px">${chips.map(([k, t]) => `<button class="${leadFilter === k ? 'on' : ''}" onclick="leadFilter='${k}';drawLeads()">${t}</button>`).join('')}</div>
+    ${leadTable(rows)}
+    <p class="aff-note">Khách hàng được tính khi nhà phân phối gửi yêu cầu báo giá qua link có mã của bạn. MAKENOV duyệt trong 1–3 ngày làm việc.</p>`;
+}
+
+async function drawMoney(){
+  const ws = await AffApi.withdrawals();
+  const hasBank = ME.bank_account && ME.bank_holder;
+  document.getElementById('tab-money').innerHTML = `
+    <div class="aff-two">
+      <div class="aff-box"><h3>Số dư</h3>
+        <div class="aff-bal"><b>${vnd(SUM.balance_vnd)}</b><span>có thể rút</span></div>
+        <p class="aff-note">Đã duyệt ${vnd(SUM.approved_vnd)} · Đã rút / đang xử lý ${vnd(SUM.withdrawn_vnd)}</p>
+        <div class="f-row" style="margin-top:18px"><label>Số tiền muốn rút</label><input id="wd-amt" type="number" min="${SUM.min_withdraw}" step="1000" placeholder="${SUM.min_withdraw.toLocaleString('vi-VN')}" ${hasBank ? '' : 'disabled'}></div>
+        <button class="btn btn-primary btn-block" onclick="requestWd()" ${hasBank ? '' : 'disabled'}>Gửi yêu cầu rút tiền</button>
+        <p class="aff-note">${hasBank ? `Chuyển vào ${esc(ME.bank_name)} ${esc(ME.bank_account)} (${esc(ME.bank_holder)}). Tối thiểu ${vnd(SUM.min_withdraw)}, chuyển khoản thứ Sáu hằng tuần.` : `Bạn cần thêm tài khoản ngân hàng trong tab <a href="#account" onclick="showTab('account');return false">Tài khoản</a> trước khi rút.`}</p>
+      </div>
+      <div class="aff-box"><h3>Lịch sử rút tiền</h3>
+        ${ws.length ? `<table class="aff-table"><thead><tr><th>Ngày</th><th class="num">Số tiền</th><th>Trạng thái</th></tr></thead><tbody>${ws.map(w => `<tr><td>${fmtDate(w.created_at)}${w.paid_at ? `<span class="sub">Đã chuyển ${fmtDate(w.paid_at)}</span>` : ''}${w.memo ? `<span class="sub">${esc(w.memo)}</span>` : ''}</td><td class="num">${vnd(w.amount_vnd)}</td><td>${stBadge(w.status)}</td></tr>`).join('')}</tbody></table>` : `<p class="aff-note">Chưa có yêu cầu rút tiền.</p>`}
+      </div>
+    </div>`;
+}
+async function requestWd(){
+  try{ await AffApi.requestWithdrawal(v('wd-amt')); toast('Đã gửi yêu cầu rút tiền'); SUM = await AffApi.summary(); drawMoney(); affHeader('account'); }
+  catch(e){ toast(e.message); }
+}
+
+function drawAccount(){
+  const f = (id, label, val, type) => `<div class="f-row"><label>${label}</label><input id="${id}" type="${type || 'text'}" value="${esc(val || '')}"></div>`;
+  document.getElementById('tab-account').innerHTML = `
+    <div class="aff-two">
+      <div>
+        <div class="aff-box"><h3>Thông tin</h3>
+          <div class="f-row"><label>Email</label><input value="${esc(ME.email)}" readonly></div>
+          ${f('ac-name', 'Họ tên', ME.name)}${f('ac-phone', 'Số điện thoại', ME.phone, 'tel')}${f('ac-zalo', 'Zalo', ME.zalo)}
+          <button class="btn btn-primary" onclick="saveInfo()">Lưu</button></div>
+        <div class="aff-box"><h3>Đổi mật khẩu</h3>
+          ${f('pw-old', 'Mật khẩu hiện tại', '', 'password')}${f('pw-new', 'Mật khẩu mới (tối thiểu 8 ký tự)', '', 'password')}
+          <button class="btn btn-ghost" onclick="savePw()">Đổi mật khẩu</button></div>
+      </div>
+      <div class="aff-box"><h3>Tài khoản ngân hàng nhận hoa hồng</h3>
+        ${f('bk-name', 'Ngân hàng', ME.bank_name)}${f('bk-acc', 'Số tài khoản', ME.bank_account)}${f('bk-holder', 'Chủ tài khoản (viết không dấu)', ME.bank_holder)}
+        <button class="btn btn-primary" onclick="saveBank()">Lưu tài khoản</button>
+        <p class="aff-note">Hoa hồng chỉ chuyển vào tài khoản đứng tên bạn.</p></div>
+    </div>`;
+}
+async function saveInfo(){ try{ ME = await AffApi.updateMe({ name:v('ac-name'), phone:v('ac-phone'), zalo:v('ac-zalo') }); toast('Đã lưu'); drawTop(); affHeader('account'); }catch(e){ toast(e.message); } }
+async function saveBank(){ try{ ME = await AffApi.updateMe({ bank_name:v('bk-name'), bank_account:v('bk-acc'), bank_holder:v('bk-holder').toUpperCase() }); toast('Đã lưu tài khoản ngân hàng'); drawMoney(); }catch(e){ toast(e.message); } }
+async function savePw(){ try{ await AffApi.changePassword(v('pw-old'), v('pw-new')); toast('Đã đổi mật khẩu'); drawAccount(); }catch(e){ toast(e.message); } }
+
+affBoot('account', async () => {
+  if(!affGuard()) return;
+  await drawTop();
+  await Promise.all([drawDash(), drawLeads(), drawMoney()]); drawAccount();
+  const h = location.hash.replace('#', '');
+  if(['dash','leads','money','account'].includes(h)) showTab(h);
+});
+</script>
+</body>
+</html>

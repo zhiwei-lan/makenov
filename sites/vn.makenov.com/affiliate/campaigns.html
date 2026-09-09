@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chiến dịch | Cộng tác viên MAKENOV</title>
+<meta name="description" content="Danh sách chiến dịch cộng tác viên MAKENOV: sản phẩm Hàn Quốc, hoa hồng cho mỗi khách hàng, số suất còn lại.">
+<link rel="canonical" href="https://vn.makenov.com/affiliate/campaigns.html">
+<link rel="stylesheet" href="../assets/css/style.css?v=20260909b">
+<link rel="stylesheet" href="affiliate.css?v=20260909c">
+<link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
+</head>
+<body>
+<header class="mk-header" id="mk-header"></header>
+
+<main class="wrap">
+  <div class="page-head"><h1>Chiến dịch</h1><p>Chọn sản phẩm, lấy link riêng của bạn, chia sẻ cho nhà phân phối.</p></div>
+  <div class="filterbar aff" id="filter"></div>
+  <div class="grid" id="list" style="margin-top:26px"></div>
+</main>
+
+<footer class="mk-footer" id="mk-footer"></footer>
+<script src="../assets/js/config.js?v=20260817b"></script>
+<script src="aff-mock.js?v=20260909c"></script>
+<script src="aff.js?v=20260909c"></script>
+<script>
+let cat = qs('cat') || '', sort = 'cpa';
+function setCat(c){ cat = c; draw(); }
+function setSort(s){ sort = s; draw(); }
+async function draw(){
+  const all = await AffApi.campaigns({ sort });
+  const cats = AFF_CATS.filter(c => all.some(x => x.cat === c.id));
+  document.getElementById('filter').innerHTML =
+    `<button class="chip ${!cat ? 'on' : ''}" onclick="setCat('')">Tất cả</button>` +
+    cats.map(c => `<button class="chip ${cat === c.id ? 'on' : ''}" onclick="setCat('${c.id}')">${esc(c.name)}</button>`).join('') +
+    `<select class="sortsel" onchange="setSort(this.value)"><option value="cpa" ${sort === 'cpa' ? 'selected' : ''}>Hoa hồng cao</option><option value="new" ${sort === 'new' ? 'selected' : ''}>Mới nhất</option></select>`;
+  const list = cat ? all.filter(c => c.cat === cat) : all;
+  document.getElementById('list').innerHTML = list.length ? list.map(campaignCard).join('')
+    : `<div class="empty" style="grid-column:1/-1"><p>Chưa có chiến dịch trong danh mục này</p></div>`;
+}
+affBoot('campaigns', draw);
+</script>
+</body>
+</html>

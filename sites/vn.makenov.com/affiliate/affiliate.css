@@ -1,0 +1,129 @@
+/* affiliate.css — 제휴(CTV) 화면 전용. 나머지는 style.css 를 그대로 쓴다 */
+.aff-tag{font-style:normal;font-family:inherit;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#13A583;background:#EEFBF7;border-radius:4px;padding:4px 7px;margin-left:10px;line-height:1}
+.mk-nav a.on{color:var(--mk-primary);border-bottom-color:var(--mk-primary)}
+.aff-me{display:flex;flex-direction:column;align-items:flex-end;line-height:1.25;margin-right:6px}
+.aff-me b{font-size:14px;color:var(--mk-ink)}
+.aff-me span{font-size:12px;color:#13A583;font-weight:700}
+
+/* 카드 단가·잔여 */
+.p-card .meta .aff-cpa{font-size:18px;font-weight:700;line-height:27px;color:var(--mk-primary);letter-spacing:-.01em}
+.p-card .meta .aff-cpa small{font-size:12px;font-weight:400;color:#808284;margin-left:3px}
+.p-card .meta .aff-left{margin-left:auto;font-size:12px;color:#808284;align-self:center}
+
+/* 히어로 */
+.aff-hero{margin:28px 0 56px;padding:56px 48px;border-radius:12px;background:#EEFBF7;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:36px;align-items:center}
+.aff-hero h1{font-size:34px;font-weight:800;letter-spacing:-.025em;line-height:1.28;color:#191F28;margin:0 0 14px}
+.aff-hero p{font-size:16px;line-height:1.75;color:#37424E;margin:0 0 24px;max-width:560px}
+.aff-hero .cta{display:flex;gap:10px;flex-wrap:wrap}
+.aff-hero .facts{display:grid;gap:10px}
+.aff-hero .fact{background:#fff;border-radius:10px;padding:16px 18px;display:flex;align-items:center;gap:14px}
+.aff-hero .fact b{font-size:22px;font-weight:800;color:#13A583;letter-spacing:-.02em;min-width:64px}
+.aff-hero .fact span{font-size:14px;color:#37424E;line-height:1.5}
+
+/* 숫자 카드 (대시보드·이용 방법) */
+.aff-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:0 0 28px}
+.aff-stats.three{grid-template-columns:repeat(3,1fr)}
+.aff-stat{border:1px solid var(--mk-line);border-radius:10px;padding:20px 22px;background:#fff}
+.aff-stat .lb{font-size:13px;color:#8B95A1;margin-bottom:8px}
+.aff-stat .v{font-size:26px;font-weight:800;letter-spacing:-.02em;color:#191F28;line-height:1.2}
+.aff-stat .v small{font-size:13px;font-weight:500;color:#8B95A1;margin-left:4px}
+.aff-stat.step .n{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--mk-primary);color:#fff;font-size:14px;font-weight:800;margin-bottom:12px}
+.aff-stat.step h3{font-size:16px;font-weight:700;margin:0 0 6px}
+.aff-stat.step p{font-size:14px;line-height:1.65;color:#4E5968;margin:0}
+
+/* 랭킹 */
+.aff-rank{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.aff-rank .box{border:1px solid var(--mk-line);border-radius:10px;padding:20px 22px;background:#fff}
+.aff-rank h3{font-size:16px;font-weight:700;margin:0 0 12px}
+.aff-rank ol{list-style:none;margin:0;padding:0}
+.aff-rank li{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--mk-line);font-size:14px;color:#37424E}
+.aff-rank li:last-child{border-bottom:0}
+.aff-rank .r{width:22px;font-weight:800;color:#8B95A1;text-align:center}
+.aff-rank li:nth-child(-n+3) .r{color:var(--mk-primary)}
+.aff-rank .nm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.aff-rank .v{font-weight:700;color:#191F28}
+
+/* 표 */
+.aff-table{width:100%;border-collapse:collapse;font-size:14px}
+.aff-table th{text-align:left;font-size:12px;font-weight:600;color:#8B95A1;padding:10px 8px;border-bottom:1px solid var(--mk-line);white-space:nowrap}
+.aff-table td{padding:13px 8px;border-bottom:1px solid var(--mk-line);color:#37424E;vertical-align:top}
+.aff-table td.num,.aff-table th.num{text-align:right;white-space:nowrap}
+.aff-table .sub{display:block;font-size:12px;color:#8B95A1;margin-top:3px}
+.aff-table-wrap{overflow-x:auto}
+
+/* 상태 뱃지 */
+.aff-status{display:inline-block;font-size:12px;font-weight:700;padding:3px 8px;border-radius:999px;background:#F2F4F6;color:#4E5968;white-space:nowrap}
+.aff-status.approved,.aff-status.paid{background:#EEFBF7;color:#13A583}
+.aff-status.rejected{background:#FDECEC;color:#D9534F}
+
+/* 소재 그리드 · 링크 박스 */
+.aff-mats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.aff-mats figure{margin:0;border:1px solid var(--mk-line);border-radius:8px;overflow:hidden;background:#fff}
+.aff-mats img{width:100%;aspect-ratio:1;object-fit:cover;display:block}
+.aff-mats figcaption{padding:10px;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#8B95A1}
+.aff-copybox{position:relative;background:var(--mk-bg-soft);border-radius:8px;padding:16px 18px;font-size:15px;line-height:1.75;color:#37424E;white-space:pre-wrap}
+.aff-copybox .btn{position:absolute;top:10px;right:10px}
+.aff-rules{white-space:pre-wrap;font-size:15px;line-height:1.8;color:#37424E}
+.aff-linkbox{display:flex;gap:8px;margin-top:14px}
+.aff-linkbox input{flex:1;min-width:0;height:42px;border:1px solid var(--mk-line-strong);border-radius:var(--r-sm);padding:0 12px;font-size:13px;color:#37424E;background:#fff}
+.aff-side-cpa{font-size:28px;font-weight:800;color:var(--mk-primary);letter-spacing:-.02em;margin:14px 0 2px}
+.aff-side-cpa small{font-size:13px;font-weight:500;color:#8B95A1;margin-left:4px}
+.aff-side-left{font-size:13px;color:#8B95A1;margin-bottom:14px}
+
+/* 가입·로그인 카드 */
+.aff-form{max-width:440px;margin:40px auto 60px;background:#fff;border:1px solid var(--mk-line);border-radius:12px;padding:34px 32px}
+.aff-form h1{font-size:24px;font-weight:800;letter-spacing:-.02em;margin:0 0 6px}
+.aff-form .sub{font-size:14px;color:#8B95A1;margin:0 0 22px}
+.aff-form .foot{margin-top:18px;font-size:14px;color:#8B95A1;text-align:center}
+.aff-form .foot a{color:var(--mk-primary-dark);font-weight:600}
+.aff-form .agree{display:flex;gap:8px;align-items:flex-start;font-size:13px;color:#4E5968;line-height:1.5;margin:4px 0 16px}
+.aff-form .agree input{margin-top:3px}
+
+/* 마이페이지 */
+.aff-bars{display:flex;align-items:flex-end;gap:4px;height:120px;padding:0 0 6px;border-bottom:1px solid var(--mk-line)}
+.aff-bars i{flex:1;background:var(--mk-primary);opacity:.85;border-radius:3px 3px 0 0;min-height:2px;position:relative}
+.aff-bars i:hover{opacity:1}
+.aff-bars i::after{content:attr(data-v);position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:11px;color:#8B95A1;opacity:0}
+.aff-bars i:hover::after{opacity:1}
+.aff-bars-lb{display:flex;justify-content:space-between;font-size:12px;color:#8B95A1;margin-top:6px}
+.aff-bal{display:flex;align-items:baseline;gap:10px;margin:0 0 6px}
+.aff-bal b{font-size:32px;font-weight:800;letter-spacing:-.02em;color:#191F28}
+.aff-bal span{font-size:14px;color:#8B95A1}
+.aff-two{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
+.aff-box{border:1px solid var(--mk-line);border-radius:10px;padding:22px 24px;background:#fff;margin-bottom:20px}
+.aff-box h3{font-size:16px;font-weight:700;margin:0 0 14px}
+.aff-note{font-size:13px;color:#8B95A1;line-height:1.6;margin:8px 0 0}
+
+/* 목록 페이지 필터바 — 본 사이트는 헤더 137px 기준 sticky */
+.filterbar.aff{top:137px}
+
+@media(max-width:960px){
+  .aff-hero{grid-template-columns:1fr;padding:40px 28px}
+  .aff-stats{grid-template-columns:repeat(2,1fr)}
+  .aff-rank{grid-template-columns:1fr}
+  .aff-two{grid-template-columns:1fr}
+}
+@media(max-width:640px){
+  .aff-hero{padding:30px 20px;margin:16px 0 40px}
+  .aff-hero h1{font-size:26px}
+  .aff-stats,.aff-stats.three{grid-template-columns:1fr 1fr;gap:10px}
+  .aff-stat{padding:16px}
+  .aff-stat .v{font-size:22px}
+  .aff-mats{grid-template-columns:1fr 1fr}
+  .aff-form{margin:20px auto 40px;padding:26px 20px;border:0}
+  .aff-me b{display:none}
+  .aff-tag{display:none}
+}
+
+/* 모바일 — 본 사이트는 메뉴행·버튼을 숨기고 별도 모바일 메뉴를 쓰지만, CTV 화면은 메뉴가 4개뿐이라 가로 스크롤 행으로 그대로 보인다 */
+@media(max-width:860px){
+  .mk-header .mk-nav.mk-head-nav{display:flex;height:46px;gap:18px;font-size:15px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .mk-header .mk-nav.mk-head-nav::-webkit-scrollbar{display:none}
+  .mk-header .mk-nav .gnb{margin-left:auto;padding-left:12px}
+  .mk-header .mk-nav .gnb a{font-size:13px}
+}
+@media(max-width:640px){
+  .mk-header .mk-head-top{height:60px;gap:12px}
+  .mk-header .mk-head-right > .btn{display:inline-flex;height:34px;padding:0 12px;font-size:13px}
+  .mk-header .mk-head-right{gap:6px}
+}

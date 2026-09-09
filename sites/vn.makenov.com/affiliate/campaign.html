@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chiến dịch | Cộng tác viên MAKENOV</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="../assets/css/style.css?v=20260909b">
+<link rel="stylesheet" href="affiliate.css?v=20260909c">
+<link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
+</head>
+<body>
+<header class="mk-header" id="mk-header"></header>
+
+<main class="pd-wrap" id="root"></main>
+
+<footer class="mk-footer" id="mk-footer"></footer>
+<script src="../assets/js/config.js?v=20260817b"></script>
+<script src="aff-mock.js?v=20260909c"></script>
+<script src="aff.js?v=20260909c"></script>
+<script>
+affBoot('campaigns', async () => {
+  const root = document.getElementById('root');
+  const c = await AffApi.campaign(qs('id'));
+  if(!c){
+    root.innerHTML = `<div class="empty" style="margin:40px 0"><p>Không tìm thấy chiến dịch này</p><a class="btn btn-primary" href="campaigns.html" style="margin-top:16px">Xem chiến dịch</a></div>`;
+    return;
+  }
+  document.title = `${c.name} | Cộng tác viên MAKENOV`;
+  const m = AffApi.session();
+  const link = m ? affLink(m.code, c.product_id) : '';
+  const left = c.remaining == null ? 'Không giới hạn số suất' : `Còn ${c.remaining} / ${c.cap} suất`;
+  const next = encodeURIComponent('campaign.html?id=' + c.product_id);
+
+  root.innerHTML = `
+  <div class="pd-row">
+    <div class="pd-main">
+      <div class="pd-gallery"><div class="main"><img src="${esc(c.img)}" alt="${esc(c.name)}"></div></div>
+
+      <section class="pd-sec">
+        <h2>Tài liệu quảng bá</h2>
+        ${c.materials.length ? `<div class="aff-mats">${c.materials.map((u, i) => `<figure><img src="${esc(u)}" alt="${esc(c.name)} ${i + 1}" loading="lazy"><figcaption><span>Hình ${i + 1}</span><a class="btn btn-ghost btn-sm" href="${esc(u)}" download target="_blank" rel="noopener">Tải xuống</a></figcaption></figure>`).join('')}</div>`
+          : `<p class="aff-note">Chưa có tài liệu. Dùng hình sản phẩm phía trên.</p>`}
+      </section>
+
+      <section class="pd-sec">
+        <h2>Nội dung gợi ý</h2>
+        <div class="aff-copybox" id="copybox">${esc(c.copy_text)}<button class="btn btn-ghost btn-sm" onclick="copyText(${JSON.stringify(c.copy_text)})">Sao chép</button></div>
+        <p class="aff-note">Bạn có thể sửa lại theo cách nói của mình. Chỉ cần giữ đúng thông tin sản phẩm và link có mã của bạn.</p>
+      </section>
+
+      <section class="pd-sec">
+        <h2>Quy định chiến dịch</h2>
+        <div class="aff-rules">${esc(c.rules)}</div>
+      </section>
+    </div>
+
+    <aside class="pd-side">
+      <div class="box">
+        <div class="brand">${esc(c.brand)}</div>
+        <h1>${esc(c.name)}</h1>
+        <p class="tagline">${esc(c.headline)}</p>
+        <div class="aff-side-cpa">${vnd(c.cpa_vnd)}<small>/ khách hàng được duyệt</small></div>
+        <div class="aff-side-left">${left} · Đã duyệt ${c.approved} · Chờ ${c.pending}</div>
+        ${m ? `
+        <div style="font-size:13px;font-weight:600;color:#4E5968">Link của bạn</div>
+        <div class="aff-linkbox"><input readonly value="${esc(link)}" onclick="this.select()"><button class="btn btn-primary" onclick="copyText(${JSON.stringify(link)})">Sao chép</button></div>
+        <div class="pd-ctas" style="margin-top:14px">
+          <a class="btn btn-ghost" href="${esc(link)}" target="_blank" rel="noopener">Mở trang sản phẩm ↗</a>
+          <a class="btn btn-soft" href="my.html">Xem khách hàng của tôi</a>
+        </div>` : `
+        <div class="pd-ctas">
+          <a class="btn btn-primary" href="login.html?next=${next}">Đăng nhập để lấy link</a>
+          <a class="btn btn-ghost" href="join.html?next=${next}">Đăng ký cộng tác viên</a>
+        </div>
+        <p class="aff-note">Mỗi cộng tác viên có link riêng. Khách hàng gửi yêu cầu qua link của bạn mới được tính hoa hồng.</p>`}
+      </div>
+    </aside>
+  </div>
+  <nav class="pd-links"><a href="campaigns.html">Tất cả chiến dịch</a><a href="campaigns.html?cat=${esc(c.cat)}">${esc(catName(c.cat))}</a><a href="${AFF_HOST}/products/${esc(c.product_id)}.html" target="_blank" rel="noopener">Trang sản phẩm trên MAKENOV ↗</a></nav>`;
+});
+</script>
+</body>
+</html>

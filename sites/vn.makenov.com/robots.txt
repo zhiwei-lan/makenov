@@ -2,65 +2,104 @@ User-agent: *
 Allow: /
 Disallow: /admin/
 Disallow: /mypage.html
+Disallow: /affiliate/my.html
+Disallow: /affiliate/login.html
+Disallow: /affiliate/join.html
 
 User-agent: GPTBot
 Allow: /
 Disallow: /admin/
 Disallow: /mypage.html
+Disallow: /affiliate/my.html
+Disallow: /affiliate/login.html
+Disallow: /affiliate/join.html
 
 User-agent: OAI-SearchBot
 Allow: /
 Disallow: /admin/
 Disallow: /mypage.html
+Disallow: /affiliate/my.html
+Disallow: /affiliate/login.html
+Disallow: /affiliate/join.html
 
 User-agent: ChatGPT-User
 Allow: /
 Disallow: /admin/
 Disallow: /mypage.html
+Disallow: /affiliate/my.html
+Disallow: /affiliate/login.html
+Disallow: /affiliate/join.html
 
 User-agent: ClaudeBot
 Allow: /
 Disallow: /admin/
 Disallow: /mypage.html
+Disallow: /affiliate/my.html
+Disallow: /affiliate/login.html
+Disallow: /affiliate/join.html
 
 User-agent: Claude-User
 Allow: /
 Disallow: /admin/
 Disallow: /mypage.html
+Disallow: /affiliate/my.html
+Disallow: /affiliate/login.html
+Disallow: /affiliate/join.html
 
 User-agent: Claude-SearchBot
 Allow: /
 Disallow: /admin/
 Disallow: /mypage.html
+Disallow: /affiliate/my.html
+Disallow: /affiliate/login.html
+Disallow: /affiliate/join.html
 
 User-agent: PerplexityBot
 Allow: /
 Disallow: /admin/
 Disallow: /mypage.html
+Disallow: /affiliate/my.html
+Disallow: /affiliate/login.html
+Disallow: /affiliate/join.html
 
 User-agent: Perplexity-User
 Allow: /
 Disallow: /admin/
 Disallow: /mypage.html
+Disallow: /affiliate/my.html
+Disallow: /affiliate/login.html
+Disallow: /affiliate/join.html
 
 User-agent: Google-Extended
 Allow: /
 Disallow: /admin/
 Disallow: /mypage.html
+Disallow: /affiliate/my.html
+Disallow: /affiliate/login.html
+Disallow: /affiliate/join.html
 
 User-agent: Applebot-Extended
 Allow: /
 Disallow: /admin/
 Disallow: /mypage.html
+Disallow: /affiliate/my.html
+Disallow: /affiliate/login.html
+Disallow: /affiliate/join.html
 
 User-agent: meta-externalagent
 Allow: /
 Disallow: /admin/
 Disallow: /mypage.html
+Disallow: /affiliate/my.html
+Disallow: /affiliate/login.html
+Disallow: /affiliate/join.html
 
 User-agent: CCBot
 Allow: /
 Disallow: /admin/
 Disallow: /mypage.html
+Disallow: /affiliate/my.html
+Disallow: /affiliate/login.html
+Disallow: /affiliate/join.html
 
 Sitemap: https://vn.makenov.com/sitemap.xml
