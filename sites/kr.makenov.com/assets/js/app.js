@@ -702,20 +702,40 @@ function mkSwapPrerender(){
 /* ---------- 제휴(CTV) 추적 ----------
    마케터 링크 ?ref=코드[&ch=채널] 로 들어오면 30일(관리자 설정) 기억하고 클릭 1건을 보낸다.
    문의를 보낼 때 store-supabase.addInquiry 가 mkAffRef() 를 읽어 aff_ref 를 붙인다. */
-function mkAffRef(){
+/* 저장은 두 곳: localStorage(이 호스트) + .makenov.com 공통 쿠키(vn/kr/en/makenov.com 어디로 갔다 와도 유지).
+   만료 30일은 마지막 클릭부터 다시 센다(마지막 클릭 우선). */
+const MK_AFF_DAYS = 30;
+function mkAffCookie(){
+  const m = document.cookie.match(/(?:^|;\s*)mk_aff=([^;]*)/);
+  if(!m) return null;
+  try{ return JSON.parse(decodeURIComponent(m[1])); }catch(e){ return null; }
+}
+function mkAffStore(a){
+  try{ localStorage.setItem('mk_aff', JSON.stringify(a)); }catch(e){}
   try{
-    const a = JSON.parse(localStorage.getItem('mk_aff') || 'null');
-    if(!a || !a.code) return null;
-    if(Date.now() - (a.ts || 0) > (a.days || 30) * 86400000){ localStorage.removeItem('mk_aff'); return null; }
-    return a;
-  }catch(e){ return null; }
+    const host = location.hostname, dom = /makenov\.com$/.test(host) ? ';domain=.makenov.com' : '';
+    document.cookie = 'mk_aff=' + encodeURIComponent(JSON.stringify(a)) + ';max-age=' + (MK_AFF_DAYS * 86400) + ';path=/' + dom + ';SameSite=Lax' + (location.protocol === 'https:' ? ';Secure' : '');
+  }catch(e){}
+}
+function mkAffRef(){
+  let a = null;
+  try{ a = JSON.parse(localStorage.getItem('mk_aff') || 'null'); }catch(e){}
+  const c = mkAffCookie();
+  if(c && c.code && (!a || (c.ts || 0) > (a.ts || 0))) a = c;     // 다른 서브도메인에서 더 최근에 눌렀으면 그쪽
+  if(!a || !a.code) return null;
+  if(Date.now() - (a.ts || 0) > (a.days || MK_AFF_DAYS) * 86400000){ try{ localStorage.removeItem('mk_aff'); }catch(e){} return null; }
+  return a;
 }
 function mkAffCapture(){
   const q = new URLSearchParams(location.search);
   const code = (q.get('ref') || '').toUpperCase();
-  if(!/^[A-Z0-9]{4,8}$/.test(code)) return;
+  if(!/^[A-Z0-9]{4,8}$/.test(code)){
+    /* ref 없이 왔어도 쿠키에 있으면 localStorage 로 옮겨 둔다(서브도메인 이동) */
+    const c = mkAffCookie(); if(c && c.code){ try{ if(!localStorage.getItem('mk_aff')) localStorage.setItem('mk_aff', JSON.stringify(c)); }catch(e){} }
+    return;
+  }
   const ch = (q.get('ch') || '').toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 16);
-  try{ localStorage.setItem('mk_aff', JSON.stringify({ code, ch, ts: Date.now(), days: 30 })); }catch(e){}
+  mkAffStore({ code, ch, ts: Date.now(), days: MK_AFF_DAYS });
   const pid = window.MK_PID || q.get('id') || '';
   try{
     fetch(MK_SUPABASE_URL.replace(/\/$/, '') + '/aff/v1/click', { method:'POST', keepalive:true,
