@@ -546,3 +546,11 @@ body.aff-body{background:#fff}
 .lp-qa .q h3{margin:0 0 8px;font-size:17px;font-weight:700;color:var(--aff-ink);letter-spacing:-.01em}
 .lp-qa .q p{margin:0;font-size:15px;line-height:1.7;color:var(--aff-body);max-width:760px}
 @media(max-width:640px){.lp-qa .q{padding:16px 16px;grid-template-columns:28px 1fr;column-gap:10px}.lp-qa .q h3{font-size:15px}.lp-qa .q p{font-size:14px}}
+
+/* 가이드 4단계: 채널 로고만 (히어로 타일과 같은 면, 기울기 없음) */
+.g2-logos{display:flex;gap:22px;flex-wrap:wrap;margin-top:14px}
+.g2-logos .l{display:flex;flex-direction:column;align-items:center;gap:8px}
+.g2-logos .tile{display:block;width:76px;height:76px;border-radius:20px;position:relative;background:linear-gradient(160deg,#F1F3F6 0%,#D5DAE2 100%);box-shadow:0 12px 20px -10px rgba(25,31,40,.28),inset 0 1px 0 #fff,inset 0 -3px 0 rgba(25,31,40,.08)}
+.g2-logos .face{position:absolute;inset:6px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(25,31,40,.08)}
+.g2-logos svg{width:36px;height:36px}
+.g2-logos b{font-size:12px;font-weight:700;color:var(--aff-sub)}
