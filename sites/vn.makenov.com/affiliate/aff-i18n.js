@@ -65,6 +65,7 @@ ko: {
   join_title:'가입', join_h:'파트너 가입', join_sub:'무료입니다. 가입하면 캠페인마다 내 링크가 바로 생깁니다.',
   email:'이메일', pw:'비밀번호', pw_ph:'8자 이상', pw2:'비밀번호 확인', name:'이름', phone:'전화번호', zalo:'Zalo', optional:'(선택)', zalo_ph:'알림 받을 Zalo 번호',
   agree:'<a href="rules.html" target="_blank">홍보 규정</a>에 동의합니다: 허위 광고·가짜 요청 금지, 링크의 내 코드 유지.',
+  channel:'내 채널 링크', channel_hint:'TikTok·Facebook·YouTube 프로필 주소. 심사 때 참고합니다.', channel_ph:'https://www.tiktok.com/@...',
   join_btn:'가입하기', has_acc:'이미 계정이 있나요?', pw_mismatch:'비밀번호가 서로 다릅니다', join_ok:'가입되었습니다',
   login_title:'로그인', login_h:'로그인', login_sub:'MAKENOV 파트너 계정', login_btn:'로그인', forgot:'비밀번호를 잊었나요?', forgot_msg:'비밀번호 재설정은 Zalo {z} 로 문의하세요', no_acc:'계정이 없나요?',
   /* 내 페이지 */
@@ -168,6 +169,7 @@ vi: {
   join_title:'Đăng ký', join_h:'Đăng ký cộng tác viên', join_sub:'Miễn phí. Sau khi đăng ký bạn có ngay link riêng cho từng chiến dịch.',
   email:'Email', pw:'Mật khẩu', pw_ph:'Tối thiểu 8 ký tự', pw2:'Nhập lại mật khẩu', name:'Họ tên', phone:'Số điện thoại', zalo:'Zalo', optional:'(không bắt buộc)', zalo_ph:'Số Zalo để nhận thông báo',
   agree:'Tôi đồng ý với <a href="rules.html" target="_blank">quy định chia sẻ</a>: không quảng cáo sai sự thật, không tự tạo yêu cầu giả, giữ nguyên mã CTV trong link.',
+  channel:'Link kênh của bạn', channel_hint:'Địa chỉ trang TikTok, Facebook hoặc YouTube. Dùng khi xét duyệt.', channel_ph:'https://www.tiktok.com/@...',
   join_btn:'Đăng ký', has_acc:'Đã có tài khoản?', pw_mismatch:'Hai mật khẩu không khớp', join_ok:'Đăng ký thành công',
   login_title:'Đăng nhập', login_h:'Đăng nhập', login_sub:'Tài khoản cộng tác viên MAKENOV', login_btn:'Đăng nhập', forgot:'Quên mật khẩu?', forgot_msg:'Liên hệ Zalo hỗ trợ {z} để đặt lại mật khẩu', no_acc:'Chưa có tài khoản?',
   my_title:'Trang của tôi', member_since:'Tham gia', my_link:'Link giới thiệu chung', my_link_note:'Link theo từng sản phẩm lấy trong trang <a href="index.html">Chiến dịch</a>.',

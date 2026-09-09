@@ -32,7 +32,7 @@ class Aff extends BaseApiController
 
     private ?array $marketer = null;   // aff_tokens 로 식별된 마케터 행
     /** 마이그레이션을 추가하면 올린다 — writable/aff_schema_ok 에 적힌 값과 다르면 latest() 를 다시 돈다 */
-    private const SCHEMA_VER = '2';
+    private const SCHEMA_VER = '3';
 
     /* ================= 진입점 ================= */
 
@@ -198,7 +198,7 @@ class Aff extends BaseApiController
         $m = [
             'id' => $this->uuid(), 'code' => $this->newCode(), 'email' => $email,
             'password_hash' => password_hash($pw, PASSWORD_DEFAULT), 'name' => $name,
-            'phone' => trim((string) ($b['phone'] ?? '')), 'zalo' => trim((string) ($b['zalo'] ?? '')),
+            'phone' => trim((string) ($b['phone'] ?? '')), 'zalo' => trim((string) ($b['zalo'] ?? '')), 'channel' => substr(trim((string) ($b['channel'] ?? '')), 0, 255),
             'bank_name' => '', 'bank_account' => '', 'bank_holder' => '', 'status' => 'active',
             'created_at' => $now, 'updated_at' => $now,
         ];
@@ -245,7 +245,7 @@ class Aff extends BaseApiController
     {
         $b = $this->bodyJson() ?? [];
         $row = [];
-        foreach (['name', 'phone', 'zalo', 'bank_name', 'bank_account', 'bank_holder'] as $k) {
+        foreach (['name', 'phone', 'zalo', 'channel', 'bank_name', 'bank_account', 'bank_holder'] as $k) {
             if (array_key_exists($k, $b)) $row[$k] = trim((string) $b[$k]);
         }
         if (isset($row['name']) && $row['name'] === '') return $this->err('Vui lòng nhập họ tên', 422);
