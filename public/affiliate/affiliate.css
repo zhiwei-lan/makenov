@@ -515,9 +515,10 @@ body.aff-body{background:#fff}
   box-shadow:inset 0 1px 0 #fff,0 2px 6px rgba(25,31,40,.08)}
 .hero-tiles .tile svg{width:58px;height:58px;position:relative;z-index:1}
 .hero-tiles .tile.t4 svg{width:70px;height:70px}
-.hero-tiles .t2,.hero-tiles .t4{transform:translateY(34px) rotateX(10deg) rotateY(-12deg)}
+/* 둥실 애니메이션은 margin 이 아니라 translate 로 — margin 을 흔들면 레이아웃이 바뀌어 페이지 전체가 일렁였음 */
+.hero-tiles .t2,.hero-tiles .t4{margin-top:34px}
 .hero-tiles .t2{animation-delay:-1.2s}.hero-tiles .t3{animation-delay:-2.4s}.hero-tiles .t4{animation-delay:-3.6s}
-@keyframes tileFloat{0%,100%{margin-top:0}50%{margin-top:-8px}}
+@keyframes tileFloat{0%,100%{translate:0 0}50%{translate:0 -8px}}
 @media(prefers-reduced-motion:reduce){.hero-tiles .tile{animation:none}}
 @media(max-width:1100px){.lp-hero .visual{max-width:none}}
-@media(max-width:640px){.hero-tiles{grid-template-columns:repeat(2,96px);gap:18px 22px}.hero-tiles .tile{width:96px;height:96px;border-radius:26px}.hero-tiles .tile .face{inset:7px;border-radius:20px}.hero-tiles .tile svg{width:44px;height:44px}.hero-tiles .tile.t4 svg{width:54px;height:54px}.hero-tiles .t2,.hero-tiles .t4{transform:translateY(24px) rotateX(10deg) rotateY(-12deg)}}
+@media(max-width:640px){.hero-tiles{grid-template-columns:repeat(2,96px);gap:18px 22px}.hero-tiles .tile{width:96px;height:96px;border-radius:26px}.hero-tiles .tile .face{inset:7px;border-radius:20px}.hero-tiles .tile svg{width:44px;height:44px}.hero-tiles .tile.t4 svg{width:54px;height:54px}.hero-tiles .t2,.hero-tiles .t4{margin-top:24px}}
