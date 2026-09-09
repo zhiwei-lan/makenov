@@ -11,7 +11,7 @@
 CREATE TABLE IF NOT EXISTS `aff_marketers` (
   `id` CHAR(36) NOT NULL,
   `code` VARCHAR(8) NOT NULL,
-  `email` VARCHAR(255) NOT NULL,
+  `email` VARCHAR(191) NOT NULL,
   `password_hash` VARCHAR(255) NOT NULL,
   `name` VARCHAR(120) NULL,
   `phone` VARCHAR(40) NULL,

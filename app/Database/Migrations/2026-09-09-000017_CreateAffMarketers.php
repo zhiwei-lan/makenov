@@ -17,7 +17,7 @@ class CreateAffMarketers extends Migration
         $this->forge->addField([
             'id' => ['type'=>'CHAR','constraint'=>36],
             'code' => ['type'=>'VARCHAR','constraint'=>8],
-            'email' => ['type'=>'VARCHAR','constraint'=>255],
+            'email' => ['type'=>'VARCHAR','constraint'=>191],   // utf8mb4 유니크 인덱스 767바이트 한도(MySQL 5.6)
             'password_hash' => ['type'=>'VARCHAR','constraint'=>255],
             'name' => ['type'=>'VARCHAR','constraint'=>120,'null'=>true],
             'phone' => ['type'=>'VARCHAR','constraint'=>40,'null'=>true],
