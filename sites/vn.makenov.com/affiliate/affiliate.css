@@ -538,3 +538,11 @@ body.aff-body{background:#fff}
 .lp-top1 .btn{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.3)}
 .lp-top1 .btn:hover{background:rgba(255,255,255,.18)}
 @media(max-width:640px){.lp-top1 .v{font-size:32px}}
+
+/* 랜딩 FAQ: 질문 하나 = 블록 하나 (접지 않음) */
+.lp-qa{display:flex;flex-direction:column;gap:12px}
+.lp-qa .q{display:grid;grid-template-columns:36px 1fr;column-gap:14px;background:#fff;border:1px solid var(--aff-line);border-radius:14px;padding:20px 22px}
+.lp-qa .q .n{grid-row:1/3;width:28px;height:28px;border-radius:50%;background:#EEFBF7;color:var(--aff-mint-dark);font-size:13px;font-weight:800;display:grid;place-items:center;margin-top:1px}
+.lp-qa .q h3{margin:0 0 8px;font-size:17px;font-weight:700;color:var(--aff-ink);letter-spacing:-.01em}
+.lp-qa .q p{margin:0;font-size:15px;line-height:1.7;color:var(--aff-body);max-width:760px}
+@media(max-width:640px){.lp-qa .q{padding:16px 16px;grid-template-columns:28px 1fr;column-gap:10px}.lp-qa .q h3{font-size:15px}.lp-qa .q p{font-size:14px}}
