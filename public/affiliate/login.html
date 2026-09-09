@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Đăng nhập cộng tác viên | MAKENOV</title>
+<title>Đăng nhập | Cộng tác viên MAKENOV</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="../assets/css/style.css?v=20260909b">
-<link rel="stylesheet" href="affiliate.css?v=20260909f">
+<link rel="stylesheet" href="affiliate.css?v=20260909g">
 <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
 </head>
 <body class="aff-body">
@@ -16,31 +16,30 @@
     <div class="aff-top" id="aff-top"></div>
     <main class="aff-content">
       <form class="aff-form" onsubmit="return submitLogin(event)">
-        <h1>Đăng nhập</h1>
-        <p class="sub">Tài khoản cộng tác viên MAKENOV</p>
-        <div class="f-row"><label>Email</label><input id="email" type="email" required autocomplete="email"></div>
-        <div class="f-row"><label>Mật khẩu</label><input id="pw" type="password" required autocomplete="current-password"></div>
-        <button class="btn btn-primary btn-block btn-lg" id="btn" type="submit">Đăng nhập</button>
-        <p class="foot"><a href="#" onclick="toast('Liên hệ Zalo hỗ trợ ' + AFF_ZALO + ' để đặt lại mật khẩu');return false">Quên mật khẩu?</a> · Chưa có tài khoản? <a href="join.html" id="join-link">Đăng ký</a></p>
+        <h1 data-i18n="login_h"></h1>
+        <p class="sub" data-i18n="login_sub"></p>
+        <div class="f-row"><label data-i18n="email"></label><input id="email" type="email" required autocomplete="email"></div>
+        <div class="f-row"><label data-i18n="pw"></label><input id="pw" type="password" required autocomplete="current-password"></div>
+        <button class="btn btn-primary btn-block btn-lg" id="btn" type="submit" data-i18n="login_btn"></button>
+        <p class="foot"><a href="#" onclick="toast(t('forgot_msg',{z:AFF_ZALO}));return false" data-i18n="forgot"></a> · <span data-i18n="no_acc"></span> <a href="join.html" id="join-link" data-i18n="join"></a></p>
       </form>
     </main>
     <footer class="aff-foot" id="aff-foot"></footer>
   </div>
 </div>
 <script src="../assets/js/config.js?v=20260817b"></script>
-<script src="aff-api.js?v=20260909f"></script>
-<script src="aff.js?v=20260909f"></script>
+<script src="aff-i18n.js?v=20260909g"></script>
+<script src="aff-api.js?v=20260909g"></script>
+<script src="aff.js?v=20260909g"></script>
 <script>
 async function submitLogin(e){
   e.preventDefault();
   const b = document.getElementById('btn'); b.disabled = true;
-  try{
-    await AffApi.login(document.getElementById('email').value.trim(), document.getElementById('pw').value);
-    location.href = qs('next') || 'my.html';
-  }catch(err){ toast(err.message); b.disabled = false; }
+  try{ await AffApi.login(document.getElementById('email').value.trim(), document.getElementById('pw').value); location.href = qs('next') || 'my.html'; }
+  catch(err){ toast(err.message); b.disabled = false; }
   return false;
 }
-affBoot('', { title:'Đăng nhập', back:'index.html' }, () => {
+affBoot('', { titleKey:'login_title', back:'index.html' }, () => {
   if(AffApi.session()){ location.replace(qs('next') || 'my.html'); return; }
   if(qs('next')) document.getElementById('join-link').href = 'join.html?next=' + encodeURIComponent(qs('next'));
 });

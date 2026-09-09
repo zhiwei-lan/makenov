@@ -7,10 +7,10 @@
 <meta name="description" content="Chương trình cộng tác viên MAKENOV: chọn chiến dịch sản phẩm Hàn Quốc, lấy link riêng, đăng lên TikTok, Facebook, Zalo và nhận hoa hồng cho mỗi khách hàng được duyệt.">
 <link rel="canonical" href="https://vn.makenov.com/affiliate/">
 <meta property="og:title" content="Cộng tác viên MAKENOV — kiếm hoa hồng khi giới thiệu sản phẩm Hàn Quốc">
-<meta property="og:description" content="Đăng link lên TikTok, Facebook, Zalo. Nhận 150.000–250.000 ₫ cho mỗi khách hàng được duyệt. Không cần vốn.">
+<meta property="og:description" content="Đăng link lên TikTok, Facebook, Zalo. Nhận hoa hồng cho mỗi khách hàng được duyệt. Không cần vốn.">
 <meta property="og:image" content="https://makenov.com/assets/img/og.png">
 <link rel="stylesheet" href="../assets/css/style.css?v=20260909b">
-<link rel="stylesheet" href="affiliate.css?v=20260909f">
+<link rel="stylesheet" href="affiliate.css?v=20260909g">
 <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
 </head>
 <body class="aff-body">
@@ -19,49 +19,45 @@
   <div class="aff-main">
     <div class="aff-top" id="aff-top"></div>
     <main class="aff-content">
-      <section class="aff-banner" id="banner">
-        <div>
-          <h2>Đăng link lên TikTok, Facebook, Zalo. Nhận hoa hồng cho mỗi khách hàng.</h2>
-          <p>Cửa hàng, đại lý gửi yêu cầu báo giá qua link của bạn và được duyệt → bạn nhận <b id="banner-range">150.000–250.000 ₫</b>. Không cần vốn, không cần nhập hàng.</p>
-        </div>
+      <section class="aff-banner">
+        <div><h2 data-i18n="banner_h"></h2><p data-i18n="banner_p"></p></div>
         <div class="cta" id="banner-cta"></div>
       </section>
-
       <div class="aff-tabs" id="tabs"></div>
       <div class="aff-list" id="list"></div>
     </main>
     <footer class="aff-foot" id="aff-foot"></footer>
   </div>
 </div>
-
 <script src="../assets/js/config.js?v=20260817b"></script>
-<script src="aff-api.js?v=20260909f"></script>
-<script src="aff.js?v=20260909f"></script>
+<script src="aff-i18n.js?v=20260909g"></script>
+<script src="aff-api.js?v=20260909g"></script>
+<script src="aff.js?v=20260909g"></script>
 <script>
-let cat = qs('cat') || '', sort = 'cpa', q = '';
+let cat = qs('cat') || '', sort = 'cpa', q = '', ALL = [];
 function setCat(c){ cat = c; draw(); }
 function setSort(s){ sort = s; draw(); }
 function setQ(v){ q = v.trim().toLowerCase(); draw(); }
-async function draw(){
-  const all = await AffApi.campaigns({ sort });
-  const cats = AFF_CATS.filter(c => all.some(x => x.cat === c.id));
+function draw(){
+  const all = ALL.slice().sort((a, b) => sort === 'new' ? b.sort - a.sort : b.cpa_vnd - a.cpa_vnd);
+  const cats = AFF_CATS.filter(c => all.some(x => x.cat === c));
   document.getElementById('tabs').innerHTML =
-    `<button class="${!cat ? 'on' : ''}" onclick="setCat('')">Tất cả <span style="color:#8B95A1;font-weight:500">${all.length}</span></button>` +
-    cats.map(c => `<button class="${cat === c.id ? 'on' : ''}" onclick="setCat('${c.id}')">${esc(c.name)}</button>`).join('') +
-    `<span class="sp"></span><select onchange="setSort(this.value)"><option value="cpa" ${sort === 'cpa' ? 'selected' : ''}>Hoa hồng cao</option><option value="new" ${sort === 'new' ? 'selected' : ''}>Mới nhất</option></select>`;
+    `<button class="${!cat ? 'on' : ''}" onclick="setCat('')">${t('all')} <span class="n">${all.length}</span></button>` +
+    cats.map(c => `<button class="${cat === c ? 'on' : ''}" onclick="setCat('${c}')">${esc(catName(c))}</button>`).join('') +
+    `<span class="sp"></span><select onchange="setSort(this.value)"><option value="cpa" ${sort === 'cpa' ? 'selected' : ''}>${t('sort_cpa')}</option><option value="new" ${sort === 'new' ? 'selected' : ''}>${t('sort_new')}</option></select>`;
   let list = cat ? all.filter(c => c.cat === cat) : all;
   if(q) list = list.filter(c => (c.name + ' ' + c.brand + ' ' + (c.headline || '')).toLowerCase().includes(q));
-  document.getElementById('list').innerHTML = list.length ? list.map(campaignRow).join('') : `<div class="aff-empty">Chưa có chiến dịch phù hợp</div>`;
+  document.getElementById('list').innerHTML = list.length ? list.map(campaignRow).join('') : `<div class="aff-empty">${t('empty_list')}</div>`;
 }
-affBoot('home', { title:'Chiến dịch', mid:`<div class="aff-search"><input type="search" placeholder="Tìm sản phẩm, thương hiệu…" oninput="setQ(this.value)"></div>` }, async () => {
+affBoot('home', { titleKey:'home_title', mid:`<div class="aff-search"><input type="search" placeholder="${t('search_ph')}" oninput="setQ(this.value)"></div>` }, async () => {
   const m = AffApi.session();
   document.getElementById('banner-cta').innerHTML = m
-    ? `<a class="btn btn-primary" href="my.html">Trang của tôi</a><a class="btn btn-ghost" href="guide.html">Hướng dẫn</a>`
-    : `<a class="btn btn-primary" href="join.html">Đăng ký miễn phí</a><a class="btn btn-ghost" href="guide.html">Cách kiếm tiền</a>`;
-  const all = await AffApi.campaigns({});
-  if(all.length){ const cpas = all.map(c => c.cpa_vnd), lo = Math.min(...cpas), hi = Math.max(...cpas);
-    document.getElementById('banner-range').textContent = lo === hi ? vnd(hi) : `${lo.toLocaleString('vi-VN')}–${hi.toLocaleString('vi-VN')} ₫`; }
-  await draw();
+    ? `<a class="btn btn-primary" href="my.html">${t('my')}</a>`
+    : `<a class="btn btn-primary" href="join.html">${t('banner_cta')}</a><a class="btn btn-ghost" href="guide.html">${t('banner_cta2')}</a>`;
+  ALL = await AffApi.campaigns({});
+  if(ALL.length){ const cpas = ALL.map(c => c.cpa_vnd), lo = Math.min(...cpas), hi = Math.max(...cpas);
+    const r = document.getElementById('banner-range'); if(r) r.textContent = lo === hi ? vnd(hi) : `${lo.toLocaleString('vi-VN')}–${hi.toLocaleString('vi-VN')} ₫`; }
+  draw();
 });
 </script>
 </body>

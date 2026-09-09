@@ -26,6 +26,11 @@ body.aff-body{background:#fff}
 .aff-logo span{display:none}
 .aff-logo.txt span{display:inline}
 .aff-logo b{color:var(--aff-mint)}
+.aff-side-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.aff-lang{display:flex;border:1px solid var(--aff-line);border-radius:6px;overflow:hidden}
+.aff-lang button{border:0;background:#fff;font-size:11px;font-weight:800;padding:5px 7px;color:var(--aff-sub);cursor:pointer;font-family:inherit}
+.aff-lang button.on{background:var(--aff-ink);color:#fff}
+.aff-tagline{font-size:12px;color:var(--aff-sub);margin:-8px 0 0}
 .aff-logo em{font-style:normal;font-family:inherit;font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--aff-mint-dark);background:var(--aff-tint);border-radius:4px;padding:3px 5px;line-height:1;white-space:nowrap}
 .aff-profile{text-align:center;padding:4px 0 18px;border-bottom:1px solid var(--aff-line)}
 .aff-profile .av{width:56px;height:56px;border-radius:50%;margin:0 auto 10px;background:linear-gradient(135deg,#27CAA1,#13A583);color:#fff;font-size:22px;font-weight:800;display:grid;place-items:center}
@@ -56,9 +61,9 @@ body.aff-body{background:#fff}
 .aff-share.lg .si{width:40px;height:40px;font-size:16px}
 
 /* ===== 홈: 배너 · 탭 · 목록 행 ===== */
-.aff-banner{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center;background:var(--aff-tint);border-radius:12px;padding:22px 26px;margin-bottom:18px}
-.aff-banner h2{font-size:20px;font-weight:800;letter-spacing:-.02em;margin:0 0 4px;color:var(--aff-ink)}
-.aff-banner p{font-size:14px;color:var(--aff-body);margin:0}
+.aff-banner{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center;background:var(--aff-tint);border-radius:12px;padding:18px 24px;margin-bottom:16px}
+.aff-banner h2{font-size:18px;font-weight:800;letter-spacing:-.02em;margin:0 0 4px;color:var(--aff-ink)}
+.aff-banner p{font-size:13px;color:var(--aff-body);margin:0}
 .aff-banner p b{color:var(--aff-mint-dark)}
 .aff-banner .cta{display:flex;gap:8px;flex-wrap:wrap}
 .aff-tabs{display:flex;gap:4px;align-items:center;flex-wrap:wrap;margin:0 0 6px;border-bottom:1px solid var(--aff-line)}
@@ -70,23 +75,24 @@ body.aff-body{background:#fff}
 .aff-search input{flex:1;min-width:0;height:38px;border:1px solid var(--aff-mint);border-radius:999px;padding:0 16px;font-size:14px;background:#fff}
 .aff-search input:focus{outline:none;box-shadow:0 0 0 3px var(--aff-tint)}
 .aff-list{background:#fff;border:1px solid var(--aff-line);border-radius:12px;overflow:hidden}
-.aff-row{display:grid;grid-template-columns:132px minmax(0,1fr) auto;gap:18px;padding:18px 20px;border-bottom:1px solid var(--aff-line);cursor:pointer;align-items:center}
+.aff-row{display:grid;grid-template-columns:120px minmax(0,1fr) auto;gap:18px;padding:16px 20px;border-bottom:1px solid var(--aff-line);align-items:center;text-decoration:none;color:inherit}
 .aff-row:last-child{border-bottom:0}
 .aff-row:hover{background:#FAFBFC}
 .aff-row .th{display:block;aspect-ratio:4/3;border-radius:8px;overflow:hidden;background:var(--aff-bg)}
 .aff-row .th img{width:100%;height:100%;object-fit:cover;display:block}
-.aff-row .meta{font-size:12px;color:var(--aff-sub);margin-bottom:4px}
+.aff-row .bd{display:flex;flex-direction:column;gap:4px;min-width:0}
+.aff-row .meta{font-size:12px;color:var(--aff-sub)}
 .aff-row .meta b{color:var(--aff-mint-dark);font-weight:700}
 .aff-row .meta i{font-style:normal;margin:0 6px;color:#CED4DA}
-.aff-row h3{font-size:16px;font-weight:700;margin:0 0 4px;line-height:1.4}
-.aff-row h3 a{color:var(--aff-ink);text-decoration:none}
-.aff-row p{font-size:13px;color:var(--aff-body);margin:0 0 10px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
-.aff-row .foot{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-.aff-row .cpa{font-size:15px;font-weight:800;color:var(--aff-mint-dark)}
+.aff-row .nm{font-size:16px;font-weight:700;line-height:1.4;color:var(--aff-ink)}
+.aff-row .hl{font-size:13px;color:var(--aff-body);line-height:1.5;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+.aff-row .rt{display:flex;flex-direction:column;align-items:flex-end;gap:3px;white-space:nowrap;min-width:140px}
+.aff-row .cpa{font-size:18px;font-weight:800;color:var(--aff-mint-dark);letter-spacing:-.01em}
 .aff-row .cpa small{font-size:11px;font-weight:500;color:var(--aff-sub);margin-left:2px}
 .aff-row .left{font-size:12px;color:var(--aff-sub)}
-.aff-row .acts{display:flex;flex-direction:column;gap:6px;align-items:stretch;min-width:150px}
-.aff-row .acts .btn{white-space:nowrap}
+.aff-row .go{font-size:13px;font-weight:600;color:var(--aff-ink);margin-top:4px}
+.aff-row:hover .go{color:var(--aff-mint-dark)}
+.aff-tabs .n{color:var(--aff-sub);font-weight:500;margin-left:2px}
 .aff-empty{padding:60px 20px;text-align:center;color:var(--aff-sub);font-size:14px}
 
 /* ===== 캠페인 상세 (텐핑 소문내기 구조) ===== */
@@ -242,8 +248,6 @@ body.aff-body{background:#fff}
 
 /* ===== 반응형 ===== */
 @media(max-width:1100px){
-  .aff-row{grid-template-columns:110px minmax(0,1fr)}
-  .aff-row .acts{grid-column:2;flex-direction:row}
   .aff-cd-cols{grid-template-columns:1fr}
   .aff-channels{grid-template-columns:1fr 1fr}
   .aff-calc{grid-template-columns:1fr;padding:26px 22px;gap:20px}
@@ -266,8 +270,9 @@ body.aff-body{background:#fff}
   .aff-content{padding:16px 14px 30px}
   .aff-foot{padding:14px;flex-direction:column;gap:4px}
   .aff-banner{grid-template-columns:1fr;padding:18px}
-  .aff-row{grid-template-columns:96px minmax(0,1fr);gap:12px;padding:14px}
-  .aff-row .acts{min-width:0;flex-wrap:wrap}
+  .aff-row{grid-template-columns:88px minmax(0,1fr);gap:12px;padding:14px}
+  .aff-row .rt{grid-column:2;flex-direction:row;align-items:center;gap:10px;min-width:0;flex-wrap:wrap}
+  .aff-row .go{margin:0 0 0 auto}
   .aff-cd-head{grid-template-columns:1fr}
   .aff-cd-head .th{max-width:220px}
   .aff-cd-cta .btn{min-width:0;width:100%}

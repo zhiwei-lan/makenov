@@ -6,7 +6,7 @@
 <title>Chia sẻ | Cộng tác viên MAKENOV</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="../assets/css/style.css?v=20260909b">
-<link rel="stylesheet" href="affiliate.css?v=20260909f">
+<link rel="stylesheet" href="affiliate.css?v=20260909g">
 <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
 </head>
 <body class="aff-body">
@@ -18,78 +18,70 @@
     <footer class="aff-foot" id="aff-foot"></footer>
   </div>
 </div>
-
 <script src="../assets/js/config.js?v=20260817b"></script>
-<script src="aff-api.js?v=20260909f"></script>
-<script src="aff.js?v=20260909f"></script>
+<script src="aff-i18n.js?v=20260909g"></script>
+<script src="aff-api.js?v=20260909g"></script>
+<script src="aff.js?v=20260909g"></script>
 <script>
-/* 텐핑 '소문내기' 페이지 구조: 요약 카드 → 공유 아이콘 → 큰 CTA → [이미지 크리에이티브 | 주의사항] */
+/* 텐핑 '소문내기' 구조: 요약 카드 → 공유 → 큰 CTA → [이미지·예시 글 | 주의사항] */
 let C = null;
 function ctaBlock(){
   const m = AffApi.session();
-  if(!m) return `<a class="btn btn-primary" href="login.html?next=${encodeURIComponent('campaign.html?id=' + C.product_id)}">Đăng nhập để lấy link chia sẻ</a><span class="note">Chưa có tài khoản? <a href="join.html?next=${encodeURIComponent('campaign.html?id=' + C.product_id)}">Đăng ký miễn phí</a> — có link ngay sau 1 phút.</span>`;
+  const next = encodeURIComponent('campaign.html?id=' + C.product_id);
+  if(!m) return `<a class="btn btn-primary" href="login.html?next=${next}">${t('cta_login')}</a><span class="note">${t('cta_no_acc', { join:'join.html?next=' + next })}</span>`;
   const link = affLink(m.code, C.product_id);
-  return `<button class="btn btn-primary" onclick="copyText(${JSON.stringify(link)}, 'Đã sao chép link của bạn — dán vào bài đăng')">Sao chép link của bạn và chia sẻ ngay</button>
-    <div class="lk"><input readonly value="${esc(link)}" onclick="this.select()"><a class="btn btn-ghost" href="${esc(link)}" target="_blank" rel="noopener">Mở ↗</a></div>
-    <span class="note">Link đã gắn mã <b>${esc(m.code)}</b>. Khách hàng gửi yêu cầu qua link này trong 30 ngày được tính cho bạn.</span>`;
+  return `<button class="btn btn-primary" onclick="copyText(${JSON.stringify(link)}, t('copied_link'))">${t('cta_copy')}</button>
+    <div class="lk"><input readonly value="${esc(link)}" onclick="this.select()"><a class="btn btn-ghost" href="${esc(link)}" target="_blank" rel="noopener">${t('open')} ↗</a></div>
+    <span class="note">${t('cta_note', { code: esc(m.code) })}</span>`;
 }
-affBoot('home', { title:'Chia sẻ', back:'index.html' }, async () => {
+affBoot('home', { titleKey:'cd_title', back:'index.html' }, async () => {
   const root = document.getElementById('root');
   C = await AffApi.campaign(qs('id'));
-  if(!C){ root.innerHTML = `<div class="aff-empty">Không tìm thấy chiến dịch này<br><a class="btn btn-primary" href="index.html" style="margin-top:16px">Xem chiến dịch</a></div>`; return; }
-  document.title = `${C.name} | Cộng tác viên MAKENOV`;
+  if(!C){ root.innerHTML = `<div class="aff-empty">${t('not_found')}<br><a class="btn btn-primary" href="index.html" style="margin-top:16px">${t('see_campaigns')}</a></div>`; return; }
+  document.title = `${cName(C)} | MAKENOV`;
   const mats = C.materials.length ? C.materials : [C.img];
-  const left = C.remaining == null ? 'Không giới hạn' : `Còn ${C.remaining} / ${C.cap}`;
+  const left = C.remaining == null ? t('unlimited') : `${C.remaining} / ${C.cap}`;
   const m = AffApi.session();
-  const postText = `${C.copy_text}\n\n👉 Xem giá & MOQ: ${affLink(m ? m.code : 'MÃ-CỦA-BẠN', C.product_id)}`;
-
+  const postText = `${C.copy_text}\n\n${t('view_price')} ${affLink(m ? m.code : 'XXXXXX', C.product_id)}`;
   root.innerHTML = `
   <section class="aff-cd-head">
     <div class="th"><img src="${esc(C.img)}" alt="${esc(C.name)}"></div>
     <div>
       <div class="meta"><b>${esc(catName(C.cat))}</b><i>|</i>${esc(C.brand)}</div>
-      <h1>${esc(C.name)}</h1>
-      <p>${esc(C.headline || '')}${C.headline ? ' — ' : ''}${esc(C.copy_text)}</p>
-      <div class="bar"><a class="home" href="index.html">Về danh sách ›</a>${shareIcons(C.product_id, 'lg')}<span class="sp"></span><a class="btn btn-ghost btn-sm" href="${AFF_HOST}/products/${esc(C.product_id)}.html" target="_blank" rel="noopener">Trang sản phẩm ↗</a></div>
+      <h1>${esc(cName(C))}</h1>
+      <p>${esc(C.headline || C.copy_text)}</p>
+      <div class="bar"><a class="home" href="index.html">‹ ${t('back_list')}</a>${shareIcons(C.product_id)}<span class="sp"></span><a class="btn btn-ghost btn-sm" href="${AFF_HOST}/products/${esc(C.product_id)}.html" target="_blank" rel="noopener">${t('product_page')} ↗</a></div>
     </div>
   </section>
-
-  <section class="aff-cd-cta" id="cta">${ctaBlock()}</section>
-
+  <section class="aff-cd-cta">${ctaBlock()}</section>
   <div class="aff-cd-cols">
     <div class="aff-cd-col">
-      <h2>Hình ảnh quảng bá</h2>
+      <h2>${t('mats_h')}</h2>
       <div class="aff-cd-box">
-        <p class="hint">Dùng các hình dưới đây khi chia sẻ. Tải về rồi chỉnh sửa tự do.</p>
-        <div class="aff-mats">${mats.map((u, i) => `<figure><img src="${esc(u)}" alt="${esc(C.name)} ${i + 1}" loading="lazy"><figcaption><span>Hình ${i + 1}</span><a href="${esc(u)}" download target="_blank" rel="noopener">Tải xuống ↓</a></figcaption></figure>`).join('')}</div>
-        <h3 style="margin-top:20px">Bài mẫu để dán</h3>
-        <div class="aff-copybox">${esc(postText)}<button class="btn btn-primary btn-sm" onclick="copyText(${JSON.stringify(postText)}, 'Đã sao chép bài mẫu')">Sao chép</button></div>
-        <p class="aff-note">Sửa theo cách nói của bạn cũng được — giữ đúng thông tin sản phẩm và giữ nguyên link có mã.</p>
+        <p class="hint">${t('mats_hint')}</p>
+        <div class="aff-mats">${mats.map((u, i) => `<figure><img src="${esc(u)}" alt="${esc(C.name)} ${i + 1}" loading="lazy"><figcaption><span>${t('img', { n: i + 1 })}</span><a href="${esc(u)}" download target="_blank" rel="noopener">${t('download')}</a></figcaption></figure>`).join('')}</div>
+        <h3 style="margin-top:20px">${t('post_h')}</h3>
+        <div class="aff-copybox">${esc(postText)}<button class="btn btn-primary btn-sm" onclick="copyText(${JSON.stringify(postText)}, t('copied_post'))">${t('copy')}</button></div>
+        <p class="aff-note">${t('post_hint')}</p>
         <div class="aff-cd-info">
-          <div><div class="lb">Hoa hồng / khách hàng</div><div class="v mint">${vnd(C.cpa_vnd)}</div></div>
-          <div><div class="lb">Suất còn lại</div><div class="v">${left}</div></div>
-          <div><div class="lb">Đã duyệt · chờ</div><div class="v">${C.approved} · ${C.pending}</div></div>
+          <div><div class="lb">${t('info_cpa')}</div><div class="v mint">${vnd(C.cpa_vnd)}</div></div>
+          <div><div class="lb">${t('info_left')}</div><div class="v">${left}</div></div>
+          <div><div class="lb">${t('info_stat')}</div><div class="v">${C.approved} · ${C.pending}</div></div>
         </div>
       </div>
     </div>
-
     <div class="aff-cd-col">
-      <h2>Lưu ý khi chia sẻ</h2>
+      <h2>${t('notes_h')}</h2>
       <div class="aff-cd-box">
-        <h3>Tên sản phẩm</h3>
+        <h3>${t('product_name')}</h3>
         <div class="aff-chips"><span class="name">${esc(C.name)}</span></div>
-        <h3><span class="tip">TIP</span>Từ khóa gợi ý</h3>
-        <p class="hint" style="margin-bottom:8px">Dùng các từ này trong bài đăng, hashtag, tiêu đề video. Bấm để sao chép.</p>
+        <h3><span class="tip">${t('tip')}</span>${t('kw_h')}</h3>
+        <p class="hint" style="margin-bottom:8px">${t('kw_hint')}</p>
         <div class="aff-chips">${(C.keywords || []).map(k => `<span onclick="copyText(${JSON.stringify('#' + k.replace(/\s+/g, ''))})">${esc(k)}</span>`).join('') || '<span class="name">—</span>'}</div>
-        <h3>Quy định chiến dịch</h3>
-        <p class="aff-rules">${esc(C.rules)}</p>
-        <h3>Quy định chung</h3>
-        <p class="aff-rules">1. Chỉ "khách hàng" là cửa hàng, đại lý, spa, doanh nghiệp gửi yêu cầu báo giá mới được tính. Lượt xem, lượt bấm không tính.
-2. Không tự gửi yêu cầu, không nhờ người quen gửi cho có. Yêu cầu không có nhu cầu thật sẽ bị từ chối.
-3. Không thu thập số điện thoại qua form ngoài (Google Form, Facebook Lead…). Khách phải tự gửi trên MAKENOV.
-4. Không mạo danh nhân viên MAKENOV hay nhà sản xuất. Không hứa giá, quà tặng ngoài thông tin trên trang sản phẩm.
-5. Bài đăng có nhận hoa hồng cần ghi rõ là bài giới thiệu (ví dụ: #giớithiệu, #CTV).</p>
-        <div class="aff-warn"><b>Lưu ý:</b> Gian lận (yêu cầu giả, tự gửi, mạo danh) sẽ bị khóa tài khoản và <b>hủy toàn bộ hoa hồng chưa rút</b>. Hoa hồng chỉ chuyển sang "có thể rút" sau khi MAKENOV xác nhận khách hàng là thật.</div>
+        ${C.rules ? `<h3>${t('rules_camp')}</h3><p class="aff-rules">${esc(C.rules)}</p>` : ''}
+        <h3>${t('rules_common')}</h3>
+        <p class="aff-rules">${esc(t('rules_text'))}</p>
+        <div class="aff-warn">${t('warn')}</div>
       </div>
     </div>
   </div>`;
