@@ -472,3 +472,19 @@ body.aff-body{background:#fff}
 .aff-two.eq .aff-box{height:100%;margin-bottom:0;box-sizing:border-box}
 
 .aff-rate i{font-style:normal;font-weight:500;opacity:.8}
+
+/* 랜딩 히어로 게시글 카드 — 실제 SNS 미리보기처럼: 고정 폭, 글 3줄, 이미지 낮게, 기울임 없음 */
+.lp-hero .visual{display:flex;justify-content:center}
+.lp-hero .visual .aff-sample{display:block;width:100%;max-width:360px}
+.lp-hero .visual .post{transform:none;width:100%;box-shadow:0 14px 40px rgba(25,31,40,.10);border-radius:14px}
+.lp-hero .visual .post .ph{padding:14px 16px 8px}
+.lp-hero .visual .post .ph .av{width:34px;height:34px}
+.lp-hero .visual .post .ph b{font-size:14px;line-height:1.2}
+.lp-hero .visual .post .ph span{font-size:12px}
+.lp-hero .visual .post .pt{font-size:13px;line-height:1.6;padding:0 16px 10px;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;white-space:normal}
+.lp-hero .visual .post .pt a{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:inline-block;max-width:100%;vertical-align:bottom}
+.lp-hero .visual .post img{aspect-ratio:16/10;max-height:190px}
+.lp-hero .visual .post .pf{padding:10px 14px}
+.lp-hero .visual .post .pf span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.lp-hero .visual .post .pf .btn{flex:none}
+.lp-hero .visual .pill{right:-6px;top:-12px}
