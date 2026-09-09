@@ -308,9 +308,9 @@ class Aff extends BaseApiController
                 'product_id' => $r['product_id'],
                 'name'  => is_array($name) ? ($name['vi'] ?? $name['ko'] ?? $name['en'] ?? '') : (string) ($r['p_name'] ?? ''),
                 'name_ko' => is_array($name) ? ($name['ko'] ?? '') : '',
-                'brand' => $r['p_brand'] ?? '', 'cat' => $r['p_cat'] ?? '', 'img' => $r['p_img'] ?? '',
+                'brand' => $r['p_brand'] ?? '', 'cat' => $r['p_cat'] ?? '', 'img' => self::absUrl($r['p_img'] ?? ''),
                 'cpa_vnd' => (int) $r['cpa_vnd'], 'cap' => $cap,
-                'headline' => $r['headline'] ?? '', 'materials' => json_decode($r['materials'] ?? '[]', true) ?: [],
+                'headline' => $r['headline'] ?? '', 'materials' => array_map([self::class, 'absUrl'], json_decode($r['materials'] ?? '[]', true) ?: []),
                 'copy_text' => $r['copy_text'] ?? '', 'keywords' => json_decode($r['keywords'] ?? '[]', true) ?: [], 'rules' => $r['rules'] ?? '',
                 'featured' => (bool) $r['featured'], 'active' => (bool) $r['active'], 'sort' => (int) $r['sort'],
                 'approved' => $approved, 'pending' => $pending, 'rejected' => $rejected,
@@ -320,6 +320,12 @@ class Aff extends BaseApiController
             ];
         }
         return $out;
+    }
+
+    /** 제품 이미지가 상대경로(assets/img/…)면 vn 호스트 절대 URL 로 — CTV 페이지는 /affiliate/ 아래라 상대경로가 깨진다 */
+    private static function absUrl(string $u): string
+    {
+        return preg_match('#^https?://#', $u) ? $u : ($u === '' ? '' : 'https://vn.makenov.com/' . ltrim($u, './'));
     }
 
     /** 승인률 = 승인 ÷ (승인+반려). 판정 3건 미만이면 null(표시 안 함) */
