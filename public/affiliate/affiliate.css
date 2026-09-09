@@ -245,7 +245,11 @@ body.aff-body{background:#fff}
 .aff-final h2{font-size:24px;font-weight:800;letter-spacing:-.02em;margin:0 0 6px}
 .aff-final p{font-size:14px;color:#4E5968;margin:0 0 18px}
 .aff-final .cta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-.faq-list .faq-item{background:#fff}
+/* style.css 의 FAQ 는 테두리 없는 리스트용(좌우 패딩 2px). 제휴에서는 카드로 쓰니 안쪽 여백을 준다 */
+.aff-body .faq-list{max-width:none;border-top:0;display:flex;flex-direction:column;gap:8px}
+.aff-body .faq-list .faq-item{background:#fff;border:1px solid var(--aff-line);border-radius:12px}
+.aff-body .faq-item summary{padding:16px 18px}
+.aff-body .faq-item .a{padding:0 18px 18px;max-width:none}
 
 /* ===== 반응형 ===== */
 @media(max-width:1100px){
