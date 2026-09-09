@@ -513,6 +513,30 @@ const MK_SETTINGS = {
     ko: '사업자 인증하면 가격과 MOQ가 바로 열립니다. 인증은 무료, 1분이면 끝납니다',
     en: 'Verify your business and prices unlock instantly. Free, about a minute',
   },
+  /* 제품 상세 공통 섹션 — 갤러리와 '제품 상세' 사이, 모든 제품에 같은 내용 (2026-09-09 지시).
+     관리자 > 제품 탭 상단 카드에서 편집. Supabase 모드에선 settings(key='site') 값이 덮는다. */
+  pdDist: {
+    on: true,
+    title: {
+      vi: 'Chúng tôi tìm kiếm các nhà phân phối',
+      ko: '유통 파트너를 찾습니다',
+      en: 'We are looking for distributors',
+    },
+    items: [
+      { vi: 'Cung cấp trực tiếp từ nhà sản xuất Hàn Quốc, không qua trung gian',
+        ko: '한국 제조사 직공급, 중간 유통 없음',
+        en: 'Supplied directly by the Korean manufacturer, no middlemen' },
+      { vi: 'Hỗ trợ hình ảnh, nội dung và tài liệu bán hàng cho nhà phân phối',
+        ko: '유통 파트너에게 제품 이미지·콘텐츠·영업 자료 지원',
+        en: 'Product images, content and sales materials provided to distributors' },
+      { vi: 'Giá và MOQ mở ngay sau khi xác thực doanh nghiệp (miễn phí)',
+        ko: '사업자 인증 후 가격·MOQ 즉시 공개 (무료)',
+        en: 'Price and MOQ unlock right after free business verification' },
+      { vi: 'Gửi yêu cầu báo giá bằng nút bên phải, phản hồi trong 1–2 ngày làm việc',
+        ko: '오른쪽 문의 버튼으로 견적 요청, 영업일 1~2일 내 회신',
+        en: 'Request a quote with the button on the right, reply within 1–2 business days' },
+    ],
+  },
 };
 
 /* ---------- 관리자 오버라이드 (관리자에서 저장하면 여기로 들어옴) ----------

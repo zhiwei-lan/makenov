@@ -872,7 +872,7 @@ function renderProducts(){
   const list = MK_PRODUCTS.filter(p=> !q ||
     Object.values(p.name).join(' ').toLowerCase().includes(q) || p.brand.toLowerCase().includes(q));
 
-  el.innerHTML = `
+  el.innerHTML = `${pdDistCard()}
     <div class="card"><p class="note">제품을 등록·수정·삭제하면 사이트에 즉시 반영됩니다. 저장 위치는 이 브라우저이며,
     배포 전에 <b>설정 · 내보내기</b> 탭에서 <code>data.js</code>로 구워야 다른 기기에도 반영됩니다.</p><div class="bar"><input class="srch" placeholder="제품명 · 브랜드 검색" value="${esc(pSearch)}" oninput="pSearch=this.value;renderProducts()"><span class="grow"></span><button class="btn btn-primary btn-sm" onclick="pEditing='';pBlocks=[];pGallery=[];renderProducts()">+ 새 제품 등록</button></div><div class="tbl-wrap"><table><thead><tr><th style="width:60px">이미지</th><th>제품명</th><th>브랜드</th><th>카테고리</th><th>가격(잠금)</th><th>문의</th><th>관심</th><th>표시</th><th style="width:120px"></th></tr></thead><tbody>${list.length ? list.map(p=>`
         <tr class="row-hover"${p.published===false?' style="opacity:.55"':''}><td><img class="thumb-sm" src="${esc(imgSrc(p.img))}" alt=""></td><td><b>${esc(p.name.ko||p.name.vi)}</b><div class="sub">${esc(p.id)} · ${esc(p.createdAt)}</div></td><td>${esc(p.brand)}<div class="sub">${esc(p.origin)}</div></td><td>${esc(mkCat(p.cat)?mkCat(p.cat).name.ko:p.cat)}</td><td>${esc(triText(p.price))}</td><td><b>${p.inquiries}</b></td><td>${p.views}</td><td>${p.published===false?'<span class="pill-st st-off" title="사이트에서 숨김 상태 — 수정에서 다시 켤 수 있습니다">숨김</span> ':''}${p.featured?'<span class="pill-st st-vip">추천</span> ':''}${p.isNew?'<span class="pill-st st-new">신규</span>':''}</td><td><button class="btn btn-ghost btn-sm" onclick="editProduct('${p.id}')">수정</button><button class="btn btn-ghost btn-sm" onclick="if(confirm('${esc(p.name.ko||p.name.vi)}\\n삭제할까요?')){admDo(Admin.deleteProduct('${p.id}'));}">삭제</button></td></tr>`).join('') : `<tr class="empty-row"><td colspan="9">제품이 없습니다</td></tr>`}
@@ -2171,3 +2171,91 @@ document.addEventListener('DOMContentLoaded', async ()=>{
 /* 제품 편집 폼이 그려진 뒤 갤러리·블록 편집기 채우기 */
 const _origRenderProducts = renderProducts;
 renderProducts = function(){ _origRenderProducts(); if(pEditing !== null){ renderGallery(); renderBlocks(); } };
+
+/* ============================================================
+   2-C. 제품 상세 공통 섹션 — "유통 파트너를 찾습니다" (2026-09-09 지시)
+   ------------------------------------------------------------
+   모든 제품 상세의 갤러리와 '제품 상세' 사이에 같은 내용으로 들어가는 섹션.
+   제목 하나 + ✅ 항목 여러 개, 세 언어. 저장 위치는 띠배너와 같은 settings(key='site')
+   의 pdDist 한 칸 — 제품마다 따로 넣지 않는다. 정적 페이지는 다음 자동 굽기 때 반영.
+   ============================================================ */
+let pddOpen = false, pddDraft = null, pddPvLang = 'ko';
+const PDD_LANGS = ['ko','vi','en'], PDD_LN = { ko:'한국어', vi:'베트남어', en:'영어' };
+
+function pddCur(){
+  const d = (typeof MK_SETTINGS !== 'undefined' && MK_SETTINGS.pdDist) || {};
+  return { on: d.on !== false, title: Object.assign({}, d.title || {}), items: (d.items || []).map(it => Object.assign({}, it)) };
+}
+
+/* 사이트와 같은 모양의 미리보기 (관리자 CSS 와 무관하게 인라인) */
+function pddPreview(d, lang){
+  const title = (d.title || {})[lang] || '';
+  const items = (d.items || []).map(it => it[lang] || '').filter(x => x.trim());
+  const empty = !title && !items.length;
+  return `<div style="border:1px solid #E9ECEF;border-radius:8px;background:#F8F9FA;padding:22px 24px${d.on===false?';opacity:.45':''}">
+    ${empty ? `<p style="margin:0;color:#8B95A1;font-size:13px">이 언어(${PDD_LN[lang]})에는 아직 문구가 없습니다 — 사이트에서는 섹션이 표시되지 않습니다</p>` : ''}
+    ${title ? `<h2 style="font-size:18px;font-weight:700;letter-spacing:-.02em;margin:0 0 ${items.length?14:0}px;color:#191F28">${esc(title)}</h2>` : ''}
+    ${items.length ? `<ul style="list-style:none;margin:0;padding:0;display:grid;gap:9px">${items.map(x => `<li style="display:flex;gap:9px;align-items:flex-start;font-size:15px;line-height:1.65;color:#495057"><span style="flex:none">✅</span><span>${esc(x)}</span></li>`).join('')}</ul>` : ''}
+  </div>`;
+}
+
+function pdDistCard(){
+  const d = pddOpen && pddDraft ? pddDraft : pddCur();
+  const head = (btns) => `<div class="bar" style="margin:0 0 12px"><h3 style="margin:0">제품 상세 공통 섹션 <span style="color:var(--adm-sub);font-size:12px;font-weight:500;margin-left:6px">갤러리와 '제품 상세' 사이 · 모든 제품에 동일하게 표시</span></h3><span class="grow"></span>${btns}</div>`;
+  const pvTabs = `<div class="bchips" style="margin:0 0 10px">${PDD_LANGS.map(l => `<button class="bchip${pddPvLang===l?' on':''}" onclick="pddPvLang='${l}';${pddOpen?'pddSync()':'renderProducts()'}">${l.toUpperCase()}</button>`).join('')}</div>`;
+
+  if(!pddOpen){
+    return `<div class="card">${head(`<span class="bchip${d.on?' on':''}" style="cursor:default">${d.on?'노출 중':'숨김'}</span><button class="btn btn-primary btn-sm" onclick="pddEdit()">수정</button>`)}${pvTabs}<div id="pdd-pv">${pddPreview(d, pddPvLang)}</div></div>`;
+  }
+
+  const tri3 = (base, o, tag, ph) => `<div class="fgrid">${PDD_LANGS.map(l => `<div class="fld"><label><span class="lang-tag">${l.toUpperCase()}</span>${PDD_LN[l]}</label>${tag==='textarea'
+    ? `<textarea id="${base}-${l}" rows="2" oninput="pddSync()" placeholder="${esc(ph[l]||'')}">${esc(o[l]||'')}</textarea>`
+    : `<input id="${base}-${l}" value="${esc(o[l]||'')}" oninput="pddSync()" placeholder="${esc(ph[l]||'')}">`}</div>`).join('')}</div>`;
+  const items = d.items.length ? d.items : [{}];
+  const rows = items.map((it, i) => `<div class="blk"><div class="blk-head"><b style="font-size:13px">✅ 항목 ${i+1}</b><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm" onclick="pddMove(${i},-1)" ${i===0?'disabled':''} title="위로">↑</button><button class="btn btn-ghost btn-sm" onclick="pddMove(${i},1)" ${i===items.length-1?'disabled':''} title="아래로">↓</button><button class="btn btn-ghost btn-sm" onclick="pddRemove(${i})">삭제</button></div></div>${tri3('pdd-i'+i, it, 'textarea', { ko:'예) 한국 제조사 직공급', vi:'', en:'' })}</div>`).join('');
+
+  return `<div class="card">${head(`<button class="btn btn-ghost btn-sm" onclick="pddTranslate(this)" title="한국어를 베트남어·영어로 자동 번역 (빈 칸만 채움)">🌐 한국어 자동번역</button><button class="btn btn-ghost btn-sm" onclick="pddOpen=false;pddDraft=null;renderProducts()">취소</button><button class="btn btn-primary btn-sm" onclick="pddSave()">저장</button>`)}
+    <p class="note">제목 한 줄과 ✅ 항목을 세 언어로 씁니다. 저장하면 사이트의 모든 제품 상세에 바로 반영되고, 검색엔진용 정적 페이지는 다음 자동 굽기(최대 6시간) 때 따라옵니다.</p>
+    <div class="pdd-wrap">
+      <div>
+        <label class="chk" style="margin-bottom:16px"><input type="checkbox" id="pdd-on" ${d.on?'checked':''} onchange="pddSync()"> 사이트에 노출</label>
+        <div class="sect" style="margin-top:0;padding-top:0;border:0"><h4>제목</h4>${tri3('pdd-title', d.title, 'input', { ko:'유통 파트너를 찾습니다', vi:'Chúng tôi tìm kiếm các nhà phân phối', en:'We are looking for distributors' })}</div>
+        <div class="sect"><h4>✅ 항목 <span style="color:var(--adm-sub);font-size:11px;font-weight:500">위에서부터 순서대로 표시됩니다</span></h4><div id="pdd-items">${rows}</div><div class="bar" style="margin:4px 0 0"><button class="btn btn-ghost btn-sm" onclick="pddAdd()">+ 항목 추가</button></div></div>
+      </div>
+      <div class="pdd-side"><div style="font-size:13px;font-weight:600;color:#4E5968;margin-bottom:8px">미리보기</div>${pvTabs}<div id="pdd-pv">${pddPreview(d, pddPvLang)}</div></div>
+    </div>
+  </div>`;
+}
+
+/* 폼 → 초안 (입력할 때마다) — 미리보기만 갈아끼워 커서를 잃지 않게 한다 */
+function pddRead(){
+  const n = document.querySelectorAll('#pdd-items .blk').length;
+  const items = [];
+  for(let i = 0; i < n; i++) items.push(tri('pdd-i'+i));
+  return { on: ac('pdd-on'), title: tri('pdd-title'), items };
+}
+function pddSync(){
+  if(!pddOpen) return;
+  pddDraft = pddRead();
+  const pv = document.getElementById('pdd-pv');
+  if(pv) pv.innerHTML = pddPreview(pddDraft, pddPvLang);
+  document.querySelectorAll('.pdd-side .bchip').forEach(b => b.classList.toggle('on', b.textContent.trim().toLowerCase() === pddPvLang));
+}
+function pddEdit(){ pddOpen = true; pddDraft = pddCur(); if(!pddDraft.items.length) pddDraft.items.push({}); renderProducts(); }
+function pddAdd(){ pddDraft = pddRead(); pddDraft.items.push({}); renderProducts(); setTimeout(() => { const el = document.getElementById('pdd-i' + (pddDraft.items.length-1) + '-ko'); if(el) el.focus(); }, 0); }
+function pddRemove(i){ pddDraft = pddRead(); pddDraft.items.splice(i, 1); renderProducts(); }
+function pddMove(i, dir){ pddDraft = pddRead(); const j = i + dir; if(j < 0 || j >= pddDraft.items.length) return; [pddDraft.items[i], pddDraft.items[j]] = [pddDraft.items[j], pddDraft.items[i]]; renderProducts(); }
+async function pddTranslate(btn){
+  const n = document.querySelectorAll('#pdd-items .blk').length;
+  await autoTranslate(btn, ['pdd-title', ...Array.from({length:n}, (_, i) => 'pdd-i'+i)], false);
+  pddSync();
+}
+function pddSave(){
+  const d = pddRead();
+  /* 세 언어 모두 빈 항목은 버린다 (빈 줄이 사이트에 ✅ 만 남는 것 방지) */
+  d.items = d.items.filter(it => it.ko || it.vi || it.en);
+  const any = d.title.ko || d.title.vi || d.title.en || d.items.length;
+  if(!any){ toastA('제목이나 항목을 하나 이상 입력하세요 (숨기려면 "사이트에 노출"만 끄세요)'); return; }
+  toastA('저장하는 중…');
+  admDo(Promise.resolve(Admin.saveSettings({ pdDist: d })), 0).then(() => { pddOpen = false; pddDraft = null; renderProducts(); });
+}

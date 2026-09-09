@@ -104,6 +104,19 @@ function detailHtml(p, lang){
   return out || `<p>${esc(T(p.tagline, lang))}</p>`;
 }
 
+/* 제품 상세 공통 섹션(유통 파트너 모집) — page-product.js 의 mkPdDistHtml 과 같은 마크업.
+   값은 settings(key='site').pdDist, 없으면 data.js 의 MK_SETTINGS 시드. */
+let PD_DIST = null;
+function distHtml(lang){
+  const d = PD_DIST;
+  if(!d || d.on === false) return '';
+  const title = T(d.title, lang);
+  const items = (d.items || []).map(it => T(it, lang)).filter(x => String(x).trim());
+  if(!title && !items.length) return '';
+  return `<section class="pd-sec pd-dist">${title ? `<h2>${esc(title)}</h2>` : ''}${items.length
+    ? `<ul class="pd-checks">${items.map(x => `<li><span class="ck">✅</span><span>${esc(x)}</span></li>`).join('')}</ul>` : ''}</section>`;
+}
+
 function card(o, lang){
   return `<a class="p-card" href="products/${o.id}.html"><div class="thumb"><img src="${o.img}" alt="${esc(T(o.name, lang))}" loading="lazy"></div><div class="body"><span class="brand">${esc(o.brand)}</span><h3>${esc(T(o.name, lang))}</h3><div class="meta"><span class="left">${esc(o.origin || '')}</span></div></div></a>`;
 }
@@ -145,6 +158,7 @@ ${FAVICON}
   <div class="pd-row">
     <div class="pd-main">
       <div class="pd-gallery"><div class="main"><img src="${p.img}" alt="${esc(name)}"></div></div>
+      ${distHtml(lang)}
       <div class="pd-sec">
         <h2>${esc(L.detail)}</h2>
         <div class="pd-body">${detailHtml(p, lang)}</div>
@@ -199,6 +213,12 @@ ${PAGE_PROD}
     name:p.name, tagline:p.tagline, brandStory:p.brand_story, img:p.img, gallery:p.gallery || [],
     video:p.video || '', detail:p.detail || [] }));
   const companies = Object.fromEntries(co.map(c => [c.id, c]));
+  /* 공통 섹션 — DB(site 설정) 우선, 없으면 data.js 시드(런타임 Object.assign 과 같은 우선순위) */
+  const seed = (() => { const m = read('assets/js/data.js').match(/const MK_SETTINGS = (\{[\s\S]*?\n\});/); try{ return m ? Function('return ' + m[1])() : {}; }catch(e){ return {}; } })();
+  const siteRows = await get('settings?key=eq.site').catch(() => []);
+  const site = (siteRows[0] && siteRows[0].value) || {};
+  PD_DIST = (site.pdDist && typeof site.pdDist === 'object') ? site.pdDist : (seed.pdDist || null);
+  console.log('공통 섹션(pdDist):', PD_DIST ? `${PD_DIST.on === false ? '숨김' : '노출'} · 항목 ${(PD_DIST.items || []).length}개 · ${site.pdDist ? 'DB' : '시드'}` : '없음');
   console.log(`제품 ${products.length}건 · 회사 ${co.length}곳 (REST ${url})`);
 
   let n = 0;

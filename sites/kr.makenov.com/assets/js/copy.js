@@ -62,7 +62,9 @@ function mkCopyWalk(node, prefix, out, strLeaf){
 
 /* 화면 어디에도 안 나오는 값. 목록에 두면 고쳐도 안 바뀌어 헷갈리므로 뺀다.
    hero 의 kicker 는 예전 디자인의 잔재다. 지금 슬라이드는 title 과 sub 만 그린다. */
-const MK_COPY_HIDE = /^hero\.\d+\.kicker$/;
+/* site.pdDist(제품 상세 공통 섹션)는 관리자 > 제품 탭의 전용 에디터로만 고친다.
+   여기 목록에도 나오면 두 군데서 따로 저장돼 부팅 때 카피 오버라이드가 에디터 값을 덮는다. */
+const MK_COPY_HIDE = /^hero\.\d+\.kicker$|^site\.pdDist\./;
 
 /* 편집 가능한 문구 전체 목록 [{src, path, label, val}] */
 function mkCopyFields(){
