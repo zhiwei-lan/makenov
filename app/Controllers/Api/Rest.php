@@ -61,7 +61,7 @@ class Rest extends BaseApiController
             'json' => [], 'bool' => [],
         ],
         'inquiries' => [
-            'cols' => ['id','product_id','buyer_id','message','status','memo','created_at'],
+            'cols' => ['id','product_id','buyer_id','message','status','memo','aff_ref','aff_ch','created_at'],
             'json' => [], 'bool' => [],
         ],
         'maker_leads' => [
@@ -235,6 +235,14 @@ class Rest extends BaseApiController
                 }
             } else {
                 $db->table($table)->insert($row);
+            }
+            /* 제휴: 마케터 링크(aff_ref)로 들어온 문의면 리드를 만든다. 실패해도 문의 저장은 그대로 */
+            if ($table === 'inquiries' && ! empty($it['aff_ref'])) {
+                try {
+                    Aff::attachLead(array_merge($row, ['aff_ref' => $it['aff_ref'], 'aff_ch' => $it['aff_ch'] ?? '']));
+                } catch (\Throwable $e) {
+                    log_message('error', 'aff attachLead: ' . $e->getMessage());
+                }
             }
             $written[] = $this->decode($table, $row);
         }

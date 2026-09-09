@@ -447,9 +447,11 @@ Object.assign(Store, {
 
   async addInquiry(pid, message){
     if(!MkData.session) return { ok:false, err:'auth' };
-    const { error } = await SB.from('inquiries').insert({
+    /* 제휴: 마케터 링크로 들어온 방문이면 코드·채널을 같이 보낸다(서버가 리드 생성). 마이그레이션 전엔 서버가 컬럼을 버린다 */
+    const aff = (typeof mkAffRef === 'function') ? mkAffRef() : null;
+    const { error } = await SB.from('inquiries').insert(Object.assign({
       product_id:pid, buyer_id:MkData.session.user.id, message,
-    });
+    }, aff ? { aff_ref: aff.code, aff_ch: aff.ch || '' } : {}));
     if(error) return { ok:false, err:error.message };
     return { ok:true };
   },

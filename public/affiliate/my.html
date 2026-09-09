@@ -6,7 +6,7 @@
 <title>Trang của tôi | Cộng tác viên MAKENOV</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="../assets/css/style.css?v=20260909b">
-<link rel="stylesheet" href="affiliate.css?v=20260909e">
+<link rel="stylesheet" href="affiliate.css?v=20260909f">
 <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
 </head>
 <body class="aff-body">
@@ -31,8 +31,8 @@
   </div>
 </div>
 <script src="../assets/js/config.js?v=20260817b"></script>
-<script src="aff-mock.js?v=20260909e"></script>
-<script src="aff.js?v=20260909e"></script>
+<script src="aff-api.js?v=20260909f"></script>
+<script src="aff.js?v=20260909f"></script>
 <script>
 let ME = null, SUM = null, leadFilter = '';
 const v = id => document.getElementById(id).value.trim();
@@ -56,7 +56,9 @@ async function drawTop(){
 }
 
 async function drawDash(){
-  const [clicks, leads] = await Promise.all([AffApi.clicks(30), AffApi.leads({})]);
+  const [cf, leads] = await Promise.all([AffApi.clicksFull(30), AffApi.leads({})]);
+  const clicks = cf.days || [], chs = Object.entries(cf.channels || {}).sort((a, b) => b[1] - a[1]);
+  const CH = { fb:'Facebook', zalo:'Zalo', tiktok:'TikTok', copy:'Link sao chép', other:'Khác' };
   const max = Math.max(1, ...clicks.map(c => c.clicks));
   document.getElementById('tab-dash').innerHTML = `
     <div class="aff-stats">
@@ -67,7 +69,8 @@ async function drawDash(){
     </div>
     <div class="aff-box"><h3>Lượt bấm link theo ngày</h3>
       <div class="aff-bars">${clicks.map(c => `<i style="height:${Math.round(c.clicks / max * 100)}%" data-v="${c.clicks}" title="${c.day}: ${c.clicks}"></i>`).join('')}</div>
-      <div class="aff-bars-lb"><span>${clicks[0].day}</span><span>${clicks[clicks.length - 1].day}</span></div></div>
+      <div class="aff-bars-lb"><span>${clicks.length ? clicks[0].day : ''}</span><span>${clicks.length ? clicks[clicks.length - 1].day : ''}</span></div>
+      ${chs.length ? `<p class="aff-note">Theo kênh: ${chs.map(([k, v]) => `<b>${CH[k] || k}</b> ${v}`).join(' · ')}</p>` : ''}</div>
     <div class="aff-box"><h3>Khách hàng gần đây</h3>${leadTable(leads.slice(0, 5))}
       <p class="aff-note"><a href="#leads" onclick="showTab('leads');return false">Xem tất cả →</a></p></div>`;
 }

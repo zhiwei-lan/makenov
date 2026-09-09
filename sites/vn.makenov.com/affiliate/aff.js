@@ -18,7 +18,7 @@ const AFF_ST = { pending:'Chờ duyệt', approved:'Đã duyệt', rejected:'T�
 function esc(s){ return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
 function vnd(n){ return (Math.round(Number(n) || 0)).toLocaleString('vi-VN') + ' ₫'; }
 function catName(id){ const c = AFF_CATS.find(x => x.id === id); return c ? c.name : id; }
-function affLink(code, pid){ return pid ? `${AFF_HOST}/products/${pid}.html?ref=${code}` : `${AFF_HOST}/?ref=${code}`; }
+function affLink(code, pid, ch){ const c = ch ? `&ch=${ch}` : ''; return pid ? `${AFF_HOST}/products/${pid}.html?ref=${code}${c}` : `${AFF_HOST}/?ref=${code}${c}`; }
 function qs(k){ return new URLSearchParams(location.search).get(k) || ''; }
 function fmtDate(s){ return String(s || '').slice(0, 10); }
 function stBadge(st){ return `<span class="aff-status ${esc(st)}">${esc(AFF_ST[st] || st)}</span>`; }
@@ -46,14 +46,14 @@ function affGuard(){
 /* ---------- 공유 ----------
    링크는 항상 마케터 코드가 붙은 것. 비로그인은 로그인으로 보낸다.
    Facebook 은 공유창, Zalo·TikTok 은 앱 안에서 붙여넣는 흐름이라 복사 + 안내. */
-function affShareLink(pid){
+function affShareLink(pid, ch){
   const m = AffApi.session();
   if(!m){ location.href = 'login.html?next=' + encodeURIComponent('campaign.html?id=' + pid); return null; }
-  return affLink(m.code, pid);
+  return affLink(m.code, pid, ch);
 }
 function shareTo(where, pid, ev){
   if(ev){ ev.preventDefault(); ev.stopPropagation(); }
-  const link = affShareLink(pid); if(!link) return;
+  const link = affShareLink(pid, where); if(!link) return;
   if(where === 'fb'){ window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(link), '_blank', 'width=640,height=520'); return; }
   if(where === 'zalo'){ copyText(link, 'Đã sao chép link — dán vào Zalo để gửi'); return; }
   if(where === 'tiktok'){ copyText(link, 'Đã sao chép link — dán vào bio hoặc bình luận TikTok'); return; }

@@ -699,9 +699,35 @@ function mkSwapPrerender(){
   document.documentElement.classList.remove('mk-pre');
 }
 
+/* ---------- 제휴(CTV) 추적 ----------
+   마케터 링크 ?ref=코드[&ch=채널] 로 들어오면 30일(관리자 설정) 기억하고 클릭 1건을 보낸다.
+   문의를 보낼 때 store-supabase.addInquiry 가 mkAffRef() 를 읽어 aff_ref 를 붙인다. */
+function mkAffRef(){
+  try{
+    const a = JSON.parse(localStorage.getItem('mk_aff') || 'null');
+    if(!a || !a.code) return null;
+    if(Date.now() - (a.ts || 0) > (a.days || 30) * 86400000){ localStorage.removeItem('mk_aff'); return null; }
+    return a;
+  }catch(e){ return null; }
+}
+function mkAffCapture(){
+  const q = new URLSearchParams(location.search);
+  const code = (q.get('ref') || '').toUpperCase();
+  if(!/^[A-Z0-9]{4,8}$/.test(code)) return;
+  const ch = (q.get('ch') || '').toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 16);
+  try{ localStorage.setItem('mk_aff', JSON.stringify({ code, ch, ts: Date.now(), days: 30 })); }catch(e){}
+  const pid = window.MK_PID || q.get('id') || '';
+  try{
+    fetch(MK_SUPABASE_URL.replace(/\/$/, '') + '/aff/v1/click', { method:'POST', keepalive:true,
+      headers:{ 'Content-Type':'application/json', apikey: MK_SUPABASE_ANON },
+      body: JSON.stringify({ code, ch, product_id: pid }) }).catch(()=>{});
+  }catch(e){}
+}
+
 /* ---------- boot ---------- */
 document.addEventListener('DOMContentLoaded', async ()=>{
   document.documentElement.lang = MK_LANG;
+  mkAffCapture();
 
   /* 0) 사전 렌더 블록 제거.
         prerender.js 가 크롤러용으로 구워 넣은 정적 사본이다. JS가 도는 브라우저에서는
