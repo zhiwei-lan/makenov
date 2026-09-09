@@ -38,7 +38,7 @@ function affLink(code, pid, ch){ const c = ch ? `&ch=${ch}` : ''; return pid ? `
 function qs(k){ return new URLSearchParams(location.search).get(k) || ''; }
 function fmtDate(s){ return String(s || '').slice(0, 10); }
 function stBadge(st){ return `<span class="aff-status ${esc(st)}">${esc(t('st_' + st + '_b'))}</span>`; }
-function rateChip(r){ return r == null ? `<span class="aff-rate na">${t('rate_na')}</span>` : `<span class="aff-rate ${r >= .8 ? 'good' : r >= .5 ? 'ok' : 'warn'}">${t('rate_short', { p: Math.round(r * 100) })}</span>`; }
+function rateChip(r, n){ return r == null ? `<span class="aff-rate na">${t('rate_na')}</span>` : `<span class="aff-rate ${r >= .8 ? 'good' : r >= .5 ? 'ok' : 'warn'}">${t('rate_short', { p: Math.round(r * 100) })}${n ? ` <i>· ${t('rate_n', { n })}</i>` : ''}</span>`; }
 function gradeOf(r){ return r == null ? '' : r >= .8 ? t('grade_good') : r >= .5 ? t('grade_ok') : t('grade_warn'); }
 function chName(k){ return t('ch_' + (k || 'other')) === 'ch_' + (k || 'other') ? k : t('ch_' + (k || 'other')); }
 
@@ -129,7 +129,7 @@ function campaignRow(c){
     <span class="bd">
       <span class="meta"><b>${esc(catName(c.cat))}</b><i>·</i>${esc(c.brand)}</span>
       <span class="nm">${esc(cName(c))}</span>${hl}
-      <span class="stats">${rateChip(c.approval_rate)}<span class="pill">${esc(left)}</span><span class="pill muted">${t('info_stat')} ${c.approved} · ${c.pending}</span></span>
+      <span class="stats">${rateChip(c.approval_rate, c.decided)}<span class="pill">${esc(left)}</span>${c.avg_days != null ? `<span class="pill muted">${t('avg_days', { d: c.avg_days })}</span>` : ''}</span>
     </span>
     <span class="rt"><span class="cpa">${vnd(c.cpa_vnd)}</span><span class="lb">${t('info_cpa')}</span><span class="btn btn-primary btn-sm">${t('detail')} →</span></span></a>`;
 }

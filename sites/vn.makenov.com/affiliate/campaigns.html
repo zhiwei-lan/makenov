@@ -10,7 +10,7 @@
 <meta property="og:description" content="Đăng link lên TikTok, Facebook, Zalo. Nhận hoa hồng cho mỗi khách hàng được duyệt. Không cần vốn.">
 <meta property="og:image" content="https://makenov.com/assets/img/og.png">
 <link rel="stylesheet" href="../assets/css/style.css?v=20260909b">
-<link rel="stylesheet" href="affiliate.css?v=20260909s">
+<link rel="stylesheet" href="affiliate.css?v=20260909t">
 <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
 </head>
 <body class="aff-body">
@@ -26,21 +26,21 @@
   </div>
 </div>
 <script src="../assets/js/config.js?v=20260817b"></script>
-<script src="aff-i18n.js?v=20260909s"></script>
-<script src="aff-api.js?v=20260909s"></script>
-<script src="aff.js?v=20260909s"></script>
+<script src="aff-i18n.js?v=20260909t"></script>
+<script src="aff-api.js?v=20260909t"></script>
+<script src="aff.js?v=20260909t"></script>
 <script>
-let cat = qs('cat') || '', sort = 'cpa', q = '', ALL = [];
+let cat = qs('cat') || '', sort = qs('sort') || 'rate', q = '', ALL = [];
 function setCat(c){ cat = c; draw(); }
 function setSort(s){ sort = s; draw(); }
 function setQ(v){ q = v.trim().toLowerCase(); draw(); }
 function draw(){
-  const all = ALL.slice().sort((a, b) => sort === 'new' ? b.sort - a.sort : b.cpa_vnd - a.cpa_vnd);
+  const all = ALL.slice().sort((a, b) => sort === 'new' ? b.sort - a.sort : sort === 'cpa' ? b.cpa_vnd - a.cpa_vnd : ((b.approval_rate ?? -1) - (a.approval_rate ?? -1)) || (b.cpa_vnd - a.cpa_vnd));
   const cats = AFF_CATS.filter(c => all.some(x => x.cat === c));
   document.getElementById('tabs').innerHTML =
     `<button class="${!cat ? 'on' : ''}" onclick="setCat('')">${t('all')} <span class="n">${all.length}</span></button>` +
     cats.map(c => `<button class="${cat === c ? 'on' : ''}" onclick="setCat('${c}')">${esc(catName(c))}</button>`).join('') +
-    `<span class="sp"></span><select onchange="setSort(this.value)"><option value="cpa" ${sort === 'cpa' ? 'selected' : ''}>${t('sort_cpa')}</option><option value="new" ${sort === 'new' ? 'selected' : ''}>${t('sort_new')}</option></select>`;
+    `<span class="sp"></span><select onchange="setSort(this.value)"><option value="rate" ${sort === 'rate' ? 'selected' : ''}>${t('sort_rate')}</option><option value="cpa" ${sort === 'cpa' ? 'selected' : ''}>${t('sort_cpa')}</option><option value="new" ${sort === 'new' ? 'selected' : ''}>${t('sort_new')}</option></select>`;
   let list = cat ? all.filter(c => c.cat === cat) : all;
   if(q) list = list.filter(c => (c.name + ' ' + c.brand + ' ' + (c.headline || '')).toLowerCase().includes(q));
   document.getElementById('list').innerHTML = list.length ? list.map(campaignRow).join('') : `<div class="aff-empty">${t('empty_list')}</div>`;

@@ -6,7 +6,7 @@
 <title>Chia sẻ | Cộng tác viên MAKENOV</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="../assets/css/style.css?v=20260909b">
-<link rel="stylesheet" href="affiliate.css?v=20260909s">
+<link rel="stylesheet" href="affiliate.css?v=20260909t">
 <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
 </head>
 <body class="aff-body">
@@ -19,9 +19,9 @@
   </div>
 </div>
 <script src="../assets/js/config.js?v=20260817b"></script>
-<script src="aff-i18n.js?v=20260909s"></script>
-<script src="aff-api.js?v=20260909s"></script>
-<script src="aff.js?v=20260909s"></script>
+<script src="aff-i18n.js?v=20260909t"></script>
+<script src="aff-api.js?v=20260909t"></script>
+<script src="aff.js?v=20260909t"></script>
 <script>
 /* 텐핑 '소문내기' 구조: 요약 카드 → 공유 → 큰 CTA → [이미지·예시 글 | 주의사항] */
 let C = null;
@@ -68,6 +68,14 @@ affBoot('home', { titleKey:'cd_title', back:'index.html' }, async () => {
           <div><div class="lb">${t('info_left')}</div><div class="v">${left}</div></div>
           <div><div class="lb">${t('rate')}</div><div class="v">${C.approval_rate == null ? '—' : Math.round(C.approval_rate * 100) + '%'}</div></div>
         </div>
+        <h3 style="margin-top:20px">${t('ap_h')}</h3>
+        <table class="aff-table"><tbody>
+          <tr><td>${t('ap_who')}</td><td class="num"><b>${t('ap_who_v')}</b></td></tr>
+          <tr><td>${t('ap_rate')}</td><td class="num"><b>${C.approval_rate == null ? t('rate_na') : Math.round(C.approval_rate * 100) + '%'}</b> <span class="sub" style="display:inline">(${t('rate_n', { n: C.decided })})</span></td></tr>
+          <tr><td>${t('ap_days')}</td><td class="num"><b>${C.avg_days == null ? '—' : t('ap_days_v', { d: C.avg_days })}</b></td></tr>
+          <tr><td>${t('ap_ok')}</td><td class="num"><b>${C.approved}</b></td></tr>
+        </tbody></table>
+        <p class="aff-note">${t('ap_note')}</p>
       </div>
     </div>
     <div class="aff-cd-col">

@@ -325,6 +325,11 @@ class Aff extends BaseApiController
         foreach ($db->table('aff_leads')->select('product_id, status, COUNT(*) n')->groupBy(['product_id', 'status'])->get()->getResultArray() as $s) {
             $stats[$s['product_id']][$s['status']] = (int) $s['n'];
         }
+        /* 평균 승인 소요일 — 접수(created_at)부터 판정(decided_at)까지, 승인 건 기준 */
+        $days = [];
+        foreach ($db->table('aff_leads')->select('product_id, AVG(TIMESTAMPDIFF(HOUR, created_at, decided_at)) h')->where('status', 'approved')->where('decided_at IS NOT NULL', null, false)->groupBy('product_id')->get()->getResultArray() as $s) {
+            $days[$s['product_id']] = $s['h'] === null ? null : round(max(0, (float) $s['h']) / 24, 1);
+        }
         $out = [];
         foreach ($rows as $r) {
             $name = json_decode($r['p_name'] ?? '', true);
@@ -342,7 +347,7 @@ class Aff extends BaseApiController
                 'copy_text' => $r['copy_text'] ?? '', 'keywords' => json_decode($r['keywords'] ?? '[]', true) ?: [], 'rules' => $r['rules'] ?? '',
                 'featured' => (bool) $r['featured'], 'active' => (bool) $r['active'], 'sort' => (int) $r['sort'],
                 'approved' => $approved, 'pending' => $pending, 'rejected' => $rejected,
-                'approval_rate' => self::rate($approved, $rejected),
+                'approval_rate' => self::rate($approved, $rejected), 'decided' => $approved + $rejected, 'avg_days' => $days[$r['product_id']] ?? null,
                 'remaining' => $cap === null ? null : max(0, $cap - $approved - $pending),
                 'published' => (bool) ($r['p_published'] ?? 0),
             ];

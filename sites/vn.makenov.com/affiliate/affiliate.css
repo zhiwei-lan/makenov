@@ -470,3 +470,5 @@ body.aff-body{background:#fff}
 /* 규정 페이지 2단 박스 높이 맞춤 */
 .aff-two.eq{align-items:stretch}
 .aff-two.eq .aff-box{height:100%;margin-bottom:0;box-sizing:border-box}
+
+.aff-rate i{font-style:normal;font-weight:500;opacity:.8}
