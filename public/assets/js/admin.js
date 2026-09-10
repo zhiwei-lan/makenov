@@ -883,7 +883,7 @@ function renderProducts(){
   const list = MK_PRODUCTS.filter(p=> !q ||
     Object.values(p.name).join(' ').toLowerCase().includes(q) || p.brand.toLowerCase().includes(q));
 
-  el.innerHTML = `${pdDistCard()}
+  el.innerHTML = `
     <div class="card"><p class="note">제품을 등록·수정·삭제하면 사이트에 즉시 반영됩니다. 저장 위치는 이 브라우저이며,
     배포 전에 <b>설정 · 내보내기</b> 탭에서 <code>data.js</code>로 구워야 다른 기기에도 반영됩니다.</p><div class="bar"><input class="srch" placeholder="제품명 · 브랜드 검색" value="${esc(pSearch)}" oninput="pSearch=this.value;renderProducts()"><span class="grow"></span><button class="btn btn-primary btn-sm" onclick="pEditing='';pBlocks=[];pGallery=[];renderProducts()">+ 새 제품 등록</button></div><div class="tbl-wrap"><table><thead><tr><th style="width:60px">이미지</th><th>제품명</th><th>브랜드</th><th>카테고리</th><th>가격(잠금)</th><th>문의</th><th>관심</th><th>표시</th><th style="width:120px"></th></tr></thead><tbody>${list.length ? list.map(p=>`
         <tr class="row-hover"${p.published===false?' style="opacity:.55"':''}><td><img class="thumb-sm" src="${esc(imgSrc(p.img))}" alt=""></td><td><b>${esc(p.name.ko||p.name.vi)}</b><div class="sub">${esc(p.id)} · ${esc(p.createdAt)}</div></td><td>${esc(p.brand)}<div class="sub">${esc(p.origin)}</div></td><td>${esc(mkCat(p.cat)?mkCat(p.cat).name.ko:p.cat)}</td><td>${esc(triText(p.price))}</td><td><b>${p.inquiries}</b></td><td>${p.views}</td><td>${p.published===false?'<span class="pill-st st-off" title="사이트에서 숨김 상태 — 수정에서 다시 켤 수 있습니다">숨김</span> ':''}${p.featured?'<span class="pill-st st-vip">추천</span> ':''}${p.isNew?'<span class="pill-st st-new">신규</span>':''}</td><td><button class="btn btn-ghost btn-sm" onclick="editProduct('${p.id}')">수정</button><button class="btn btn-ghost btn-sm" onclick="if(confirm('${esc(p.name.ko||p.name.vi)}\\n삭제할까요?')){admDo(Admin.deleteProduct('${p.id}'));}">삭제</button></td></tr>`).join('') : `<tr class="empty-row"><td colspan="9">제품이 없습니다</td></tr>`}
@@ -1139,18 +1139,17 @@ function pdDistRowHtml(it){
     <div class="fgrid">${['ko','vi','en'].map(l => `<div class="fld"><label><span class="lang-tag">${l.toUpperCase()}</span>${PDD_LN[l]}</label><input id="f-dist-i${k}-${l}" value="${esc(o[l]||'')}"></div>`).join('')}</div></div>`;
 }
 function pdDistFormHtml(p){
-  const d = (p && p.dist && typeof p.dist === 'object') ? p.dist : null;
-  const mode = d && d.mode ? d.mode : 'common';
-  const title = (d && d.title) || {};
-  const items = (d && d.items && d.items.length) ? d.items : [{}];
+  /* 제품마다 따로 쓴다(공통 문구 없음 — 2026-09-10 지시). 아직 저장한 적 없으면 시드 문구로 채워 두고 고치게 한다 */
+  const d = (p && p.dist && typeof p.dist === 'object' && p.dist.mode) ? p.dist : null;
+  const seed = pddCur();
+  const on = d ? d.mode !== 'off' : true;
+  const title = d ? (d.title || {}) : seed.title;
+  const items = d ? ((d.items && d.items.length) ? d.items : [{}]) : (seed.items.length ? seed.items : [{}]);
   pdDistSeq = 0;
-  return `<div class="sect"><h4>유통 파트너 모집 섹션 <span style="color:var(--adm-sub);font-size:11px;font-weight:500">갤러리와 제품 상세 사이. 기본은 공통 문구(제품 탭 맨 위 카드)</span></h4>
-    <div class="fgrid two"><div class="fld"><label>이 제품에서는</label><select id="f-dist-mode" onchange="pdDistModeUI()">
-      <option value="common" ${mode==='common'?'selected':''}>공통 문구 그대로</option>
-      <option value="custom" ${mode==='custom'?'selected':''}>이 제품만 따로 쓰기</option>
-      <option value="off" ${mode==='off'?'selected':''}>이 제품은 숨김</option></select></div></div>
-    <div id="f-dist-box" ${mode==='custom'?'':'hidden'}>
-      <div class="bar" style="margin:0 0 10px"><button class="btn btn-ghost btn-sm" onclick="pdDistCopyCommon()">공통 문구 가져와서 고치기</button><button class="btn btn-ghost btn-sm" onclick="pdDistTranslate(this)" title="한국어를 베트남어·영어로 자동 번역 (빈 칸만 채움)">🌐 한국어 자동번역</button></div>
+  return `<div class="sect"><h4>유통 파트너 모집 섹션 <span style="color:var(--adm-sub);font-size:11px;font-weight:500">갤러리와 제품 상세 사이 · 이 제품에만 적용</span></h4>
+    <label class="chk" style="margin-bottom:12px"><input type="checkbox" id="f-dist-on" ${on?'checked':''}> 이 제품 상세에 노출</label>
+    <div id="f-dist-box">
+      <div class="bar" style="margin:0 0 10px"><button class="btn btn-ghost btn-sm" onclick="pdDistTranslate(this)" title="한국어를 베트남어·영어로 자동 번역 (빈 칸만 채움)">🌐 한국어 자동번역</button></div>
       <div style="font-size:13px;font-weight:600;margin:0 0 6px">제목</div>
       <div class="fgrid">${['ko','vi','en'].map(l => `<div class="fld"><label><span class="lang-tag">${l.toUpperCase()}</span>${PDD_LN[l]}</label><input id="f-dist-title-${l}" value="${esc(title[l]||'')}"></div>`).join('')}</div>
       <div style="font-size:13px;font-weight:600;margin:14px 0 6px">✅ 항목 <span style="color:var(--adm-sub);font-size:11px;font-weight:500">위에서부터 순서대로</span></div>
@@ -1158,21 +1157,12 @@ function pdDistFormHtml(p){
       <div class="bar" style="margin:6px 0 0"><button class="btn btn-ghost btn-sm" onclick="pdDistAddRow()">+ 항목</button></div>
     </div></div>`;
 }
-function pdDistModeUI(){ const box = document.getElementById('f-dist-box'); if(box) box.hidden = av('f-dist-mode') !== 'custom'; }
 function pdDistAddRow(){ const box = document.getElementById('f-dist-items'); box.insertAdjacentHTML('beforeend', pdDistRowHtml({})); const last = box.lastElementChild.querySelector('input'); if(last) last.focus(); }
 function pdDistBases(){ return [...document.querySelectorAll('#f-dist-items [data-dist-row]')].map(r => 'f-dist-i' + r.getAttribute('data-dist-row')); }
-function pdDistCopyCommon(){
-  const c = pddCur();
-  ['ko','vi','en'].forEach(l => { const el = document.getElementById('f-dist-title-' + l); if(el) el.value = c.title[l] || ''; });
-  const box = document.getElementById('f-dist-items'); box.innerHTML = (c.items.length ? c.items : [{}]).map(pdDistRowHtml).join('');
-}
 async function pdDistTranslate(btn){ await autoTranslate(btn, ['f-dist-title', ...pdDistBases()], false); }
 function pdDistRead(){
-  const mode = av('f-dist-mode') || 'common';
-  if(mode === 'common') return null;
-  if(mode === 'off') return { mode:'off' };
   const items = pdDistBases().map(b => tri(b)).filter(it => it.ko || it.vi || it.en);
-  return { mode:'custom', title: tri('f-dist-title'), items };
+  return { mode: ac('f-dist-on') ? 'custom' : 'off', title: tri('f-dist-title'), items };
 }
 
 /* ============================================================
