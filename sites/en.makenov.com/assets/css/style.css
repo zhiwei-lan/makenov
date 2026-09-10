@@ -785,7 +785,7 @@ button{font-family:var(--font-body);cursor:pointer;border:none;background:none;c
 .blog-body h3{font-size:21px;font-weight:700;color:var(--col-ink);margin:34px 0 14px}
 .blog-body ul,.blog-body ol{margin:0 0 26px 20px}
 .blog-body li{margin-bottom:9px}
-.blog-body img{border-radius:var(--r-card);margin:30px 0}
+.blog-body img{border-radius:var(--r-card);margin:30px 0;width:100%;height:auto}  /* width/height 속성만 있고 height:auto 가 없어 좁은 화면에서 세로로 늘어나던 것(9/10) */
 .blog-body strong,.blog-body b{font-weight:700;color:var(--col-ink)}
 .blog-body blockquote{border-left:3px solid var(--mk-primary);background:var(--mk-bg-soft);
   border-radius:0 var(--r-base) var(--r-base) 0;padding:18px 22px;margin:30px 0;color:var(--mk-body)}
