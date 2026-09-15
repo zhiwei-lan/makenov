@@ -29,16 +29,22 @@ jobs:
             git config --global --add safe.directory /opt/1panel/www/sites/makenov.vigo.co.kr/index 2>/dev/null || true
             git pull origin main
             # Meta 전환 API 토큰(시크릿 META_CAPI_TOKEN) → .env 의 makenov.metaCapiToken 갱신
-            # CI4 DotEnv 는 값에 공백이 있으면 따옴표가 없을 때 예외를 던져 전 라우트가 500 이 난다(2026-09-15 장애).
-            # 시크릿에서 개행·공백·따옴표를 걷어내고 항상 큰따옴표로 감싸 쓴다.
+            # ⚠ 2026-09-15 장애: sed -i / mv 는 .env 를 새 inode 로 재생성해 소유자·권한이
+            #   deploy 유저 것(600)으로 바뀌고, PHP-FPM(다른 유저)이 못 읽어 DotEnv 가 boot 에서
+            #   throw → 전 라우트 500. 반드시 (1) 같은 inode 에 덮어써 원 파일을 유지하고
+            #   (2) 이미 깨진 .env 의 권한을 PHP 가 읽는 레포 파일(composer.json) 기준으로 복구한다.
             if [ -n "$META_CAPI_TOKEN" ]; then
               T=$(printf '%s' "$META_CAPI_TOKEN" | tr -d '[:space:]"'"'"'')
-              if grep -q '^makenov.metaCapiToken' .env 2>/dev/null; then
-                sed -i "s|^makenov.metaCapiToken.*|makenov.metaCapiToken = \"$T\"|" .env || echo "WARN: .env 토큰 갱신 실패"
-              else
-                { echo ""; echo "makenov.metaCapiToken = \"$T\""; } >> .env || echo "WARN: .env 토큰 추가 실패"
+              if [ -f .env ]; then
+                # 기존 줄 제거 + 새 줄 추가한 내용을 같은 inode 의 .env 에 그대로 덮어쓴다(> 는 truncate, inode 유지)
+                { grep -v '^makenov.metaCapiToken' .env; echo "makenov.metaCapiToken = \"$T\""; } > .env.tmp \
+                  && cat .env.tmp > .env && rm -f .env.tmp || echo "WARN: .env 토큰 기록 실패"
+                # 이전 sed -i 배포가 남긴 잘못된 권한을 PHP 가 읽는 레포 파일 기준으로 복구
+                chmod --reference=composer.json .env 2>/dev/null || chmod 644 .env 2>/dev/null || true
+                chown --reference=composer.json .env 2>/dev/null || true
+                grep -c '^makenov.metaCapiToken' .env || true
+                ls -l .env composer.json || true
               fi
-              grep -c '^makenov.metaCapiToken' .env || true
             fi
             composer install --no-dev --optimize-autoloader --no-interaction 2>/dev/null || echo "WARN: composer install 失败"
             rm -rf writable/cache/* writable/debugbar/* 2>/dev/null || true
