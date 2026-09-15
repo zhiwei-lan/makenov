@@ -525,6 +525,7 @@ function columnPage(c, colFaqs, prev, next, others, lang, ctx){
 <html lang="${docLang}">
 <head>
 <meta charset="UTF-8">
+<meta name="facebook-domain-verification" content="v2c3qvkf2vtfyqntlbv59k1m1oa5x8">
 ${baseTag(langFile(relVi, lang))}
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 ${seoBlock({ title: headTitle, ogTitle: `${title} | MAKENOV`, desc, canonical, ogImage: c.img, jsonld, alt: relVi, altLangs: ok, lang: docLang, date: c.date, modified: c.modified || c.date })}

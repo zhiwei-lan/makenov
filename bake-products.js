@@ -147,6 +147,7 @@ function productPage(p, co, related, lang){
 <html lang="${lang}">
 <head>
 <meta charset="UTF-8">
+<meta name="facebook-domain-verification" content="v2c3qvkf2vtfyqntlbv59k1m1oa5x8">
 ${baseTag(langFile(relVi, lang))}
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 ${seoBlock({ title, desc: tagline, canonical, ogImage: p.img, jsonld, alt: relVi })}

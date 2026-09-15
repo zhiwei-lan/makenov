@@ -133,7 +133,7 @@ function writeLegacyHomeRedirects(dst){
     const dir = path.join(dst, prefix);
     fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(path.join(dir, 'index.html'), `<!doctype html>
-<html lang="${lang}"><head><meta charset="utf-8">
+<html lang="${lang}"><head><meta charset="utf-8"><meta name="facebook-domain-verification" content="v2c3qvkf2vtfyqntlbv59k1m1oa5x8">
 <meta http-equiv="refresh" content="0;url=https://${host}/">
 <link rel="canonical" href="https://${host}/">
 <title>MAKENOV</title></head><body>
