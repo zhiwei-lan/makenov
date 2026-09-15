@@ -33,7 +33,7 @@ class Makenov extends BaseConfig
      *   metaTestCode   테스트 이벤트 탭의 TEST#### 코드. 확인 끝나면 반드시 비울 것 (실집계 안 됨)
      * .env 에서 덮는다:  makenov.metaCapiToken = EAAB…
      */
-    public string $metaPixelId   = '3977378782563774';
+    public string $metaPixelId   = '1411974053770702';
     public string $metaCapiToken = '';
     public string $metaTestCode  = '';
 
