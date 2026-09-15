@@ -33,7 +33,7 @@ const MK_USE_EDGE_VERIFY = true;
         권장 순서: Lead > CompleteRegistration > InitiateCheckout
                    > AddToWishlist > ViewContent > Search > PageView
    ============================================================ */
-const MK_PIXEL_ID = '';           // 예: '1234567890123456'
+const MK_PIXEL_ID = '3977378782563774';           // 예: '1234567890123456'
 const MK_PIXEL_DEBUG = false;     // true 면 발생 이벤트를 콘솔에 전부 출력
 
 const MK_BACKEND = (MK_SUPABASE_URL && MK_SUPABASE_ANON) ? 'supabase' : 'local';
