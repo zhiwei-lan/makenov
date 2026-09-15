@@ -14,16 +14,30 @@ jobs:
     steps:
       - name: Deploy to 1Panel Server
         uses: appleboy/ssh-action@v1.0.3
+        env:
+          META_CAPI_TOKEN: ${{ secrets.META_CAPI_TOKEN }}
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: deploy
           key: ${{ secrets.SERVER_KEY }}
           port: 2218
+          # 비밀값은 레포에 두지 않는다 — GitHub 시크릿 → 배포 때 서버 .env 에 써 넣는다
+          envs: META_CAPI_TOKEN
           script: |
             echo "===== 开始部署 makenov0001 ====="
             cd /opt/1panel/www/sites/makenov.vigo.co.kr/index
             git config --global --add safe.directory /opt/1panel/www/sites/makenov.vigo.co.kr/index 2>/dev/null || true
             git pull origin main
+            # Meta 전환 API 토큰(시크릿 META_CAPI_TOKEN) → .env 의 makenov.metaCapiToken 갱신
+            if [ -n "$META_CAPI_TOKEN" ]; then
+              if grep -q '^makenov.metaCapiToken' .env 2>/dev/null; then
+                sed -i "s|^makenov.metaCapiToken.*|makenov.metaCapiToken = $META_CAPI_TOKEN|" .env || echo "WARN: .env 토큰 갱신 실패"
+              else
+                printf '
+makenov.metaCapiToken = %s
+' "$META_CAPI_TOKEN" >> .env || echo "WARN: .env 토큰 추가 실패"
+              fi
+            fi
             composer install --no-dev --optimize-autoloader --no-interaction 2>/dev/null || echo "WARN: composer install 失败"
             rm -rf writable/cache/* writable/debugbar/* 2>/dev/null || true
             chmod -R 775 writable/ 2>/dev/null || true
