@@ -33,9 +33,7 @@ jobs:
               if grep -q '^makenov.metaCapiToken' .env 2>/dev/null; then
                 sed -i "s|^makenov.metaCapiToken.*|makenov.metaCapiToken = $META_CAPI_TOKEN|" .env || echo "WARN: .env 토큰 갱신 실패"
               else
-                printf '
-makenov.metaCapiToken = %s
-' "$META_CAPI_TOKEN" >> .env || echo "WARN: .env 토큰 추가 실패"
+                { echo ""; echo "makenov.metaCapiToken = $META_CAPI_TOKEN"; } >> .env || echo "WARN: .env 토큰 추가 실패"
               fi
             fi
             composer install --no-dev --optimize-autoloader --no-interaction 2>/dev/null || echo "WARN: composer install 失败"
