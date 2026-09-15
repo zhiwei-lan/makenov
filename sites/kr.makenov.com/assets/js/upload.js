@@ -15,7 +15,10 @@ const MkImg = {
      - 긴 변 기준으로 줄이면 가로가 80px이 돼 완전히 뭉개진다 (실제로 그랬음)
      - 브라우저 캔버스는 한 변 16384px 제한이 있어 통째로도 못 그린다
      → 가로만 기준으로 잡고, 세로는 조각내서 저장한 뒤 이어 붙인다 */
-  DETAIL_MAXW: 1200,
+  /* 가로 3구간 (2026-09-15): 1200 미만은 1200 으로 키우고 언샤프(HiDPI 화면에서 브라우저가 늘리지 않고 줄이게),
+     1200~1600 은 그대로, 1600 초과는 1600 으로 줄임(서버 WebP 변환 한도와 같음) */
+  DETAIL_MINW: 1200,
+  DETAIL_MAXW: 1600,
   SLICE_H: 2400,
   DETAIL_QUALITY: 0.92,   // 글자가 많아 품질을 높인다
   TALL_RATIO: 2.5,        // 세로/가로가 이 값을 넘으면 상세페이지로 취급
@@ -74,7 +77,7 @@ const MkImg = {
   async compress(file){
     const img = await this._load(file);
     const keepAlpha = /png|webp|svg/i.test(file.type);
-    const maxw = this.isTall(img) ? this.DETAIL_MAXW : this.MAXW;
+    const maxw = this.MAXW;   // 세로형 상세는 sliceTall 이 맡는다(3구간 규칙)
     const q = this.isTall(img) ? this.DETAIL_QUALITY : this.QUALITY;
     const scale = Math.min(1, maxw / img.width);   // 확대는 하지 않는다
     const w = Math.round(img.width * scale);
@@ -97,9 +100,48 @@ const MkImg = {
      세로로 긴 이미지를 가로는 그대로 두고 세로만 SLICE_H 단위로 잘라 여러 장으로 만든다.
      화면에서는 이어 붙여 표시하므로 사용자에겐 한 장처럼 보인다.
      onProgress(현재, 전체) 로 진행률을 알린다. */
+  /* 상세페이지 목표 가로 (3구간) */
+  _detailW(srcW){ return srcW < this.DETAIL_MINW ? this.DETAIL_MINW : Math.min(srcW, this.DETAIL_MAXW); },
+
+  /* 언샤프 마스크 — 확대한 조각의 윤곽을 되살린다 (5탭 가우시안 블러와의 차이를 되더함).
+     amount 0.7 · threshold 2 : 서버 스크립트(reupload_detail.py)와 같은 값 */
+  _unsharp(cx, w, h, amount, threshold){
+    const id = cx.getImageData(0, 0, w, h), d = id.data, n = w * h;
+    const k = [1, 4, 6, 4, 1], ks = 16;
+    const tmp = new Float32Array(n * 3), blur = new Float32Array(n * 3);
+    for(let y = 0; y < h; y++){                       // 가로 블러
+      for(let x = 0; x < w; x++){
+        let r = 0, g = 0, b = 0;
+        for(let i = -2; i <= 2; i++){
+          const xx = Math.min(w - 1, Math.max(0, x + i)), o = (y * w + xx) * 4, kk = k[i + 2];
+          r += d[o] * kk; g += d[o + 1] * kk; b += d[o + 2] * kk;
+        }
+        const t = (y * w + x) * 3; tmp[t] = r / ks; tmp[t + 1] = g / ks; tmp[t + 2] = b / ks;
+      }
+    }
+    for(let y = 0; y < h; y++){                       // 세로 블러
+      for(let x = 0; x < w; x++){
+        let r = 0, g = 0, b = 0;
+        for(let i = -2; i <= 2; i++){
+          const yy = Math.min(h - 1, Math.max(0, y + i)), t = (yy * w + x) * 3, kk = k[i + 2];
+          r += tmp[t] * kk; g += tmp[t + 1] * kk; b += tmp[t + 2] * kk;
+        }
+        const t = (y * w + x) * 3; blur[t] = r / ks; blur[t + 1] = g / ks; blur[t + 2] = b / ks;
+      }
+    }
+    for(let i = 0; i < n; i++){
+      const o = i * 4, t = i * 3;
+      for(let c = 0; c < 3; c++){
+        const diff = d[o + c] - blur[t + c];
+        if(Math.abs(diff) >= threshold){ const v = d[o + c] + diff * amount; d[o + c] = v < 0 ? 0 : v > 255 ? 255 : v; }
+      }
+    }
+    cx.putImageData(id, 0, 0);
+  },
+
   async sliceTall(file, onProgress){
     const img = await this._load(file);
-    const scale = Math.min(1, this.DETAIL_MAXW / img.width);
+    const scale = this._detailW(img.width) / img.width;   // 1 보다 클 수 있다(확대)
     const w = Math.round(img.width * scale);
     const totalH = Math.round(img.height * scale);
     const n = Math.ceil(totalH / this.SLICE_H);
@@ -119,6 +161,7 @@ const MkImg = {
       cx.imageSmoothingQuality = 'high';
       cx.fillStyle = '#fff'; cx.fillRect(0,0,w,dh);
       cx.drawImage(img, 0, sy, img.width, sh, 0, 0, w, dh);
+      if(scale > 1) this._unsharp(cx, w, dh, 0.7, 2);   // 확대했을 때만
       const dataUrl = cv.toDataURL('image/jpeg', this.DETAIL_QUALITY);
       parts.push({ dataUrl, w, h: dh, bytes: Math.round(dataUrl.length * 0.75) });
       cv.width = cv.height = 0;   // 메모리 즉시 해제
