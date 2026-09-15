@@ -29,12 +29,16 @@ jobs:
             git config --global --add safe.directory /opt/1panel/www/sites/makenov.vigo.co.kr/index 2>/dev/null || true
             git pull origin main
             # Meta 전환 API 토큰(시크릿 META_CAPI_TOKEN) → .env 의 makenov.metaCapiToken 갱신
+            # CI4 DotEnv 는 값에 공백이 있으면 따옴표가 없을 때 예외를 던져 전 라우트가 500 이 난다(2026-09-15 장애).
+            # 시크릿에서 개행·공백·따옴표를 걷어내고 항상 큰따옴표로 감싸 쓴다.
             if [ -n "$META_CAPI_TOKEN" ]; then
+              T=$(printf '%s' "$META_CAPI_TOKEN" | tr -d '[:space:]"'"'"'')
               if grep -q '^makenov.metaCapiToken' .env 2>/dev/null; then
-                sed -i "s|^makenov.metaCapiToken.*|makenov.metaCapiToken = $META_CAPI_TOKEN|" .env || echo "WARN: .env 토큰 갱신 실패"
+                sed -i "s|^makenov.metaCapiToken.*|makenov.metaCapiToken = \"$T\"|" .env || echo "WARN: .env 토큰 갱신 실패"
               else
-                { echo ""; echo "makenov.metaCapiToken = $META_CAPI_TOKEN"; } >> .env || echo "WARN: .env 토큰 추가 실패"
+                { echo ""; echo "makenov.metaCapiToken = \"$T\""; } >> .env || echo "WARN: .env 토큰 추가 실패"
               fi
+              grep -c '^makenov.metaCapiToken' .env || true
             fi
             composer install --no-dev --optimize-autoloader --no-interaction 2>/dev/null || echo "WARN: composer install 失败"
             rm -rf writable/cache/* writable/debugbar/* 2>/dev/null || true
