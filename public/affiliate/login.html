@@ -28,15 +28,17 @@
   </div>
 </div>
 <script src="../assets/js/config.js?v=20260915a"></script>
-<script src="../assets/js/pixel.js?v=20260915a"></script>
+<script src="../assets/js/pixel.js?v=20260915b"></script>
 <script src="aff-i18n.js?v=20260910o"></script>
 <script src="aff-api.js?v=20260910o"></script>
-<script src="aff.js?v=20260910o"></script>
+<script src="aff.js?v=20260915b"></script>
 <script>
 async function submitLogin(e){
   e.preventDefault();
   const b = document.getElementById('btn'); b.disabled = true;
-  try{ await AffApi.login(document.getElementById('email').value.trim(), document.getElementById('pw').value); location.href = qs('next') || 'my.html'; }
+  try{ await AffApi.login(document.getElementById('email').value.trim(), document.getElementById('pw').value);
+    mkPixelIdentify({ em: document.getElementById('email').value.trim() }); mkTrack('CtvLogin', { content_category:'ctv' });
+    location.href = qs('next') || 'my.html'; }
   catch(err){ toast(err.message); b.disabled = false; }
   return false;
 }

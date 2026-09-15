@@ -9,6 +9,11 @@ function pageInit(){
   const totalInq = prods.reduce((s,p)=>s+p.inquiries,0);
   const yrs = new Date().getFullYear() - Number(c.since);
   document.title = L(c.name) + ' | MAKENOV';
+  /* 공급사 상세 조회 — 제품과 같은 ViewContent 지만 content_type 으로 구분. 언어 전환 재렌더는 한 번만 */
+  if(window._vcSentCo !== c.id){
+    window._vcSentCo = c.id;
+    mkTrack('ViewContent', { content_type:'company', content_ids:[c.id], content_name:L(c.name), content_category:c.cat || '' });
+  }
 
   document.getElementById('co-root').innerHTML = `
     <div class="co-cover"><img src="${c.cover}" alt=""></div>

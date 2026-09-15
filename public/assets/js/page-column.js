@@ -117,6 +117,12 @@ function pageInit(){
      다시 그리는 경우는 둘뿐이다: 동적 ?id= 뷰어로 들어왔거나, 보는 언어가 구운 언어와 다를 때. */
   const root = document.getElementById('col-root');
   const bakedLang = (document.documentElement.getAttribute('lang') || 'vi').toLowerCase();
+  /* 칼럼 조회 — 구운 페이지(아래 early return)든 동적 뷰어든 한 번은 센다 */
+  if(window._vcSentCol !== id){
+    window._vcSentCol = id;
+    const cc = MK_COLUMNS.find(x=>x.id===id);
+    mkTrack('ViewContent', { content_type:'article', content_ids:[id], content_name: cc ? L(cc.title) : (document.title || ''), content_category: cc ? L(cc.cat) : '' });
+  }
   if(window.MK_CID && root && root.querySelector('.blog-body') && bakedLang === MK_LANG) return;
 
   const idx = Math.max(0, MK_COLUMNS.findIndex(x=>x.id===id));

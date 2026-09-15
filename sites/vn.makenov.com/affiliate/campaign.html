@@ -19,10 +19,10 @@
   </div>
 </div>
 <script src="../assets/js/config.js?v=20260915a"></script>
-<script src="../assets/js/pixel.js?v=20260915a"></script>
+<script src="../assets/js/pixel.js?v=20260915b"></script>
 <script src="aff-i18n.js?v=20260910o"></script>
 <script src="aff-api.js?v=20260910o"></script>
-<script src="aff.js?v=20260910o"></script>
+<script src="aff.js?v=20260915b"></script>
 <script>
 /* 텐핑 '소문내기' 구조: 요약 카드 → 공유 → 큰 CTA → [이미지·예시 글 | 주의사항] */
 let C = null;
@@ -31,13 +31,14 @@ function ctaBlock(){
   const next = encodeURIComponent('campaign.html?id=' + C.product_id);
   if(!m) return `<a class="btn btn-primary" href="login.html?next=${next}">${t('cta_login')}</a><span class="note">${t('cta_no_acc', { join:'join.html?next=' + next })}</span>`;
   const link = affLink(m.code, C.product_id);
-  return `<button class="btn btn-primary" onclick="copyText(${JSON.stringify(link)}, t('copied_link'))">${t('cta_copy')}</button>
+  return `<button class="btn btn-primary" onclick="mkTrack('CtvShareLink',{content_category:'copy_link',content_ids:['${C.product_id}']});copyText(${JSON.stringify(link)}, t('copied_link'))">${t('cta_copy')}</button>
     <div class="lk"><input readonly value="${esc(link)}" onclick="this.select()"><a class="btn btn-ghost" href="${esc(link)}" target="_blank" rel="noopener">${t('open')} ↗</a></div>
     <span class="note">${t('cta_note', { code: esc(m.code) })}</span>`;
 }
 affBoot('home', { titleKey:'cd_title', back:'index.html' }, async () => {
   const root = document.getElementById('root');
   C = await AffApi.campaign(qs('id'));
+  if(C) mkTrack('CtvViewCampaign', { content_ids:[String(C.id || qs('id'))], content_name: C.headline || '', content_category: C.cat || '' });
   if(!C){ root.innerHTML = `<div class="aff-empty">${t('not_found')}<br><a class="btn btn-primary" href="index.html" style="margin-top:16px">${t('see_campaigns')}</a></div>`; return; }
   document.title = `${cName(C)} | MAKENOV`;
   const mats = C.materials.length ? C.materials : [C.img];
@@ -62,7 +63,7 @@ affBoot('home', { titleKey:'cd_title', back:'index.html' }, async () => {
         <p class="hint">${t('mats_hint')}</p>
         <div class="aff-mats">${mats.map((u, i) => `<figure><img src="${esc(u)}" alt="${esc(C.name)} ${i + 1}" loading="lazy"><figcaption><span>${t('img', { n: i + 1 })}</span><a href="${esc(u)}" download target="_blank" rel="noopener">${t('download')}</a></figcaption></figure>`).join('')}</div>
         <h3 style="margin-top:20px">${t('post_h')}</h3>
-        <div class="aff-copybox">${esc(postText)}<button class="btn btn-primary btn-sm" onclick="copyText(${JSON.stringify(postText)}, t('copied_post'))">${t('copy')}</button></div>
+        <div class="aff-copybox">${esc(postText)}<button class="btn btn-primary btn-sm" onclick="mkTrack('CtvShareLink',{content_category:'copy_post',content_ids:['${C.product_id}']});copyText(${JSON.stringify(postText)}, t('copied_post'))">${t('copy')}</button></div>
         <p class="aff-note">${t('post_hint')}</p>
         <div class="aff-cd-info">
           <div><div class="lb">${t('info_cpa')}</div><div class="v mint">${vnd(C.cpa_vnd)}</div></div>

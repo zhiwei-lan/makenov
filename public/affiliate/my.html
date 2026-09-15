@@ -31,10 +31,10 @@
   </div>
 </div>
 <script src="../assets/js/config.js?v=20260915a"></script>
-<script src="../assets/js/pixel.js?v=20260915a"></script>
+<script src="../assets/js/pixel.js?v=20260915b"></script>
 <script src="aff-i18n.js?v=20260910o"></script>
 <script src="aff-api.js?v=20260910o"></script>
-<script src="aff.js?v=20260910o"></script>
+<script src="aff.js?v=20260915b"></script>
 <script>
 let ME = null, SUM = null, leadFilter = '';
 const v = id => document.getElementById(id).value.trim();
@@ -104,7 +104,7 @@ async function drawMoney(){
       </div>
     </div>`;
 }
-async function requestWd(){ try{ await AffApi.requestWithdrawal(v('wd-amt')); toast(t('wd_sent')); await drawTop(); drawMoney(); }catch(e){ toast(e.message); } }
+async function requestWd(){ try{ await AffApi.requestWithdrawal(v('wd-amt')); mkTrack('CtvWithdraw', { content_category:'ctv', value: Number(v('wd-amt')) || 0, currency:'VND' }); toast(t('wd_sent')); await drawTop(); drawMoney(); }catch(e){ toast(e.message); } }
 function drawAccount(){
   const f = (id, label, val, type) => `<div class="f-row"><label>${label}</label><input id="${id}" type="${type || 'text'}" value="${esc(val || '')}"></div>`;
   document.getElementById('tab-account').innerHTML = `

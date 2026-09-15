@@ -213,6 +213,9 @@ function openAuth(mode){
   }
   _verified = null;
   _suCountry = MK_LANG === 'ko' ? 'KR' : (MK_LANG === 'en' ? 'US' : 'VN');
+  /* 가입 창을 연 시점 — 가입 완료(CompleteRegistration)보다 볼륨이 많아
+     "창은 열었는데 끝내지 않은 사람" 리타겟팅에 쓴다 */
+  mkTrack('StartRegistration', { content_category: _suCountry });
 
   mkModal(`
     <h2 data-i18n="auth_signup_title"></h2>
@@ -370,6 +373,8 @@ async function runVerify(){
   }
 
   _verified = { ...res, country:_suCountry, regNo: val('v-regno') };
+  /* 사업자 인증 통과 = 진짜 사업자. 가입을 안 끝내도 이 사람은 광고 가치가 있다 */
+  mkTrack('VerifyBusiness', { content_name: res.checked || '', content_category: _suCountry });
   box.className = 'mst-result';
   box.innerHTML = `✓ <b>${t('auth_mst_ok')}</b><br>${esc(res.company)}`
     + (res.address ? `<br><span style="color:var(--mk-muted)">${esc(res.address)}</span>` : '')
@@ -414,7 +419,9 @@ async function suDone(){
   });
   if(!res.ok){ toast(res.err==='exists' ? t('err_exists') : t('auth_mst_fail')); return; }
 
-  /* ★ 가입 = 사업자 인증 통과까지 끝난 상태. 광고 최적화의 핵심 전환. */
+  /* ★ 가입 = 사업자 인증 통과까지 끝난 상태. 광고 최적화의 핵심 전환.
+     고급 매칭용 연락처를 먼저 등록하고 쏜다 (Meta 가 브라우저에서 해시) */
+  mkPixelIdentify({ em: email, ph: v('su-phone'), dial: c.dial, fn: v('su-name'), country: _suCountry });
   mkTrack('CompleteRegistration', {
     status: true,                       // 인증까지 완료됨
     content_name: _verified.checked,    // gov | nts | checksum | domain
@@ -462,6 +469,7 @@ async function sendEasyLead(){
     site: '', cat: 'buyer',                    // cat=buyer → 관리자에서 유통 파트너 문의로 구분
     message: '[유통 파트너 간편문의 · ' + _suCountry + '] ' + v('ez-msg'),
   });
+  mkPixelIdentify({ em: v('ez-email'), ph: v('ez-tel'), dial: mkCountry(_suCountry).dial, fn: v('ez-name'), country: _suCountry });
   mkTrack('Lead', { content_category:'easy_lead', country:_suCountry });
   closeModal();
   toast(t('easy_ok'));
@@ -470,7 +478,7 @@ async function sendEasyLead(){
 async function doLogin(){
   const email = document.getElementById('li-email').value.trim();
   const res = await Store.login(email, document.getElementById('li-pw').value);
-  if(res && res.ok){ closeModal(); setTimeout(()=>location.reload(), 400); return; }
+  if(res && res.ok){ mkPixelIdentify({ em: email }); closeModal(); setTimeout(()=>location.reload(), 400); return; }
 
   const box = document.getElementById('li-err');
   const err = (res && res.err) || 'invalid';
@@ -665,7 +673,10 @@ async function sendInquiry(pidCsv){
   document.dispatchEvent(new CustomEvent('mk:inquiry'));
 }
 function openCatalog(pid){
-  requireAuth(()=>{ toast(t('catalog_ok')); });
+  requireAuth(()=>{
+    mkTrack('RequestCatalog', mkProductParams(mkProduct(pid)));
+    toast(t('catalog_ok'));
+  });
 }
 
 /* ---------- shared renderers ---------- */
@@ -761,6 +772,9 @@ function mkAffCapture(){
 document.addEventListener('DOMContentLoaded', async ()=>{
   document.documentElement.lang = MK_LANG;
   mkAffCapture();
+  /* 로그인 상태면 고급 매칭 갱신 — 다른 기기·브라우저 삭제 뒤에도 매칭이 이어진다 */
+  try{ const s = Store.session(); if(s && s.email && typeof mkPixelIdentify === 'function')
+    mkPixelIdentify({ em: s.email, ph: s.phone, fn: s.contactName, country: s.country }); }catch(e){}
 
   /* 0) 사전 렌더 블록 제거.
         prerender.js 가 크롤러용으로 구워 넣은 정적 사본이다. JS가 도는 브라우저에서는

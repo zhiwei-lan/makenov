@@ -66,6 +66,8 @@ function shareTo(where, pid, ev){
   const m = AffApi.session();
   if(!m){ location.href = 'login.html?next=' + encodeURIComponent('campaign.html?id=' + pid); return; }
   const link = affLink(m.code, pid, where);
+  /* 공유 = CTV 의 핵심 행동. 채널별로 나눠 센다 */
+  if(typeof mkTrack === 'function') mkTrack('CtvShareLink', { content_category: where, content_ids: pid ? [pid] : [] });
   if(where === 'fb'){ window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(link), '_blank', 'width=640,height=520'); return; }
   if(where === 'zalo'){ copyText(link, t('copied_zalo')); return; }
   if(where === 'tiktok'){ copyText(link, t('copied_tiktok')); return; }

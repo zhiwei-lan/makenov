@@ -26,6 +26,17 @@ class Makenov extends BaseConfig
      */
     public string $ntsKey = '';
 
+    /**
+     * Meta 픽셀 — 전환 API(서버 전송) 설정. Api\Pixel 이 쓴다.
+     *   metaPixelId    프론트 config.js 의 MK_PIXEL_ID 와 같은 값
+     *   metaCapiToken  이벤트 관리자 → 설정 → 전환 API → 액세스 토큰 생성. 비우면 서버 전송 안 함
+     *   metaTestCode   테스트 이벤트 탭의 TEST#### 코드. 확인 끝나면 반드시 비울 것 (실집계 안 됨)
+     * .env 에서 덮는다:  makenov.metaCapiToken = EAAB…
+     */
+    public string $metaPixelId   = '3977378782563774';
+    public string $metaCapiToken = '';
+    public string $metaTestCode  = '';
+
     /** 업로드 저장 폴더 (public 기준 상대경로) */
     public string $uploadDir = 'uploads';
 
