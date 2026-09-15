@@ -139,7 +139,8 @@ class Storage extends BaseApiController
             return null;
         }
         $dir = WRITEPATH . 'cache' . DIRECTORY_SEPARATOR . 'img';
-        $out = $dir . DIRECTORY_SEPARATOR . md5($file) . '-' . filemtime($file) . '.webp';
+        /* v2: 파일명에 버전을 넣어 예전(긴 변 1600 축소) 캐시는 자연히 버려진다 */
+        $out = $dir . DIRECTORY_SEPARATOR . md5($file) . '-' . filemtime($file) . '-v2.webp';
         if (is_file($out)) {
             return $out;
         }
@@ -152,16 +153,21 @@ class Storage extends BaseApiController
                 return null;
             }
             $w = imagesx($src); $h = imagesy($src);
+            /* 축소 기준은 '긴 변'이 아니라 '가로'다 (upload.js 와 같은 원칙).
+               세로로 긴 상세페이지 조각(860×2400)을 긴 변 1600 으로 줄이면 가로가 573 이 되어
+               화면에서 다시 늘어나며 글자가 뭉개졌다(2026-09-15 진단). 가로 1600 이하면 축소하지 않는다. */
             $max = 1600;
-            if ($w > $max || $h > $max) {
-                $r  = min($max / $w, $max / $h);
+            if ($w > $max) {
+                $r  = $max / $w;
                 $nw = (int) round($w * $r); $nh = (int) round($h * $r);
                 $dst = imagecreatetruecolor($nw, $nh);
                 imagealphablending($dst, false); imagesavealpha($dst, true);
                 imagecopyresampled($dst, $src, 0, 0, 0, 0, $nw, $nh, $w, $h);
                 imagedestroy($src); $src = $dst;
             }
-            $ok = @imagewebp($src, $out, 80);
+            /* 세로로 긴 상세페이지(글자 많음)는 품질을 더 준다 */
+            $q  = ($h / max(1, $w) >= 2.5) ? 88 : 80;
+            $ok = @imagewebp($src, $out, $q);
             imagedestroy($src);
             return ($ok && is_file($out)) ? $out : null;
         } catch (\Throwable $e) {
