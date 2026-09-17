@@ -74,7 +74,18 @@ const MkImg = {
   /* ---------- 리사이즈·압축 ----------
      ★ 축소 기준은 '긴 변'이 아니라 '가로'다.
        긴 변 기준으로 하면 세로로 긴 상세페이지의 가로가 수십 px로 뭉개진다. */
+  /* GIF 는 캔버스로 다시 그리면 첫 프레임만 남아 움직임이 사라진다 → 원본 바이트 그대로 (5MB 이하) */
+  GIF_MAX: 5 * 1024 * 1024,
+  isGif(file){ return /^image\/gif$/i.test(file.type) || /\.gif$/i.test(file.name || ''); },
+  async _raw(file){
+    if(file.size > this.GIF_MAX) throw new Error('GIF 는 5MB 이하만 올릴 수 있습니다 (지금 ' + (file.size/1048576).toFixed(1) + 'MB). 크기를 줄이거나 프레임 수를 줄여 주세요');
+    const img = await this._load(file);
+    const dataUrl = await new Promise((res, rej)=>{ const fr = new FileReader(); fr.onerror = () => rej(new Error('파일을 읽지 못했습니다')); fr.onload = () => res(fr.result); fr.readAsDataURL(file); });
+    return { dataUrl, w: img.width, h: img.height, bytes: file.size };
+  },
+
   async compress(file){
+    if(this.isGif(file)) return this._raw(file);
     const img = await this._load(file);
     const keepAlpha = /png|webp|svg/i.test(file.type);
     const maxw = this.MAXW;   // 세로형 상세는 sliceTall 이 맡는다(3구간 규칙)
@@ -194,7 +205,7 @@ const MkImg = {
   /* 상세페이지 저장 → 조각 참조 배열 반환 */
   async saveDetail(file, onProgress){
     const img = await this._load(file);
-    if(!this.isTall(img)){                       // 평범한 비율이면 한 장 그대로
+    if(!this.isTall(img) || this.isGif(file)){   // 평범한 비율이거나 GIF(자를 수 없음)면 한 장 그대로
       const r = await this.save(file);
       return { refs:[r.ref], count:1, w:r.w, totalH:r.h, bytes:r.bytes,
                originW:img.width, originH:img.height, sliced:false };

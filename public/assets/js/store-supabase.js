@@ -716,7 +716,7 @@ Object.assign(MkImg, {
        이것만 갈아끼우면 조각들도 IndexedDB가 아니라 Storage로 간다. */
   async _store(dataUrl){
     const blob = await (await fetch(dataUrl)).blob();
-    const ext  = blob.type === 'image/png' ? 'png' : 'jpg';
+    const ext  = blob.type === 'image/png' ? 'png' : blob.type === 'image/gif' ? 'gif' : blob.type === 'image/webp' ? 'webp' : 'jpg';
     const path = `${new Date().getFullYear()}/${Date.now().toString(36)}${Math.floor(Math.random()*1e9).toString(36)}.${ext}`;
     /* storage-js v2 최신은 Blob 을 multipart/form-data 로 보내는데,
        이 CI4 미믹 서버는 multipart 본문을 읽지 못한다(php://input 기본값 그대로 →
