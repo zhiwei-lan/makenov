@@ -74,11 +74,11 @@ const MkImg = {
   /* ---------- 리사이즈·압축 ----------
      ★ 축소 기준은 '긴 변'이 아니라 '가로'다.
        긴 변 기준으로 하면 세로로 긴 상세페이지의 가로가 수십 px로 뭉개진다. */
-  /* GIF 는 캔버스로 다시 그리면 첫 프레임만 남아 움직임이 사라진다 → 원본 바이트 그대로 (5MB 이하) */
-  GIF_MAX: 5 * 1024 * 1024,
+  /* GIF 는 캔버스로 다시 그리면 첫 프레임만 남아 움직임이 사라진다 → 원본 바이트 그대로 (20MB 이하) */
+  GIF_MAX: 20 * 1024 * 1024,
   isGif(file){ return /^image\/gif$/i.test(file.type) || /\.gif$/i.test(file.name || ''); },
   async _raw(file){
-    if(file.size > this.GIF_MAX) throw new Error('GIF 는 5MB 이하만 올릴 수 있습니다 (지금 ' + (file.size/1048576).toFixed(1) + 'MB). 크기를 줄이거나 프레임 수를 줄여 주세요');
+    if(file.size > this.GIF_MAX) throw new Error('GIF 는 20MB 이하만 올릴 수 있습니다 (지금 ' + (file.size/1048576).toFixed(1) + 'MB). 크기를 줄이거나 프레임 수를 줄여 주세요');
     const img = await this._load(file);
     const dataUrl = await new Promise((res, rej)=>{ const fr = new FileReader(); fr.onerror = () => rej(new Error('파일을 읽지 못했습니다')); fr.onload = () => res(fr.result); fr.readAsDataURL(file); });
     return { dataUrl, w: img.width, h: img.height, bytes: file.size };

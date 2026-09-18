@@ -44,8 +44,9 @@ class Storage extends BaseApiController
         if ($raw === null || $raw === '') {
             return $this->json(['message' => 'empty body'], 400);
         }
-        if (strlen($raw) > $this->cfg->uploadMax) {
-            return $this->json(['message' => 'file too large (max 5MB)'], 413);
+        $max = ($ext === 'gif') ? $this->cfg->uploadMaxGif : $this->cfg->uploadMax;
+        if (strlen($raw) > $max) {
+            return $this->json(['message' => 'file too large (max ' . (int) ($max / 1048576) . 'MB)'], 413);
         }
 
         $dest = FCPATH . $this->cfg->uploadDir . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $path);
