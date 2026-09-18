@@ -48,4 +48,7 @@ class Makenov extends BaseConfig
 
     /** GIF 만 예외 — 애니메이션은 압축·분할이 안 되므로 20MB 까지 (2026-09-18 지시). 서버 본문 한도는 20MB 통과 확인됨 */
     public int $uploadMaxGif = 20 * 1024 * 1024;
+
+    /** PDF(제품 카탈로그)도 20MB 까지 */
+    public int $uploadMaxPdf = 20 * 1024 * 1024;
 }

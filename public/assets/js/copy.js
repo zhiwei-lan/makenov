@@ -204,11 +204,18 @@ async function mkTranslate(text, from, to){
 /* 줄바꿈을 지킨다.
    히어로 제목처럼 \n 이 곧 <br> 인 문구가 있어서, 통째로 넘기면 줄이 뭉개진다.
    줄 단위로 옮기고 다시 \n 으로 잇는다. */
-async function mkTranslateLines(ko, to){
+async function mkTranslateLines(ko, to, from){
   const lines = String(ko == null ? '' : ko).split('\n');
   const out = [];
-  for(const l of lines) out.push(l.trim() ? await mkTranslate(l, 'ko', to) : '');
+  for(const l of lines) out.push(l.trim() ? await mkTranslate(l, from || 'ko', to) : '');
   return out.join('\n');
+}
+
+/* ★ 기준 언어 = 베트남어 (2026-09-18). 베트남어 하나로 한국어·영어를 만든다 */
+async function mkTranslateVi(vi){
+  const ko = await mkTranslateLines(vi, 'ko', 'vi');
+  const en = await mkTranslateLines(vi, 'en', 'vi');
+  return { ko, en };
 }
 
 /* 한국어 하나로 두 언어를 만든다. 한쪽이라도 실패하면 그 칸은 빈 문자열이다 */

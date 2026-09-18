@@ -127,7 +127,7 @@ const MkData = {
       MK_PRODUCTS.push({
         id:p.id, companyId:p.company_id, cat:p.cat, brand:p.brand, origin:p.origin,
         name:p.name, tagline:p.tagline, brandStory:p.brand_story,
-        img:p.img, gallery:p.gallery||[], video:p.video||'', detail:p.detail||[],
+        img:p.img, gallery:p.gallery||[], video:p.video||'', catalog:p.catalog||'', detail:p.detail||[],
         dist:(p.dist && typeof p.dist==='object') ? p.dist : null,   // 제품별 유통 파트너 섹션 (null=공통)
         inquiries:p.inquiries||0, views:p.views||0, wish:p.wish_count||0,
         featured:!!p.featured, isNew:!!p.is_new, createdAt:String(p.created_at||'').slice(0,10),
@@ -535,7 +535,7 @@ Object.assign(Admin, {
     const row = {
       id:p.id, company_id:p.companyId||null, cat:p.cat, brand:p.brand, origin:p.origin,
       name:p.name, tagline:p.tagline, brand_story:p.brandStory,
-      img:p.img, gallery:p.gallery, video:p.video, detail:p.detail,
+      img:p.img, gallery:p.gallery, video:p.video, catalog:p.catalog||null, detail:p.detail,
       dist:p.dist||null,
       featured:p.featured, is_new:p.isNew, created_at:p.createdAt,
       inquiries:p.inquiries, views:p.views, negotiable:!!p.negotiable,
@@ -741,6 +741,23 @@ Object.assign(MkImg, {
                 'apikey': MK_SUPABASE_ANON,
                 'Authorization':'Bearer ' + (session ? session.access_token : '') },
       body: blob,
+    });
+    if(!res.ok) throw new Error('업로드 실패: ' + await res.text());
+    return base + '/storage/v1/object/public/product-images/' + path;
+  },
+  /* 이미지가 아닌 파일(PDF 카탈로그) — 가공 없이 원본 그대로 Storage 로 */
+  async saveFile(file){
+    const ext = (String(file.name||'').split('.').pop() || '').toLowerCase();
+    if(ext !== 'pdf') throw new Error('PDF 파일만 올릴 수 있습니다');
+    if(file.size > 20 * 1024 * 1024) throw new Error('PDF 는 20MB 이하만 올릴 수 있습니다 (지금 ' + (file.size/1048576).toFixed(1) + 'MB)');
+    const path = `${new Date().getFullYear()}/${Date.now().toString(36)}${Math.floor(Math.random()*1e9).toString(36)}.pdf`;
+    const { data:{ session } } = await SB.auth.getSession();
+    const base = MK_SUPABASE_URL.replace(/\/$/,'');
+    const res = await fetch(base + '/storage/v1/object/product-images/' + path, {
+      method:'POST',
+      headers:{ 'Content-Type':'application/pdf', 'apikey': MK_SUPABASE_ANON,
+                'Authorization':'Bearer ' + (session ? session.access_token : '') },
+      body: file,
     });
     if(!res.ok) throw new Error('업로드 실패: ' + await res.text());
     return base + '/storage/v1/object/public/product-images/' + path;

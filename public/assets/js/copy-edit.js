@@ -92,7 +92,7 @@
         <div class="ft">
           <span class="msg"></span>
           ${hasOther(cur) ? `<button class="btn btn-ghost btn-sm tr" type="button"
-            title="한국어를 베트남어·영어로 다시 번역합니다">🌐 번역</button>` : ''}
+            title="베트남어를 한국어·영어로 다시 번역합니다">🌐 번역</button>` : ''}
           <button class="btn btn-ghost btn-sm cancel" type="button">취소</button>
           <button class="btn btn-primary btn-sm save" type="button">저장</button>
         </div>`;
@@ -111,19 +111,19 @@
 
     function taOf(l){ return pop.querySelector(`textarea[data-l="${l}"]`); }
 
-    /* 한국어 칸을 읽어 나머지 두 칸을 채운다.
+    /* 베트남어 칸(기준 언어)을 읽어 나머지 두 칸을 채운다.
        ⚠ 들어 있던 값을 덮어쓴다. 한국어를 고쳤으면 옛 번역은 이미 틀린 말이다. */
     async function translate(btn){
       const msg = pop.querySelector('.msg');
-      const ko = taOf('ko') ? taOf('ko').value.trim() : '';
-      if(!ko){ msg.textContent = '한국어 칸이 비어 있습니다'; return false; }
+      const viSrc = taOf('vi') ? taOf('vi').value.trim() : '';
+      if(!viSrc){ msg.textContent = '베트남어 칸이 비어 있습니다'; return false; }
       const orig = btn ? btn.textContent : '';
       if(btn){ btn.disabled = true; btn.textContent = '번역 중…'; }
       msg.textContent = '번역 중…';
       try{
-        const { vi, en } = await mkTranslateKo(ko);
-        if(!vi && !en) throw new Error('번역을 받지 못했습니다');
-        if(taOf('vi') && vi) taOf('vi').value = vi;
+        const { ko, en } = await mkTranslateVi(viSrc);
+        if(!ko && !en) throw new Error('번역을 받지 못했습니다');
+        if(taOf('ko') && ko) taOf('ko').value = ko;
         if(taOf('en') && en) taOf('en').value = en;
         msg.textContent = '번역했습니다 — 확인 후 저장하세요';
       }catch(e){

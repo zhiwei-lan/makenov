@@ -44,7 +44,7 @@ class Storage extends BaseApiController
         if ($raw === null || $raw === '') {
             return $this->json(['message' => 'empty body'], 400);
         }
-        $max = ($ext === 'gif') ? $this->cfg->uploadMaxGif : $this->cfg->uploadMax;
+        $max = ($ext === 'gif') ? $this->cfg->uploadMaxGif : (($ext === 'pdf') ? $this->cfg->uploadMaxPdf : $this->cfg->uploadMax);
         if (strlen($raw) > $max) {
             return $this->json(['message' => 'file too large (max ' . (int) ($max / 1048576) . 'MB)'], 413);
         }

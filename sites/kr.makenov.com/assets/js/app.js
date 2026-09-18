@@ -674,7 +674,10 @@ async function sendInquiry(pidCsv){
 }
 function openCatalog(pid){
   requireAuth(()=>{
-    mkTrack('RequestCatalog', mkProductParams(mkProduct(pid)));
+    const p = mkProduct(pid);
+    mkTrack('RequestCatalog', mkProductParams(p));
+    /* 관리자가 PDF 를 등록한 제품은 바로 연다. 없으면 종전대로 '이메일로 보내드립니다' 안내 */
+    if(p && p.catalog){ window.open(p.catalog, '_blank', 'noopener'); return; }
     toast(t('catalog_ok'));
   });
 }

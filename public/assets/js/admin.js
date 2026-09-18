@@ -893,6 +893,7 @@ function renderProducts(){
 function editProduct(id){
   const p = mkProduct(id);
   pBlocks  = p ? JSON.parse(JSON.stringify(p.detail||[])) : [];
+  pBlocks.forEach(b => { if(b.type === 'p' && b.text) b._vi0 = String(b.text.vi || ''); });
   pGallery = p ? [...(p.gallery||[])] : [];
   pEditing = id; renderProducts();
 }
@@ -924,7 +925,7 @@ function companyForm(id){
     return `<div class="fld">${tag}${kind==='ta' ? `<textarea id="${base}-${l}">${esc(g(val,l))}</textarea>` : `<input id="${base}-${l}" value="${esc(g(val,l))}">`}</div>`;
   }).join('')}</div></div>`;
   return `
-    <div class="card"><div class="bar"><h3 style="margin:0">${c?'공급사 수정':'새 공급사 등록'}</h3><span class="grow"></span><button class="btn btn-ghost btn-sm" onclick="autoTranslate(this,['co-name','co-tag','co-intro','co-loc'])" title="한국어를 베트남어·영어로 자동 번역 (빈 칸만 채움)">🌐 한국어 자동번역</button><button class="btn btn-ghost btn-sm" onclick="coEditing=null;renderCompanies()">취소</button><button class="btn btn-primary btn-sm" onclick="saveCompany('${id}')">저장</button></div><div class="fgrid two"><div class="fld"><label>회사 ID (영문 소문자 — 주소·연결에 쓰임${c?', 수정 불가':''})</label><input id="co-id" value="${esc(c?c.id:'')}" ${c?'disabled':''} placeholder="wellbeing"></div><div class="fld"><label>대표 브랜드명</label><input id="co-brand" value="${esc(c?c.brand||'':'')}" placeholder="WELLBEING HEALTHFARM"></div></div><div class="fgrid two"><div class="fld"><label>주력 카테고리</label><select id="co-cat">${MK_CATEGORIES.map(x=>`<option value="${x.id}" ${c&&c.cat===x.id?'selected':''}>${esc(x.name.ko)}</option>`).join('')}</select></div><div class="fld"><label>노출 순서 (작을수록 먼저)</label><input id="co-sort" type="number" value="${esc(c&&c.sort!=null?c.sort:MK_COMPANIES.length+1)}"></div></div>
+    <div class="card"><div class="bar"><h3 style="margin:0">${c?'공급사 수정':'새 공급사 등록'}</h3><span class="grow"></span><button class="btn btn-ghost btn-sm" onclick="autoTranslate(this,['co-name','co-tag','co-intro','co-loc'])" title="베트남어를 한국어·영어로 자동 번역 (빈 칸만 채움). 저장할 때도 베트남어가 바뀐 칸은 자동으로 다시 번역됩니다">🌐 베트남어 → 한·영 번역</button><button class="btn btn-ghost btn-sm" onclick="coEditing=null;renderCompanies()">취소</button><button class="btn btn-primary btn-sm" onclick="saveCompany('${id}')">저장</button></div><div class="fgrid two"><div class="fld"><label>회사 ID (영문 소문자 — 주소·연결에 쓰임${c?', 수정 불가':''})</label><input id="co-id" value="${esc(c?c.id:'')}" ${c?'disabled':''} placeholder="wellbeing"></div><div class="fld"><label>대표 브랜드명</label><input id="co-brand" value="${esc(c?c.brand||'':'')}" placeholder="WELLBEING HEALTHFARM"></div></div><div class="fgrid two"><div class="fld"><label>주력 카테고리</label><select id="co-cat">${MK_CATEGORIES.map(x=>`<option value="${x.id}" ${c&&c.cat===x.id?'selected':''}>${esc(x.name.ko)}</option>`).join('')}</select></div><div class="fld"><label>노출 순서 (작을수록 먼저)</label><input id="co-sort" type="number" value="${esc(c&&c.sort!=null?c.sort:MK_COMPANIES.length+1)}"></div></div>
     ${tri3('co-name','회사명',nm)}
     ${tri3('co-tag','한 줄 소개',tg)}
     ${tri3('co-intro','회사 소개',it,'ta')}
@@ -940,7 +941,8 @@ function companyForm(id){
     <div class="bar" style="margin-top:22px"><span class="grow"></span><button class="btn btn-ghost" onclick="coEditing=null;renderCompanies()">취소</button><button class="btn btn-primary" onclick="saveCompany('${id}')">저장</button></div></div>`;
 }
 
-function saveCompany(id){
+async function saveCompany(id){
+  await viSync(['co-name','co-tag','co-intro','co-loc'], false);
   const name = tri('co-name');
   if(!name.ko && !name.vi && !name.en){ toastA('회사명을 입력하세요'); return; }
   const cid = id || slugify(av('co-id')) || slugify(av('co-brand') || name.en || '');
@@ -968,7 +970,7 @@ function saveCompany(id){
 }
 
 /* ============================================================
-   한국어 자동번역
+   베트남어 → 한·영 번역
    mkTranslate · mkTranslateLines · mkTranslateKo 는 copy.js 에 있다.
    화면 편집기(copy-edit.js)도 같은 함수를 써야 해서 그쪽으로 옮겼다.
    ============================================================ */
@@ -976,35 +978,70 @@ function saveCompany(id){
 /* 폼의 한국어 필드를 읽어 비어있는 베트남어·영어 칸을 자동으로 채운다.
    prefixes: ['f-name','f-tag',...] → <prefix>-ko/-vi/-en 3칸 세트.
    includeBlocks=true 면 제품 상세 문단블록(pBlocks[i].text)도 번역한다. */
+/* ★ 기준 언어 = 베트남어 (2026-09-18 지시). 베트남어 칸을 읽어 한국어·영어 칸을 채운다.
+   - 버튼(autoTranslate): 비어 있는 한·영 칸만 채운다.
+   - 저장(viSync): 빈 칸 + '베트남어가 이번에 바뀐 칸'은 한·영을 다시 번역해 덮어쓴다.
+     바뀌었는지는 칸에 처음 포커스가 갈 때 적어 둔 값(data-vi0)과 비교한다. 에디터(RTE)는 빈 칸 채우기만. */
+document.addEventListener('focusin', e => {
+  const el = e.target;
+  if(el && el.id && /-vi$/.test(el.id) && el.dataset && el.dataset.vi0 === undefined) el.dataset.vi0 = el.value || '';
+});
+async function viSync(prefixes, includeBlocks){
+  let n = 0;
+  for(const pre of prefixes){
+    const viEl = document.getElementById(pre + '-vi');
+    const vi = rteGet(pre + '-vi');
+    if(!vi) continue;
+    const changed = !!(viEl && viEl.dataset && viEl.dataset.vi0 !== undefined && viEl.dataset.vi0 !== (viEl.value || ''));
+    for(const to of ['ko','en']){
+      const tid = pre + '-' + to;
+      if(!(RTE[tid] || document.getElementById(tid))) continue;
+      if(rteGet(tid) && !changed) continue;
+      const tr = await mkTranslate(vi, 'vi', to);
+      if(tr){ rteSet(tid, tr); n++; }
+    }
+    if(viEl && viEl.dataset) viEl.dataset.vi0 = viEl.value || '';
+  }
+  if(includeBlocks && typeof pBlocks !== 'undefined'){
+    for(const b of pBlocks){
+      if(b.type !== 'p' || !b.text) continue;
+      const vi = String(b.text.vi || '').trim();
+      if(!vi) continue;
+      const changed = b._vi0 !== undefined && b._vi0 !== String(b.text.vi || '');
+      for(const to of ['ko','en']){
+        if(String(b.text[to] || '').trim() && !changed) continue;
+        const tr = await mkTranslate(vi, 'vi', to);
+        if(tr){ b.text[to] = tr; n++; }
+      }
+      b._vi0 = String(b.text.vi || '');
+    }
+  }
+  return n;
+}
 async function autoTranslate(btn, prefixes, includeBlocks){
   const orig = btn.textContent;
   btn.disabled = true; btn.textContent = '번역 중…';
-  let n = 0;
   try{
-    for(const pre of prefixes){
-      const ko = rteGet(pre + '-ko');                 // 일반 필드는 텍스트, 에디터는 HTML(태그 보존)
-      if(!ko) continue;
-      for(const to of ['vi','en']){
-        const tid = pre + '-' + to;
-        if(!(RTE[tid] || document.getElementById(tid))) continue;
-        if(rteGet(tid)) continue;                     // 이미 채워진 칸은 건드리지 않음
-        const tr = await mkTranslate(ko, 'ko', to);
-        if(tr){ rteSet(tid, tr); n++; }
-      }
-    }
-    if(includeBlocks && typeof pBlocks !== 'undefined'){
-      for(const b of pBlocks){
-        if(b.type !== 'p' || !b.text || !String(b.text.ko||'').trim()) continue;
-        if(!String(b.text.vi||'').trim()){ const t = await mkTranslate(b.text.ko,'ko','vi'); if(t){ b.text.vi = t; n++; } }
-        if(!String(b.text.en||'').trim()){ const t = await mkTranslate(b.text.ko,'ko','en'); if(t){ b.text.en = t; n++; } }
-      }
-      if(typeof renderBlocks === 'function') renderBlocks();
-    }
-    toastA(n ? (n + '개 칸 자동번역 완료 — 저장 전에 확인하세요') : '번역할 한국어 내용이 없거나 이미 다 채워져 있습니다');
+    const n = await viSync(prefixes, includeBlocks);
+    if(includeBlocks && typeof renderBlocks === 'function') renderBlocks();
+    toastA(n ? (n + '개 칸 자동번역 완료 — 저장 전에 확인하세요') : '번역할 베트남어 내용이 없거나 이미 다 채워져 있습니다');
   }catch(e){
     toastA('번역 실패: ' + (e.message||e));
   }
   btn.disabled = false; btn.textContent = orig;
+}
+
+/* 카탈로그 PDF 업로드 → 주소를 f-catalog 칸에 넣는다 (제품 저장을 눌러야 반영) */
+async function catalogUpload(input){
+  const file = input.files && input.files[0]; input.value = '';
+  if(!file) return;
+  if(typeof MkImg === 'undefined' || typeof MkImg.saveFile !== 'function'){ toastA('PDF 업로드는 서버 모드에서만 됩니다'); return; }
+  toastA('PDF 올리는 중…');
+  try{
+    const url = await MkImg.saveFile(file);
+    document.getElementById('f-catalog').value = url;
+    toastA('카탈로그를 올렸습니다 — 제품 저장을 눌러야 반영됩니다');
+  }catch(e){ toastA(e.message || String(e)); }
 }
 
 function productForm(id){
@@ -1015,7 +1052,7 @@ function productForm(id){
   const t3 = v => isLocked(v) ? {} : (typeof v==='string' ? {ko:v} : (v||{}));
   const pr = t3(p&&p.price), mq = t3(p&&p.moq), ld = t3(p&&p.lead), tm = t3(p&&p.terms);
   return `
-    <div class="card"><div class="bar"><h3 style="margin:0">${p?'제품 수정':'새 제품 등록'}</h3><span class="grow"></span><button class="btn btn-ghost btn-sm" onclick="autoTranslate(this,['f-name','f-tag','f-story','f-price','f-moq','f-lead','f-terms'],true)" title="한국어를 베트남어·영어로 자동 번역 (빈 칸만 채움)">🌐 한국어 자동번역</button><button class="btn btn-ghost btn-sm" onclick="pEditing=null;renderProducts()">취소</button><button class="btn btn-primary btn-sm" onclick="saveProduct('${id}')">저장</button></div><div class="fgrid two"><div class="fld"><label>브랜드 / 공급사</label><input id="f-brand" value="${esc(p?p.brand:'')}" placeholder="DAON COSMETIC"></div><div class="fld"><label>소재지</label><input id="f-origin" value="${esc(p?p.origin:'')}" placeholder="Daegu, Korea"></div></div><div class="fgrid two"><div class="fld"><label>카테고리</label><select id="f-cat">${MK_CATEGORIES.map(c=>`<option value="${c.id}" ${p&&p.cat===c.id?'selected':''}>${esc(c.name.ko)}</option>`).join('')}</select></div><div class="fld"><label>공급사 연결 <span style="color:var(--adm-sub);font-size:11px">회사 소개·회사 페이지 링크가 상세에 붙습니다 (공급사 탭에서 등록)</span></label><select id="f-company"><option value="">연결 안 함</option>${MK_COMPANIES.map(c=>`<option value="${c.id}" ${p&&p.companyId===c.id?'selected':''}>${esc(triText(c.name)||c.brand||c.id)}</option>`).join('')}</select></div></div><div class="sect"><h4>제품명 (3개 국어)</h4><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span>한국어</label><input id="f-name-ko" value="${esc(g(nm,'ko'))}"></div><div class="fld"><label><span class="lang-tag">VI</span>베트남어</label><input id="f-name-vi" value="${esc(g(nm,'vi'))}"></div><div class="fld"><label><span class="lang-tag">EN</span>영어</label><input id="f-name-en" value="${esc(g(nm,'en'))}"></div></div></div><div class="sect"><h4>한 줄 소개 (3개 국어)</h4><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span>한국어</label><textarea id="f-tag-ko">${esc(g(tg,'ko'))}</textarea></div><div class="fld"><label><span class="lang-tag">VI</span>베트남어</label><textarea id="f-tag-vi">${esc(g(tg,'vi'))}</textarea></div><div class="fld"><label><span class="lang-tag">EN</span>영어</label><textarea id="f-tag-en">${esc(g(tg,'en'))}</textarea></div></div></div><div class="sect"><h4>대표 이미지</h4>${uploader('f-img', p?p.img:'', {hint:'목록·카드에 쓰이는 사진입니다. 끌어다 놓거나 파일을 선택하세요.'})}</div><div class="sect"><h4>갤러리 <span style="color:var(--adm-sub);font-size:11px"> 상세페이지 상단 슬라이드</span></h4><div class="gal-grid" id="gal-list"></div><div class="bar" style="margin:12px 0 0"><button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('gal-file').click()">사진 추가 (여러 장 선택 가능)</button><input type="file" id="gal-file" accept="image/*" multiple hidden onchange="galAdd(this)"><span class="hint" id="gal-info" style="margin:0">비워두면 대표 이미지만 사용됩니다.</span></div></div><div class="sect"><h4>대표 영상 <span style="color:var(--mk-muted);font-size:11px"> 선택 · 없으면 비워두세요</span></h4><div class="fld"><label>영상 URL</label><input id="f-video" value="${esc(p&&p.video?p.video:'')}" placeholder="https://www.youtube.com/watch?v=... 또는 https://youtu.be/..."><p class="hint">유튜브·Vimeo 주소를 그대로 붙여넣으면 됩니다. 비워두면 상세페이지에 영상 영역이 아예 표시되지 않습니다.</p></div></div><div class="sect"><h4>거래 조건 (3개 국어) <span style="color:var(--mk-lock);font-size:11px"> 인증 유통 파트너만 열람</span></h4><div style="margin:4px 0 6px;font-weight:600;font-size:13px">가격 / 공급가 <span style="color:var(--mk-accent);font-size:11px">USD 표기 권장</span></div><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span>한국어</label><input id="f-price-ko" value="${esc(g(pr,'ko'))}" placeholder="US$ 4.20 / unit (FOB Busan)"></div><div class="fld"><label><span class="lang-tag">VI</span>베트남어</label><input id="f-price-vi" value="${esc(g(pr,'vi'))}"></div><div class="fld"><label><span class="lang-tag">EN</span>영어</label><input id="f-price-en" value="${esc(g(pr,'en'))}"></div></div><div style="margin:14px 0 6px;font-weight:600;font-size:13px">최소주문수량 MOQ</div><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span>한국어</label><input id="f-moq-ko" value="${esc(g(mq,'ko'))}" placeholder="3,000 units"></div><div class="fld"><label><span class="lang-tag">VI</span>베트남어</label><input id="f-moq-vi" value="${esc(g(mq,'vi'))}"></div><div class="fld"><label><span class="lang-tag">EN</span>영어</label><input id="f-moq-en" value="${esc(g(mq,'en'))}"></div></div><div style="margin:14px 0 6px;font-weight:600;font-size:13px">납기</div><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span>한국어</label><input id="f-lead-ko" value="${esc(g(ld,'ko'))}" placeholder="30 days"></div><div class="fld"><label><span class="lang-tag">VI</span>베트남어</label><input id="f-lead-vi" value="${esc(g(ld,'vi'))}"></div><div class="fld"><label><span class="lang-tag">EN</span>영어</label><input id="f-lead-en" value="${esc(g(ld,'en'))}"></div></div><div style="margin:14px 0 6px;font-weight:600;font-size:13px">공급 조건</div><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span>한국어</label><input id="f-terms-ko" value="${esc(g(tm,'ko'))}" placeholder="OEM/ODM available"></div><div class="fld"><label><span class="lang-tag">VI</span>베트남어</label><input id="f-terms-vi" value="${esc(g(tm,'vi'))}"></div><div class="fld"><label><span class="lang-tag">EN</span>영어</label><input id="f-terms-en" value="${esc(g(tm,'en'))}"></div></div><label class="chk" style="margin-top:12px;display:inline-flex;gap:8px;align-items:center"><input type="checkbox" id="f-nego" ${p&&p.negotiable?'checked':''}> 가격 협의 가능 — 상세페이지 가격 옆에 <b>협의 가능</b> 배지 표시</label></div><div class="sect"><h4>브랜드 소개 (3개 국어)</h4><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span>한국어</label><textarea id="f-story-ko">${esc(g(bs,'ko'))}</textarea></div><div class="fld"><label><span class="lang-tag">VI</span>베트남어</label><textarea id="f-story-vi">${esc(g(bs,'vi'))}</textarea></div><div class="fld"><label><span class="lang-tag">EN</span>영어</label><textarea id="f-story-en">${esc(g(bs,'en'))}</textarea></div></div></div><div class="sect"><h4>상세 페이지 구성</h4><div id="blk-list"></div><div class="bar" style="margin:12px 0 0"><button class="btn btn-primary btn-sm" onclick="document.getElementById('detail-file').click()">상세페이지 통이미지 올리기 (여러 장 선택 가능)</button><input type="file" id="detail-file" accept="image/*" multiple hidden onchange="detailUpload(this)"><button class="btn btn-ghost btn-sm" onclick="addBlock('p')">+ 문단</button><button class="btn btn-ghost btn-sm" onclick="addBlock('img')">+ 이미지</button><button class="btn btn-ghost btn-sm" onclick="addBlock('video')">+ 영상</button></div><p class="hint" id="detail-info" style="margin:8px 0 0">세로로 긴 상세페이지 이미지를 그대로 올리세요. 가로는 1200~1600px 로 자동으로 맞추고(작으면 키우고 선명하게, 크면 줄임) 세로는 나눠 담습니다. GIF 는 움직임 그대로 올라갑니다(20MB 이하, 자르지 않음). 무거우면 페이지가 느려지니 짧게.<br>상세페이지가 <b>여러 장으로 나뉘어 있으면 한 번에 모두 선택</b>하세요 — 파일명 순서(1, 2, 3 …)대로 이어 붙입니다.</p></div>${pdDistFormHtml(p)}<div class="sect"><h4>노출 설정</h4><div class="fgrid"><div class="fld"><label>문의 수</label><input id="f-inq" type="number" value="${p?p.inquiries:0}"></div><div class="fld"><label>관심 수</label><input id="f-views" type="number" value="${p?p.views:0}"></div><div class="fld"><label>등록일</label><input id="f-date" value="${esc(p?p.createdAt:today())}"></div></div><div style="display:flex;gap:22px;margin-top:4px"><label class="chk"><input type="checkbox" id="f-featured" ${p&&p.featured?'checked':''}> 추천 제품 (홈 상단 노출)</label><label class="chk"><input type="checkbox" id="f-new" ${p&&p.isNew?'checked':''}> 신규 배지 표시</label></div><div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--adm-line,#E5E8EB)"><label class="chk"><input type="checkbox" id="f-pub" ${!p||p.published!==false?'checked':''}> 사이트에 노출</label><p class="hint" style="margin:6px 0 0">끄면 제품 목록·상세·검색에서 잠깐 숨겨집니다. 데이터와 사진은 그대로 남고, 다시 켜면 바로 복구됩니다. 정적 페이지는 다음 자동 굽기(최대 6시간) 때 정리됩니다.</p></div></div><div class="bar" style="margin-top:22px"><span class="grow"></span><button class="btn btn-ghost" onclick="pEditing=null;renderProducts()">취소</button><button class="btn btn-primary" onclick="saveProduct('${id}')">저장</button></div></div>`;
+    <div class="card"><div class="bar"><h3 style="margin:0">${p?'제품 수정':'새 제품 등록'}</h3><span class="grow"></span><button class="btn btn-ghost btn-sm" onclick="autoTranslate(this,['f-name','f-tag','f-story','f-price','f-moq','f-lead','f-terms'],true)" title="베트남어를 한국어·영어로 자동 번역 (빈 칸만 채움). 저장할 때도 베트남어가 바뀐 칸은 자동으로 다시 번역됩니다">🌐 베트남어 → 한·영 번역</button><button class="btn btn-ghost btn-sm" onclick="pEditing=null;renderProducts()">취소</button><button class="btn btn-primary btn-sm" onclick="saveProduct('${id}')">저장</button></div><div class="fgrid two"><div class="fld"><label>브랜드 / 공급사</label><input id="f-brand" value="${esc(p?p.brand:'')}" placeholder="DAON COSMETIC"></div><div class="fld"><label>소재지</label><input id="f-origin" value="${esc(p?p.origin:'')}" placeholder="Daegu, Korea"></div></div><div class="fgrid two"><div class="fld"><label>카테고리</label><select id="f-cat">${MK_CATEGORIES.map(c=>`<option value="${c.id}" ${p&&p.cat===c.id?'selected':''}>${esc(c.name.ko)}</option>`).join('')}</select></div><div class="fld"><label>공급사 연결 <span style="color:var(--adm-sub);font-size:11px">회사 소개·회사 페이지 링크가 상세에 붙습니다 (공급사 탭에서 등록)</span></label><select id="f-company"><option value="">연결 안 함</option>${MK_COMPANIES.map(c=>`<option value="${c.id}" ${p&&p.companyId===c.id?'selected':''}>${esc(triText(c.name)||c.brand||c.id)}</option>`).join('')}</select></div></div><div class="sect"><h4>제품명 (3개 국어)</h4><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span>한국어</label><input id="f-name-ko" value="${esc(g(nm,'ko'))}"></div><div class="fld"><label><span class="lang-tag">VI</span>베트남어</label><input id="f-name-vi" value="${esc(g(nm,'vi'))}"></div><div class="fld"><label><span class="lang-tag">EN</span>영어</label><input id="f-name-en" value="${esc(g(nm,'en'))}"></div></div></div><div class="sect"><h4>한 줄 소개 (3개 국어)</h4><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span>한국어</label><textarea id="f-tag-ko">${esc(g(tg,'ko'))}</textarea></div><div class="fld"><label><span class="lang-tag">VI</span>베트남어</label><textarea id="f-tag-vi">${esc(g(tg,'vi'))}</textarea></div><div class="fld"><label><span class="lang-tag">EN</span>영어</label><textarea id="f-tag-en">${esc(g(tg,'en'))}</textarea></div></div></div><div class="sect"><h4>대표 이미지</h4>${uploader('f-img', p?p.img:'', {hint:'목록·카드에 쓰이는 사진입니다. 끌어다 놓거나 파일을 선택하세요.'})}</div><div class="sect"><h4>갤러리 <span style="color:var(--adm-sub);font-size:11px"> 상세페이지 상단 슬라이드</span></h4><div class="gal-grid" id="gal-list"></div><div class="bar" style="margin:12px 0 0"><button type="button" class="btn btn-primary btn-sm" onclick="document.getElementById('gal-file').click()">사진 추가 (여러 장 선택 가능)</button><input type="file" id="gal-file" accept="image/*" multiple hidden onchange="galAdd(this)"><span class="hint" id="gal-info" style="margin:0">비워두면 대표 이미지만 사용됩니다.</span></div></div><div class="sect"><h4>카탈로그 PDF <span style="color:var(--adm-sub);font-size:11px;font-weight:500">상세의 Tải catalogue (PDF) 버튼이 이 파일을 엽니다 · 20MB 이하 · 비우면 이메일 안내만 뜹니다</span></h4><div class="fld"><div style="display:flex;gap:8px;align-items:center"><input id="f-catalog" value="${esc(p&&p.catalog?p.catalog:"")}" placeholder="PDF 를 올리면 주소가 채워집니다" style="flex:1"><button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById(&quot;f-catalog-file&quot;).click()">PDF 올리기</button><button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById(&quot;f-catalog&quot;).value=&quot;&quot;">지우기</button><input type="file" id="f-catalog-file" accept="application/pdf,.pdf" hidden onchange="catalogUpload(this)"></div></div></div><div class="sect"><h4>대표 영상 <span style="color:var(--mk-muted);font-size:11px"> 선택 · 없으면 비워두세요</span></h4><div class="fld"><label>영상 URL</label><input id="f-video" value="${esc(p&&p.video?p.video:'')}" placeholder="https://www.youtube.com/watch?v=... 또는 https://youtu.be/..."><p class="hint">유튜브·Vimeo 주소를 그대로 붙여넣으면 됩니다. 비워두면 상세페이지에 영상 영역이 아예 표시되지 않습니다.</p></div></div><div class="sect"><h4>거래 조건 (3개 국어) <span style="color:var(--mk-lock);font-size:11px"> 인증 유통 파트너만 열람</span></h4><div style="margin:4px 0 6px;font-weight:600;font-size:13px">가격 / 공급가 <span style="color:var(--mk-accent);font-size:11px">USD 표기 권장</span></div><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span>한국어</label><input id="f-price-ko" value="${esc(g(pr,'ko'))}" placeholder="US$ 4.20 / unit (FOB Busan)"></div><div class="fld"><label><span class="lang-tag">VI</span>베트남어</label><input id="f-price-vi" value="${esc(g(pr,'vi'))}"></div><div class="fld"><label><span class="lang-tag">EN</span>영어</label><input id="f-price-en" value="${esc(g(pr,'en'))}"></div></div><div style="margin:14px 0 6px;font-weight:600;font-size:13px">최소주문수량 MOQ</div><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span>한국어</label><input id="f-moq-ko" value="${esc(g(mq,'ko'))}" placeholder="3,000 units"></div><div class="fld"><label><span class="lang-tag">VI</span>베트남어</label><input id="f-moq-vi" value="${esc(g(mq,'vi'))}"></div><div class="fld"><label><span class="lang-tag">EN</span>영어</label><input id="f-moq-en" value="${esc(g(mq,'en'))}"></div></div><div style="margin:14px 0 6px;font-weight:600;font-size:13px">납기</div><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span>한국어</label><input id="f-lead-ko" value="${esc(g(ld,'ko'))}" placeholder="30 days"></div><div class="fld"><label><span class="lang-tag">VI</span>베트남어</label><input id="f-lead-vi" value="${esc(g(ld,'vi'))}"></div><div class="fld"><label><span class="lang-tag">EN</span>영어</label><input id="f-lead-en" value="${esc(g(ld,'en'))}"></div></div><div style="margin:14px 0 6px;font-weight:600;font-size:13px">공급 조건</div><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span>한국어</label><input id="f-terms-ko" value="${esc(g(tm,'ko'))}" placeholder="OEM/ODM available"></div><div class="fld"><label><span class="lang-tag">VI</span>베트남어</label><input id="f-terms-vi" value="${esc(g(tm,'vi'))}"></div><div class="fld"><label><span class="lang-tag">EN</span>영어</label><input id="f-terms-en" value="${esc(g(tm,'en'))}"></div></div><label class="chk" style="margin-top:12px;display:inline-flex;gap:8px;align-items:center"><input type="checkbox" id="f-nego" ${p&&p.negotiable?'checked':''}> 가격 협의 가능 — 상세페이지 가격 옆에 <b>협의 가능</b> 배지 표시</label></div><div class="sect"><h4>브랜드 소개 (3개 국어)</h4><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span>한국어</label><textarea id="f-story-ko">${esc(g(bs,'ko'))}</textarea></div><div class="fld"><label><span class="lang-tag">VI</span>베트남어</label><textarea id="f-story-vi">${esc(g(bs,'vi'))}</textarea></div><div class="fld"><label><span class="lang-tag">EN</span>영어</label><textarea id="f-story-en">${esc(g(bs,'en'))}</textarea></div></div></div><div class="sect"><h4>상세 페이지 구성</h4><div id="blk-list"></div><div class="bar" style="margin:12px 0 0"><button class="btn btn-primary btn-sm" onclick="document.getElementById('detail-file').click()">상세페이지 통이미지 올리기 (여러 장 선택 가능)</button><input type="file" id="detail-file" accept="image/*" multiple hidden onchange="detailUpload(this)"><button class="btn btn-ghost btn-sm" onclick="addBlock('p')">+ 문단</button><button class="btn btn-ghost btn-sm" onclick="addBlock('img')">+ 이미지</button><button class="btn btn-ghost btn-sm" onclick="addBlock('video')">+ 영상</button></div><p class="hint" id="detail-info" style="margin:8px 0 0">세로로 긴 상세페이지 이미지를 그대로 올리세요. 가로는 1200~1600px 로 자동으로 맞추고(작으면 키우고 선명하게, 크면 줄임) 세로는 나눠 담습니다. GIF 는 움직임 그대로 올라갑니다(20MB 이하, 자르지 않음). 무거우면 페이지가 느려지니 짧게.<br>상세페이지가 <b>여러 장으로 나뉘어 있으면 한 번에 모두 선택</b>하세요 — 파일명 순서(1, 2, 3 …)대로 이어 붙입니다.</p></div>${pdDistFormHtml(p)}<div class="sect"><h4>노출 설정</h4><div class="fgrid"><div class="fld"><label>문의 수</label><input id="f-inq" type="number" value="${p?p.inquiries:0}"></div><div class="fld"><label>관심 수</label><input id="f-views" type="number" value="${p?p.views:0}"></div><div class="fld"><label>등록일</label><input id="f-date" value="${esc(p?p.createdAt:today())}"></div></div><div style="display:flex;gap:22px;margin-top:4px"><label class="chk"><input type="checkbox" id="f-featured" ${p&&p.featured?'checked':''}> 추천 제품 (홈 상단 노출)</label><label class="chk"><input type="checkbox" id="f-new" ${p&&p.isNew?'checked':''}> 신규 배지 표시</label></div><div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--adm-line,#E5E8EB)"><label class="chk"><input type="checkbox" id="f-pub" ${!p||p.published!==false?'checked':''}> 사이트에 노출</label><p class="hint" style="margin:6px 0 0">끄면 제품 목록·상세·검색에서 잠깐 숨겨집니다. 데이터와 사진은 그대로 남고, 다시 켜면 바로 복구됩니다. 정적 페이지는 다음 자동 굽기(최대 6시간) 때 정리됩니다.</p></div></div><div class="bar" style="margin-top:22px"><span class="grow"></span><button class="btn btn-ghost" onclick="pEditing=null;renderProducts()">취소</button><button class="btn btn-primary" onclick="saveProduct('${id}')">저장</button></div></div>`;
 }
 
 /* 상세 블록 편집기 */
@@ -1098,7 +1135,9 @@ function moveBlock(i,d){
   [pBlocks[i],pBlocks[j]]=[pBlocks[j],pBlocks[i]]; renderBlocks();
 }
 
-function saveProduct(id){
+async function saveProduct(id){
+  /* 기준 언어 = 베트남어: 저장 직전에 베트남어가 바뀌었거나 한·영이 빈 칸을 자동으로 번역해 채운다 */
+  await viSync(['f-name','f-tag','f-story','f-price','f-moq','f-lead','f-terms','f-dist-title', ...pdDistBases()], true);
   const name = tri('f-name');
   if(!name.ko && !name.vi && !name.en){ toastA('제품명을 입력하세요'); return; }
   if(!av('f-img') && !pGallery.length){ toastA('대표 이미지를 올려주세요'); return; }
@@ -1113,10 +1152,11 @@ function saveProduct(id){
     img: av('f-img') || gallery[0],
     gallery: gallery.length ? gallery : [av('f-img')],
     video: av('f-video'),
+    catalog: av('f-catalog'),
     inquiries: Number(av('f-inq'))||0, views: Number(av('f-views'))||0,
     price: tri('f-price'), moq: tri('f-moq'), lead: tri('f-lead'), terms: tri('f-terms'), negotiable: ac('f-nego'),
     brandStory: tri('f-story'),
-    detail: pBlocks.filter(b=> b.type==='p' ? (b.text.ko||b.text.vi||b.text.en) : b.src ),
+    detail: pBlocks.filter(b=> b.type==='p' ? (b.text.ko||b.text.vi||b.text.en) : b.src ).map(b => { const o = Object.assign({}, b); delete o._vi0; return o; }),
     dist: pdDistRead(),
   };
   toastA(id ? '제품을 저장하는 중…' : '제품을 등록하는 중…');
@@ -1149,7 +1189,7 @@ function pdDistFormHtml(p){
   return `<div class="sect"><h4>유통 파트너 모집 섹션 <span style="color:var(--adm-sub);font-size:11px;font-weight:500">갤러리와 제품 상세 사이 · 이 제품에만 적용</span></h4>
     <label class="chk" style="margin-bottom:12px"><input type="checkbox" id="f-dist-on" ${on?'checked':''}> 이 제품 상세에 노출</label>
     <div id="f-dist-box">
-      <div class="bar" style="margin:0 0 10px"><button class="btn btn-ghost btn-sm" onclick="pdDistTranslate(this)" title="한국어를 베트남어·영어로 자동 번역 (빈 칸만 채움)">🌐 한국어 자동번역</button></div>
+      <div class="bar" style="margin:0 0 10px"><button class="btn btn-ghost btn-sm" onclick="pdDistTranslate(this)" title="베트남어를 한국어·영어로 자동 번역 (빈 칸만 채움). 저장할 때도 베트남어가 바뀐 칸은 자동으로 다시 번역됩니다">🌐 베트남어 → 한·영 번역</button></div>
       <div style="font-size:13px;font-weight:600;margin:0 0 6px">제목</div>
       <div class="fgrid">${['ko','vi','en'].map(l => `<div class="fld"><label><span class="lang-tag">${l.toUpperCase()}</span>${PDD_LN[l]}</label><input id="f-dist-title-${l}" value="${esc(title[l]||'')}"></div>`).join('')}</div>
       <div style="font-size:13px;font-weight:600;margin:14px 0 6px">✅ 항목 <span style="color:var(--adm-sub);font-size:11px;font-weight:500">위에서부터 순서대로</span></div>
@@ -1307,10 +1347,11 @@ function faqForm(id){
   const g = (o,k)=> (o && o[k]) ? o[k] : '';
   const q = f?f.q:{}, a = f?f.a:{};
   return `
-    <div class="card"><div class="bar"><h3 style="margin:0">${f?'질문 수정':'새 질문'}</h3><span class="grow"></span><button class="btn btn-ghost btn-sm" onclick="autoTranslate(this,['q-q','q-a'],false)" title="한국어를 베트남어·영어로 자동 번역 (빈 칸만 채움)">🌐 한국어 자동번역</button><button class="btn btn-ghost btn-sm" onclick="fEditing=null;renderFaqTab()">취소</button><button class="btn btn-primary btn-sm" onclick="saveFaq('${id}')">저장</button></div><div class="fgrid two"><div class="fld"><label>순서 (작을수록 위)</label><input id="q-sort" type="number" value="${f?(f.sort||0):((typeof MK_FAQ!=='undefined'?MK_FAQ.length:0)+1)}"></div><div class="fld"><label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="q-pub" ${!f||f.published!==false?'checked':''} style="width:auto"> 사이트에 노출</label></div></div><div class="sect"><h4>질문</h4><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span></label><textarea id="q-q-ko">${esc(g(q,'ko'))}</textarea></div><div class="fld"><label><span class="lang-tag">VI</span></label><textarea id="q-q-vi">${esc(g(q,'vi'))}</textarea></div><div class="fld"><label><span class="lang-tag">EN</span></label><textarea id="q-q-en">${esc(g(q,'en'))}</textarea></div></div></div><div class="sect"><h4>답변</h4><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span></label><textarea id="q-a-ko" rows="4">${esc(g(a,'ko'))}</textarea></div><div class="fld"><label><span class="lang-tag">VI</span></label><textarea id="q-a-vi" rows="4">${esc(g(a,'vi'))}</textarea></div><div class="fld"><label><span class="lang-tag">EN</span></label><textarea id="q-a-en" rows="4">${esc(g(a,'en'))}</textarea></div></div></div><div class="bar" style="margin-top:22px"><span class="grow"></span><button class="btn btn-ghost" onclick="fEditing=null;renderFaqTab()">취소</button><button class="btn btn-primary" onclick="saveFaq('${id}')">저장</button></div></div>`;
+    <div class="card"><div class="bar"><h3 style="margin:0">${f?'질문 수정':'새 질문'}</h3><span class="grow"></span><button class="btn btn-ghost btn-sm" onclick="autoTranslate(this,['q-q','q-a'],false)" title="베트남어를 한국어·영어로 자동 번역 (빈 칸만 채움). 저장할 때도 베트남어가 바뀐 칸은 자동으로 다시 번역됩니다">🌐 베트남어 → 한·영 번역</button><button class="btn btn-ghost btn-sm" onclick="fEditing=null;renderFaqTab()">취소</button><button class="btn btn-primary btn-sm" onclick="saveFaq('${id}')">저장</button></div><div class="fgrid two"><div class="fld"><label>순서 (작을수록 위)</label><input id="q-sort" type="number" value="${f?(f.sort||0):((typeof MK_FAQ!=='undefined'?MK_FAQ.length:0)+1)}"></div><div class="fld"><label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="q-pub" ${!f||f.published!==false?'checked':''} style="width:auto"> 사이트에 노출</label></div></div><div class="sect"><h4>질문</h4><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span></label><textarea id="q-q-ko">${esc(g(q,'ko'))}</textarea></div><div class="fld"><label><span class="lang-tag">VI</span></label><textarea id="q-q-vi">${esc(g(q,'vi'))}</textarea></div><div class="fld"><label><span class="lang-tag">EN</span></label><textarea id="q-q-en">${esc(g(q,'en'))}</textarea></div></div></div><div class="sect"><h4>답변</h4><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span></label><textarea id="q-a-ko" rows="4">${esc(g(a,'ko'))}</textarea></div><div class="fld"><label><span class="lang-tag">VI</span></label><textarea id="q-a-vi" rows="4">${esc(g(a,'vi'))}</textarea></div><div class="fld"><label><span class="lang-tag">EN</span></label><textarea id="q-a-en" rows="4">${esc(g(a,'en'))}</textarea></div></div></div><div class="bar" style="margin-top:22px"><span class="grow"></span><button class="btn btn-ghost" onclick="fEditing=null;renderFaqTab()">취소</button><button class="btn btn-primary" onclick="saveFaq('${id}')">저장</button></div></div>`;
 }
 
-function saveFaq(id){
+async function saveFaq(id){
+  await viSync(['q-q','q-a'], false);
   const q = tri('q-q'), a = tri('q-a');
   if(!q.ko && !q.vi && !q.en){ toastA('질문을 입력하세요'); return; }
   toastA('저장하는 중…');
@@ -1344,10 +1385,11 @@ function noticeForm(id){
   const g = (o,k)=> (o && o[k]) ? o[k] : '';
   const ti = n?n.title:{}, bo = n?n.body:{};
   return `
-    <div class="card"><div class="bar"><h3 style="margin:0">${n?'공지 수정':'새 공지'}</h3><span class="grow"></span><button class="btn btn-ghost btn-sm" onclick="autoTranslate(this,['n-t','n-b'],false)" title="한국어를 베트남어·영어로 자동 번역 (빈 칸만 채움)">🌐 한국어 자동번역</button><button class="btn btn-ghost btn-sm" onclick="nEditing=null;renderNotices()">취소</button><button class="btn btn-primary btn-sm" onclick="saveNotice('${id}')">저장</button></div><div class="fgrid"><div class="fld"><label>날짜</label><input id="n-date" value="${esc(n?n.date:today())}"></div><div class="fld"><label>구분</label><select id="n-cat">${[['notice','안내'],['new','신제품'],['update','업데이트'],['event','이벤트']].map(([v,l])=>`<option value="${v}" ${n&&n.cat===v?'selected':''}>${l}</option>`).join('')}</select></div><div class="fld"><label style="display:flex;align-items:center;gap:8px;margin-top:28px"><input type="checkbox" id="n-pin" ${n&&n.pinned?'checked':''} style="width:auto"> 상단 고정 (TOP)</label><label style="display:flex;align-items:center;gap:8px;margin-top:10px"><input type="checkbox" id="n-pub" ${!n||n.published!==false?'checked':''} style="width:auto"> 사이트에 노출</label></div></div><div class="sect"><h4>제목</h4><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span></label><input id="n-t-ko" value="${esc(g(ti,'ko'))}"></div><div class="fld"><label><span class="lang-tag">VI</span></label><input id="n-t-vi" value="${esc(g(ti,'vi'))}"></div><div class="fld"><label><span class="lang-tag">EN</span></label><input id="n-t-en" value="${esc(g(ti,'en'))}"></div></div></div><div class="sect"><h4>본문 (HTML 가능)</h4><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span></label><textarea id="n-b-ko" rows="6">${esc(g(bo,'ko'))}</textarea></div><div class="fld"><label><span class="lang-tag">VI</span></label><textarea id="n-b-vi" rows="6">${esc(g(bo,'vi'))}</textarea></div><div class="fld"><label><span class="lang-tag">EN</span></label><textarea id="n-b-en" rows="6">${esc(g(bo,'en'))}</textarea></div></div><p class="hint">&lt;p&gt;문단&lt;/p&gt; 태그로 감싸면 됩니다. 한국어만 쓰고 자동번역을 눌러도 됩니다.</p></div><div class="bar" style="margin-top:22px"><span class="grow"></span><button class="btn btn-ghost" onclick="nEditing=null;renderNotices()">취소</button><button class="btn btn-primary" onclick="saveNotice('${id}')">저장</button></div></div>`;
+    <div class="card"><div class="bar"><h3 style="margin:0">${n?'공지 수정':'새 공지'}</h3><span class="grow"></span><button class="btn btn-ghost btn-sm" onclick="autoTranslate(this,['n-t','n-b'],false)" title="베트남어를 한국어·영어로 자동 번역 (빈 칸만 채움). 저장할 때도 베트남어가 바뀐 칸은 자동으로 다시 번역됩니다">🌐 베트남어 → 한·영 번역</button><button class="btn btn-ghost btn-sm" onclick="nEditing=null;renderNotices()">취소</button><button class="btn btn-primary btn-sm" onclick="saveNotice('${id}')">저장</button></div><div class="fgrid"><div class="fld"><label>날짜</label><input id="n-date" value="${esc(n?n.date:today())}"></div><div class="fld"><label>구분</label><select id="n-cat">${[['notice','안내'],['new','신제품'],['update','업데이트'],['event','이벤트']].map(([v,l])=>`<option value="${v}" ${n&&n.cat===v?'selected':''}>${l}</option>`).join('')}</select></div><div class="fld"><label style="display:flex;align-items:center;gap:8px;margin-top:28px"><input type="checkbox" id="n-pin" ${n&&n.pinned?'checked':''} style="width:auto"> 상단 고정 (TOP)</label><label style="display:flex;align-items:center;gap:8px;margin-top:10px"><input type="checkbox" id="n-pub" ${!n||n.published!==false?'checked':''} style="width:auto"> 사이트에 노출</label></div></div><div class="sect"><h4>제목</h4><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span></label><input id="n-t-ko" value="${esc(g(ti,'ko'))}"></div><div class="fld"><label><span class="lang-tag">VI</span></label><input id="n-t-vi" value="${esc(g(ti,'vi'))}"></div><div class="fld"><label><span class="lang-tag">EN</span></label><input id="n-t-en" value="${esc(g(ti,'en'))}"></div></div></div><div class="sect"><h4>본문 (HTML 가능)</h4><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span></label><textarea id="n-b-ko" rows="6">${esc(g(bo,'ko'))}</textarea></div><div class="fld"><label><span class="lang-tag">VI</span></label><textarea id="n-b-vi" rows="6">${esc(g(bo,'vi'))}</textarea></div><div class="fld"><label><span class="lang-tag">EN</span></label><textarea id="n-b-en" rows="6">${esc(g(bo,'en'))}</textarea></div></div><p class="hint">&lt;p&gt;문단&lt;/p&gt; 태그로 감싸면 됩니다. 한국어만 쓰고 자동번역을 눌러도 됩니다.</p></div><div class="bar" style="margin-top:22px"><span class="grow"></span><button class="btn btn-ghost" onclick="nEditing=null;renderNotices()">취소</button><button class="btn btn-primary" onclick="saveNotice('${id}')">저장</button></div></div>`;
 }
 
-function saveNotice(id){
+async function saveNotice(id){
+  await viSync(['n-t','n-b'], false);
   const title = tri('n-t');
   if(!title.ko && !title.vi && !title.en){ toastA('제목을 입력하세요'); return; }
   toastA('저장하는 중…');
@@ -1397,20 +1439,20 @@ async function cpTranslate(path, btn, quiet){
   const f = mkCopyFields().find(x=>x.path===path);
   if(!f) return;
   const v = cpValue(f);
-  const ko = String(v.ko || '').trim();
-  if(!ko) return toastA('한국어 칸이 비어 있습니다');
-  if(v.vi === undefined && v.en === undefined) return toastA('이 문구는 한국어만 씁니다');
+  const viSrc = String(v.vi || '').trim();
+  if(v.vi === undefined) return toastA('이 문구는 한국어만 씁니다');
+  if(!viSrc) return toastA('베트남어 칸이 비어 있습니다');
 
   const orig = btn ? btn.textContent : '';
   if(btn){ btn.disabled = true; btn.textContent = '번역 중…'; }
   try{
-    const { vi, en } = await mkTranslateKo(ko);
-    if(!vi && !en) throw new Error('번역을 받지 못했습니다');
+    const { ko, en } = await mkTranslateVi(viSrc);
+    if(!ko && !en) throw new Error('번역을 받지 못했습니다');
     const next = { ...v };
-    if(v.vi !== undefined && vi) next.vi = vi;
+    if(v.ko !== undefined && ko) next.ko = ko;
     if(v.en !== undefined && en) next.en = en;
     cpDraft[path] = next;
-    cpTouched[path] = { ...(cpTouched[path]||{}), vi:true, en:true };
+    cpTouched[path] = { ...(cpTouched[path]||{}), ko:true, en:true };
     document.getElementById('cp-dirty').textContent = Object.keys(cpDraft).length + '건 편집됨';
     document.getElementById('cp-save').disabled = false;
     if(!quiet){ cpRefreshList(); toastA('번역했습니다 — 저장 전에 확인하세요'); }
@@ -1558,7 +1600,7 @@ function cpBuildList(){
         <span class="wh">${esc(mkCopyGroup(f))} · ${esc(f.label)}</span>
         <span class="grow"></span>
         ${(v.vi !== undefined || v.en !== undefined)
-          ? `<button class="btn btn-ghost btn-sm" title="한국어를 베트남어·영어로 다시 번역합니다 (들어 있던 값을 덮어씁니다)"
+          ? `<button class="btn btn-ghost btn-sm" title="베트남어를 한국어·영어로 다시 번역합니다 (들어 있던 값을 덮어씁니다)"
               onclick="event.stopPropagation();cpTranslate('${esc(f.path)}',this)">🌐 번역</button>` : ''}
         ${on?`<button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();cpReset('${esc(f.path)}')">되돌리기</button>`:''}
         <span class="fold">접기</span>
@@ -2001,7 +2043,7 @@ function renderSettings(){
   const g = k => esc(tb[k] || '');
 
   document.getElementById('tab-settings').innerHTML = `
-    <div class="card"><div class="bar"><h3 style="margin:0">상단 띠배너</h3><span class="grow"></span><button class="btn btn-ghost btn-sm" onclick="autoTranslate(this,['set-tb'],false)" title="한국어를 베트남어·영어로 자동 번역 (빈 칸만 채움)">🌐 한국어 자동번역</button><button class="btn btn-primary btn-sm" onclick="saveTopbar()">저장</button></div><p class="note">모든 페이지 맨 위에 뜨는 파란 띠입니다. 방문자가 ✕로 닫으면 그 세션 동안만 숨겨집니다.</p><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span></label><textarea id="set-tb-ko" rows="2">${g('ko')}</textarea></div><div class="fld"><label><span class="lang-tag">VI</span></label><textarea id="set-tb-vi" rows="2">${g('vi')}</textarea></div><div class="fld"><label><span class="lang-tag">EN</span></label><textarea id="set-tb-en" rows="2">${g('en')}</textarea></div></div><div class="fgrid two" style="margin-top:14px"><div class="fld"><label>클릭 시 이동할 주소 (비우면 링크 없음)</label><input id="set-tb-link" value="${esc(S.topbarLink||'')}" placeholder="maker.html"></div><div class="fld"><label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="set-tb-on" ${S.topbarOn!==false?'checked':''} style="width:auto"> 띠배너 노출</label></div></div></div><div class="card"><h3>배포용 데이터 내보내기</h3><p class="note">지금 편집한 제품·칼럼은 <b>이 브라우저에만</b> 저장돼 있습니다.
+    <div class="card"><div class="bar"><h3 style="margin:0">상단 띠배너</h3><span class="grow"></span><button class="btn btn-ghost btn-sm" onclick="autoTranslate(this,['set-tb'],false)" title="베트남어를 한국어·영어로 자동 번역 (빈 칸만 채움). 저장할 때도 베트남어가 바뀐 칸은 자동으로 다시 번역됩니다">🌐 베트남어 → 한·영 번역</button><button class="btn btn-primary btn-sm" onclick="saveTopbar()">저장</button></div><p class="note">모든 페이지 맨 위에 뜨는 파란 띠입니다. 방문자가 ✕로 닫으면 그 세션 동안만 숨겨집니다.</p><div class="fgrid"><div class="fld"><label><span class="lang-tag">KO</span></label><textarea id="set-tb-ko" rows="2">${g('ko')}</textarea></div><div class="fld"><label><span class="lang-tag">VI</span></label><textarea id="set-tb-vi" rows="2">${g('vi')}</textarea></div><div class="fld"><label><span class="lang-tag">EN</span></label><textarea id="set-tb-en" rows="2">${g('en')}</textarea></div></div><div class="fgrid two" style="margin-top:14px"><div class="fld"><label>클릭 시 이동할 주소 (비우면 링크 없음)</label><input id="set-tb-link" value="${esc(S.topbarLink||'')}" placeholder="maker.html"></div><div class="fld"><label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="set-tb-on" ${S.topbarOn!==false?'checked':''} style="width:auto"> 띠배너 노출</label></div></div></div><div class="card"><h3>배포용 데이터 내보내기</h3><p class="note">지금 편집한 제품·칼럼은 <b>이 브라우저에만</b> 저장돼 있습니다.
       아래에서 <code>data.js</code>를 내려받아 <code>makenov/assets/js/data.js</code>를 교체하면
       다른 기기와 배포 사이트에도 반영됩니다.</p><div class="bar"><button class="btn btn-primary btn-sm" onclick="exportDataJs()">data.js 내려받기</button><button class="btn btn-ghost btn-sm" onclick="exportJson()">전체 백업 (JSON)</button><label class="btn btn-ghost btn-sm" style="cursor:pointer;margin:0">
           백업 복원<input type="file" accept=".json" style="display:none" onchange="importJson(this)"></label></div></div>${isSB() ? `<div class="card"><h3>비밀번호 변경</h3><p class="note" style="margin:0">서버 모드에서는 관리자마다 계정과 비밀번호가 따로 있습니다.
@@ -2015,7 +2057,8 @@ function renderSettings(){
 }
 
 /* 상단 띠배너 저장 — 3개 국어 문구 + 링크 + 노출여부 */
-function saveTopbar(){
+async function saveTopbar(){
+  await viSync(['set-tb'], false);
   const topbar = tri('set-tb');
   if(!topbar.ko && !topbar.vi && !topbar.en){ toastA('띠배너 문구를 입력하세요'); return; }
   toastA('저장하는 중…');
@@ -2268,7 +2311,7 @@ function pdDistCard(){
   const items = d.items.length ? d.items : [{}];
   const rows = items.map((it, i) => `<div class="blk"><div class="blk-head"><b style="font-size:13px">✅ 항목 ${i+1}</b><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm" onclick="pddMove(${i},-1)" ${i===0?'disabled':''} title="위로">↑</button><button class="btn btn-ghost btn-sm" onclick="pddMove(${i},1)" ${i===items.length-1?'disabled':''} title="아래로">↓</button><button class="btn btn-ghost btn-sm" onclick="pddRemove(${i})">삭제</button></div></div>${tri3('pdd-i'+i, it, 'textarea', { ko:'예) 한국 제조사 직공급', vi:'', en:'' })}</div>`).join('');
 
-  return `<div class="card">${head(`<button class="btn btn-ghost btn-sm" onclick="pddTranslate(this)" title="한국어를 베트남어·영어로 자동 번역 (빈 칸만 채움)">🌐 한국어 자동번역</button><button class="btn btn-ghost btn-sm" onclick="pddOpen=false;pddDraft=null;renderProducts()">취소</button><button class="btn btn-primary btn-sm" onclick="pddSave()">저장</button>`)}
+  return `<div class="card">${head(`<button class="btn btn-ghost btn-sm" onclick="pddTranslate(this)" title="베트남어를 한국어·영어로 자동 번역 (빈 칸만 채움). 저장할 때도 베트남어가 바뀐 칸은 자동으로 다시 번역됩니다">🌐 베트남어 → 한·영 번역</button><button class="btn btn-ghost btn-sm" onclick="pddOpen=false;pddDraft=null;renderProducts()">취소</button><button class="btn btn-primary btn-sm" onclick="pddSave()">저장</button>`)}
     <p class="note">제목 한 줄과 ✅ 항목을 세 언어로 씁니다. 저장하면 사이트의 모든 제품 상세에 바로 반영되고, 검색엔진용 정적 페이지는 다음 자동 굽기(최대 6시간) 때 따라옵니다.</p>
     <div class="pdd-wrap">
       <div>

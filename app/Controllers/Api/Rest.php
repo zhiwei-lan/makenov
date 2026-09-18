@@ -24,7 +24,7 @@ class Rest extends BaseApiController
             'json' => ['name','tagline','intro','location','certs'], 'bool' => [],
         ],
         'products' => [
-            'cols' => ['id','company_id','cat','brand','origin','name','tagline','brand_story','img','gallery','video','detail','dist','inquiries','views','wish_count','featured','is_new','negotiable','published','created_at'],
+            'cols' => ['id','company_id','cat','brand','origin','name','tagline','brand_story','img','gallery','video','catalog','detail','dist','inquiries','views','wish_count','featured','is_new','negotiable','published','created_at'],
             'json' => ['name','tagline','brand_story','gallery','detail','dist'],
             'bool' => ['featured','is_new','negotiable','published'],
         ],
