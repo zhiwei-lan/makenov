@@ -15,7 +15,7 @@ name: bake
 
 on:
   schedule:
-    - cron: '0 */6 * * *'    # 6시간마다
+    - cron: '0 * * * *'    # 1시간마다 (관리자 수정 후 정적 페이지가 늦게 따라와 깜빡이는 시간을 줄임, 2026-09-18). 바뀐 게 없으면 커밋 안 함
   workflow_dispatch: {}
 
 permissions:

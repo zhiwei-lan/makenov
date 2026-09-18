@@ -160,7 +160,11 @@ ${FAVICON}
 <main class="pd-wrap" id="pd-root">
   <div class="pd-row">
     <div class="pd-main">
-      <div class="pd-gallery"><div class="main"><img src="${p.img}" alt="${esc(name)}"></div></div>
+      ${(() => {
+        /* 런타임(page-product.js)과 같은 규칙 — 대표 사진은 갤러리 첫 장. p.img 를 쓰면 하이드레이션 때 사진이 바뀌며 깜빡인다(2026-09-18) */
+        const g = (Array.isArray(p.gallery) && p.gallery.length) ? p.gallery : [p.img];
+        return `<div class="pd-gallery"><div class="main"><img id="pd-shot" src="${g[0]}" alt="${esc(name)}"></div>${g.length > 1 ? `<span class="cnt" id="pd-cnt">1 / ${g.length}</span>` : ''}</div>${g.length > 1 ? `<div class="pd-thumbs">${g.map((x, i) => `<img src="${x}" class="${i === 0 ? 'on' : ''}" alt="">`).join('')}</div>` : ''}`;
+      })()}
       ${distHtml(lang, p)}
       <div class="pd-sec">
         <h2>${esc(L.detail)}</h2>
@@ -213,7 +217,7 @@ ${PAGE_PROD}
   const pr = await get('products?select=*&published=eq.true&order=created_at.desc');
   const co = await get('companies?select=*&order=sort');
   const products = pr.map(p => ({ id:p.id, companyId:p.company_id, cat:p.cat, brand:p.brand, origin:p.origin,
-    name:p.name, tagline:p.tagline, brandStory:p.brand_story, img:p.img, gallery:p.gallery || [],
+    name:p.name, tagline:p.tagline, brandStory:p.brand_story, img:p.img, gallery:p.gallery || [], dist:(p.dist && typeof p.dist === 'object') ? p.dist : null,
     video:p.video || '', detail:p.detail || [] }));
   const companies = Object.fromEntries(co.map(c => [c.id, c]));
   /* 공통 섹션 — DB(site 설정) 우선, 없으면 data.js 시드(런타임 Object.assign 과 같은 우선순위) */

@@ -84,6 +84,17 @@ const MkData = {
     const adminView = this.admin && /\/admin(\/|$)/.test(location.pathname);
     let prq = SB.from('products').select('*');
     if(!adminView) prq = prq.eq('published', true);
+    /* 아래 6개는 예전엔 하나씩 순서대로 기다렸다(요청당 0.4초 × 6 = 화면이 한참 뒤에 바뀜, 2026-09-18).
+       요청은 지금 한꺼번에 출발시키고, 결과를 '적용'하는 순서만 종전대로 둔다(copy 가 마지막).
+       Promise.resolve(thenable) 은 즉시 then 을 불러 요청을 시작한다. 실패는 각 자리에서 종전처럼 무시. */
+    const later = q => Promise.resolve(q).catch(e => ({ error: e, data: null }));
+    const pTm = later(SB.from('product_terms').select('*'));
+    const pFq = later(SB.from('faqs').select('*').order('sort'));
+    const pNt = later(SB.from('notices').select('*').eq('published', true).order('date',{ascending:false}));
+    const pSt = later(SB.from('settings').select('*').eq('key', 'site').maybeSingle());
+    const pSe = later(SB.from('settings').select('*').eq('key', 'seo').maybeSingle());
+    const pCp = later(SB.from('settings').select('*').eq('key', 'copy').maybeSingle());
+
     const [co, pr, cl, he] = await Promise.all([
       SB.from('companies').select('*').order('sort'),
       prq.order('created_at', {ascending:false}),
@@ -94,7 +105,7 @@ const MkData = {
 
     /* ★ 거래 조건은 별도 테이블. RLS 때문에 인증 유통 파트너가 아니면 0건이 돌아온다.
        즉 미인증 사용자에게는 가격이 애초에 전송되지 않는다. */
-    const tm = await SB.from('product_terms').select('*');
+    const tm = await pTm;
     const terms = {};
     (tm.data || []).forEach(t => terms[t.product_id] = t);
     this.termsLoaded = (tm.data || []).length > 0;
@@ -135,7 +146,7 @@ const MkData = {
 
     /* FAQ — 06_faq_seo.sql 미적용이면 테이블이 없으므로 시드(data.js)를 그대로 둔다 */
     try{
-      const fq = await SB.from('faqs').select('*').order('sort');
+      const fq = await pFq;
       /* 빈 테이블이면 시드 유지. 공지와 같은 이유(CI4 이관 누락) */
       if(!fq.error && fq.data && fq.data.length && typeof MK_FAQ !== 'undefined'){
         MK_FAQ.length = 0;
@@ -150,7 +161,7 @@ const MkData = {
        CI4 이관 때 행이 안 넘어와 빈 테이블이 조회에 성공하면서,
        먼저 그려진 시드 공지를 지워 공지가 깜빨이다 사라졌다(2026-08-17). */
     try{
-      const nt = await SB.from('notices').select('*').eq('published', true).order('date',{ascending:false});
+      const nt = await pNt;
       if(!nt.error && nt.data && nt.data.length && typeof MK_NOTICES !== 'undefined'){
         MK_NOTICES.length = 0;
         nt.data.forEach(n => MK_NOTICES.push({
@@ -163,7 +174,7 @@ const MkData = {
 
     /* 사이트 설정 — 07_settings.sql 미적용이면 시드(data.js) 값을 그대로 쓴다 */
     try{
-      const st = await SB.from('settings').select('*').eq('key', 'site').maybeSingle();
+      const st = await pSt;
       if(!st.error && st.data && st.data.value && typeof MK_SETTINGS !== 'undefined'){
         Object.assign(MK_SETTINGS, st.data.value);
       }
@@ -180,7 +191,7 @@ const MkData = {
        화면에는 영향이 없고, `node build.js` 가 이 값을 읽어 각 페이지 head 에 심는다.
        관리자 화면에서 지금 값을 보여줘야 하므로 여기서 함께 받아 둔다. */
     try{
-      const se = await SB.from('settings').select('*').eq('key', 'seo').maybeSingle();
+      const se = await pSe;
       if(!se.error && se.data && se.data.value) window.MK_SEO = se.data.value;
     }catch(e){}
 
@@ -188,7 +199,7 @@ const MkData = {
        ⚠ 반드시 맨 마지막이어야 한다. 앞서 채운 값 위에 덮어야 오버라이드가 이긴다.
           예전엔 히어로보다 먼저 적용해서, 히어로 문구를 고쳐도 곧바로 DB 값에 덮여 사라졌다. */
     try{
-      const cp = await SB.from('settings').select('*').eq('key', 'copy').maybeSingle();
+      const cp = await pCp;
       if(!cp.error && cp.data && cp.data.value){
         window.MK_COPY_OVERRIDE = cp.data.value;
         if(typeof mkApplyCopy === 'function') mkApplyCopy(cp.data.value);
