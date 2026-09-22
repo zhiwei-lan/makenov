@@ -214,7 +214,15 @@ child.stdout.once('data', () => {
       const src = fs.readFileSync(file, 'utf8');
       const rx = /(<main[^>]*id="co-root"[^>]*>)[\s\S]*?(<\/main>)/;
       if (!rx.test(src)) { console.log('건너뜀 (#co-root 없음)'); failed++; continue; }
-      fs.writeFileSync(file, src.replace(rx, (a, o, c) => o + inner + c), 'utf8');
+      let out = src.replace(rx, (a, o, c) => o + inner + c);
+      /* 헤드 JSON-LD 의 인증 목록도 화면과 같은 언어로 — 생성기가 없어 8/10 한국어 값이 남아 있었다 */
+      const certBox = inner.match(/<div class="co-certs">([\s\S]*?)<\/div>/);
+      if (certBox) {
+        const unesc = t => t.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+        const certs = [...certBox[1].matchAll(/<span>([\s\S]*?)<\/span>/g)].map(x => unesc(x[1]).trim()).filter(Boolean);
+        out = out.replace(/"hasCredential":\[[^\]]*\]/, '"hasCredential":' + JSON.stringify(certs).replace(/</g, '\u003c'));
+      }
+      fs.writeFileSync(file, out, 'utf8');
       console.log(`${text(inner)}자`);
       report.push({ 페이지: f, 텍스트: text(inner), HTML: inner.length });
     } catch (e) { console.log('실패:', e.message); failed++; }
