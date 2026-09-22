@@ -220,7 +220,7 @@ child.stdout.once('data', () => {
       if (certBox) {
         const unesc = t => t.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
         const certs = [...certBox[1].matchAll(/<span>([\s\S]*?)<\/span>/g)].map(x => unesc(x[1]).trim()).filter(Boolean);
-        out = out.replace(/"hasCredential":\[[^\]]*\]/, '"hasCredential":' + JSON.stringify(certs).replace(/</g, '\u003c'));
+        out = out.replace(/"hasCredential":\[[^\]]*\]/, '"hasCredential":' + JSON.stringify(certs).replace(/</g, '\\u003c'));
       }
       fs.writeFileSync(file, out, 'utf8');
       console.log(`${text(inner)}자`);
