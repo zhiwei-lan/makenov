@@ -54,7 +54,8 @@ const withLangs = f => LANGS.map(pre => pre + f);
 const PAGES = [
   ...HUBS.flatMap(withLangs),
   'maker.html',
-  'products.html',
+  /* ★ko/en 도 굽는다 — 예전엔 vi 만 굽혀서 kr·en 제품 페이지 첫 화면이 옛 시드(카테고리 6개·제품 13개)였다 (2026-09-22) */
+  ...withLangs('products.html'),
   ...withLangs('support.html').map(page => ({ page, extraHashes: ['#faq', '#ask'] })),
 ].filter(e => fs.existsSync(path.join(ROOT, typeof e === 'string' ? e : e.page)));
 
@@ -189,6 +190,36 @@ child.stdout.once('data', () => {
       failed++;
     }
   }
+  /* ---------- 4. 공급사 상세 (companies/<id>.html × 3언어) ----------
+     ★2026-09-22: 이 페이지들은 어떤 굽기도 다시 만들지 않아 8/10 시드(한국어 인증 목록 등)가
+     vn·en 첫 화면·크롤러 본문에 그대로 남아 있었다. 런타임(page-company.js)이 #co-root 를
+     통째로 다시 그리므로 사본 블록 없이 <main> 안을 직접 교체한다. */
+  const coDir = path.join(ROOT, 'companies');
+  const coFiles = fs.existsSync(coDir) ? fs.readdirSync(coDir).filter(f => f.endsWith('.html')) : [];
+  for (const f of coFiles.flatMap(f => withLangs('companies/' + f))) {
+    const file = path.join(ROOT, f);
+    if (!fs.existsSync(file)) continue;
+    process.stdout.write(`  ${f} … `);
+    try {
+      let dom;
+      try {
+        dom = execFileSync(CHROME, ['--headless=new', '--disable-gpu', '--no-sandbox', '--disable-dev-shm-usage',
+          `--user-data-dir=${PROFILE}`, '--timeout=15000', '--virtual-time-budget=9000', '--dump-dom',
+          `http://localhost:${PORT}/${f}`],
+          { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, timeout: 30000, stdio: ['ignore', 'pipe', 'ignore'] });
+      } catch (e) { dom = e.stdout || ''; if (!dom) throw e; }
+      const m = dom.match(/<main[^>]*id="co-root"[^>]*>([\s\S]*?)<\/main>/);
+      const inner = m && m[1].replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<!--[\s\S]*?-->/g, '').trim();
+      if (!inner || text(inner) < 200) { console.log(`건너뜀 (렌더 결과 ${inner ? text(inner) : 0}자)`); failed++; continue; }
+      const src = fs.readFileSync(file, 'utf8');
+      const rx = /(<main[^>]*id="co-root"[^>]*>)[\s\S]*?(<\/main>)/;
+      if (!rx.test(src)) { console.log('건너뜀 (#co-root 없음)'); failed++; continue; }
+      fs.writeFileSync(file, src.replace(rx, (a, o, c) => o + inner + c), 'utf8');
+      console.log(`${text(inner)}자`);
+      report.push({ 페이지: f, 텍스트: text(inner), HTML: inner.length });
+    } catch (e) { console.log('실패:', e.message); failed++; }
+  }
+
   console.log('');
   console.table(report);
   if (failed) console.log(`⚠ ${failed}개 페이지가 렌더되지 않았습니다.`);

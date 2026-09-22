@@ -40,13 +40,18 @@ const stripHtml = s => String(s ?? '')
   .replace(/<(style|script)[^>]*>[\s\S]*?<\/\1\s*>/gi, ' ')   /* 태그 안 내용까지. 닫는 태그 쪽 정규식에 제어문자가 섞여 실제로는 하나도 안 지워지고 있었다
      — 요약이 CSS 로 새고, 2분짜리 글의 읽는 시간이 54분으로 나왔다 (2026-08-28 수리) */
   .replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-/** 글자로 언어를 알아본다 (한글 → ko, 베트남어 성조 부호 → vi, 나머지 → en) */
+/** 글자로 언어를 알아본다 — 한글·베트남어 성조 글자 중 많은 쪽, 둘 다 없으면 en.
+    ★2026-09-22: 예전엔 한글이 한 글자라도 있으면 ko 였다. 베트남어 글에 "(두바이 쫀득쿠키)"·"(건강기능식품)"
+      같은 한국어 용어가 괄호로 들어간 c22·c23·c28·c31 이 한국어 글로 판정돼, vn 페이지가 한국어 틀
+      (읽는 시간·CTA·푸터)로 굽히고 canonical 까지 kr 로 갔다. */
 function detectLang(html){
   const s = stripHtml(html).slice(0, 4000);
   if(!s) return null;
-  if(RE_HANGUL.test(s)) return 'ko';
-  if(RE_VIET.test(s)) return 'vi';
-  return 'en';
+  const h = (s.match(new RegExp(RE_HANGUL.source, 'g')) || []).length;
+  const v = (s.match(new RegExp(RE_VIET.source, 'gi')) || []).length;
+  if(h > v) return 'ko';
+  if(v) return 'vi';
+  return h ? 'ko' : 'en';
 }
 /** 이 칼럼이 해당 언어로 "진짜" 번역돼 있는가 — 값이 있고, 그 값의 언어가 실제로 맞는가 */
 function hasLang(c, lang){

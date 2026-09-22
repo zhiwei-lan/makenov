@@ -33,13 +33,13 @@
 <div id="mk-topbar" class="topbar"><div class="wrap"><span></span><button class="x" onclick="sessionStorage.setItem('mk_topbar_off','1');this.closest('.topbar').remove()">✕</button></div></div><header class="mk-header" id="mk-header"></header><main class="wrap">
 <!-- mk:pre (prerender.js가 관리 — 직접 수정 금지) -->
 <div id="mk-prerender"><div class="dir-top"><h1 data-i18n="dir_title">Product Directory</h1><p data-i18n="dir_desc">Meet global innovative products</p></div><div class="filterbar"><a class="chip on" href="directory.html?sort=new" data-i18n="dir_all">All</a><a class="chip " href="directory.html?category=beauty&amp;sort=new">Beauty &amp; Cosmetics</a><a class="chip " href="directory.html?category=food&amp;sort=new">Food &amp; Beverage</a><a class="chip " href="directory.html?category=living&amp;sort=new">Home &amp; Living</a><a class="chip " href="directory.html?category=health&amp;sort=new">Health &amp; Wellness</a><a class="chip " href="directory.html?category=kids&amp;sort=new">Kids &amp; Baby</a><a class="chip " href="directory.html?category=tech&amp;sort=new">Tech &amp; Devices</a><select class="sortsel" onchange="location.href='directory.html?sort='+this.value"><option value="new" selected="">Newest</option><option value="popular">Most popular</option><option value="inq">Most inquiries</option></select></div><section class="sec" style="padding-top:28px"><div class="grid">
-  <a class="p-card" href="products/p1.html"><div class="thumb"><img src="https://makenov.com/storage/v1/object/public/product-images/2026/mu3mmxhibfnto5.jpg" alt="KORA Pro Hybrid noodle maker (N1)" loading="lazy"><span class="flag" data-i18n="spot_new">New product</span>
+  <a class="p-card" href="products/p1.html" data-cat="tech"><div class="thumb"><img src="https://makenov.com/storage/v1/object/public/product-images/2026/mu3mmxhibfnto5.jpg" alt="KORA Pro Hybrid noodle maker (N1)" loading="lazy"><span class="flag" data-i18n="spot_new">New product</span>
       <button class="heart " onclick="event.preventDefault();event.stopPropagation();toggleCart('p1',this)">♡</button></div><div class="body"><span class="brand">Cook In Paper</span><h3>KORA Pro Hybrid noodle maker (N1)</h3><div class="meta"><span class="rate">12<span data-i18n="inquiries_count">inquiries</span></span><span class="left">Gyeonggi-do, Hàn Quốc</span></div></div></a>
-  <a class="p-card" href="products/p11.html"><div class="thumb"><img src="assets/img/products/miralet/skinbooster.jpg" alt="MIRALET Phyto Intensive Skinbooster 2.0ml × 4ea" loading="lazy"><span class="flag" data-i18n="spot_new">New product</span>
+  <a class="p-card" href="products/p11.html" data-cat="beauty"><div class="thumb"><img src="assets/img/products/miralet/skinbooster.jpg" alt="MIRALET Phyto Intensive Skinbooster 2.0ml × 4ea" loading="lazy"><span class="flag" data-i18n="spot_new">New product</span>
       <button class="heart " onclick="event.preventDefault();event.stopPropagation();toggleCart('p11',this)">♡</button></div><div class="body"><span class="brand">MIRALET</span><h3>MIRALET Phyto Intensive Skinbooster 2.0ml × 4ea</h3><div class="meta"><span class="rate">43<span data-i18n="inquiries_count">inquiries</span></span><span class="amt">1 saved</span><span class="left">Daegu, Hàn Quốc</span></div></div></a>
-  <a class="p-card" href="products/p9.html"><div class="thumb"><img src="https://makenov.com/storage/v1/object/public/product-images/2026/mszejcol5ldjob.png" alt="Gounbal Premium Foot Cream" loading="lazy"><span class="flag" data-i18n="spot_new">New product</span>
+  <a class="p-card" href="products/p9.html" data-cat="beauty"><div class="thumb"><img src="https://makenov.com/storage/v1/object/public/product-images/2026/mszejcol5ldjob.png" alt="Gounbal Premium Foot Cream" loading="lazy"><span class="flag" data-i18n="spot_new">New product</span>
       <button class="heart " onclick="event.preventDefault();event.stopPropagation();toggleCart('p9',this)">♡</button></div><div class="body"><span class="brand">WELLBEING HEALTH FARM</span><h3>Gounbal Premium Foot Cream</h3><div class="meta"><span class="rate">35<span data-i18n="inquiries_count">inquiries</span></span><span class="left">Incheon, Hàn Quốc</span></div></div></a>
-  <a class="p-card" href="products/p0.html"><div class="thumb"><img src="https://makenov.com/storage/v1/object/public/product-images/2026/mu4wncu3ebdh8j.png" alt="FIRESSAK Motorcycle Fire Blanket FS-MV6S" loading="lazy"><span class="flag" data-i18n="spot_new">New product</span>
+  <a class="p-card" href="products/p0.html" data-cat="tech"><div class="thumb"><img src="https://makenov.com/storage/v1/object/public/product-images/2026/mu4wncu3ebdh8j.png" alt="FIRESSAK Motorcycle Fire Blanket FS-MV6S" loading="lazy"><span class="flag" data-i18n="spot_new">New product</span>
       <button class="heart " onclick="event.preventDefault();event.stopPropagation();toggleCart('p0',this)">♡</button></div><div class="body"><span class="brand">FIRESSAK</span><h3>FIRESSAK Motorcycle Fire Blanket FS-MV6S</h3><div class="meta"><span class="rate">5<span data-i18n="inquiries_count">inquiries</span></span><span class="amt">2 saved</span><span class="left">Daegu, Hàn Quốc</span></div></div></a></div><div class="empty" style="display:none"><div class="big"></div><p data-i18n="dir_empty">No products in this category</p></div></section>
 
 <nav class="mk-static-mk-header">
@@ -56,7 +56,7 @@
 <script src="assets/js/config.js?v=20260915c"></script>
 <script src="assets/js/pixel.js?v=20260915b"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="assets/js/i18n.js?v=20260907a"></script>
+<script src="assets/js/i18n.js?v=20260922a"></script>
 <script src="assets/js/baked.js?v=20260826a"></script>
 <script src="assets/js/data.js?v=20260909a"></script>
 <script src="assets/js/copy.js?v=20260918c"></script>
@@ -65,8 +65,26 @@
 <script src="assets/js/upload.js?v=20260918a"></script>
 <script src="assets/js/store-supabase.js?v=20260918c"></script>
 <script src="assets/js/copy-edit.js?v=20260918c"></script>
-<script src="assets/js/app.js?v=20260918c"></script>
+<script src="assets/js/app.js?v=20260922a"></script>
 <script>
+/* 사전 렌더 사본은 '전체' 목록으로 구워진다. 카테고리 레일·칩에서 ?category= 로 들어오면
+   데이터 부팅(2~3초)이 끝날 때까지 엉뚱한 전체 목록이 떠서 "필터가 안 먹는다"로 보였다.
+   부팅 전에 사본 카드를 URL 조건대로 먼저 거른다. 카드에 data-cat 이 없거나(옛 사본)
+   검색·정렬이 걸려 있으면 틀린 목록을 보여 주느니 비워 두고 부팅 렌더를 기다린다. */
+(function(){
+  const pre = document.getElementById('mk-prerender');
+  if(!pre) return;
+  const params = new URLSearchParams(location.search);
+  const cat = params.get('category') || '', q = params.get('q') || '', sort = params.get('sort') || 'new';
+  if(!cat && !q && sort === 'new') return;
+  const cards = [...pre.querySelectorAll('.p-card')];
+  const exact = !q && sort === 'new' && cards.every(c => c.hasAttribute('data-cat'));
+  cards.forEach(c => { if(!exact || c.getAttribute('data-cat') !== cat) c.remove(); });
+  pre.querySelectorAll('.filterbar .chip').forEach(a => {
+    const m = (a.getAttribute('href') || '').match(/[?&]category=([^&]+)/);
+    a.classList.toggle('on', (m ? m[1] : '') === cat);
+  });
+})();
 function pageInit(){
   const params = new URLSearchParams(location.search);
   const cat = params.get('category') || '';
