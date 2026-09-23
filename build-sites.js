@@ -90,6 +90,18 @@ function rehost(html, host){
     .replace(/(<meta property="og:url" content=")https:\/\/vn\.makenov\.com\//g, `$1https://${host}/`);
 }
 
+/* og:url 은 항상 그 페이지의 canonical 과 같게. 손으로 박은 값이 다른 페이지를 가리키던 사고 방지
+   (홈 og:url 이 kr/about.html 이던 것). OG 블록이 있는데 og:url 만 빠진 페이지는 og:title 앞에 넣는다 */
+function syncOgUrl(html){
+  const can = (html.match(/<link rel="canonical" href="([^"]+)">/) || [])[1];
+  if(!can) return html;
+  if(/<meta property="og:url" content="[^"]*">/.test(html))
+    return html.replace(/(<meta property="og:url" content=")[^"]*(">)/, `$1${can}$2`);
+  if(/<meta property="og:title"/.test(html))
+    return html.replace(/<meta property="og:title"/, `<meta property="og:url" content="${can}">\n<meta property="og:title"`);
+  return html;
+}
+
 function localizeNeutral(html, file, lang, host){
   html = rehost(html, host)
     .replace(/<html lang="[^"]+">/, `<html lang="${lang}">`);
@@ -182,6 +194,7 @@ for(const [host, cfg] of Object.entries(SITES)){
     let h = repairMissingDetailLinks(fs.readFileSync(f, 'utf8'), dst);
     h = stripLangPrefix(h, cfg.dir);
     h = absolutizeLangSwitch(h);
+    h = syncOgUrl(h);
     fs.writeFileSync(f, h);
   }
 
