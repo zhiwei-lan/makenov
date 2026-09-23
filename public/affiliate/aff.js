@@ -16,11 +16,21 @@ const AFF_LANG = (() => {
   try{ const s = localStorage.getItem('aff_lang'); if(s === 'ko' || s === 'vi') return s; }catch(e){}
   return 'vi';
 })();
+/* 링크 유효시간 — 관리자 제휴 설정값(기본 36시간)을 {hours} 자리에 넣는다.
+   문구에 숫자를 박아 두면 설정을 바꿨을 때 CTV 안내와 실제 동작이 어긋난다 (2026-09-22). */
+let AFF_HOURS = 36;
 function t(key, vars){
   let s = (AFF_I18N[AFF_LANG] && AFF_I18N[AFF_LANG][key]) ?? AFF_I18N.vi[key] ?? key;
   if(vars) Object.entries(vars).forEach(([k, v]) => { s = s.split('{' + k + '}').join(v); });
-  return s;
+  return s.split('{hours}').join(AFF_HOURS);
 }
+(function affLoadHours(){
+  if(typeof AffApi === 'undefined' || !AffApi.settings) return;
+  AffApi.settings().then(s => {
+    const h = Number(s && (s.cookieHours || 0));
+    if(h > 0 && h !== AFF_HOURS){ AFF_HOURS = h; try{ affApplyI18n(document); }catch(e){} }
+  }).catch(() => {});
+})();
 function affSetLang(l){ try{ localStorage.setItem('aff_lang', l); }catch(e){} const u = new URL(location.href); u.searchParams.delete('lang'); location.href = u.toString(); }
 /* data-i18n / data-i18n-ph 채우기 (HTML 허용 — 문구는 우리 것) */
 function affApplyI18n(root){

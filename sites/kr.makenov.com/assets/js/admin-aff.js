@@ -212,7 +212,7 @@ async function affMemo(id, cur){
 async function affSettingsView(){
   const s = await AffAdmin.settings();
   AffAdmin.call('GET', 'demo').then(r => { const el = document.getElementById('aff-demo-cnt'); if(el) el.textContent = r.count ? `현재 데모 마케터 ${r.count}명` : '데모 데이터 없음'; }).catch(() => {});
-  return `<div class="fgrid two"><div class="fld"><label>최소 출금액 (VND)</label><input id="afs-min" type="number" step="10000" value="${s.minWithdraw}"></div><div class="fld"><label>링크 유효기간 (일) — 마지막 클릭 후 며칠까지 문의를 CTV 것으로 볼지</label><input id="afs-days" type="number" value="${s.cookieDays}"></div></div>
+  return `<div class="fgrid two"><div class="fld"><label>최소 출금액 (VND)</label><input id="afs-min" type="number" step="10000" value="${s.minWithdraw}"></div><div class="fld"><label>링크 유효시간 (시간) — 마지막 클릭 후 몇 시간까지 문의를 CTV 것으로 볼지 (기본 36시간)</label><input id="afs-days" type="number" min="1" value="${s.cookieHours || 36}"></div></div>
   <div class="fgrid two"><div class="fld"><label>CTV 지원 Zalo</label><input id="afs-zalo" value="${esc(s.zalo || '')}"></div><div class="fld"><label>CTV 지원 이메일</label><input id="afs-email" value="${esc(s.email || '')}"></div></div>
   <div class="fld"><label>랭킹 페이지 상단 문구 — 이달 TOP 3 혜택 (베트남어, 비우면 숨김)</label><input id="afs-reward" value="${esc(s.rankReward || '')}" placeholder="Top 3 tháng này nhận thêm 500.000 ₫ và được ưu tiên chiến dịch mới"></div>
   <div class="bar"><button class="btn btn-primary btn-sm" onclick="affSaveSettings()">저장</button></div>
@@ -223,7 +223,7 @@ async function affDeleteDemo(){
   try{ const r = await AffAdmin.call('DELETE', 'demo'); toastA('데모 데이터 ' + r.deleted + '명분을 지웠습니다'); renderAff(); }catch(e){ affFail(e); }
 }
 async function affSaveSettings(){
-  try{ await AffAdmin.saveSettings({ minWithdraw:Number(av('afs-min')) || 0, cookieDays:Number(av('afs-days')) || 30, zalo:av('afs-zalo'), email:av('afs-email'), rankReward:av('afs-reward') }); toastA('설정을 저장했습니다'); }
+  try{ await AffAdmin.saveSettings({ minWithdraw:Number(av('afs-min')) || 0, cookieHours:Number(av('afs-days')) || 36, zalo:av('afs-zalo'), email:av('afs-email'), rankReward:av('afs-reward') }); toastA('설정을 저장했습니다'); }
   catch(e){ affFail(e); }
 }
 

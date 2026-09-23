@@ -28,7 +28,9 @@ use CodeIgniter\HTTP\ResponseInterface;
 class Aff extends BaseApiController
 {
     private const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-    private const DEFAULT_SETTINGS = ['minWithdraw' => 500000, 'cookieDays' => 30, 'zalo' => '', 'email' => '', 'rankReward' => ''];
+    /* cookieHours: 마지막 클릭 뒤 몇 시간까지 문의를 그 CTV 것으로 보는가(= 주소창 ?ref= 가 따라붙는 시간).
+       2026-09-22 사장님 지시로 30일(cookieDays) → 36시간 기본. 옛 cookieDays 값은 settings() 에서 버린다. */
+    private const DEFAULT_SETTINGS = ['minWithdraw' => 500000, 'cookieHours' => 36, 'zalo' => '', 'email' => '', 'rankReward' => ''];
 
     private ?array $marketer = null;   // aff_tokens 로 식별된 마케터 행
     /** 마이그레이션을 추가하면 올린다 — writable/aff_schema_ok 에 적힌 값과 다르면 latest() 를 다시 돈다 */
@@ -298,13 +300,16 @@ class Aff extends BaseApiController
     {
         $row = db_connect()->table('settings')->where('key', 'aff')->get()->getRowArray();
         $v = $row ? (json_decode($row['value'], true) ?: []) : [];
+        /* 옛 설정행의 cookieDays(30일)는 버린다 — 2026-09-22 지시로 기본 36시간.
+           관리자 제휴 설정에서 시간 값을 저장하면 그때부터 cookieHours 가 쓰인다. */
+        unset($v['cookieDays']);
         return array_merge(self::DEFAULT_SETTINGS, $v);
     }
 
     private function publicSettings(): array
     {
         $s = $this->settings();
-        return ['minWithdraw' => (int) $s['minWithdraw'], 'cookieDays' => (int) $s['cookieDays'], 'zalo' => $s['zalo'], 'email' => $s['email']];
+        return ['minWithdraw' => (int) $s['minWithdraw'], 'cookieHours' => (int) $s['cookieHours'], 'zalo' => $s['zalo'], 'email' => $s['email']];
     }
 
     /* ================= 캠페인 (공개) ================= */
@@ -775,7 +780,8 @@ class Aff extends BaseApiController
         $b = $this->bodyJson() ?? [];
         $s = $this->settings();
         if (isset($b['minWithdraw'])) $s['minWithdraw'] = max(0, (int) $b['minWithdraw']);
-        if (isset($b['cookieDays']))  $s['cookieDays']  = max(1, min(365, (int) $b['cookieDays']));
+        if (isset($b['cookieHours'])) $s['cookieHours'] = max(1, min(8760, (int) $b['cookieHours']));
+        unset($s['cookieDays']);
         foreach (['zalo', 'email', 'rankReward'] as $k) if (array_key_exists($k, $b)) $s[$k] = trim((string) $b[$k]);
         $db = db_connect();
         $val = json_encode($s, JSON_UNESCAPED_UNICODE);

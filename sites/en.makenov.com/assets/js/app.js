@@ -714,11 +714,23 @@ function mkSwapPrerender(){
 }
 
 /* ---------- 제휴(CTV) 추적 ----------
-   마케터 링크 ?ref=코드[&ch=채널] 로 들어오면 30일(관리자 설정) 기억하고 클릭 1건을 보낸다.
+   마케터 링크 ?ref=코드[&ch=채널] 로 들어오면 일정 시간 기억하고 클릭 1건을 보낸다.
    문의를 보낼 때 store-supabase.addInquiry 가 mkAffRef() 를 읽어 aff_ref 를 붙인다. */
 /* 저장은 두 곳: localStorage(이 호스트) + .makenov.com 공통 쿠키(vn/kr/en/makenov.com 어디로 갔다 와도 유지).
-   만료 30일은 마지막 클릭부터 다시 센다(마지막 클릭 우선). */
-const MK_AFF_DAYS = 30;
+   만료는 마지막 클릭부터 다시 센다(마지막 클릭 우선).
+   ★2026-09-22: 30일 고정 → 관리자 제휴 설정의 '링크 유효시간'(기본 36시간). 코드를 기억하는 동안
+     주소창에 ?ref= 가 계속 따라붙는 것이 30일이나 이어져서 사장님 지시로 줄였다.
+     관리자 값은 ?ref= 로 들어온 순간에만 한 번 물어본다(평소 페이지에는 요청을 더하지 않는다). */
+const MK_AFF_HOURS = 36;
+function mkAffHours(a){ const h = Number(a && a.hours); return h > 0 ? h : (Number(a && a.days) > 0 ? a.days * 24 : MK_AFF_HOURS); }
+async function mkAffSettingHours(){
+  try{
+    const r = await fetch(MK_SUPABASE_URL.replace(/\/$/, '') + '/aff/v1/settings', { headers:{ apikey: MK_SUPABASE_ANON } });
+    const s = await r.json();
+    const h = Number(s && (s.cookieHours || 0));
+    return h > 0 ? h : MK_AFF_HOURS;
+  }catch(e){ return MK_AFF_HOURS; }
+}
 function mkAffCookie(){
   const m = document.cookie.match(/(?:^|;\s*)mk_aff=([^;]*)/);
   if(!m) return null;
@@ -728,7 +740,7 @@ function mkAffStore(a){
   try{ localStorage.setItem('mk_aff', JSON.stringify(a)); }catch(e){}
   try{
     const host = location.hostname, dom = /makenov\.com$/.test(host) ? ';domain=.makenov.com' : '';
-    document.cookie = 'mk_aff=' + encodeURIComponent(JSON.stringify(a)) + ';max-age=' + (MK_AFF_DAYS * 86400) + ';path=/' + dom + ';SameSite=Lax' + (location.protocol === 'https:' ? ';Secure' : '');
+    document.cookie = 'mk_aff=' + encodeURIComponent(JSON.stringify(a)) + ';max-age=' + Math.round(mkAffHours(a) * 3600) + ';path=/' + dom + ';SameSite=Lax' + (location.protocol === 'https:' ? ';Secure' : '');
   }catch(e){}
 }
 function mkAffRef(){
@@ -737,7 +749,7 @@ function mkAffRef(){
   const c = mkAffCookie();
   if(c && c.code && (!a || (c.ts || 0) > (a.ts || 0))) a = c;     // 다른 서브도메인에서 더 최근에 눌렀으면 그쪽
   if(!a || !a.code) return null;
-  if(Date.now() - (a.ts || 0) > (a.days || MK_AFF_DAYS) * 86400000){ try{ localStorage.removeItem('mk_aff'); }catch(e){} return null; }
+  if(Date.now() - (a.ts || 0) > mkAffHours(a) * 3600000){ mkAffForget(); return null; }
   return a;
 }
 /* 코드를 기억하는 동안은 주소창에도 ?ref= 를 다시 붙인다 — 사람이 보기에 "링크가 살아 있고",
@@ -752,6 +764,14 @@ function mkAffDecorateUrl(a){
     history.replaceState(history.state, '', u.toString());
   }catch(e){}
 }
+/* 만료된 코드는 두 저장소에서 같이 지운다 — 쿠키만 남으면 다음 페이지에서 되살아난다 */
+function mkAffForget(){
+  try{ localStorage.removeItem('mk_aff'); }catch(e){}
+  try{
+    const host = location.hostname, dom = /makenov\.com$/.test(host) ? ';domain=.makenov.com' : '';
+    document.cookie = 'mk_aff=;max-age=0;path=/' + dom;
+  }catch(e){}
+}
 function mkAffCapture(){
   const q = new URLSearchParams(location.search);
   const code = (q.get('ref') || '').toUpperCase();
@@ -762,7 +782,8 @@ function mkAffCapture(){
     return;
   }
   const ch = (q.get('ch') || '').toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 16);
-  mkAffStore({ code, ch, ts: Date.now(), days: MK_AFF_DAYS });
+  mkAffStore({ code, ch, ts: Date.now(), hours: MK_AFF_HOURS });
+  mkAffSettingHours().then(h => { const a = mkAffRef(); if(a && a.code === code && mkAffHours(a) !== h) mkAffStore({ ...a, hours: h }); });
   const pid = window.MK_PID || q.get('id') || '';
   try{
     fetch(MK_SUPABASE_URL.replace(/\/$/, '') + '/aff/v1/click', { method:'POST', keepalive:true,
