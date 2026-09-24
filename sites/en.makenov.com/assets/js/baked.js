@@ -3,6 +3,7 @@
    정식 주소(products/…html)로 링크하고, 없으면 ?id= 뷰어로 보낸다. */
 window.MK_BAKED = {
   "products": [
+      "p2",
       "p1",
       "p11",
       "p9",
@@ -14,6 +15,8 @@ window.MK_BAKED = {
     "wellbeing"
   ],
   "columns": {
+      "c35": "c35",
+      "c36": "c36",
       "c34": "c34",
       "c32": "c32",
       "c33": "c33",
