@@ -133,9 +133,9 @@ const MK_PRODUCTS = [
   {
     id:'p0', cat:'tech', featured:true, isNew:true, createdAt:'2026-07-27',
     companyId:'lgind', brand:'FIRESSAK', origin:'Daegu, Korea',
-    name:{vi:'Chăn chữa cháy xe điện FIRESSAK FS-EV54S',
-          ko:'파이어싹 질식소화덮개 FS-EV54S',
-          en:'FIRESSAK EV Fire Blanket FS-EV54S'},
+    name:{vi:'Chăn chữa cháy xe máy FIRESSAK FS-MV6S',
+          ko:'파이어싹 오토바이용 질식소화덮개 FS-MV6S',
+          en:'FIRESSAK Motorcycle Fire Blanket FS-MV6S'},
     tagline:{vi:'Chăn phủ dập lửa xe điện — cách ly oxy, kiểm soát cháy pin lithium tại chỗ',
              ko:'전기차 화재를 덮어서 진압하는 질식소화덮개 — 산소를 차단해 현장에서 확산을 막습니다',
              en:'Smothering blanket for EV fires — cuts off oxygen to contain lithium battery fires on the spot'},
