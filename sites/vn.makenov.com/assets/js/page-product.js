@@ -124,7 +124,7 @@ function pageInit(){
           <button class="btn btn-primary" onclick="openInquiry(['${p.id}'])" data-i18n="cta_inquiry"></button>
           <button class="btn btn-ghost" id="pd-cart" onclick="toggleCart('${p.id}');pdCartLabel('${p.id}')">
             <span data-i18n="${inCart?'cta_wishlist_on':'cta_wishlist'}"></span></button>
-          <button class="btn btn-soft" onclick="openCatalog('${p.id}')" data-i18n="cta_catalog"></button>
+          ${mkCatalogHidden(p)?'':`<button class="btn btn-soft" onclick="openCatalog('${p.id}')" data-i18n="cta_catalog"></button>`}
         </div>
       </div>
     </aside>

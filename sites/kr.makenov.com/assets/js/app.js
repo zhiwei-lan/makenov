@@ -672,12 +672,16 @@ async function sendInquiry(pidCsv){
   closeModal(); toast(t('inq_ok'));
   document.dispatchEvent(new CustomEvent('mk:inquiry'));
 }
+/* 카탈로그 숨김 — 관리자 '숨기기' 체크 시 catalog 값 앞에 'hide:' 가 붙는다(DB 스키마 변경 없이).
+   뒤의 PDF 주소는 보존해서, 체크를 풀면 그대로 다시 나온다. */
+function mkCatalogHidden(p){ return /^hide:/.test(String((p && p.catalog) || '')); }
+function mkCatalogUrl(p){ return String((p && p.catalog) || '').replace(/^hide:/, ''); }
 function openCatalog(pid){
   requireAuth(()=>{
     const p = mkProduct(pid);
     mkTrack('RequestCatalog', mkProductParams(p));
     /* 관리자가 PDF 를 등록한 제품은 바로 연다. 없으면 종전대로 '이메일로 보내드립니다' 안내 */
-    if(p && p.catalog){ window.open(p.catalog, '_blank', 'noopener'); return; }
+    if(p && mkCatalogUrl(p)){ window.open(mkCatalogUrl(p), '_blank', 'noopener'); return; }
     toast(t('catalog_ok'));
   });
 }
