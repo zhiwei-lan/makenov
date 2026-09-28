@@ -722,11 +722,14 @@ function mkSwapPrerender(){
    문의를 보낼 때 store-supabase.addInquiry 가 mkAffRef() 를 읽어 aff_ref 를 붙인다. */
 /* 저장은 두 곳: localStorage(이 호스트) + .makenov.com 공통 쿠키(vn/kr/en/makenov.com 어디로 갔다 와도 유지).
    만료는 마지막 클릭부터 다시 센다(마지막 클릭 우선).
-   ★2026-09-22: 30일 고정 → 관리자 제휴 설정의 '링크 유효시간'(기본 36시간). 코드를 기억하는 동안
-     주소창에 ?ref= 가 계속 따라붙는 것이 30일이나 이어져서 사장님 지시로 줄였다.
-     관리자 값은 ?ref= 로 들어온 순간에만 한 번 물어본다(평소 페이지에는 요청을 더하지 않는다). */
+   ★2026-09-22: 30일 고정 → 관리자 제휴 설정의 '링크 유효시간'(기본 36시간).
+     관리자 값은 ?ref= 로 들어온 순간에만 한 번 물어본다(평소 페이지에는 요청을 더하지 않는다).
+   ★2026-09-28: 주소창에 ?ref= 를 다시 붙이던 것을 없앴다. 붙여 둔 ?ref= 를 다음 페이지에서
+     '새 클릭'으로 읽어 기한이 무한정 연장되고(36시간이 지나도 안 사라짐) 클릭 수도 페이지마다
+     1건씩 올라갔다. 이제 코드는 저장소에만 남고, 들어온 주소의 ref·ch 는 읽은 뒤 지운다.
+     옛 기록의 days(30일)는 더 이상 보지 않는다 — 남아 있던 30일짜리도 이 규칙으로 만료된다. */
 const MK_AFF_HOURS = 36;
-function mkAffHours(a){ const h = Number(a && a.hours); return h > 0 ? h : (Number(a && a.days) > 0 ? a.days * 24 : MK_AFF_HOURS); }
+function mkAffHours(a){ const h = Number(a && a.hours); return h > 0 ? h : MK_AFF_HOURS; }
 async function mkAffSettingHours(){
   try{
     const r = await fetch(MK_SUPABASE_URL.replace(/\/$/, '') + '/aff/v1/settings', { headers:{ apikey: MK_SUPABASE_ANON } });
@@ -756,16 +759,15 @@ function mkAffRef(){
   if(Date.now() - (a.ts || 0) > mkAffHours(a) * 3600000){ mkAffForget(); return null; }
   return a;
 }
-/* 코드를 기억하는 동안은 주소창에도 ?ref= 를 다시 붙인다 — 사람이 보기에 "링크가 살아 있고",
-   그 주소를 복사해 넘겨도 코드가 따라간다. 새로고침 없이 주소만 바꾼다(replaceState). */
-function mkAffDecorateUrl(a){
+/* 읽고 난 ref·ch 는 주소창에서 지운다 — 코드는 저장소에 있으므로 추적은 그대로다.
+   새로고침 없이 주소만 바꾼다(replaceState). */
+function mkAffCleanUrl(){
   try{
-    if(!a || !a.code || /\/admin\//.test(location.pathname)) return;
     const u = new URL(location.href);
-    if(u.searchParams.get('ref') === a.code) return;
-    u.searchParams.set('ref', a.code);
-    if(a.ch) u.searchParams.set('ch', a.ch);
-    history.replaceState(history.state, '', u.toString());
+    if(!u.searchParams.has('ref') && !u.searchParams.has('ch')) return;
+    u.searchParams.delete('ref');
+    u.searchParams.delete('ch');
+    history.replaceState(history.state, '', u.pathname + (u.search || '') + u.hash);
   }catch(e){}
 }
 /* 만료된 코드는 두 저장소에서 같이 지운다 — 쿠키만 남으면 다음 페이지에서 되살아난다 */
@@ -782,7 +784,8 @@ function mkAffCapture(){
   if(!/^[A-Z0-9]{4,8}$/.test(code)){
     /* ref 없이 왔어도 쿠키에 있으면 localStorage 로 옮겨 둔다(서브도메인 이동) */
     const c = mkAffCookie(); if(c && c.code){ try{ if(!localStorage.getItem('mk_aff')) localStorage.setItem('mk_aff', JSON.stringify(c)); }catch(e){} }
-    mkAffDecorateUrl(mkAffRef());
+    mkAffRef();                                   // 기한이 지났으면 여기서 지워진다
+    mkAffCleanUrl();                              // 옛 버전이 붙여 둔 ?ref= 도 걷어낸다
     return;
   }
   const ch = (q.get('ch') || '').toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 16);
@@ -794,6 +797,7 @@ function mkAffCapture(){
       headers:{ 'Content-Type':'application/json', apikey: MK_SUPABASE_ANON },
       body: JSON.stringify({ code, ch, product_id: pid }) }).catch(()=>{});
   }catch(e){}
+  mkAffCleanUrl();
 }
 
 /* ---------- boot ---------- */
