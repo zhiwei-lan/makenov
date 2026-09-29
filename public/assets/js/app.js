@@ -842,8 +842,12 @@ document.addEventListener('DOMContentLoaded', async ()=>{
      예전엔 모든 페이지가 MkData.boot()(제품·회사·칼럼 전부 로드)를 기다린 뒤에야
      pageInit()이 돌아서, 공지·FAQ만 쓰는 고객센터까지 몇 초씩 빈 화면이었다.
      시드(data.js)만으로 완성되는 화면을 먼저 띄우고, 부팅 후 한 번 더 그려 확정한다. */
+  /* ★ 2026-09-29: early render 가 끝나면 사전 렌더 사본도 그 자리에서 걷어낸다.
+       사본은 '필터 없음' 상태로 구워져 있어서, ?category= 로 들어오거나 사본 위의 탭·카테고리를
+       눌러도 DB 부팅(1~3초)이 끝날 때까지 화면이 '전체' 그대로였다 — 탭이 고장난 것처럼 보였다
+       (companies·directory·columns). 시드로 완성된 실제 렌더가 있으니 바로 보여 준다. */
   if(window.MK_EARLY_RENDER && typeof pageInit === 'function'){
-    try{ pageInit(); applyI18n(); }catch(e){ console.warn('early render 실패', e); }
+    try{ pageInit(); applyI18n(); mkSwapPrerender(); }catch(e){ console.warn('early render 실패', e); }
   }
 
   /* 2) 그다음 데이터 */
