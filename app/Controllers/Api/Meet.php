@@ -305,7 +305,7 @@ class Meet extends BaseApiController
         }
         $id = $id !== '' ? $id : (string) ($in['id'] ?? '');
         if (! preg_match('/^[a-z0-9][a-z0-9-]{2,39}$/', $id)) {
-            return $this->err('bad_id', 'id 는 영문 소문자·숫자·하이픈 3~40자 (예: hcm-20261203)', 400);
+            return $this->err('bad_id', 'id 는 영문 소문자·숫자·하이픈 3~40자 (예: visit-20261203)', 400);
         }
         foreach (['visit_date', 'visit_end', 'deadline'] as $d) {
             if (! empty($in[$d]) && ! preg_match('/^\d{4}-\d{2}-\d{2}$/', (string) $in[$d])) {
