@@ -905,10 +905,35 @@ function mtMini(tr){
     <div style="margin-top:10px">${mtBar({ count: n, goal: Math.max(1, g), confirmed: done })}${mtProg({ count: n, goal: g }, `<span>${esc(mtRep('mt_suppliers', { n: items.length }))}</span>`)}</div>
   </div></a>`;
 }
+/* 홈 섹션의 주인공 배너 — 일정이 보통 하나뿐이라 작은 카드 하나만 덩그러니 남던 것을
+   섹션 전체 폭 배너로: 날짜 · 제목·D-day·숫자 · 오는 공급사 사진과 각자 신청 현황 · 버튼 */
+function mtFeatured(tr){
+  const items = MkMeet.itemsOf(tr);
+  const joined = items.reduce((a, i) => a + i.count, 0);
+  const done = items.filter(i => i.confirmed).length;
+  const d = mtDate(tr.visit_date);
+  const sups = items.slice(0, 4).map(it => {
+    const p = mkProduct(it.product_id);
+    return `<div class="mt-feat-sup ${it.confirmed ? 'done' : ''}"><img src="${esc(p.img)}" alt="" loading="lazy"><div class="tx"><span class="br">${esc(p.brand)}</span>${mtBar(it)}<span class="n"><b>${it.count}</b>/${it.goal}</span></div></div>`;
+  }).join('');
+  return `<a class="mt-feat" href="${mkUrl('meetings.html')}#trip-${esc(tr.id)}">
+    <div class="mt-feat-date"><span class="mo">${esc(mtFmt(tr.visit_date, { month:'short' }))}</span><span class="d">${d ? d.getDate() : ''}</span><span class="dw">${esc(mtFmt(tr.visit_date, { weekday:'short' }))}</span></div>
+    <div class="mt-feat-main">
+      <div class="mt-feat-top"><span class="kick">${esc(t('mt_next_kick'))}</span>${mtDdayChip(tr)}</div>
+      <h3>${esc(L(tr.title) || t('mt_page_kick'))}</h3>
+      <div class="mt-feat-meta">${L(tr.city) ? `<span>${MT_ICO.pin}${esc(L(tr.city))}</span>` : ''}<span>${esc(t('mt_ev_sup'))} <b>${items.length}</b></span><span>${esc(t('mt_ev_joined'))} <b>${joined}</b></span><span>${esc(t('mt_ev_confirmed'))} <b>${done}</b></span></div>
+      <div class="mt-feat-sups">${sups}</div>
+    </div>
+    <div class="mt-feat-cta"><span class="btn btn-primary">${esc(t('mt_ev_cta'))} →</span></div>
+  </a>`;
+}
 function mtHomeHtml(){
-  const list = MkMeet.upcoming().filter(tr => MkMeet.itemsOf(tr).length).slice(0, 3);
+  const list = MkMeet.upcoming().filter(tr => MkMeet.itemsOf(tr).length).slice(0, 4);
   if(!list.length) return '';
-  return `<div class="sec-head"><h2>${esc(t('mt_home_h'))}</h2><a class="more" href="${mkUrl('meetings.html')}">${esc(t('mt_home_more'))}</a></div><div class="mt-home">${list.map(mtMini).join('')}</div>`;
+  const rest = list.slice(1);
+  return `<div class="sec-head"><h2>${esc(t('mt_home_h'))}</h2><a class="more" href="${mkUrl('meetings.html')}">${esc(t('mt_home_more'))}</a></div>`
+    + mtFeatured(list[0])
+    + (rest.length ? `<div class="mt-home" style="margin-top:16px">${rest.map(mtMini).join('')}</div>` : '');
 }
 /* 제품 상세 = 펀딩 페이지. 텀블벅 프로젝트 오른쪽처럼
    '신청한 기업 n곳 · 달성률' / '남은 기간' / '목표' 를 크게, 그 아래 방문일·마감·규칙, 맨 아래 큰 신청 버튼.
