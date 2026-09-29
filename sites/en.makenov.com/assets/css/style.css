@@ -853,7 +853,9 @@ button{font-family:var(--font-body);cursor:pointer;border:none;background:none;c
 /* 커버 위 초록 그라디언트 오버레이 제거 (2026-09-29) — 사진 원색 그대로 */
 .co-card .bd{padding:0 20px 20px}
 .co-card .lg{width:56px;height:56px;border-radius:12px;object-fit:cover;border:3px solid #fff;
-  margin-top:-28px;position:relative;z-index:2;background:#fff}
+  margin-top:-28px;position:relative;z-index:2;background:#fff;
+  /* 밝은 커버 사진 위에서 로고가 묻히지 않게: 옅은 그림자 + 1px 외곽선 */
+  box-shadow:0 2px 10px rgba(0,0,0,.16),0 0 0 1px rgba(0,0,0,.08)}
 .co-card h3{font-size:17px;font-weight:700;margin:12px 0 4px}
 .co-card .tag{font-size:13px;color:var(--mk-body);line-height:1.55;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.9em}
