@@ -1683,3 +1683,5 @@ body.mkedit-on .omc-hero .slide.on .shot{pointer-events:none}
 @media(max-width:420px){.mt-fund-stats .v b{font-size:26px}.mt-fund-stats .st:first-child .v b{font-size:34px}.mt-fund-info li span{flex-basis:80px}}
 /* 펀딩 패널이 들어가면 박스가 화면보다 길어져 sticky 로 아래(가격·보조 버튼)가 가려진다 — 고정하지 않는다 */
 .pd-row.mt-on .pd-side{position:static}
+/* 모바일 날짜 배지 가로 배치(.mt-trip 용)가 홈 요약 카드의 좁은 칸에도 적용돼 숫자가 잘리던 것 */
+@media(max-width:860px){.mt-mini .mt-date{flex-direction:column;gap:0;padding:10px 4px;justify-content:center}.mt-mini .mt-date .d{font-size:26px;margin:2px 0}}
