@@ -66,6 +66,9 @@ $routes->post('functions/v1/pixel-event', '\App\Controllers\Api\Pixel::handle');
 $routes->match(['GET', 'POST', 'PATCH', 'DELETE'], 'aff/v1/(:any)', '\App\Controllers\Api\Aff::handle/$1');
 $routes->match(['GET', 'POST', 'PATCH', 'DELETE'], 'aff/v1', '\App\Controllers\Api\Aff::handle');
 
+/* ── 미팅 펀딩(방문 일정) API — /meet/v1/{경로} 를 Meet::handle 이 세그먼트로 나눠 처리 ── */
+$routes->match(['GET', 'POST', 'DELETE'], 'meet/v1/(:any)', '\App\Controllers\Api\Meet::handle/$1');
+
 /* ── Storage (버킷 product-images) ───────────────────────── */
 $routes->group('storage/v1', ['namespace' => 'App\Controllers\Api'], static function ($routes) {
     $routes->post('object/product-images/(:any)', 'Storage::upload/$1');
@@ -78,6 +81,6 @@ $routes->group('storage/v1', ['namespace' => 'App\Controllers\Api'], static func
    CI4 는 라우트 매칭이 필터보다 먼저라 미등록 경로의 OPTIONS 는
    필터가 안 돌고 그냥 404 가 된다. 프리플라이트가 오는 경로를
    전부 OPTIONS 라우트로 등록해 전역 cors 필터가 204 로 처리하게 한다 */
-foreach (['rest/v1', 'auth/v1', 'functions/v1', 'storage/v1', 'aff/v1'] as $prefix) {
+foreach (['rest/v1', 'auth/v1', 'functions/v1', 'storage/v1', 'aff/v1', 'meet/v1'] as $prefix) {
     $routes->options("$prefix/(:any)", static fn () => '');
 }
