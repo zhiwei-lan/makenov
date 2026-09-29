@@ -729,6 +729,7 @@ const MT_ICO = {
   clock: `<svg class="mt-ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>`,
   users: `<svg class="mt-ico" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19c.7-3 3-4.7 5.5-4.7s4.8 1.7 5.5 4.7"/><path d="M15.5 5.6a3 3 0 0 1 0 5.8M17.5 14.6c1.5.6 2.6 2 3 4.4"/></svg>`,
   check: `<svg class="mt-ico" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`,
+  share: `<svg class="mt-ico" viewBox="0 0 24 24"><circle cx="18" cy="5.5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="18.5" r="2.5"/><path d="M8.2 10.8l7.6-4.1M8.2 13.2l7.6 4.1"/></svg>`,
 };
 
 const MkMeet = {
@@ -818,14 +819,25 @@ function mtAction(tr, it){
   if(tr.open) return `<button class="btn btn-primary" onclick="event.preventDefault();openMeetApply(${a})">${esc(t('mt_btn_apply'))}</button>`;
   return `<button class="btn btn-ghost" disabled>${esc(t('mt_st_' + mtTripState(tr)))}</button>`;
 }
+function mtPct(it){ return Math.round((it.count || 0) / Math.max(1, it.goal) * 100); }
+function mtDdayTxt(tr){
+  if(!tr.open) return t('mt_st_' + mtTripState(tr));
+  if(tr.days_left == null) return t('mt_st_open');
+  return tr.days_left <= 0 ? t('mt_dday_today') : mtRep('mt_dday', { n: tr.days_left });
+}
 
+/* 일정 안의 공급사 카드 — 텀블벅 프로젝트 카드처럼: 큰 사진 · 달성률 · 남은 기간.
+   눌러서 제품 상세(= 펀딩 페이지)의 #meet 로 간다. 신청은 거기서 한다. */
 function mtItemCard(tr, it){
   const p = mkProduct(it.product_id);
-  return `<div class="mt-item ${it.confirmed ? 'done' : ''}">
-    <a class="mt-item-hd" href="${mkDocUrl('product', p.id)}"><img src="${esc(p.img)}" alt="" loading="lazy"><div><div class="br">${esc(p.brand)}</div><h3>${esc(L(p.name))}</h3></div></a>
-    <div>${mtBar(it)}${mtProg(it)}</div>
-    ${mtAction(tr, it)}
-  </div>`;
+  const tag = it.confirmed ? `<span class="mt-chip confirmed">${MT_ICO.check}${esc(t('mt_st_confirmed'))}</span>`
+    : it.mine ? `<span class="mt-chip open">${MT_ICO.check}${esc(t('mt_btn_applied'))}</span>` : '';
+  return `<a class="mt-pcard ${it.confirmed ? 'done' : ''}" href="${mkDocUrl('product', p.id)}#meet">
+    <div class="th"><img src="${esc(p.img)}" alt="${esc(L(p.name))}" loading="lazy">${tag}</div>
+    <div class="br">${esc(p.brand)}</div><h3>${esc(L(p.name))}</h3>
+    <div class="mt-pcard-foot"><b>${esc(mtRep('mt_pct', { p: mtPct(it) }))}</b><span>${esc(mtRep('mt_joined', { n: it.count, g: it.goal }))}</span><span class="dd">${esc(mtDdayTxt(tr))}</span></div>
+    ${mtBar(it)}
+  </a>`;
 }
 function mtTripCard(tr, past){
   const items = MkMeet.itemsOf(tr);
@@ -860,23 +872,41 @@ function mtHomeHtml(){
   if(!list.length) return '';
   return `<div class="sec-head"><h2>${esc(t('mt_home_h'))}</h2><a class="more" href="${mkUrl('meetings.html')}">${esc(t('mt_home_more'))}</a></div><div class="mt-home">${list.map(mtMini).join('')}</div>`;
 }
-function mtProductBox(pid){
+/* 제품 상세 = 펀딩 페이지. 텀블벅 프로젝트 오른쪽처럼
+   '신청한 기업 n곳 · 달성률' / '남은 기간' / '목표' 를 크게, 그 아래 방문일·마감·규칙, 맨 아래 큰 신청 버튼.
+   page-product.js 가 이 제품이 일정에 걸려 있으면 가격 박스 위에 넣는다. */
+function mtFundingPanel(pid){
   const hit = MkMeet.forProduct(pid);
   if(!hit || !mkProduct(pid)) return '';
   const { trip: tr, item: it } = hit;
-  return `<div class="mt-box ${it.confirmed ? 'done' : ''}">
-    <div class="kick">${esc(t('mt_box_kick'))}</div>
-    <h4>${esc(mtRep('mt_box_h', { d: mtLong(tr.visit_date) }))}</h4>
-    ${tr.deadline ? `<p>${esc(mtRep('mt_box_p', { g: it.goal, dl: mtLong(tr.deadline) }))}</p>` : ''}
-    ${mtBar(it)}${mtProg(it, mtDdayChip(tr) || `<span class="need ${it.confirmed ? 'done' : ''}">${esc(mtNeedTxt(it))}</span>`)}
-    <div class="row">${mtAction(tr, it)}<a class="btn btn-ghost" href="${mkUrl('meetings.html')}#trip-${esc(tr.id)}">${esc(t('mt_btn_view'))}</a></div>
+  const city = L(tr.city) ? ' · ' + esc(L(tr.city)) : '';
+  const left = !tr.open ? `<b class="sm">${esc(t('mt_st_' + mtTripState(tr)))}</b>`
+    : tr.days_left == null ? `<b class="sm">—</b>`
+    : tr.days_left <= 0 ? `<b class="sm">${esc(t('mt_dday_today'))}</b>`
+    : `<b>${tr.days_left}</b><small>${esc(t('mt_pd_days'))}</small>`;
+  return `<div class="mt-fund ${it.confirmed ? 'done' : ''}" id="meet">
+    <div class="mt-fund-kick">${MT_ICO.cal}<span>${esc(t('mt_box_kick'))}</span></div>
+    <div class="mt-fund-stats">
+      <div class="st"><span class="lb">${esc(t('mt_pd_joined'))}</span><div class="v"><b>${it.count}</b><small>${esc(t('mt_pd_unit'))}</small><em>${mtPct(it)}%</em></div></div>
+      <div class="st"><span class="lb">${esc(t('mt_pd_left'))}</span><div class="v">${left}</div></div>
+      <div class="st"><span class="lb">${esc(t('mt_pd_goal'))}</span><div class="v"><b>${it.goal}</b><small>${esc(t('mt_pd_unit'))}</small></div></div>
+    </div>
+    ${mtBar(it)}
+    <ul class="mt-fund-info">
+      <li><span>${esc(t('mt_visit'))}</span><b>${esc(mtLong(tr.visit_date))}${city}</b></li>
+      ${tr.deadline ? `<li><span>${esc(t('mt_deadline'))}</span><b>${esc(mtLong(tr.deadline))}</b></li>` : ''}
+      <li class="rule">${esc(it.confirmed ? mtRep('mt_apply_ok_confirmed', { g: it.goal }) : mtRep('mt_pd_rule', { g: it.goal }))}</li>
+    </ul>
+    <div class="mt-fund-cta">${mtAction(tr, it)}<button class="btn btn-ghost mt-share-btn" title="${esc(t('mt_share_btn'))}" aria-label="${esc(t('mt_share_btn'))}" onclick="mtCopy(location.href.split('#')[0])">${MT_ICO.share}</button></div>
+    <a class="mt-fund-more" href="${mkUrl('meetings.html')}#trip-${esc(tr.id)}">${esc(t('mt_btn_view'))} →</a>
   </div>`;
 }
+/* 제품 카드 하단 — 텀블벅 카드처럼 달성률을 크게 */
 function mtCardLine(pid){
   const hit = MkMeet.forProduct(pid);
   if(!hit) return '';
   const { trip: tr, item: it } = hit;
-  return `<div class="mt-cardline ${it.confirmed ? 'done' : ''}">${MT_ICO.cal}<span>${esc(mtRep('mt_card_line', { d: mtShort(tr.visit_date) }))}</span>${mtBar(it)}<span>${it.count}/${it.goal}</span></div>`;
+  return `<div class="mt-cardline ${it.confirmed ? 'done' : ''}"><b>${esc(mtRep('mt_pct', { p: mtPct(it) }))}</b><span>${esc(mtRep('mt_joined', { n: it.count, g: it.goal }))}</span><span class="dd">${esc(mtRep('mt_card_line', { d: mtShort(tr.visit_date) }))}</span>${mtBar(it)}</div>`;
 }
 
 /* 페이지 안의 미팅 자리들을 채운다. pageInit 뒤마다 부른다(언어 전환·신청 후 포함) */
@@ -886,7 +916,7 @@ function mtFillSlots(){
     el.innerHTML = h ? `<div class="wrap">${h}</div>` : '';
     el.hidden = !h;
   });
-  document.querySelectorAll('[data-mt-product]').forEach(el => { el.innerHTML = mtProductBox(el.dataset.mtProduct); });
+  document.querySelectorAll('[data-mt-product]').forEach(el => { el.innerHTML = mtFundingPanel(el.dataset.mtProduct); });
 }
 function mtRerender(){
   try{ if(typeof pageInit === 'function') pageInit(); mtFillSlots(); applyI18n(); unlockIfAuthed(); }catch(e){ console.warn('mt rerender', e); }

@@ -61,8 +61,11 @@ function pageInit(){
          ${mkVideoEmbed(p.video)}</div>`
     : '';
 
+  /* 미팅 펀딩 — 이 제품이 다가오는 방문 일정에 걸려 있으면 이 페이지가 곧 펀딩 페이지다 */
+  const mtOn = typeof MkMeet !== 'undefined' && !!MkMeet.forProduct(p.id);
+
   document.getElementById('pd-root').innerHTML = `
-  <div class="pd-row">
+  <div class="pd-row ${mtOn ? 'mt-on' : ''}">
 
     <div class="pd-main">
       <div class="pd-gallery">
@@ -107,10 +110,14 @@ function pageInit(){
         <h1>${esc(L(p.name))}</h1>
         <p class="tagline">${esc(L(p.tagline))}</p>
 
+        ${mtOn ? `
+        <!-- 미팅 펀딩 중: 문의수·조회수 대신 신청 기업·달성률·남은 기간 (app.js mtFundingPanel / mtFillSlots) -->
+        <div data-mt-product="${esc(p.id)}">${mtFundingPanel(p.id)}</div>
+        <h3 class="pd-terms-h" data-i18n="mt_pd_terms"></h3>` : `
         <div class="stat">
           <div><b>${p.inquiries}</b><span data-i18n="inquiries_count"></span></div>
           <div><b>${p.views.toLocaleString()}</b><span data-i18n="views_label"></span></div>
-        </div>
+        </div>`}
 
         <div class="lockbox">
           <div class="lockrow"><span class="lbl" data-i18n="price"></span><span class="lockval">${esc(lockVal(L(p.price)))}</span>${p.negotiable?`<span class="nego" data-i18n="negotiable_badge"></span>`:''}</div>
@@ -120,11 +127,9 @@ function pageInit(){
           ${Store.session()?'':`<div class="locknote" data-i18n="locked_note"></div>`}
         </div>
 
-        <!-- 미팅 펀딩: 이 제품이 걸린 방문 일정이 있으면 app.js mtFillSlots 가 신청 박스를 채운다 -->
-        <div data-mt-product="${esc(p.id)}">${typeof mtProductBox === 'function' ? mtProductBox(p.id) : ''}</div>
-
-        <div class="pd-ctas">
-          <button class="btn btn-primary" onclick="openInquiry(['${p.id}'])" data-i18n="cta_inquiry"></button>
+        <!-- 펀딩 중이면 주 버튼은 위의 '미팅 신청'. 견적·관심·카탈로그는 작은 보조 버튼으로 -->
+        <div class="pd-ctas ${mtOn ? 'sub' : ''}">
+          <button class="btn ${mtOn ? 'btn-ghost' : 'btn-primary'}" onclick="openInquiry(['${p.id}'])" data-i18n="cta_inquiry"></button>
           <button class="btn btn-ghost" id="pd-cart" onclick="toggleCart('${p.id}');pdCartLabel('${p.id}')">
             <span data-i18n="${inCart?'cta_wishlist_on':'cta_wishlist'}"></span></button>
           ${mkCatalogHidden(p)?'':`<button class="btn btn-soft" onclick="openCatalog('${p.id}')" data-i18n="cta_catalog"></button>`}
@@ -136,6 +141,16 @@ function pageInit(){
 
   applyI18n(document.getElementById('pd-root'));
   unlockIfAuthed();
+
+  /* 일정 페이지 카드에서 #meet 로 들어오면 펀딩 패널로 (한 번만) */
+  if(mtOn && location.hash === '#meet' && !window._mtJumped){
+    /* 사진이 늦게 로드되면 높이가 늘어 패널이 밀려난다 — 로드가 끝난 뒤 한 번 더 맞춘다 */
+    const go = ()=>{ const el = document.getElementById('meet'); if(el) el.scrollIntoView({ block:'center' }); };
+    window._mtJumped = true;
+    setTimeout(go, 80);
+    if(document.readyState !== 'complete') addEventListener('load', ()=>setTimeout(go, 50), { once:true });
+    else setTimeout(go, 600);
+  }
 
   /* 광고 목적지 = 이 페이지. 언어를 바꾸면 pageInit이 다시 도는데,
      그때마다 쏘면 조회수가 부풀려지므로 제품당 한 번만 보낸다. */
