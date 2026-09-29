@@ -729,6 +729,7 @@ const MT_ICO = {
   clock: `<svg class="mt-ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>`,
   users: `<svg class="mt-ico" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19c.7-3 3-4.7 5.5-4.7s4.8 1.7 5.5 4.7"/><path d="M15.5 5.6a3 3 0 0 1 0 5.8M17.5 14.6c1.5.6 2.6 2 3 4.4"/></svg>`,
   check: `<svg class="mt-ico" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`,
+  heart: `<svg class="mt-ico" viewBox="0 0 24 24"><path d="M12 20s-7-4.5-7-9.5A3.9 3.9 0 0 1 12 7a3.9 3.9 0 0 1 7 3.5c0 5-7 9.5-7 9.5z"/></svg>`,
   share: `<svg class="mt-ico" viewBox="0 0 24 24"><circle cx="18" cy="5.5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="18.5" r="2.5"/><path d="M8.2 10.8l7.6-4.1M8.2 13.2l7.6 4.1"/></svg>`,
 };
 
@@ -886,8 +887,10 @@ function mtHomeHtml(){
    page-product.js 가 이 제품이 일정에 걸려 있으면 가격 박스 위에 넣는다. */
 function mtFundingPanel(pid){
   const hit = MkMeet.forProduct(pid);
-  if(!hit || !mkProduct(pid)) return '';
+  const p = mkProduct(pid);
+  if(!hit || !p) return '';
   const { trip: tr, item: it } = hit;
+  const inCart = typeof Store !== 'undefined' && Store.cartHas ? Store.cartHas(pid) : false;
   const city = L(tr.city) ? ' · ' + esc(L(tr.city)) : '';
   const left = !tr.open ? `<b class="sm">${esc(t('mt_st_' + mtTripState(tr)))}</b>`
     : tr.days_left == null ? `<b class="sm">—</b>`
@@ -906,8 +909,12 @@ function mtFundingPanel(pid){
       ${tr.deadline ? `<li><span>${esc(t('mt_deadline'))}</span><b>${esc(mtLong(tr.deadline))}</b></li>` : ''}
       <li class="rule">${esc(it.confirmed ? mtRep('mt_apply_ok_confirmed', { g: it.goal }) : mtRep('mt_pd_rule', { g: it.goal }))}</li>
     </ul>
-    <div class="mt-fund-cta">${mtAction(tr, it)}<button class="btn btn-ghost mt-share-btn" title="${esc(t('mt_share_btn'))}" aria-label="${esc(t('mt_share_btn'))}" onclick="mtCopy(location.href.split('#')[0])">${MT_ICO.share}</button></div>
-    <a class="mt-fund-more" href="${mkUrl('meetings.html')}#trip-${esc(tr.id)}">${esc(t('mt_btn_view'))} →</a>
+    <div class="mt-fund-cta">
+      <button class="btn btn-ghost mt-icon-btn mt-heart ${inCart ? 'on' : ''}" title="${esc(t('cta_wishlist'))}" aria-label="${esc(t('cta_wishlist'))}" onclick="toggleCart('${esc(pid)}',this)">${MT_ICO.heart}</button>
+      <button class="btn btn-ghost mt-icon-btn" title="${esc(t('mt_share_btn'))}" aria-label="${esc(t('mt_share_btn'))}" onclick="mtCopy(location.href.split('#')[0])">${MT_ICO.share}</button>
+      ${mtAction(tr, it)}
+    </div>
+    <div class="mt-fund-links"><a class="btn btn-soft" href="${mkUrl('meetings.html')}#trip-${esc(tr.id)}">${MT_ICO.cal}${esc(t('mt_btn_view'))}</a>${!mkCatalogHidden(p) ? `<button class="btn btn-ghost" onclick="openCatalog('${esc(pid)}')">${esc(t('cta_catalog'))}</button>` : ''}</div>
   </div>`;
 }
 /* 제품 카드 하단 — 텀블벅 카드처럼 달성률을 크게 */

@@ -1651,14 +1651,6 @@ body.mkedit-on .omc-hero .slide.on .shot{pointer-events:none}
 .mt-fund-cta{display:flex;gap:8px;align-items:stretch}
 .mt-fund-cta>.btn,.mt-fund-cta>.mt-mine{flex:1}
 .mt-fund-cta .btn{padding:16px 18px;font-size:16px}
-.mt-fund-cta .mt-share-btn{flex:0 0 54px;padding:0;display:inline-flex;align-items:center;justify-content:center}
-.mt-fund-cta .mt-share-btn .mt-ico{width:20px;height:20px}
-.mt-fund-more{display:block;margin-top:12px;font-size:13px;color:var(--mk-muted);text-align:center}
-.mt-fund-more:hover{color:var(--mk-ink)}
-.pd-terms-h{font-size:14px;font-weight:700;margin:0 0 10px;color:var(--mk-ink)}
-.pd-ctas.sub{flex-direction:row;flex-wrap:wrap;gap:8px;margin-top:14px}
-.pd-ctas.sub .btn{flex:1 1 40%;padding:11px 10px;font-size:13.5px}
-.pd-ctas.sub .btn:first-child{flex-basis:100%}
 /* 일정 페이지 공급사 카드 (텀블벅 프로젝트 카드) */
 .mt-pcard{display:flex;flex-direction:column;color:inherit}
 .mt-pcard .th{position:relative;aspect-ratio:4/3;border-radius:12px;overflow:hidden;background:var(--mk-bg-soft)}
@@ -1685,3 +1677,15 @@ body.mkedit-on .omc-hero .slide.on .shot{pointer-events:none}
 .pd-row.mt-on .pd-side{position:static}
 /* 모바일 날짜 배지 가로 배치(.mt-trip 용)가 홈 요약 카드의 좁은 칸에도 적용돼 숫자가 잘리던 것 */
 @media(max-width:860px){.mt-mini .mt-date{flex-direction:column;gap:0;padding:10px 4px;justify-content:center}.mt-mini .mt-date .d{font-size:26px;margin:2px 0}}
+
+/* 펀딩 패널 하단(3차): [관심][공유][미팅 신청] 한 줄 + 작은 링크. 가격 박스·견적 버튼은 펀딩 중인 제품에서 뺐다 */
+.mt-fund-cta>.mt-icon-btn{flex:0 0 54px}
+.mt-fund-cta .mt-icon-btn{padding:0;display:inline-flex;align-items:center;justify-content:center;color:var(--mk-body)}
+.mt-fund-cta .mt-icon-btn .mt-ico{width:20px;height:20px}
+.mt-fund-cta .mt-heart.on{color:var(--mk-danger);border-color:#FFC9C9;background:#FFF5F5}
+.mt-fund-cta .mt-heart.on .mt-ico{fill:currentColor}
+.mt-fund-links{display:flex;gap:8px;margin-top:8px}
+.mt-fund-links .btn{flex:1 1 0;min-width:0;padding:13px 10px;font-size:14px;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-align:center}
+.mt-fund-links .btn .mt-ico{width:17px;height:17px}
+.pd-side .box.mt-box-on .tagline{margin-bottom:18px}
+.pd-side .box.mt-box-on .mt-fund{margin-bottom:0}

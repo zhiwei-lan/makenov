@@ -105,19 +105,19 @@ function pageInit(){
     </div>
 
     <aside class="pd-side">
-      <div class="box">
+      <div class="box ${mtOn ? 'mt-box-on' : ''}">
         <div class="brand">${esc(p.brand)}</div>
         <h1>${esc(L(p.name))}</h1>
         <p class="tagline">${esc(L(p.tagline))}</p>
 
         ${mtOn ? `
-        <!-- 미팅 펀딩 중: 문의수·조회수 대신 신청 기업·달성률·남은 기간 (app.js mtFundingPanel / mtFillSlots) -->
-        <div data-mt-product="${esc(p.id)}">${mtFundingPanel(p.id)}</div>
-        <h3 class="pd-terms-h" data-i18n="mt_pd_terms"></h3>` : `
+        <!-- 미팅 펀딩 중(2026-09-29): 이 박스는 펀딩 패널 하나만 — 숫자 · 일정 · [관심][공유][미팅 신청].
+             가격·MOQ 박스와 견적 버튼은 사용자 지시로 뺐다(미팅이 이 페이지의 유일한 행동). app.js mtFundingPanel / mtFillSlots -->
+        <div data-mt-product="${esc(p.id)}">${mtFundingPanel(p.id)}</div>` : `
         <div class="stat">
           <div><b>${p.inquiries}</b><span data-i18n="inquiries_count"></span></div>
           <div><b>${p.views.toLocaleString()}</b><span data-i18n="views_label"></span></div>
-        </div>`}
+        </div>
 
         <div class="lockbox">
           <div class="lockrow"><span class="lbl" data-i18n="price"></span><span class="lockval">${esc(lockVal(L(p.price)))}</span>${p.negotiable?`<span class="nego" data-i18n="negotiable_badge"></span>`:''}</div>
@@ -127,13 +127,12 @@ function pageInit(){
           ${Store.session()?'':`<div class="locknote" data-i18n="locked_note"></div>`}
         </div>
 
-        <!-- 펀딩 중이면 주 버튼은 위의 '미팅 신청'. 견적·관심·카탈로그는 작은 보조 버튼으로 -->
-        <div class="pd-ctas ${mtOn ? 'sub' : ''}">
-          <button class="btn ${mtOn ? 'btn-ghost' : 'btn-primary'}" onclick="openInquiry(['${p.id}'])" data-i18n="cta_inquiry"></button>
+        <div class="pd-ctas">
+          <button class="btn btn-primary" onclick="openInquiry(['${p.id}'])" data-i18n="cta_inquiry"></button>
           <button class="btn btn-ghost" id="pd-cart" onclick="toggleCart('${p.id}');pdCartLabel('${p.id}')">
             <span data-i18n="${inCart?'cta_wishlist_on':'cta_wishlist'}"></span></button>
           ${mkCatalogHidden(p)?'':`<button class="btn btn-soft" onclick="openCatalog('${p.id}')" data-i18n="cta_catalog"></button>`}
-        </div>
+        </div>`}
       </div>
     </aside>
 
