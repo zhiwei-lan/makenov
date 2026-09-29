@@ -1580,9 +1580,6 @@ body.mkedit-on .omc-hero .slide.on .shot{pointer-events:none}
 /* 제품 카드 한 줄 */
 .mt-cardline{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;margin-top:10px;font-size:12.5px;color:var(--mk-muted)}
 .mt-cardline .mt-bar{flex:1 1 100%;height:4px;margin-top:2px}
-.mt-cardline b{font-size:15px;font-weight:800;color:var(--mk-primary);letter-spacing:-.01em}
-.mt-cardline .dd{margin-left:auto}
-.mt-cardline.done b{color:var(--mk-navy)}
 /* 홈(제품) 섹션 — 가로 요약 */
 .mt-home{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
 .mt-home a.mt-mini{display:grid;grid-template-columns:76px 1fr;border:1px solid var(--mk-line);border-radius:var(--r-card);overflow:hidden;color:inherit;transition:.18s}
@@ -1648,9 +1645,6 @@ body.mkedit-on .omc-hero .slide.on .shot{pointer-events:none}
 .mt-pcard .br{margin-top:12px;font-size:12px;color:var(--mk-muted);text-transform:uppercase;letter-spacing:.02em}
 .mt-pcard h3{margin-top:4px;font-size:15px;font-weight:600;line-height:1.4;min-height:2.8em;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .mt-pcard-foot{display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 8px;margin:10px 0 8px;font-size:12.5px;color:var(--mk-muted)}
-.mt-pcard-foot b{font-size:17px;font-weight:800;color:var(--mk-primary);letter-spacing:-.01em}
-.mt-pcard.done .mt-pcard-foot b{color:var(--mk-navy)}
-.mt-pcard-foot .dd{margin-left:auto;color:var(--mk-lock);font-weight:600}
 .mt-pcard .mt-bar{height:4px}
 /* 모바일: 펀딩 중인 제품은 사진 바로 아래에 펀딩 패널(원래는 긴 상세 설명 맨 아래로 밀렸다) */
 @media(max-width:960px){
@@ -1707,3 +1701,12 @@ body.mkedit-on .omc-hero .slide.on .shot{pointer-events:none}
 .mt-how .mt-step p{color:var(--mk-body)}
 .mt-home.mt-past .mt-mini{opacity:.65}
 @media(max-width:860px){.mt-hero.is-event{padding:32px 0 28px}.mt-ev{grid-template-columns:1fr;gap:24px}.mt-ev-date b{font-size:34px}.mt-hero .mt-ev h1{font-size:22px}.mt-ev-dd .v b{font-size:46px}.mt-ev .btn-lg{width:100%}}
+/* 신청 수 강조(6차): "2/5곳 신청" 의 2 를 크게, 달성률은 오른쪽 보조 */
+.mt-jn{display:inline-flex;align-items:baseline;flex-wrap:wrap;font-size:13px;font-weight:600;color:var(--mk-body)}
+.mt-jn b{font-size:22px;font-weight:800;line-height:1.1;letter-spacing:-.02em;color:var(--mk-ink);margin-right:1px}
+.mt-jn small{font-size:13px;font-weight:600;color:var(--mk-body)}
+.mt-pc{margin-left:auto;font-style:normal;font-size:15px;font-weight:800;color:var(--mk-primary)}
+.mt-cardline.done .mt-pc,.mt-pcard.done .mt-pc{color:var(--mk-navy)}
+.mt-cardline .dd{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--mk-muted)}
+.mt-cardline .dd .mt-ico{width:14px;height:14px}
+.mt-pcard-dd{margin-top:6px;font-size:12.5px;font-weight:600;color:var(--mk-lock)}

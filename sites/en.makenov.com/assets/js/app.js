@@ -834,6 +834,11 @@ function mtAction(tr, it){
   if(tr.open) return `<button class="btn btn-primary" onclick="event.preventDefault();openMeetApply(${a})">${esc(t('mt_btn_apply'))}</button>`;
   return `<button class="btn btn-ghost" disabled>${esc(t('mt_st_' + mtTripState(tr)))}</button>`;
 }
+/* '2/5곳 신청' — 신청 수(2)만 크게, 나머지는 작게. 문구 틀(mt_joined)은 언어별로 그대로 쓴다 */
+function mtJoinedHtml(it){
+  const parts = mtRep('mt_joined', { n: '\u0000', g: it.goal }).split('\u0000');
+  return `<span class="mt-jn">${esc(parts[0] || '')}<b>${it.count}</b><small>${esc(parts[1] || '')}</small></span>`;
+}
 function mtPct(it){ return Math.round((it.count || 0) / Math.max(1, it.goal) * 100); }
 function mtDdayTxt(tr){
   if(!tr.open) return t('mt_st_' + mtTripState(tr));
@@ -850,8 +855,9 @@ function mtItemCard(tr, it){
   return `<a class="mt-pcard ${it.confirmed ? 'done' : ''}" href="${mkDocUrl('product', p.id)}#meet">
     <div class="th"><img src="${esc(p.img)}" alt="${esc(L(p.name))}" loading="lazy">${tag}</div>
     <div class="br">${esc(p.brand)}</div><h3>${esc(L(p.name))}</h3>
-    <div class="mt-pcard-foot"><b>${esc(mtRep('mt_pct', { p: mtPct(it) }))}</b><span>${esc(mtRep('mt_joined', { n: it.count, g: it.goal }))}</span><span class="dd">${esc(mtDdayTxt(tr))}</span></div>
+    <div class="mt-pcard-foot">${mtJoinedHtml(it)}<em class="mt-pc">${mtPct(it)}%</em></div>
     ${mtBar(it)}
+    <div class="mt-pcard-dd">${esc(mtDdayTxt(tr))}</div>
   </a>`;
 }
 /* 방문 일정 페이지의 주인공 — 행사는 보통 하나뿐이라 그 하나를 히어로로 크게 보여 준다.
@@ -946,7 +952,7 @@ function mtCardLine(pid){
   const hit = MkMeet.forProduct(pid);
   if(!hit) return '';
   const { trip: tr, item: it } = hit;
-  return `<div class="mt-cardline ${it.confirmed ? 'done' : ''}"><b>${esc(mtRep('mt_pct', { p: mtPct(it) }))}</b><span>${esc(mtRep('mt_joined', { n: it.count, g: it.goal }))}</span><span class="dd">${esc(mtRep('mt_card_line', { d: mtShort(tr.visit_date) }))}</span>${mtBar(it)}</div>`;
+  return `<div class="mt-cardline ${it.confirmed ? 'done' : ''}">${mtJoinedHtml(it)}<em class="mt-pc">${mtPct(it)}%</em>${mtBar(it)}<span class="dd">${MT_ICO.cal}${esc(mtRep('mt_card_line', { d: mtShort(tr.visit_date) }))}</span></div>`;
 }
 
 /* 페이지 안의 미팅 자리들을 채운다. pageInit 뒤마다 부른다(언어 전환·신청 후 포함) */
