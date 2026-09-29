@@ -850,22 +850,39 @@ function mtItemCard(tr, it){
     ${mtBar(it)}
   </a>`;
 }
-function mtTripCard(tr, past){
+/* 방문 일정 페이지의 주인공 — 행사는 보통 하나뿐이라 그 하나를 히어로로 크게 보여 준다.
+   왼쪽: 날짜·제목·장소·마감·설명·버튼 / 오른쪽: 신청 마감까지 남은 일수 + 공급사·신청·확정 수 */
+function mtEventHero(tr){
   const items = MkMeet.itemsOf(tr);
-  const end = tr.visit_end && tr.visit_end !== tr.visit_date ? ' – ' + esc(mtLong(tr.visit_end)) : '';
-  return `<article class="mt-trip ${past ? 'past' : ''}" id="trip-${esc(tr.id)}">
-    ${mtDateBadge(tr.visit_date)}
-    <div class="mt-trip-bd">
-      <div class="mt-trip-top"><h2>${esc(L(tr.title) || t('mt_page_kick'))}</h2><div class="mt-chips">${mtChip(mtTripState(tr))}${mtDdayChip(tr)}</div></div>
-      <div class="mt-meta">
+  const joined = items.reduce((a, i) => a + i.count, 0);
+  const done = items.filter(i => i.confirmed).length;
+  const end = tr.visit_end && tr.visit_end !== tr.visit_date ? ' – ' + esc(mtFmt(tr.visit_end, { month:'long', day:'numeric' })) : '';
+  const left = !tr.open ? `<b class="sm">${esc(t('mt_st_' + mtTripState(tr)))}</b>`
+    : tr.days_left == null ? `<b class="sm">${esc(t('mt_st_open'))}</b>`
+    : tr.days_left <= 0 ? `<b class="sm">${esc(t('mt_dday_today'))}</b>`
+    : `<b>${tr.days_left}</b><small>${esc(t('mt_pd_days'))}</small>`;
+  return `<div class="mt-ev" id="trip-${esc(tr.id)}">
+    <div class="mt-ev-l">
+      <div class="kick">${esc(t('mt_next_kick'))}</div>
+      <div class="mt-ev-date"><b>${esc(mtFmt(tr.visit_date, { month:'long', day:'numeric' }))}${end}</b><span>${esc(mtFmt(tr.visit_date, { weekday:'long' }))}</span></div>
+      <h1>${esc(L(tr.title) || t('mt_page_kick'))}</h1>
+      <div class="mt-ev-meta">
         ${L(tr.city) ? `<span>${MT_ICO.pin}${esc(L(tr.city))}</span>` : ''}
-        <span>${MT_ICO.cal}${esc(t('mt_visit'))}: ${esc(mtLong(tr.visit_date))}${end}</span>
-        ${tr.deadline ? `<span>${MT_ICO.clock}${esc(t('mt_deadline'))}: ${esc(mtLong(tr.deadline))}</span>` : ''}
-        <span>${MT_ICO.users}${esc(mtRep('mt_suppliers', { n: items.length }))}</span>
+        ${tr.deadline ? `<span>${MT_ICO.clock}${esc(t('mt_deadline'))} ${esc(mtLong(tr.deadline))}</span>` : ''}
       </div>
-      ${L(tr.summary) ? `<p class="sum">${esc(L(tr.summary))}</p>` : ''}
-      <div class="mt-items">${items.map(it => mtItemCard(tr, it)).join('')}</div>
-    </div></article>`;
+      <p class="mt-ev-sub">${esc(L(tr.summary) || t('mt_page_sub'))}</p>
+      ${items.length ? `<a class="btn btn-primary btn-lg" href="#mt-sup-sec" onclick="event.preventDefault();document.getElementById('mt-sup-sec').scrollIntoView({behavior:'smooth'})">${esc(t('mt_ev_cta'))}</a>` : ''}
+    </div>
+    <div class="mt-ev-r">
+      <div class="mt-ev-dd"><span>${esc(t('mt_ev_until'))}</span><div class="v">${left}</div></div>
+      <div class="mt-ev-nums">
+        <div><b>${items.length}</b><span>${esc(t('mt_ev_sup'))}</span></div>
+        <div><b>${joined}</b><span>${esc(t('mt_ev_joined'))}</span></div>
+        <div><b>${done}</b><span>${esc(t('mt_ev_confirmed'))}</span></div>
+      </div>
+      <p class="mt-ev-rule">${esc(t('mt_ev_rule'))}</p>
+    </div>
+  </div>`;
 }
 /* 일정 하나를 한 줄 요약 — 홈 섹션용. 막대는 공급사 전체 합계 */
 function mtMini(tr){
