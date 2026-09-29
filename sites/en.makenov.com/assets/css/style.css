@@ -1710,13 +1710,8 @@ body.mkedit-on .omc-hero .slide.on .shot{pointer-events:none}
 .mt-cardline .dd{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:var(--mk-muted)}
 .mt-cardline .dd .mt-ico{width:14px;height:14px}
 .mt-pcard-dd{margin-top:6px;font-size:12.5px;font-weight:600;color:var(--mk-lock)}
-/* 신청 창 참석 인원 선택기 */
-.mt-ppl-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.mt-ppl-row label{margin:0}
-.mt-ppl-row label small{display:block;font-size:12px;font-weight:500;color:var(--mk-muted);margin-top:2px}
-.mt-ppl{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--mk-line-strong);border-radius:10px;padding:4px}
-.mt-ppl button{width:36px;height:36px;border:0;background:none;border-radius:8px;font-size:20px;line-height:1;cursor:pointer;color:var(--mk-ink)}
-.mt-ppl button:hover{background:var(--mk-bg-soft)}
-.mt-ppl b{min-width:22px;text-align:center;font-size:17px;font-weight:700}
-.mt-ppl span{font-size:13px;color:var(--mk-body);margin-right:4px}/* 모바일 펀딩 배치(display:contents)에서 상세 설명 블록이 내용 최소폭만큼 늘어나 가로로 넘치던 것 — 원래 .pd-main 의 min-width:0 을 옮겨 준다 */
+/* 카드 하단 줄 높이 고정 — 문의 수를 뺀 뒤 "관심 n" 이 있는 카드만 줄이 높아져 카드 높이가 들쭉날쭉했다 */
+.p-card .meta{align-items:center;height:24px;min-height:24px}
+.p-card .meta .amt{margin-left:0;line-height:24px}
+/* 모바일 펀딩 배치(display:contents)에서 상세 설명 블록이 내용 최소폭만큼 늘어나 가로로 넘치던 것 */
 @media(max-width:960px){.pd-row.mt-on>.pd-main>*{min-width:0;max-width:100%}}
