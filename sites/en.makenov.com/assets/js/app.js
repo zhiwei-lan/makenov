@@ -739,11 +739,18 @@ const MkMeet = {
   _dev(k){
     try{
       if(!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return null;
-      /* 로컬 시연: 주소에 ?meetdemo=1 을 붙이면 로컬 테스트 백엔드(8099)에 붙는다. ?meetdemo=0 은 해제 */
+      /* 로컬(localhost·127.0.0.1)에서는 기본으로 같은 호스트의 로컬 테스트 백엔드(:8099)에 붙는다.
+         localhost 와 127.0.0.1 은 저장소가 따로라 설정을 저장해 두는 방식은 한쪽에서만 보였다.
+         ?meetdemo=0 → 운영 API 사용(기억), ?meetdemo=1 → 다시 로컬 테스트 백엔드 */
       const d = new URLSearchParams(location.search).get('meetdemo');
-      if(d === '1') localStorage.setItem('mk_meet_api', 'http://127.0.0.1:8099/');
-      if(d === '0'){ localStorage.removeItem('mk_meet_api'); localStorage.removeItem('mk_meet_tok'); }
-      return localStorage.getItem(k);
+      if(d === '0'){ localStorage.setItem('mk_meet_api', 'off'); localStorage.removeItem('mk_meet_tok'); }
+      if(d === '1') localStorage.removeItem('mk_meet_api');
+      const v = localStorage.getItem(k);
+      if(k === 'mk_meet_api'){
+        if(v === 'off') return null;
+        return v || 'http://127.0.0.1:8099/';
+      }
+      return v;
     }catch(e){ return null; }
   },
   base(){
@@ -796,7 +803,7 @@ function mtLocale(){ return ({ vi:'vi-VN', ko:'ko-KR', en:'en-US' })[MK_LANG] ||
 function mtDate(iso){ const [y, m, d] = String(iso || '').slice(0, 10).split('-').map(Number); return y ? new Date(y, m - 1, d, 12) : null; }
 function mtFmt(iso, opt){ const d = mtDate(iso); if(!d) return ''; try{ return d.toLocaleDateString(mtLocale(), opt); }catch(e){ return String(iso); } }
 function mtLong(iso){ return mtFmt(iso, { year:'numeric', month:'long', day:'numeric', weekday:'short' }); }
-function mtShort(iso){ return mtFmt(iso, { day:'numeric', month:'numeric' }); }
+function mtShort(iso){ return MK_LANG === 'ko' ? mtFmt(iso, { month:'long', day:'numeric' }) : mtFmt(iso, { day:'numeric', month:'numeric' }); }
 function mtRep(key, map){ let s = t(key); for(const k in map) s = s.split('{' + k + '}').join(map[k]); return s; }
 
 function mtDateBadge(iso){
