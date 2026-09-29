@@ -132,10 +132,10 @@ function renderChrome(active){
       ${s
         ? `<a class="mk-util" href="mypage.html">${MK_ICO.user}<span class="lb">${esc(s.contactName||s.email.split('@')[0])}</span></a><a class="mk-util" onclick="Store.logout();location.reload()" style="cursor:pointer">${MK_ICO.logout}<span class="lb" data-i18n="logout"></span></a>`
         : `<a class="mk-util" href="mypage.html" onclick="event.preventDefault();openAuth('login')">${MK_ICO.user}<span class="lb" data-i18n="login"></span></a><button class="btn btn-primary btn-sm" style="margin-left:6px;height:40px;padding:0 18px" onclick="openAuth('signup')" data-i18n="signup"></button>`}
-    </div></div><nav class="mk-nav mk-head-nav"><a href="${mkUrl('products.html')}" data-i18n="nav_directory"></a><a href="${mkUrl('companies.html')}" data-i18n="nav_companies"></a><a href="${mkUrl('columns.html')}" data-i18n="nav_columns"></a><span class="gnb"><a href="${mkUrl('guide.html')}" data-i18n="nav_guide"></a><span class="drop"><a href="${mkUrl('support.html')}" data-i18n="nav_support"></a><span class="menu"><a href="${mkUrl('support.html#notice')}" data-i18n="nav_sp_notice"></a><a href="${mkUrl('support.html#faq')}" data-i18n="nav_sp_faq"></a><a href="${mkUrl('support.html#ask')}" data-i18n="nav_sp_ask"></a></span></span></span></nav></div>`;
+    </div></div><nav class="mk-nav mk-head-nav"><a href="${mkUrl('meetings.html')}" data-i18n="nav_meetings"></a><a href="${mkUrl('products.html')}" data-i18n="nav_directory"></a><a href="${mkUrl('companies.html')}" data-i18n="nav_companies"></a><a href="${mkUrl('columns.html')}" data-i18n="nav_columns"></a><span class="gnb"><a href="${mkUrl('guide.html')}" data-i18n="nav_guide"></a><span class="drop"><a href="${mkUrl('support.html')}" data-i18n="nav_support"></a><span class="menu"><a href="${mkUrl('support.html#notice')}" data-i18n="nav_sp_notice"></a><a href="${mkUrl('support.html#faq')}" data-i18n="nav_sp_faq"></a><a href="${mkUrl('support.html#ask')}" data-i18n="nav_sp_ask"></a></span></span></span></nav></div>`;
   document.getElementById('mk-footer').innerHTML = `
   <div class="wrap"><div class="brand"><div class="logo"><img src="${mkAsset('assets/img/logo.png')}" alt="MAKENOV"
-      onerror="this.parentNode.classList.add(&quot;txt&quot;);this.remove()"><span>MAKE<b>NOV</b></span></div><p class="desc" data-i18n="ft_desc"></p><a class="mail" href="mailto:notice@makenov.com">notice@makenov.com</a></div><div><h4 data-i18n="ft_platform"></h4><a href="${mkUrl('products.html')}" data-i18n="nav_directory"></a><a href="${mkUrl('companies.html')}" data-i18n="nav_companies"></a><a href="${mkUrl('columns.html')}" data-i18n="nav_columns"></a></div><div><h4 data-i18n="ft_partner"></h4><a href="mypage.html" onclick="return mkFtJoin(event)" data-i18n="ft_join"></a><a href="mypage.html" data-i18n="ft_verify"></a><a href="maker.html" data-i18n="util_maker"></a></div><div><h4 data-i18n="ft_support"></h4><a href="${mkUrl('support.html')}" data-i18n="nav_support"></a><a href="${mkUrl('guide.html')}" data-i18n="nav_guide"></a><a href="${mkUrl('support.html#ask')}" data-i18n="ft_contact"></a><a href="sitemap.html" data-i18n="ft_sitemap"></a></div></div><div class="base"><span>© 2026 MAKENOV. All rights reserved.</span><span class="ft-lang"><a data-lang="vi" href="${esc(mkLangHref('vi') || location.href)}" onclick="localStorage.setItem('mk_lang','vi')">Tiếng Việt</a><a data-lang="ko" href="${esc(mkLangHref('ko') || location.href)}" onclick="localStorage.setItem('mk_lang','ko')">한국어</a><a data-lang="en" href="${esc(mkLangHref('en') || location.href)}" onclick="localStorage.setItem('mk_lang','en')">English</a></span></div>`;
+      onerror="this.parentNode.classList.add(&quot;txt&quot;);this.remove()"><span>MAKE<b>NOV</b></span></div><p class="desc" data-i18n="ft_desc"></p><a class="mail" href="mailto:notice@makenov.com">notice@makenov.com</a></div><div><h4 data-i18n="ft_platform"></h4><a href="${mkUrl('meetings.html')}" data-i18n="nav_meetings"></a><a href="${mkUrl('products.html')}" data-i18n="nav_directory"></a><a href="${mkUrl('companies.html')}" data-i18n="nav_companies"></a><a href="${mkUrl('columns.html')}" data-i18n="nav_columns"></a></div><div><h4 data-i18n="ft_partner"></h4><a href="mypage.html" onclick="return mkFtJoin(event)" data-i18n="ft_join"></a><a href="mypage.html" data-i18n="ft_verify"></a><a href="maker.html" data-i18n="util_maker"></a></div><div><h4 data-i18n="ft_support"></h4><a href="${mkUrl('support.html')}" data-i18n="nav_support"></a><a href="${mkUrl('guide.html')}" data-i18n="nav_guide"></a><a href="${mkUrl('support.html#ask')}" data-i18n="ft_contact"></a><a href="sitemap.html" data-i18n="ft_sitemap"></a></div></div><div class="base"><span>© 2026 MAKENOV. All rights reserved.</span><span class="ft-lang"><a data-lang="vi" href="${esc(mkLangHref('vi') || location.href)}" onclick="localStorage.setItem('mk_lang','vi')">Tiếng Việt</a><a data-lang="ko" href="${esc(mkLangHref('ko') || location.href)}" onclick="localStorage.setItem('mk_lang','ko')">한국어</a><a data-lang="en" href="${esc(mkLangHref('en') || location.href)}" onclick="localStorage.setItem('mk_lang','en')">English</a></span></div>`;
   updateCartBadge();
   applyI18n();
 }
@@ -707,7 +707,251 @@ function productCard(p){
   const flag = p.isNew ? `<span class="flag" data-i18n="spot_new"></span>` : (p.featured?`<span class="flag">FEATURED</span>`:'');
   return `
   <a class="p-card" href="${mkDocUrl('product',p.id)}" data-cat="${esc(p.cat||'')}"><div class="thumb"><img src="${p.img}" alt="${esc(L(p.name))}" loading="lazy">${flag}
-      <button class="heart ${inCart?'on':''}" onclick="event.preventDefault();event.stopPropagation();toggleCart('${p.id}',this)">${inCart?'♥':'♡'}</button></div><div class="body"><span class="brand">${esc(p.brand)}</span><h3>${esc(L(p.name))}</h3><div class="meta">${cardMeta(p)}<span class="left">${esc(p.origin)}</span></div></div></a>`;
+      <button class="heart ${inCart?'on':''}" onclick="event.preventDefault();event.stopPropagation();toggleCart('${p.id}',this)">${inCart?'♥':'♡'}</button></div><div class="body"><span class="brand">${esc(p.brand)}</span><h3>${esc(L(p.name))}</h3><div class="meta">${cardMeta(p)}<span class="left">${esc(p.origin)}</span></div>${mtCardLine(p.id)}</div></a>`;
+}
+
+/* ============================================================
+   미팅 펀딩(방문 일정) — /meet/v1  (백엔드: app/Controllers/Api/Meet.php)
+   ------------------------------------------------------------
+   한국 공급사 담당자가 정해진 날 베트남에 온다. 공급사(제품)별로 인증 바이어가
+   goal(기본 5)곳 모이면 그 미팅은 확정. 화면 곳곳에 진행률을 보여 준다.
+     · meetings.html         방문 일정 전체 (pageInit → mtRenderPage)
+     · [data-mt-home]        홈·제품 페이지의 '곧 오는 공급사' 섹션 (mtFillSlots 가 채운다)
+     · [data-mt-product=ID]  제품 상세의 신청 박스 (mtFillSlots)
+     · productCard           카드 하단 한 줄 (mtCardLine)
+   데이터는 부팅 때 MkData.boot() 와 나란히 한 번 받는다(MkMeet.load).
+   이모지 금지(사용자 지시) — 아이콘은 인라인 SVG.
+   로컬 개발: localhost 에서만 localStorage mk_meet_api(백엔드 주소)·mk_meet_tok(토큰)을 읽는다.
+   ============================================================ */
+const MT_ICO = {
+  cal:   `<svg class="mt-ico" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>`,
+  pin:   `<svg class="mt-ico" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.4"/></svg>`,
+  clock: `<svg class="mt-ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>`,
+  users: `<svg class="mt-ico" viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 19c.7-3 3-4.7 5.5-4.7s4.8 1.7 5.5 4.7"/><path d="M15.5 5.6a3 3 0 0 1 0 5.8M17.5 14.6c1.5.6 2.6 2 3 4.4"/></svg>`,
+  check: `<svg class="mt-ico" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`,
+};
+
+const MkMeet = {
+  trips: [], loaded: false, _p: null,
+  _dev(k){ try{ return /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? localStorage.getItem(k) : null; }catch(e){ return null; } },
+  base(){
+    const root = this._dev('mk_meet_api') || (typeof MK_SUPABASE_URL !== 'undefined' && MK_SUPABASE_URL) || 'https://makenov.com/';
+    return root.replace(/\/$/, '') + '/meet/v1/';
+  },
+  async token(){
+    const dev = this._dev('mk_meet_tok'); if(dev) return dev;
+    try{
+      if(typeof SB !== 'undefined' && SB && SB.auth){
+        const { data } = await SB.auth.getSession();
+        return data && data.session ? data.session.access_token : '';
+      }
+    }catch(e){}
+    return '';
+  },
+  async call(method, path, body){
+    const tok = await this.token();
+    const h = { apikey: (typeof MK_SUPABASE_ANON !== 'undefined' ? MK_SUPABASE_ANON : ''), Accept: 'application/json' };
+    if(tok) h.Authorization = 'Bearer ' + tok;
+    if(body !== undefined) h['Content-Type'] = 'application/json';
+    const r = await fetch(this.base() + path, { method, headers: h, body: body === undefined ? undefined : JSON.stringify(body) });
+    let d = null; try{ d = await r.json(); }catch(e){}
+    return { ok: r.ok, status: r.status, data: d };
+  },
+  load(){
+    if(!this._p) this._p = this.call('GET', 'trips')
+      .then(r => { if(r.ok && Array.isArray(r.data)) this.trips = r.data; })
+      .catch(() => {})
+      .then(() => { this.loaded = true; });
+    return this._p;
+  },
+  reload(){ this._p = null; return this.load(); },
+  trip(id){ return this.trips.find(x => x.id === id) || null; },
+  /* 방문일이 오늘 이후(또는 미정)인 일정 — 취소 제외, 방문일 순 */
+  upcoming(){ return this.trips.filter(x => x.status !== 'cancelled' && (x.days_to_visit == null || x.days_to_visit >= 0)); },
+  past(){ return this.trips.filter(x => x.status !== 'cancelled' && x.days_to_visit != null && x.days_to_visit < 0).reverse(); },
+  /* 공개 제품만 — 비공개·삭제된 제품은 일정에서 조용히 뺀다 */
+  itemsOf(tr){ return (tr.items || []).filter(it => mkProduct(it.product_id)); },
+  forProduct(pid){
+    for(const tr of this.upcoming()){
+      const it = (tr.items || []).find(i => i.product_id === pid);
+      if(it) return { trip: tr, item: it };
+    }
+    return null;
+  },
+};
+
+function mtLocale(){ return ({ vi:'vi-VN', ko:'ko-KR', en:'en-US' })[MK_LANG] || 'vi-VN'; }
+function mtDate(iso){ const [y, m, d] = String(iso || '').slice(0, 10).split('-').map(Number); return y ? new Date(y, m - 1, d, 12) : null; }
+function mtFmt(iso, opt){ const d = mtDate(iso); if(!d) return ''; try{ return d.toLocaleDateString(mtLocale(), opt); }catch(e){ return String(iso); } }
+function mtLong(iso){ return mtFmt(iso, { year:'numeric', month:'long', day:'numeric', weekday:'short' }); }
+function mtShort(iso){ return mtFmt(iso, { day:'numeric', month:'numeric' }); }
+function mtRep(key, map){ let s = t(key); for(const k in map) s = s.split('{' + k + '}').join(map[k]); return s; }
+
+function mtDateBadge(iso){
+  const d = mtDate(iso);
+  return `<div class="mt-date"><span class="mo">${esc(mtFmt(iso, { month:'short' }))}</span><span class="d">${d ? d.getDate() : ''}</span><span class="dw">${esc(mtFmt(iso, { weekday:'short' }))}</span></div>`;
+}
+function mtTripState(tr){
+  if(tr.status === 'cancelled') return 'cancelled';
+  if(tr.open) return 'open';
+  return tr.status === 'confirmed' ? 'confirmed' : 'closed';
+}
+function mtChip(st){ return `<span class="mt-chip ${st}">${st === 'confirmed' ? MT_ICO.check : ''}${esc(t('mt_st_' + st))}</span>`; }
+function mtDdayChip(tr){
+  if(!tr.open || tr.days_left == null) return '';
+  const txt = tr.days_left <= 0 ? t('mt_dday_today') : mtRep('mt_dday', { n: tr.days_left });
+  return `<span class="mt-chip dday">${MT_ICO.clock}${esc(txt)}</span>`;
+}
+function mtBar(it){
+  const pct = Math.min(100, Math.round((it.count || 0) / Math.max(1, it.goal) * 100));
+  return `<div class="mt-bar ${it.confirmed ? 'done' : ''}"><i style="width:${pct}%"></i></div>`;
+}
+function mtNeedTxt(it){ return it.confirmed ? t('mt_st_confirmed') : mtRep('mt_need_more', { n: Math.max(0, it.goal - it.count) }); }
+function mtProg(it, right){
+  return `<div class="mt-prog"><b>${it.count}<small> / ${it.goal}</small></b>${right != null ? right : `<span class="need ${it.confirmed ? 'done' : ''}">${esc(mtNeedTxt(it))}</span>`}</div>`;
+}
+/* 신청 버튼 — 확정된 뒤에도 마감 전이면 더 받는다(공급사 입장에선 미팅이 늘수록 좋다) */
+function mtAction(tr, it){
+  const a = `'${esc(tr.id)}','${esc(it.product_id)}'`;
+  if(it.mine) return `<div class="mt-mine"><button class="btn btn-ghost" disabled>${MT_ICO.check} ${esc(t('mt_btn_applied'))}</button>`
+    + (tr.open ? `<a href="#" class="mt-cancel" onclick="event.preventDefault();mtCancel(${a})">${esc(t('mt_btn_cancel'))}</a>` : '') + `</div>`;
+  if(tr.open) return `<button class="btn btn-primary" onclick="event.preventDefault();openMeetApply(${a})">${esc(t('mt_btn_apply'))}</button>`;
+  return `<button class="btn btn-ghost" disabled>${esc(t('mt_st_' + mtTripState(tr)))}</button>`;
+}
+
+function mtItemCard(tr, it){
+  const p = mkProduct(it.product_id);
+  return `<div class="mt-item ${it.confirmed ? 'done' : ''}">
+    <a class="mt-item-hd" href="${mkDocUrl('product', p.id)}"><img src="${esc(p.img)}" alt="" loading="lazy"><div><div class="br">${esc(p.brand)}</div><h3>${esc(L(p.name))}</h3></div></a>
+    <div>${mtBar(it)}${mtProg(it)}</div>
+    ${mtAction(tr, it)}
+  </div>`;
+}
+function mtTripCard(tr, past){
+  const items = MkMeet.itemsOf(tr);
+  const end = tr.visit_end && tr.visit_end !== tr.visit_date ? ' – ' + esc(mtLong(tr.visit_end)) : '';
+  return `<article class="mt-trip ${past ? 'past' : ''}" id="trip-${esc(tr.id)}">
+    ${mtDateBadge(tr.visit_date)}
+    <div class="mt-trip-bd">
+      <div class="mt-trip-top"><h2>${esc(L(tr.title) || t('mt_page_kick'))}</h2><div class="mt-chips">${mtChip(mtTripState(tr))}${mtDdayChip(tr)}</div></div>
+      <div class="mt-meta">
+        ${L(tr.city) ? `<span>${MT_ICO.pin}${esc(L(tr.city))}</span>` : ''}
+        <span>${MT_ICO.cal}${esc(t('mt_visit'))}: ${esc(mtLong(tr.visit_date))}${end}</span>
+        ${tr.deadline ? `<span>${MT_ICO.clock}${esc(t('mt_deadline'))}: ${esc(mtLong(tr.deadline))}</span>` : ''}
+        <span>${MT_ICO.users}${esc(mtRep('mt_suppliers', { n: items.length }))}</span>
+      </div>
+      ${L(tr.summary) ? `<p class="sum">${esc(L(tr.summary))}</p>` : ''}
+      <div class="mt-items">${items.map(it => mtItemCard(tr, it)).join('')}</div>
+    </div></article>`;
+}
+/* 일정 하나를 한 줄 요약 — 홈 섹션용. 막대는 공급사 전체 합계 */
+function mtMini(tr){
+  const items = MkMeet.itemsOf(tr);
+  const n = items.reduce((a, i) => a + i.count, 0), g = items.reduce((a, i) => a + i.goal, 0);
+  const done = items.length > 0 && items.every(i => i.confirmed);
+  return `<a class="mt-mini" href="${mkUrl('meetings.html')}#trip-${esc(tr.id)}">${mtDateBadge(tr.visit_date)}<div class="bd">
+    <h3>${esc(L(tr.title) || t('mt_page_kick'))}</h3>
+    <div class="mt-meta">${L(tr.city) ? `<span>${MT_ICO.pin}${esc(L(tr.city))}</span>` : ''}${mtDdayChip(tr)}</div>
+    <div style="margin-top:10px">${mtBar({ count: n, goal: Math.max(1, g), confirmed: done })}${mtProg({ count: n, goal: g }, `<span>${esc(mtRep('mt_suppliers', { n: items.length }))}</span>`)}</div>
+  </div></a>`;
+}
+function mtHomeHtml(){
+  const list = MkMeet.upcoming().filter(tr => MkMeet.itemsOf(tr).length).slice(0, 3);
+  if(!list.length) return '';
+  return `<div class="sec-head"><h2>${esc(t('mt_home_h'))}</h2><a class="more" href="${mkUrl('meetings.html')}">${esc(t('mt_home_more'))}</a></div><div class="mt-home">${list.map(mtMini).join('')}</div>`;
+}
+function mtProductBox(pid){
+  const hit = MkMeet.forProduct(pid);
+  if(!hit || !mkProduct(pid)) return '';
+  const { trip: tr, item: it } = hit;
+  return `<div class="mt-box ${it.confirmed ? 'done' : ''}">
+    <div class="kick">${esc(t('mt_box_kick'))}</div>
+    <h4>${esc(mtRep('mt_box_h', { d: mtLong(tr.visit_date) }))}</h4>
+    ${tr.deadline ? `<p>${esc(mtRep('mt_box_p', { g: it.goal, dl: mtLong(tr.deadline) }))}</p>` : ''}
+    ${mtBar(it)}${mtProg(it, mtDdayChip(tr) || `<span class="need ${it.confirmed ? 'done' : ''}">${esc(mtNeedTxt(it))}</span>`)}
+    <div class="row">${mtAction(tr, it)}<a class="btn btn-ghost" href="${mkUrl('meetings.html')}#trip-${esc(tr.id)}">${esc(t('mt_btn_view'))}</a></div>
+  </div>`;
+}
+function mtCardLine(pid){
+  const hit = MkMeet.forProduct(pid);
+  if(!hit) return '';
+  const { trip: tr, item: it } = hit;
+  return `<div class="mt-cardline ${it.confirmed ? 'done' : ''}">${MT_ICO.cal}<span>${esc(mtRep('mt_card_line', { d: mtShort(tr.visit_date) }))}</span>${mtBar(it)}<span>${it.count}/${it.goal}</span></div>`;
+}
+
+/* 페이지 안의 미팅 자리들을 채운다. pageInit 뒤마다 부른다(언어 전환·신청 후 포함) */
+function mtFillSlots(){
+  document.querySelectorAll('[data-mt-home]').forEach(el => {
+    const h = mtHomeHtml();
+    el.innerHTML = h ? `<div class="wrap">${h}</div>` : '';
+    el.hidden = !h;
+  });
+  document.querySelectorAll('[data-mt-product]').forEach(el => { el.innerHTML = mtProductBox(el.dataset.mtProduct); });
+}
+function mtRerender(){
+  try{ if(typeof pageInit === 'function') pageInit(); mtFillSlots(); applyI18n(); unlockIfAuthed(); }catch(e){ console.warn('mt rerender', e); }
+}
+
+/* ---------- 신청 ---------- */
+function mtNeedVerify(){
+  mkModal(`<h2>${esc(t('mt_need_verify_h'))}</h2><p class="sub">${esc(t('mt_need_verify_p'))}</p>
+    <a class="btn btn-primary btn-block btn-lg" href="${mkUrl('mypage.html')}">${esc(t('mt_need_verify_btn'))}</a>`);
+}
+const MT_CHANNELS = ['pharmacy', 'cosmetic', 'mart', 'online', 'dist', 'other'];
+function openMeetApply(tripId, pid){
+  const tr = MkMeet.trip(tripId), p = mkProduct(pid);
+  if(!tr || !p) return;
+  if(!MkMeet._dev('mk_meet_tok')){
+    const s = (typeof Store !== 'undefined' && Store.session) ? Store.session() : null;
+    if(!s){ toast(t('auth_need')); openAuth('signup'); return; }
+    if(s.status && s.status !== 'verified'){ mtNeedVerify(); return; }
+  }
+  try{ mkTrack('InitiateCheckout', { content_ids:[pid], content_type:'product', content_category:'meeting' }); }catch(e){}
+  mkModal(`<h2>${esc(t('mt_apply_h'))}</h2>
+    <p class="sub">${esc(p.brand)} · ${esc(L(p.name))}<br>${esc(mtLong(tr.visit_date))}${L(tr.city) ? ' · ' + esc(L(tr.city)) : ''}</p>
+    <div class="f-row"><label>${esc(t('mt_apply_channel'))}</label><select id="mt-ch">${MT_CHANNELS.map(k => `<option value="${k}">${esc(t('mt_ch_' + k))}</option>`).join('')}</select></div>
+    <div class="f-row"><label>${esc(t('mt_apply_volume'))}</label><input id="mt-vol" maxlength="200" placeholder="${esc(t('mt_apply_volume_ph'))}"></div>
+    <div class="f-row"><label>${esc(t('mt_apply_msg'))}</label><textarea id="mt-msg" rows="3" maxlength="2000"></textarea></div>
+    <p class="inq-auto">${esc(t('mt_apply_note'))}</p>
+    <button class="btn btn-primary btn-block btn-lg" id="mt-send" onclick="sendMeetApply('${esc(tr.id)}','${esc(pid)}')">${esc(t('mt_apply_send'))}</button>`);
+}
+async function sendMeetApply(tripId, pid){
+  const btn = document.getElementById('mt-send');
+  if(btn){ if(btn.disabled) return; btn.disabled = true; }
+  const v = id => ((document.getElementById(id) || {}).value || '').trim();
+  const body = { trip_id: tripId, product_id: pid, channel: v('mt-ch'), volume: v('mt-vol'), message: v('mt-msg') };
+  try{ const a = mkAffRef(); if(a && a.code) body.aff_ref = a.code; }catch(e){}
+  let r;
+  try{ r = await MkMeet.call('POST', 'apply', body); }catch(e){ r = { ok: false, data: null }; }
+  if(btn) btn.disabled = false;
+  if(!r.ok){
+    const code = r.data && r.data.error;
+    if(code === 'login_required'){ closeModal(); toast(t('auth_need')); openAuth('login'); return; }
+    if(code === 'verify_required'){ mtNeedVerify(); return; }
+    toast(t(code === 'already' ? 'mt_err_already' : code === 'closed' ? 'mt_err_closed' : 'mt_err'));
+    return;
+  }
+  try{ mkTrack('Lead', { content_ids:[pid], content_type:'product', content_category:'meeting' }); }catch(e){}
+  const d = r.data || {};
+  let url = '';
+  try{ url = new URL(mkUrl('meetings.html'), document.baseURI).href.split('#')[0] + '#trip-' + tripId; }catch(e){}
+  const msg = d.confirmed ? mtRep('mt_apply_ok_confirmed', { g: d.goal }) : mtRep('mt_apply_ok_p', { n: d.count, g: d.goal });
+  mkModal(`<div class="mt-ok"><div class="ic">${MT_ICO.check}</div><h2>${esc(t('mt_apply_ok_h'))}</h2><p class="sub">${esc(msg)}</p></div>
+    ${url ? `<div class="mt-share"><p>${esc(t('mt_share'))}</p><button class="btn btn-ghost btn-block" style="margin-top:10px" onclick="mtCopy('${esc(url)}')">${esc(t('mt_share_btn'))}</button></div>` : ''}`);
+  await MkMeet.reload();
+  mtRerender();
+}
+async function mtCancel(tripId, pid){
+  if(!confirm(t('mt_cancel_confirm'))) return;
+  let r;
+  try{ r = await MkMeet.call('POST', 'cancel', { trip_id: tripId, product_id: pid }); }catch(e){ r = { ok: false }; }
+  toast(r.ok ? t('mt_cancel_ok') : t(r.data && r.data.error === 'closed' ? 'mt_err_closed' : 'mt_err'));
+  await MkMeet.reload();
+  mtRerender();
+}
+function mtCopy(url){
+  const done = () => toast(t('mt_share_copied'));
+  try{ navigator.clipboard.writeText(url).then(done, () => window.prompt('', url)); }catch(e){ window.prompt('', url); }
 }
 
 /* 사전 렌더(크롤러용 정적 사본) → 실제 렌더 교체. 한 번만 */
@@ -868,7 +1112,10 @@ document.addEventListener('DOMContentLoaded', async ()=>{
     try{ pageInit(); applyI18n(); mkSwapPrerender(); }catch(e){ console.warn('early render 실패', e); }
   }
 
-  /* 2) 그다음 데이터 */
+  /* 2) 그다음 데이터.
+        미팅 일정(MkMeet)은 제품 데이터와 나란히 받는다. 늦으면(2.5초) 기다리지 않고
+        먼저 그린 뒤, 도착하면 한 번 더 그린다 — 미팅 API 가 느려도 페이지는 안 멈춘다. */
+  const meetP = MkMeet.load();
   if(typeof MkData !== 'undefined'){
     try{
       await MkData.boot();
@@ -884,11 +1131,15 @@ document.addEventListener('DOMContentLoaded', async ()=>{
         힌트가 로그인이라고 그렸는데 토큰이 만료된 경우까지 바로잡아야 하므로
         세션 유무와 무관하게 항상 다시 그린다. */
   if(typeof MkData !== 'undefined') renderChrome();
+  let meetLate = false;
+  await Promise.race([meetP, new Promise(r => setTimeout(() => { meetLate = true; r(); }, 2500))]);
   if(typeof pageInit === 'function') pageInit();
+  mtFillSlots();
   applyI18n();
   mkSwapPrerender();
+  if(meetLate) meetP.then(() => { if(MkMeet.trips.length) mtRerender(); });
   unlockIfAuthed();
-  document.addEventListener('mk:lang', ()=>{ renderChrome(); if(typeof pageInit==='function') pageInit(); applyI18n(); unlockIfAuthed(); });
+  document.addEventListener('mk:lang', ()=>{ renderChrome(); if(typeof pageInit==='function') pageInit(); mtFillSlots(); applyI18n(); unlockIfAuthed(); });
 
   /* 4) ★2026-09-29 카테고리 칩(.chip)은 같은 페이지의 ?category= 링크다. 예전엔 페이지를 통째로
         다시 불러와서 탭을 누를 때마다 '사전 렌더 사본 → 실제 렌더' 순으로 화면이 깜빡였다.
@@ -905,8 +1156,8 @@ document.addEventListener('DOMContentLoaded', async ()=>{
       if(file && file !== here) return;
       e.preventDefault();
       history.pushState(null, '', href);
-      pageInit(); applyI18n();
+      pageInit(); mtFillSlots(); applyI18n();
     });
-    addEventListener('popstate', ()=>{ pageInit(); applyI18n(); });
+    addEventListener('popstate', ()=>{ pageInit(); mtFillSlots(); applyI18n(); });
   }
 });

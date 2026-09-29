@@ -439,7 +439,7 @@ function imgSrc(v){
 /* ---------- 사이드바 · 탭 ---------- */
 /* ⚠ 탭을 새로 만들면 NAV 와 여기 둘 다에 넣어야 한다.
    여기 빠지면 메뉴는 보이는데 눌러도 화면이 hidden 인 채로 남는다 (SEO 탭에서 실제로 겪음) */
-const TABS = ['dash','inq','leads','buyers','aff_campaigns','aff_leads','aff_withdrawals','aff_marketers','aff_settings','products','companies','columns','faq','notices','copy','seo','admins','settings'];
+const TABS = ['dash','meet','inq','leads','buyers','aff_campaigns','aff_leads','aff_withdrawals','aff_marketers','aff_settings','products','companies','columns','faq','notices','copy','seo','admins','settings'];
 const NAV = [
   { id:'dash',     label:'대시보드', title:'대시보드',      desc:'플랫폼 현황 한눈에 보기' },
   { id:'inq',      label:'문의함',   title:'문의함',        desc:'유통 파트너가 보낸 견적 문의' },
@@ -460,6 +460,8 @@ const NAV = [
   { id:'seo',      label:'SEO',      title:'SEO 설정',       desc:'검색결과 제목·설명, 공유 이미지, 파비콘. 저장 후 서버에서 node bake-seo.js 를 돌려야 실제 HTML 에 반영됩니다' },
   { id:'admins',   label:'관리자',   title:'관리자 계정',     desc:'콘솔에 로그인할 수 있는 계정을 관리합니다' },
   { id:'settings', label:'설정',     title:'설정 · 내보내기', desc:'배포용 데이터와 계정 관리' },
+  /* 미팅 펀딩 — grp 로 따로 묶는다(위 slice 인덱스를 건드리지 않게 맨 끝에 둔다). 화면: admin-meet.js renderMeet */
+  { id:'meet', grp:'meet', label:'방문 일정', title:'미팅 펀딩 · 방문 일정', desc:'한국 공급사가 베트남에 오는 날을 올리고, 공급사별 신청 인원(목표 5곳)을 관리합니다' },
 ];
 let curTab = 'dash';
 
@@ -475,12 +477,14 @@ function renderNav(){
   document.getElementById('sb-nav').innerHTML =
     `<div class="grp">운영</div>` +
     NAV.slice(0,4).map(n=>navBtn(n,counts)).join('') +
+    `<div class="grp">미팅 펀딩</div>` +
+    NAV.filter(n=>n.grp==='meet').map(n=>navBtn(n,counts)).join('') +
     `<div class="grp">제휴 <span class="grp-sub">CTV</span></div>` +
     NAV.filter(n=>n.grp==='aff').map(n=>navBtn(n,counts)).join('') +
     `<div class="grp">콘텐츠</div>` +
     NAV.slice(9,14).map(n=>navBtn(n,counts)).join('') +
     `<div class="grp">시스템</div>` +
-    NAV.slice(14).map(n=>navBtn(n,counts)).join('');
+    NAV.slice(14).filter(n=>!n.grp).map(n=>navBtn(n,counts)).join('');
 }
 function navBtn(n, counts){
   const c = counts[n.id];
@@ -490,6 +494,7 @@ function navBtn(n, counts){
 
 function showTab(name){
   curTab = name;
+  if(name==='meet' && typeof renderMeet==='function'){ meetEdit = null; renderMeet(); }
   if(name.startsWith('aff_') && typeof renderAff==='function'){ affSub = name.slice(4); affEditPid = null; affDetailId = null; renderAff(); }
   TABS.forEach(x=>document.getElementById('tab-'+x).classList.toggle('hidden', x!==name));
   const n = NAV.find(x=>x.id===name) || NAV[0];

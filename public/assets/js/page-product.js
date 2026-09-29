@@ -120,6 +120,9 @@ function pageInit(){
           ${Store.session()?'':`<div class="locknote" data-i18n="locked_note"></div>`}
         </div>
 
+        <!-- 미팅 펀딩: 이 제품이 걸린 방문 일정이 있으면 app.js mtFillSlots 가 신청 박스를 채운다 -->
+        <div data-mt-product="${esc(p.id)}">${typeof mtProductBox === 'function' ? mtProductBox(p.id) : ''}</div>
+
         <div class="pd-ctas">
           <button class="btn btn-primary" onclick="openInquiry(['${p.id}'])" data-i18n="cta_inquiry"></button>
           <button class="btn btn-ghost" id="pd-cart" onclick="toggleCart('${p.id}');pdCartLabel('${p.id}')">

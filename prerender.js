@@ -47,7 +47,7 @@ if (process.argv[2] === '--serve') {
 }
 
 /* 사전 렌더 대상 — 로그인 상태 타는 mypage/admin 제외 */
-const HUBS = ['index.html', 'directory.html', 'companies.html', 'about.html', 'guide.html', 'columns.html'];
+const HUBS = ['index.html', 'directory.html', 'companies.html', 'about.html', 'guide.html', 'columns.html', 'meetings.html'];
 const LANGS = ['', 'ko/', 'en/'];
 const withLangs = f => LANGS.map(pre => pre + f);
 
