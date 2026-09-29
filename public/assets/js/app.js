@@ -736,6 +736,9 @@ const MkMeet = {
   _dev(k){
     try{
       if(!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return null;
+      /* ★ 사전 렌더(prerender.js — 헤드리스 크롬이 localhost 로 연다)에서는 절대 로컬 테스트 백엔드를 쓰지 않는다.
+           한 번 테스트 일정이 사본에 구워져 운영에서 '가짜 펀딩 줄 → 실제 화면'으로 바뀌어 보였다(2026-09-29). */
+      if(/HeadlessChrome/.test(navigator.userAgent)) return null;
       /* 로컬(localhost·127.0.0.1)에서는 기본으로 같은 호스트의 로컬 테스트 백엔드(:8099)에 붙는다.
          localhost 와 127.0.0.1 은 저장소가 따로라 설정을 저장해 두는 방식은 한쪽에서만 보였다.
          ?meetdemo=0 → 운영 API 사용(기억), ?meetdemo=1 → 다시 로컬 테스트 백엔드 */
