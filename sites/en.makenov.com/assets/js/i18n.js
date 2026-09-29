@@ -539,6 +539,9 @@ const I18N = {
     mt_sup_h: "Nhà cung cấp sang lần này ({n})",
     mt_how_h: "Cách hoạt động",
     mt_more_h: "Lịch gặp khác",
+    mt_apply_people: "Số người tham dự",
+    mt_people_unit: "người",
+    mt_people_hint: "Tối đa 5 người mỗi doanh nghiệp",
   },
   ko: {
     nav_directory: "제품",
@@ -1059,6 +1062,9 @@ const I18N = {
     mt_sup_h: "이번에 오는 공급사 {n}곳",
     mt_how_h: "진행 방식",
     mt_more_h: "다른 방문 일정",
+    mt_apply_people: "참석 인원",
+    mt_people_unit: "명",
+    mt_people_hint: "회사당 최대 5명",
   },
   en: {
     nav_directory: "Products",
@@ -1584,6 +1590,9 @@ const I18N = {
     mt_sup_h: "Suppliers coming this time ({n})",
     mt_how_h: "How it works",
     mt_more_h: "Other visits",
+    mt_apply_people: "Attendees",
+    mt_people_unit: "people",
+    mt_people_hint: "Up to 5 per company",
   }
 };
 

@@ -985,17 +985,25 @@ function openMeetApply(tripId, pid){
   try{ mkTrack('InitiateCheckout', { content_ids:[pid], content_type:'product', content_category:'meeting' }); }catch(e){}
   mkModal(`<h2>${esc(t('mt_apply_h'))}</h2>
     <p class="sub">${esc(p.brand)} · ${esc(L(p.name))}<br>${esc(mtLong(tr.visit_date))}${L(tr.city) ? ' · ' + esc(L(tr.city)) : ''}</p>
+    <div class="f-row mt-ppl-row"><label>${esc(t('mt_apply_people'))}<small>${esc(t('mt_people_hint'))}</small></label>
+      <div class="mt-ppl"><button type="button" aria-label="-" onclick="mtPeople(-1)">&minus;</button><b id="mt-ppl">1</b><span>${esc(t('mt_people_unit'))}</span><button type="button" aria-label="+" onclick="mtPeople(1)">+</button></div></div>
     <div class="f-row"><label>${esc(t('mt_apply_channel'))}</label><select id="mt-ch">${MT_CHANNELS.map(k => `<option value="${k}">${esc(t('mt_ch_' + k))}</option>`).join('')}</select></div>
     <div class="f-row"><label>${esc(t('mt_apply_volume'))}</label><input id="mt-vol" maxlength="200" placeholder="${esc(t('mt_apply_volume_ph'))}"></div>
     <div class="f-row"><label>${esc(t('mt_apply_msg'))}</label><textarea id="mt-msg" rows="3" maxlength="2000"></textarea></div>
     <p class="inq-auto">${esc(t('mt_apply_note'))}</p>
     <button class="btn btn-primary btn-block btn-lg" id="mt-send" onclick="sendMeetApply('${esc(tr.id)}','${esc(pid)}')">${esc(t('mt_apply_send'))}</button>`);
 }
+/* 참석 인원 선택기 — 회사당 1~5명 */
+function mtPeople(d){
+  const el = document.getElementById('mt-ppl'); if(!el) return;
+  el.textContent = Math.min(5, Math.max(1, (Number(el.textContent) || 1) + d));
+}
 async function sendMeetApply(tripId, pid){
   const btn = document.getElementById('mt-send');
   if(btn){ if(btn.disabled) return; btn.disabled = true; }
   const v = id => ((document.getElementById(id) || {}).value || '').trim();
-  const body = { trip_id: tripId, product_id: pid, channel: v('mt-ch'), volume: v('mt-vol'), message: v('mt-msg') };
+  const ppl = Number((document.getElementById('mt-ppl') || {}).textContent) || 1;
+  const body = { trip_id: tripId, product_id: pid, attendees: ppl, channel: v('mt-ch'), volume: v('mt-vol'), message: v('mt-msg') };
   try{ const a = mkAffRef(); if(a && a.code) body.aff_ref = a.code; }catch(e){}
   let r;
   try{ r = await MkMeet.call('POST', 'apply', body); }catch(e){ r = { ok: false, data: null }; }

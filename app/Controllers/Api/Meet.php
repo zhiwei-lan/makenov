@@ -26,7 +26,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 class Meet extends BaseApiController
 {
     /** 마이그레이션을 추가하면 올린다 — writable/meet_schema_ok 에 적힌 값과 다르면 latest() 를 다시 돈다 */
-    private const SCHEMA_VER = '1';
+    private const SCHEMA_VER = '2';
     /** 마감·D-day 계산 기준 시간대 — 바이어가 베트남에 있다 */
     private const TZ = 'Asia/Ho_Chi_Minh';
     private const TRIP_JSON = ['title', 'city', 'venue', 'summary'];
@@ -86,12 +86,13 @@ class Meet extends BaseApiController
         }
         $db = db_connect();
         try {
-            if (! $db->tableExists('meet_trips') || ! $db->tableExists('meet_requests')) {
-                $m = service('migrations');
-                $m->setNamespace('App');
-                $m->latest();
-            }
-            if ($db->tableExists('meet_trips') && $db->tableExists('meet_requests')) {
+            /* 버전 표시가 다르면(새 마이그레이션 추가) 한 번 latest() — 000033 attendees 컬럼 같은 추가분까지 */
+            $m = service('migrations');
+            $m->setNamespace('App');
+            $m->latest();
+            $db->resetDataCache();   // 방금 추가된 컬럼이 캐시된 필드 목록에 안 보여 첫 요청이 503 나던 것
+            if ($db->tableExists('meet_trips') && $db->tableExists('meet_requests')
+                && in_array('attendees', $db->getFieldNames('meet_requests'), true)) {
                 @file_put_contents($flag, self::SCHEMA_VER);
                 return null;
             }
@@ -203,7 +204,7 @@ class Meet extends BaseApiController
             return $this->json([]);
         }
         $rows = db_connect()->table('meet_requests')
-            ->select('id, trip_id, product_id, channel, volume, message, status, created_at')
+            ->select('id, trip_id, product_id, attendees, channel, volume, message, status, created_at')
             ->where('buyer_id', $this->uid())->orderBy('created_at', 'DESC')
             ->get()->getResultArray();
         return $this->json($rows);
@@ -251,6 +252,7 @@ class Meet extends BaseApiController
             'email'        => $this->cut($prof['email'] ?? ($this->user['email'] ?? ''), 200),
             'channel'      => $this->cut($in['channel'] ?? '', 200),
             'volume'       => $this->cut($in['volume'] ?? '', 200),
+            'attendees'    => min(5, max(1, (int) ($in['attendees'] ?? 1))),   // 회사당 참석 인원 1~5
             'message'      => $this->cut($in['message'] ?? '', 2000),
             'aff_ref'      => $this->cut($in['aff_ref'] ?? '', 40) ?: null,
             'status'       => 'applied',
