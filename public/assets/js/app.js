@@ -690,7 +690,7 @@ function openCatalog(pid){
 function companyCard(c){
   const n = mkCompanyProducts(c.id).length;
   return `
-  <a class="co-card" href="${mkDocUrl('company',c.id)}"><div class="cv"><img src="${c.cover}" alt="" loading="lazy"></div><div class="bd"><img class="lg" src="${c.logo}" alt="${esc(L(c.name))}" loading="lazy"><h3>${esc(L(c.name))}</h3><p class="tag">${esc(L(c.tagline))}</p><div class="meta"><span>${esc(L(c.location))}</span><i></i><span><b>${n}</b> <span data-i18n="co_prod_unit"></span></span><i></i><span>since ${esc(c.since)}</span></div></div></a>`;
+  <a class="co-card" href="${mkDocUrl('company',c.id)}" data-cat="${esc(c.cat||'')}"><div class="cv"><img src="${c.cover}" alt="" loading="lazy"></div><div class="bd"><img class="lg" src="${c.logo}" alt="${esc(L(c.name))}" loading="lazy"><h3>${esc(L(c.name))}</h3><p class="tag">${esc(L(c.tagline))}</p><div class="meta"><span>${esc(L(c.location))}</span><i></i><span><b>${n}</b> <span data-i18n="co_prod_unit"></span></span><i></i><span>since ${esc(c.since)}</span></div></div></a>`;
 }
 /* 카드 지표 — 문의수는 0이어도 항상 표시한다(사용자 지시).
    관심(wish)은 0이면 생략. */
@@ -820,6 +820,24 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   /* 랜딩처럼 사전 렌더가 display:none(정적 헤더·푸터 사본뿐)인 페이지는 교체할 화면이 없으므로 제외 */
   if(pre && pre.style.display !== 'none') document.documentElement.classList.add('mk-pre');
 
+  /* 0-A) ★2026-09-29 사본은 '필터 없음' 상태로 구워져 있다. ?category= 로 들어오면 DB 부팅(1~3초)이
+        끝날 때까지 '전체' 탭·전체 목록이 그대로 보여 카테고리 탭이 고장난 것처럼 보였다(업체·제품 디렉터리).
+        시드(data.js)로 즉시 그리는 방법은 시드가 DB보다 낡아(삭제·비공개 제품이 남음) 쓸 수 없다.
+        → DB 로 구운 사본을 그대로 쓰되, 카테고리는 사본 안에서 바로 걸러 준다(탭 on + 다른 분류 카드 숨김).
+          검색어(q)·정렬(sort≠new)은 사본으로 표현할 수 없으니 그때만 사본을 바로 걷어낸다. */
+  if(pre && pre.style.display !== 'none'){
+    const qs = new URLSearchParams(location.search);
+    const cat = qs.get('category') || '', q = qs.get('q') || '', sort = qs.get('sort') || 'new';
+    if(q || sort !== 'new'){ mkSwapPrerender(); }
+    else if(cat){
+      pre.querySelectorAll('.chip').forEach(a=>{
+        const h = a.getAttribute('href') || '';
+        a.classList.toggle('on', h.includes('category=' + cat + '&') || h.endsWith('category=' + cat));
+      });
+      pre.querySelectorAll('[data-cat]').forEach(el=>{ if(el.dataset.cat !== cat) el.style.display = 'none'; });
+    }
+  }
+
   /* 0-B) 구워둔 카피를 먼저 덮는다.
      관리자에서 고친 문구는 DB에 있는데, 그걸 받아오는 데 1초쯤 걸린다.
      그동안 화면은 data.js·i18n.js 의 옛 문구로 그려졌다가 나중에 새 문구로 바뀌었다.
@@ -871,4 +889,24 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   mkSwapPrerender();
   unlockIfAuthed();
   document.addEventListener('mk:lang', ()=>{ renderChrome(); if(typeof pageInit==='function') pageInit(); applyI18n(); unlockIfAuthed(); });
+
+  /* 4) ★2026-09-29 카테고리 칩(.chip)은 같은 페이지의 ?category= 링크다. 예전엔 페이지를 통째로
+        다시 불러와서 탭을 누를 때마다 '사전 렌더 사본 → 실제 렌더' 순으로 화면이 깜빡였다.
+        같은 페이지로 가는 칩이면 주소만 바꾸고(pushState) pageInit 으로 그 자리에서 다시 그린다.
+        부팅 전(사본이 아직 보일 때)·다른 페이지로 가는 칩·새 탭 클릭은 평소대로 이동한다. */
+  if(typeof pageInit === 'function'){
+    const here = location.pathname.split('/').pop() || 'index.html';
+    document.addEventListener('click', e=>{
+      const a = e.target.closest('a.chip'); if(!a) return;
+      if(document.getElementById('mk-prerender')) return;
+      if(e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+      const href = a.getAttribute('href') || '';
+      const file = href.split('?')[0].split('#')[0];
+      if(file && file !== here) return;
+      e.preventDefault();
+      history.pushState(null, '', href);
+      pageInit(); applyI18n();
+    });
+    addEventListener('popstate', ()=>{ pageInit(); applyI18n(); });
+  }
 });
