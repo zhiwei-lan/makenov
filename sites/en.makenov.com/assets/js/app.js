@@ -692,14 +692,11 @@ function companyCard(c){
   return `
   <a class="co-card" href="${mkDocUrl('company',c.id)}" data-cat="${esc(c.cat||'')}"><div class="cv"><img src="${c.cover}" alt="" loading="lazy"></div><div class="bd"><img class="lg" src="${c.logo}" alt="${esc(L(c.name))}" loading="lazy"><h3>${esc(L(c.name))}</h3><p class="tag">${esc(L(c.tagline))}</p><div class="meta"><span>${esc(L(c.location))}</span><i></i><span><b>${n}</b> <span data-i18n="co_prod_unit"></span></span><i></i><span>since ${esc(c.since)}</span></div></div></a>`;
 }
-/* 카드 지표 — 문의수는 0이어도 항상 표시한다(사용자 지시).
-   관심(wish)은 0이면 생략. */
+/* 카드 지표 — ★2026-09-29 문의수는 뺀다(사용자 지시). 미팅 펀딩 달성률(mtCardLine)과 숫자가 겹쳐
+   '43건 문의 · 0% 달성'처럼 헷갈렸다. 관심(wish)만 남기고, 0이면 생략. */
 function cardMeta(p){
-  const inq  = Number(p.inquiries) || 0;
   const wish = Number(p.wish) || 0;
-  let html = `<span class="rate">${inq}<span data-i18n="inquiries_count"></span></span>`;
-  if(wish) html += `<span class="amt">${t('wish_count').replace('{n}', wish)}</span>`;
-  return html;
+  return wish ? `<span class="amt">${t('wish_count').replace('{n}', wish)}</span>` : '';
 }
 
 function productCard(p){
