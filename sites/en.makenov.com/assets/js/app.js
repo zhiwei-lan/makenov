@@ -734,7 +734,16 @@ const MT_ICO = {
 
 const MkMeet = {
   trips: [], loaded: false, _p: null,
-  _dev(k){ try{ return /^(localhost|127\.0\.0\.1)$/.test(location.hostname) ? localStorage.getItem(k) : null; }catch(e){ return null; } },
+  _dev(k){
+    try{
+      if(!/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return null;
+      /* 로컬 시연: 주소에 ?meetdemo=1 을 붙이면 로컬 테스트 백엔드(8099)에 붙는다. ?meetdemo=0 은 해제 */
+      const d = new URLSearchParams(location.search).get('meetdemo');
+      if(d === '1') localStorage.setItem('mk_meet_api', 'http://127.0.0.1:8099/');
+      if(d === '0'){ localStorage.removeItem('mk_meet_api'); localStorage.removeItem('mk_meet_tok'); }
+      return localStorage.getItem(k);
+    }catch(e){ return null; }
+  },
   base(){
     const root = this._dev('mk_meet_api') || (typeof MK_SUPABASE_URL !== 'undefined' && MK_SUPABASE_URL) || 'https://makenov.com/';
     return root.replace(/\/$/, '') + '/meet/v1/';
