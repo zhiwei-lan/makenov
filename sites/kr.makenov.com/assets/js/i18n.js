@@ -525,6 +525,10 @@ const I18N = {
     mt_pd_rule: "Đủ {g} doanh nghiệp thì cuộc gặp được xác nhận. Chưa đủ, MAKENOV sắp xếp gặp online.",
     mt_pd_terms: "Điều kiện cung ứng",
     mt_pct: "{p}% đạt",
+    mt_tool_wish: "Quan tâm",
+    mt_tool_share: "Chia sẻ",
+    mt_tool_schedule: "Lịch gặp",
+    mt_tool_catalog: "Catalogue",
   },
   ko: {
     nav_directory: "제품",
@@ -1031,6 +1035,10 @@ const I18N = {
     mt_pd_rule: "{g}곳이 모이면 미팅이 확정됩니다. 모이지 않으면 화상 미팅으로 연결해 드립니다.",
     mt_pd_terms: "공급 조건",
     mt_pct: "{p}% 달성",
+    mt_tool_wish: "관심",
+    mt_tool_share: "공유",
+    mt_tool_schedule: "방문 일정",
+    mt_tool_catalog: "카탈로그",
   },
   en: {
     nav_directory: "Products",
@@ -1542,6 +1550,10 @@ const I18N = {
     mt_pd_rule: "Confirmed once {g} buyers sign up. Otherwise MAKENOV arranges a video call.",
     mt_pd_terms: "Supply terms",
     mt_pct: "{p}% reached",
+    mt_tool_wish: "Save",
+    mt_tool_share: "Share",
+    mt_tool_schedule: "Schedule",
+    mt_tool_catalog: "Catalog",
   }
 };
 

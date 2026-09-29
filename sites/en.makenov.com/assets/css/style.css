@@ -1679,13 +1679,14 @@ body.mkedit-on .omc-hero .slide.on .shot{pointer-events:none}
 @media(max-width:860px){.mt-mini .mt-date{flex-direction:column;gap:0;padding:10px 4px;justify-content:center}.mt-mini .mt-date .d{font-size:26px;margin:2px 0}}
 
 /* 펀딩 패널 하단(3차): [관심][공유][미팅 신청] 한 줄 + 작은 링크. 가격 박스·견적 버튼은 펀딩 중인 제품에서 뺐다 */
-.mt-fund-cta>.mt-icon-btn{flex:0 0 54px}
-.mt-fund-cta .mt-icon-btn{padding:0;display:inline-flex;align-items:center;justify-content:center;color:var(--mk-body)}
-.mt-fund-cta .mt-icon-btn .mt-ico{width:20px;height:20px}
-.mt-fund-cta .mt-heart.on{color:var(--mk-danger);border-color:#FFC9C9;background:#FFF5F5}
-.mt-fund-cta .mt-heart.on .mt-ico{fill:currentColor}
-.mt-fund-links{display:flex;gap:8px;margin-top:8px}
-.mt-fund-links .btn{flex:1 1 0;min-width:0;padding:13px 10px;font-size:14px;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-align:center}
-.mt-fund-links .btn .mt-ico{width:17px;height:17px}
 .pd-side .box.mt-box-on .tagline{margin-bottom:18px}
 .pd-side .box.mt-box-on .mt-fund{margin-bottom:0}
+/* 펀딩 패널 행동(4차): 미팅 신청 한 줄 + 아래 아이콘 도구줄(관심·공유·방문 일정·카탈로그) */
+.mt-fund-cta .btn{width:100%;padding:17px 18px;font-size:16.5px}
+.mt-tools{display:flex;margin-top:14px;padding-top:12px;border-top:1px solid var(--mk-line)}
+.mt-tool{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px;padding:6px 2px;background:none;border:0;cursor:pointer;color:var(--mk-body);font:inherit;font-size:12.5px;font-weight:500;text-align:center;border-radius:8px;transition:.15s}
+.mt-tool+.mt-tool{border-left:1px solid var(--mk-line);border-radius:0}
+.mt-tool .mt-ico{width:21px;height:21px}
+.mt-tool:hover{color:var(--mk-ink);background:var(--mk-bg-soft)}
+.mt-tool.mt-heart.on{color:var(--mk-danger)}
+.mt-tool.mt-heart.on .mt-ico{fill:currentColor}
