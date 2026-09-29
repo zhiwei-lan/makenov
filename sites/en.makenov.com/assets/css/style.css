@@ -1716,30 +1716,33 @@ body.mkedit-on .omc-hero .slide.on .shot{pointer-events:none}
 /* 모바일 펀딩 배치(display:contents)에서 상세 설명 블록이 내용 최소폭만큼 늘어나 가로로 넘치던 것 */
 @media(max-width:960px){.pd-row.mt-on>.pd-main>*{min-width:0;max-width:100%}}
 
-/* 홈 섹션 주인공 배너(7차) — 다음 방문 일정 하나를 섹션 전체 폭으로 */
-.mt-feat{display:grid;grid-template-columns:120px minmax(0,1fr) auto;align-items:stretch;border-radius:var(--r-card);overflow:hidden;color:#fff;background:linear-gradient(120deg,var(--mk-navy-deep),var(--mk-navy) 55%,var(--mk-navy-lift));box-shadow:0 14px 34px rgba(4,20,63,.18);transition:transform .2s,box-shadow .2s}
-.mt-feat:hover{transform:translateY(-2px);box-shadow:0 18px 40px rgba(4,20,63,.24)}
-.mt-feat-date{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:rgba(255,255,255,.07);border-right:1px solid rgba(255,255,255,.12);padding:20px 8px}
-.mt-feat-date .mo{font-size:14px;font-weight:700;letter-spacing:.06em;color:var(--mk-mint);text-transform:uppercase}
-.mt-feat-date .d{font-size:52px;font-weight:800;line-height:1;letter-spacing:-.04em}
-.mt-feat-date .dw{font-size:13px;color:rgba(255,255,255,.7)}
-.mt-feat-main{padding:22px 26px;min-width:0}
-.mt-feat-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.mt-feat-top .kick{font-size:12px;font-weight:700;letter-spacing:.1em;color:var(--mk-mint)}
-.mt-feat h3{font-size:22px;font-weight:800;letter-spacing:-.02em;margin:8px 0 8px;color:#fff}
-.mt-feat-meta{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13.5px;color:rgba(255,255,255,.78)}
-.mt-feat-meta span{display:inline-flex;align-items:center;gap:5px}
-.mt-feat-meta b{color:#fff;font-weight:800}
-.mt-feat-sups{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:16px}
-.mt-feat-sup{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:8px}
-.mt-feat-sup img{width:44px;height:44px;border-radius:9px;object-fit:cover;flex:0 0 auto;background:#fff}
-.mt-feat-sup .tx{min-width:0;flex:1;display:flex;flex-direction:column;gap:4px}
-.mt-feat-sup .br{font-size:11.5px;font-weight:600;color:rgba(255,255,255,.85);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mt-feat-sup .mt-bar{height:4px;background:rgba(255,255,255,.18)}
-.mt-feat-sup .mt-bar>i{background:var(--mk-mint)}
-.mt-feat-sup.done .mt-bar>i{background:#fff}
-.mt-feat-sup .n{font-size:11.5px;color:rgba(255,255,255,.7)}
-.mt-feat-sup .n b{font-size:14px;color:#fff;font-weight:800}
-.mt-feat-cta{display:flex;align-items:center;padding:22px 26px 22px 0}
-.mt-feat-cta .btn{white-space:nowrap;padding:14px 22px;font-size:15px}
-@media(max-width:960px){.mt-feat{grid-template-columns:88px minmax(0,1fr)}.mt-feat-cta{grid-column:1/-1;padding:0 18px 18px}.mt-feat-cta .btn{width:100%;text-align:center}.mt-feat-main{padding:18px}.mt-feat h3{font-size:18px}.mt-feat-date .d{font-size:40px}.mt-feat-sups{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* 홈 섹션 주인공 카드(8차) — 흰 카드: 왼쪽 정보, 오른쪽 공급사 제품 사진 타일 */
+.mt-f{display:grid;grid-template-columns:minmax(300px,380px) minmax(0,1fr);gap:32px;align-items:center;padding:28px;border:1px solid var(--mk-line);border-radius:20px;background:#fff;color:inherit;box-shadow:0 1px 2px rgba(0,0,0,.03);transition:box-shadow .2s,border-color .2s}
+.mt-f:hover{border-color:var(--mk-primary);box-shadow:0 12px 30px rgba(4,20,63,.08)}
+.mt-f-info .kick{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.1em;color:var(--mk-primary-dark);background:var(--mk-primary-soft);padding:5px 10px;border-radius:var(--r-pill)}
+.mt-f-date{display:flex;align-items:center;gap:14px;margin:16px 0 6px}
+.mt-f-date>b{font-size:68px;font-weight:800;line-height:.9;letter-spacing:-.05em;color:var(--mk-navy)}
+.mt-f-date>span{display:flex;flex-direction:column;gap:3px}
+.mt-f-date em{font-style:normal;font-size:18px;font-weight:800;color:var(--mk-navy);text-transform:uppercase;letter-spacing:.02em}
+.mt-f-date i{font-style:normal;font-size:14px;color:var(--mk-muted)}
+.mt-f h3{font-size:20px;font-weight:700;line-height:1.4;letter-spacing:-.02em;margin:10px 0 6px;color:var(--mk-ink)}
+.mt-f .city{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--mk-body)}
+.mt-f-nums{display:flex;margin:18px 0 20px;padding:14px 0;border-top:1px solid var(--mk-line);border-bottom:1px solid var(--mk-line)}
+.mt-f-nums>div{flex:1;text-align:center}
+.mt-f-nums>div+div{border-left:1px solid var(--mk-line)}
+.mt-f-nums b{display:block;font-size:24px;font-weight:800;color:var(--mk-ink);line-height:1.2;letter-spacing:-.02em}
+.mt-f-nums b small{font-size:13px;font-weight:600;color:var(--mk-body);margin-left:2px}
+.mt-f-nums span{font-size:12.5px;color:var(--mk-muted)}
+.mt-f .btn{display:flex;justify-content:center;width:100%;padding:15px 18px;font-size:15.5px}
+.mt-f-tiles{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:14px}
+.mt-f-tile .im{position:relative;aspect-ratio:4/5;border-radius:14px;overflow:hidden;background:var(--mk-bg-soft)}
+.mt-f-tile img{width:100%;height:100%;object-fit:cover;transition:transform .35s ease}
+.mt-f:hover .mt-f-tile img{transform:scale(1.03)}
+.mt-f-tile .cnt{position:absolute;left:10px;bottom:10px;display:inline-flex;align-items:center;gap:3px;padding:5px 10px;border-radius:var(--r-pill);background:rgba(255,255,255,.94);font-size:12.5px;font-weight:600;color:var(--mk-body);box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.mt-f-tile .cnt b{font-size:15px;font-weight:800;color:var(--mk-ink)}
+.mt-f-tile.done .cnt{background:var(--mk-navy);color:rgba(255,255,255,.8)}
+.mt-f-tile.done .cnt b{color:#fff}
+.mt-f-tile.done .cnt .mt-ico{width:14px;height:14px;color:var(--mk-mint)}
+.mt-f-tile .cap{margin-top:8px;font-size:12.5px;font-weight:600;color:var(--mk-body);text-transform:uppercase;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:960px){.mt-f{grid-template-columns:1fr;gap:22px;padding:20px}.mt-f-tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.mt-f-tile .im{aspect-ratio:1/1}.mt-f-date>b{font-size:56px}}

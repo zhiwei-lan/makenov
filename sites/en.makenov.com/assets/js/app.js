@@ -905,26 +905,28 @@ function mtMini(tr){
     <div style="margin-top:10px">${mtBar({ count: n, goal: Math.max(1, g), confirmed: done })}${mtProg({ count: n, goal: g }, `<span>${esc(mtRep('mt_suppliers', { n: items.length }))}</span>`)}</div>
   </div></a>`;
 }
-/* 홈 섹션의 주인공 배너 — 일정이 보통 하나뿐이라 작은 카드 하나만 덩그러니 남던 것을
-   섹션 전체 폭 배너로: 날짜 · 제목·D-day·숫자 · 오는 공급사 사진과 각자 신청 현황 · 버튼 */
+/* 홈 섹션의 주인공 카드(8차) — 흰 카드. 왼쪽: 큰 날짜·제목·숫자 3개·버튼, 오른쪽: 오는 공급사 제품 사진을 크게.
+   (7차의 어두운 배너는 글씨·사진이 너무 작고 빽빽하다는 피드백으로 교체) */
 function mtFeatured(tr){
   const items = MkMeet.itemsOf(tr);
   const joined = items.reduce((a, i) => a + i.count, 0);
-  const done = items.filter(i => i.confirmed).length;
   const d = mtDate(tr.visit_date);
-  const sups = items.slice(0, 4).map(it => {
+  const left = tr.open && tr.days_left != null && tr.days_left > 0
+    ? `<div><b>${tr.days_left}<small>${esc(t('mt_pd_days'))}</small></b><span>${esc(t('mt_pd_left'))}</span></div>` : '';
+  const tiles = items.slice(0, 4).map(it => {
     const p = mkProduct(it.product_id);
-    return `<div class="mt-feat-sup ${it.confirmed ? 'done' : ''}"><img src="${esc(p.img)}" alt="" loading="lazy"><div class="tx"><span class="br">${esc(p.brand)}</span>${mtBar(it)}<span class="n"><b>${it.count}</b>/${it.goal}</span></div></div>`;
+    return `<div class="mt-f-tile ${it.confirmed ? 'done' : ''}"><div class="im"><img src="${esc(p.img)}" alt="${esc(L(p.name))}" loading="lazy"><span class="cnt">${it.confirmed ? MT_ICO.check : ''}<b>${it.count}</b>/${it.goal}</span></div><div class="cap">${esc(p.brand)}</div></div>`;
   }).join('');
-  return `<a class="mt-feat" href="${mkUrl('meetings.html')}#trip-${esc(tr.id)}">
-    <div class="mt-feat-date"><span class="mo">${esc(mtFmt(tr.visit_date, { month:'short' }))}</span><span class="d">${d ? d.getDate() : ''}</span><span class="dw">${esc(mtFmt(tr.visit_date, { weekday:'short' }))}</span></div>
-    <div class="mt-feat-main">
-      <div class="mt-feat-top"><span class="kick">${esc(t('mt_next_kick'))}</span>${mtDdayChip(tr)}</div>
+  return `<a class="mt-f" href="${mkUrl('meetings.html')}#trip-${esc(tr.id)}">
+    <div class="mt-f-info">
+      <span class="kick">${esc(t('mt_next_kick'))}</span>
+      <div class="mt-f-date"><b>${d ? d.getDate() : ''}</b><span><em>${esc(mtFmt(tr.visit_date, { month:'long' }))}</em><i>${esc(mtFmt(tr.visit_date, { weekday:'long' }))}</i></span></div>
       <h3>${esc(L(tr.title) || t('mt_page_kick'))}</h3>
-      <div class="mt-feat-meta">${L(tr.city) ? `<span>${MT_ICO.pin}${esc(L(tr.city))}</span>` : ''}<span>${esc(t('mt_ev_sup'))} <b>${items.length}</b></span><span>${esc(t('mt_ev_joined'))} <b>${joined}</b></span><span>${esc(t('mt_ev_confirmed'))} <b>${done}</b></span></div>
-      <div class="mt-feat-sups">${sups}</div>
+      ${L(tr.city) ? `<p class="city">${MT_ICO.pin}${esc(L(tr.city))}</p>` : ''}
+      <div class="mt-f-nums"><div><b>${items.length}</b><span>${esc(t('mt_ev_sup'))}</span></div><div><b>${joined}</b><span>${esc(t('mt_ev_joined'))}</span></div>${left}</div>
+      <span class="btn btn-primary">${esc(t('mt_ev_cta'))} →</span>
     </div>
-    <div class="mt-feat-cta"><span class="btn btn-primary">${esc(t('mt_ev_cta'))} →</span></div>
+    <div class="mt-f-tiles" style="--n:${Math.max(1, Math.min(4, items.length))}">${tiles}</div>
   </a>`;
 }
 function mtHomeHtml(){
