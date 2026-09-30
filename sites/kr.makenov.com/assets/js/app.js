@@ -932,7 +932,7 @@ function mtFeatured(tr){
   /* 공급사 사진은 전부 — 4개 넘으면 좌우 슬라이드(화살표 + 가로 스크롤). 사진을 누르면 그 제품의 펀딩 패널로 */
   const tiles = items.map(it => {
     const p = mkProduct(it.product_id);
-    return `<a class="mt-f-tile ${it.confirmed ? 'done' : ''}" href="${mkDocUrl('product', p.id)}#meet"><div class="im"><img src="${esc(p.img)}" alt="${esc(L(p.name))}" loading="lazy"><span class="cnt">${it.confirmed ? MT_ICO.check : ''}<b>${it.count}</b>/${it.goal}</span></div><div class="cap">${esc(p.brand)}</div></a>`;
+    return `<a class="mt-f-tile ${it.confirmed ? 'done' : ''}" href="${mkDocUrl('product', p.id)}#meet"><div class="im"><img src="${esc(p.img)}" alt="${esc(L(p.name))}" loading="lazy">${it.confirmed ? `<span class="ok">${MT_ICO.check}</span>` : ''}</div><div class="bd"><div class="br">${esc(p.brand)}</div><div class="nm">${esc(L(p.name))}</div>${mtBar(it)}<div class="pr"><span><b>${it.count}</b>/${it.goal}</span><em>${mtPct(it)}%</em></div></div></a>`;
   }).join('');
   const arrow = d => `<button type="button" class="mt-f-nav ${d < 0 ? 'prev' : 'next'}" onclick="mtSlide(this,${d})" aria-label="${d < 0 ? 'prev' : 'next'}"><svg viewBox="0 0 24 24"><path d="${d < 0 ? 'M15 5l-7 7 7 7' : 'M9 5l7 7-7 7'}"/></svg></button>`;
   return `<div class="mt-f">
