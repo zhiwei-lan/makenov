@@ -805,6 +805,20 @@ function mtFmt(iso, opt){ const d = mtDate(iso); if(!d) return ''; try{ return d
 function mtLong(iso){ return mtFmt(iso, { year:'numeric', month:'long', day:'numeric', weekday:'short' }); }
 function mtShort(iso){ return MK_LANG === 'ko' ? mtFmt(iso, { month:'long', day:'numeric' }) : mtFmt(iso, { day:'numeric', month:'numeric' }); }
 function mtRep(key, map){ let s = t(key); for(const k in map) s = s.split('{' + k + '}').join(map[k]); return s; }
+/* 행사 기본 정보 — 일자 · 시간 · 장소. 비어 있으면 '추후 안내' (관리자 › 미팅 펀딩에서 입력) */
+function mtWhen(tr){
+  const end = tr.visit_end && tr.visit_end !== tr.visit_date ? ' – ' + mtLong(tr.visit_end) : '';
+  return mtLong(tr.visit_date) + end;
+}
+function mtTime(tr){
+  const a = tr.time_start || '', b = tr.time_end || '';
+  return a && b ? a + ' – ' + b : a ? a + (MK_LANG === 'ko' ? ' 시작' : ' ~') : '';
+}
+function mtWhere(tr){ return [L(tr.venue), L(tr.city)].filter(x => String(x || '').trim()).join(' · '); }
+function mtFacts(tr, cls){
+  const row = (ico, k, v) => `<li><span class="k">${ico}${esc(t(k))}</span><b class="${v ? '' : 'tba'}">${esc(v || t('mt_tba'))}</b></li>`;
+  return `<ul class="mt-facts ${cls || ''}">${row(MT_ICO.cal, 'mt_f_date', mtWhen(tr))}${row(MT_ICO.clock, 'mt_f_time', mtTime(tr))}${row(MT_ICO.pin, 'mt_f_venue', mtWhere(tr))}</ul>`;
+}
 
 function mtDateBadge(iso){
   const d = mtDate(iso);
@@ -880,14 +894,14 @@ function mtEventHero(tr){
       <div class="mt-ev-date"><b>${esc(mtFmt(tr.visit_date, { month:'long', day:'numeric' }))}${end}</b><span>${esc(mtFmt(tr.visit_date, { weekday:'long' }))}</span></div>
       <h1>${esc(L(tr.title) || t('mt_page_kick'))}</h1>
       <div class="mt-ev-meta">
-        ${L(tr.city) ? `<span>${MT_ICO.pin}${esc(L(tr.city))}</span>` : ''}
-        ${tr.deadline ? `<span>${MT_ICO.clock}${esc(t('mt_deadline'))} ${esc(mtLong(tr.deadline))}</span>` : ''}
+        ${mtTime(tr) ? `<span>${MT_ICO.clock}${esc(mtTime(tr))}</span>` : ''}
+        <span>${MT_ICO.pin}${esc(mtWhere(tr) || t('mt_tba'))}</span>
       </div>
       <p class="mt-ev-sub">${esc(L(tr.summary) || t('mt_page_sub'))}</p>
       ${items.length ? `<a class="btn btn-primary btn-lg" href="#mt-sup-sec" onclick="event.preventDefault();document.getElementById('mt-sup-sec').scrollIntoView({behavior:'smooth'})">${esc(t('mt_ev_cta'))}</a>` : ''}
     </div>
     <div class="mt-ev-r">
-      <div class="mt-ev-dd"><span>${esc(t('mt_ev_until'))}</span><div class="v">${left}</div></div>
+      <div class="mt-ev-dd"><span>${esc(t('mt_ev_until'))}</span><div class="v">${left}</div>${tr.deadline ? `<p class="dl">${esc(t('mt_deadline'))} ${esc(mtLong(tr.deadline))}</p>` : ''}</div>
       <div class="mt-ev-nums">
         <div><b>${items.length}</b><span>${esc(t('mt_ev_sup'))}</span></div>
         <div><b>${joined}</b><span>${esc(t('mt_ev_joined'))}</span></div>
@@ -913,7 +927,6 @@ function mtMini(tr){
 function mtFeatured(tr){
   const items = MkMeet.itemsOf(tr);
   const joined = items.reduce((a, i) => a + i.count, 0);
-  const d = mtDate(tr.visit_date);
   const left = tr.open && tr.days_left != null && tr.days_left > 0
     ? `<div><b>${tr.days_left}<small>${esc(t('mt_pd_days'))}</small></b><span>${esc(t('mt_pd_left'))}</span></div>` : '';
   const tiles = items.slice(0, 4).map(it => {
@@ -923,9 +936,8 @@ function mtFeatured(tr){
   return `<a class="mt-f" href="${mkUrl('meetings.html')}#trip-${esc(tr.id)}">
     <div class="mt-f-info">
       <span class="kick">${esc(t('mt_next_kick'))}</span>
-      <div class="mt-f-date"><b>${d ? d.getDate() : ''}</b><span><em>${esc(mtFmt(tr.visit_date, { month:'long' }))}</em><i>${esc(mtFmt(tr.visit_date, { weekday:'long' }))}</i></span></div>
       <h3>${esc(L(tr.title) || t('mt_page_kick'))}</h3>
-      ${L(tr.city) ? `<p class="city">${MT_ICO.pin}${esc(L(tr.city))}</p>` : ''}
+      ${mtFacts(tr)}
       <div class="mt-f-nums"><div><b>${items.length}</b><span>${esc(t('mt_ev_sup'))}</span></div><div><b>${joined}</b><span>${esc(t('mt_ev_joined'))}</span></div>${left}</div>
       <span class="btn btn-primary">${esc(t('mt_ev_cta'))} →</span>
     </div>
@@ -949,7 +961,6 @@ function mtFundingPanel(pid){
   if(!hit || !p) return '';
   const { trip: tr, item: it } = hit;
   const inCart = typeof Store !== 'undefined' && Store.cartHas ? Store.cartHas(pid) : false;
-  const city = L(tr.city) ? ' · ' + esc(L(tr.city)) : '';
   const left = !tr.open ? `<b class="sm">${esc(t('mt_st_' + mtTripState(tr)))}</b>`
     : tr.days_left == null ? `<b class="sm">—</b>`
     : tr.days_left <= 0 ? `<b class="sm">${esc(t('mt_dday_today'))}</b>`
@@ -963,7 +974,9 @@ function mtFundingPanel(pid){
     </div>
     ${mtBar(it)}
     <ul class="mt-fund-info">
-      <li><span>${esc(t('mt_visit'))}</span><b>${esc(mtLong(tr.visit_date))}${city}</b></li>
+      <li><span>${esc(t('mt_f_date'))}</span><b>${esc(mtWhen(tr))}</b></li>
+      <li><span>${esc(t('mt_f_time'))}</span><b class="${mtTime(tr) ? '' : 'tba'}">${esc(mtTime(tr) || t('mt_tba'))}</b></li>
+      <li><span>${esc(t('mt_f_venue'))}</span><b class="${mtWhere(tr) ? '' : 'tba'}">${esc(mtWhere(tr) || t('mt_tba'))}</b></li>
       ${tr.deadline ? `<li><span>${esc(t('mt_deadline'))}</span><b>${esc(mtLong(tr.deadline))}</b></li>` : ''}
       <li class="rule">${esc(it.confirmed ? mtRep('mt_apply_ok_confirmed', { g: it.goal }) : mtRep('mt_pd_rule', { g: it.goal }))}</li>
     </ul>

@@ -104,7 +104,7 @@ function meetItemRow(it){
 function meetForm(id){
   const tr = id ? meetCache.trips.find(x => x.id === id) : null;
   const g = (o, k) => (o && o[k]) ? o[k] : '';
-  const title = tr ? tr.title : {}, city = tr ? tr.city : {}, sum = tr ? tr.summary : {};
+  const title = tr ? tr.title : {}, city = tr ? tr.city : {}, venue = tr ? tr.venue : {}, sum = tr ? tr.summary : {};
   const langRow = (base, o, area) => ['ko', 'vi', 'en'].map(l => `<div class="fld"><label><span class="lang-tag">${l.toUpperCase()}</span></label>${area
     ? `<textarea id="${base}-${l}" rows="3">${esc(g(o, l))}</textarea>` : `<input id="${base}-${l}" value="${esc(g(o, l))}">`}</div>`).join('');
   const items = tr ? (tr.items || []) : [];
@@ -115,6 +115,8 @@ function meetForm(id){
         <div class="fld"><label>일정 ID (영문 소문자·숫자·하이픈)</label><input id="mt-id" value="${esc(tr ? tr.id : '')}" ${tr ? 'disabled' : ''} placeholder="visit-20261203"></div>
         <div class="fld"><label>방문일 (필수)</label><input id="mt-visit" type="date" value="${esc(tr ? tr.visit_date || '' : '')}" onchange="if(!document.getElementById('mt-id').value&&this.value)document.getElementById('mt-id').value='visit-'+this.value.replace(/-/g,'')"></div>
         <div class="fld"><label>방문 마지막 날 (하루면 비움)</label><input id="mt-end" type="date" value="${esc(tr ? tr.visit_end || '' : '')}"></div>
+        <div class="fld"><label>시작 시각 (베트남 시간)</label><input id="mt-t1" type="time" value="${esc(tr ? tr.time_start || '' : '')}"></div>
+        <div class="fld"><label>종료 시각 (비워도 됨)</label><input id="mt-t2" type="time" value="${esc(tr ? tr.time_end || '' : '')}"></div>
         <div class="fld"><label>신청 마감일 (베트남 시간, 이날까지 신청 가능)</label><input id="mt-deadline" type="date" value="${esc(tr ? tr.deadline || '' : '')}"></div>
         <div class="fld"><label>상태</label><select id="mt-status">${Object.entries(MEET_ST).map(([v, l]) => `<option value="${v}" ${(tr ? tr.status : 'open') === v ? 'selected' : ''}>${l}</option>`).join('')}</select></div>
         <div class="fld"><label>정렬(같은 날 여러 일정일 때, 작을수록 먼저)</label><input id="mt-sort" type="number" value="${esc(tr ? tr.sort : 99)}"></div>
@@ -122,7 +124,8 @@ function meetForm(id){
       </div>
       <p class="hint">마감일은 방문일 2주 전쯤을 권장합니다. 목표를 채운 뒤 공급사 일정·항공권을 잡을 시간이 필요합니다.</p>
       <div class="sect"><h4>제목 <span class="sub">(비우면 “한국 공급사 대면 미팅”)</span></h4><div class="fgrid">${langRow('mt-title', title)}</div></div>
-      <div class="sect"><h4>도시 · 장소</h4><div class="fgrid">${langRow('mt-city', city)}</div></div>
+      <div class="sect"><h4>도시 <span class="sub">(예: 호치민)</span></h4><div class="fgrid">${langRow('mt-city', city)}</div></div>
+      <div class="sect"><h4>행사장 <span class="sub">(예: 롯데호텔 사이공 2층 크리스탈홀 — 비우면 “추후 안내”)</span></h4><div class="fgrid">${langRow('mt-venue', venue)}</div></div>
       <div class="sect"><h4>소개 (선택)</h4><div class="fgrid">${langRow('mt-sum', sum, true)}</div></div>
       <div class="sect"><h4>오는 공급사(제품)와 목표 인원</h4>
         <div id="mt-items">${(items.length ? items : [null]).map(meetItemRow).join('')}</div>
@@ -137,8 +140,9 @@ async function meetSave(id){
   const tid = id || av('mt-id');
   const body = {
     visit_date: av('mt-visit'), visit_end: av('mt-end'), deadline: av('mt-deadline'),
+    time_start: av('mt-t1'), time_end: av('mt-t2'),
     status: av('mt-status'), sort: Number(av('mt-sort')) || 99, published: ac('mt-pub'),
-    title: tri3('mt-title'), city: tri3('mt-city'), summary: tri3('mt-sum'),
+    title: tri3('mt-title'), city: tri3('mt-city'), venue: tri3('mt-venue'), summary: tri3('mt-sum'),
     items: [...document.querySelectorAll('#mt-items .meet-item')].map(r => ({
       product_id: r.querySelector('.mi-pid').value, goal: Number(r.querySelector('.mi-goal').value) || 5,
     })),

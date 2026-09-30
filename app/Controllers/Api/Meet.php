@@ -26,7 +26,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 class Meet extends BaseApiController
 {
     /** 마이그레이션을 추가하면 올린다 — writable/meet_schema_ok 에 적힌 값과 다르면 latest() 를 다시 돈다 */
-    private const SCHEMA_VER = '1';
+    private const SCHEMA_VER = '3';
     /** 마감·D-day 계산 기준 시간대 — 바이어가 베트남에 있다 */
     private const TZ = 'Asia/Ho_Chi_Minh';
     private const TRIP_JSON = ['title', 'city', 'venue', 'summary'];
@@ -86,12 +86,16 @@ class Meet extends BaseApiController
         }
         $db = db_connect();
         try {
-            if (! $db->tableExists('meet_trips') || ! $db->tableExists('meet_requests')) {
-                $m = service('migrations');
-                $m->setNamespace('App');
-                $m->latest();
+            // 버전이 바뀌면(새 마이그레이션) 무조건 latest() — 이미 적용된 것은 건너뛴다
+            $m = service('migrations');
+            $m->setNamespace('App');
+            $m->latest();
+            // 같은 요청 안에서 새 컬럼이 보이도록 필드 목록 캐시를 비운다
+            if (method_exists($db, 'resetDataCache')) {
+                $db->resetDataCache();
             }
-            if ($db->tableExists('meet_trips') && $db->tableExists('meet_requests')) {
+            if ($db->tableExists('meet_trips') && $db->tableExists('meet_requests')
+                && in_array('time_start', $db->getFieldNames('meet_trips'), true)) {
                 @file_put_contents($flag, self::SCHEMA_VER);
                 return null;
             }
@@ -312,6 +316,11 @@ class Meet extends BaseApiController
                 return $this->err('bad_date', "$d 는 YYYY-MM-DD", 400);
             }
         }
+        foreach (['time_start', 'time_end'] as $tk) {
+            if (! empty($in[$tk]) && ! preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', (string) $in[$tk])) {
+                return $this->err('bad_time', "$tk 는 HH:MM", 400);
+            }
+        }
         if (empty($in['visit_date'])) {
             return $this->err('bad_date', '방문일(visit_date)은 필수입니다', 400);
         }
@@ -333,6 +342,8 @@ class Meet extends BaseApiController
         $row = [
             'visit_date' => $in['visit_date'],
             'visit_end'  => ($in['visit_end'] ?? '') ?: null,
+            'time_start' => ($in['time_start'] ?? '') ?: null,
+            'time_end'   => ($in['time_end'] ?? '') ?: null,
             'deadline'   => ($in['deadline'] ?? '') ?: null,
             'items'      => json_encode($items, JSON_UNESCAPED_UNICODE),
             'status'     => $status,

@@ -1721,14 +1721,8 @@ body.mkedit-on .omc-hero .slide.on .shot{pointer-events:none}
 .mt-f{display:grid;grid-template-columns:minmax(300px,380px) minmax(0,1fr);gap:32px;align-items:center;padding:28px;border:1px solid var(--mk-line);border-radius:20px;background:#fff;color:inherit;box-shadow:0 1px 2px rgba(0,0,0,.03);transition:box-shadow .2s,border-color .2s}
 .mt-f:hover{border-color:var(--mk-primary);box-shadow:0 12px 30px rgba(4,20,63,.08)}
 .mt-f-info .kick{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.1em;color:var(--mk-primary-dark);background:var(--mk-primary-soft);padding:5px 10px;border-radius:var(--r-pill)}
-.mt-f-date{display:flex;align-items:center;gap:14px;margin:16px 0 6px}
-.mt-f-date>b{font-size:68px;font-weight:800;line-height:.9;letter-spacing:-.05em;color:var(--mk-navy)}
-.mt-f-date>span{display:flex;flex-direction:column;gap:3px}
-.mt-f-date em{font-style:normal;font-size:18px;font-weight:800;color:var(--mk-navy);text-transform:uppercase;letter-spacing:.02em}
-.mt-f-date i{font-style:normal;font-size:14px;color:var(--mk-muted)}
-.mt-f h3{font-size:20px;font-weight:700;line-height:1.4;letter-spacing:-.02em;margin:10px 0 6px;color:var(--mk-ink)}
-.mt-f .city{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--mk-body)}
-.mt-f-nums{display:flex;margin:18px 0 20px;padding:14px 0;border-top:1px solid var(--mk-line);border-bottom:1px solid var(--mk-line)}
+.mt-f .mt-f-info h3{font-size:22px;font-weight:800;line-height:1.35;letter-spacing:-.02em;margin:14px 0 14px;color:var(--mk-ink)}
+.mt-f-nums{display:flex;margin:16px 0 18px;padding:4px 0}
 .mt-f-nums>div{flex:1;text-align:center}
 .mt-f-nums>div+div{border-left:1px solid var(--mk-line)}
 .mt-f-nums b{display:block;font-size:24px;font-weight:800;color:var(--mk-ink);line-height:1.2;letter-spacing:-.02em}
@@ -1745,4 +1739,12 @@ body.mkedit-on .omc-hero .slide.on .shot{pointer-events:none}
 .mt-f-tile.done .cnt b{color:#fff}
 .mt-f-tile.done .cnt .mt-ico{width:14px;height:14px;color:var(--mk-mint)}
 .mt-f-tile .cap{margin-top:8px;font-size:12.5px;font-weight:600;color:var(--mk-body);text-transform:uppercase;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-@media(max-width:960px){.mt-f{grid-template-columns:1fr;gap:22px;padding:20px}.mt-f-tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.mt-f-tile .im{aspect-ratio:1/1}.mt-f-date>b{font-size:56px}}
+/* 행사 기본 정보(일자·시간·행사장) — 홈 카드 */
+.mt-facts{list-style:none;margin:0;padding:14px 16px;display:grid;gap:10px;background:var(--mk-bg-soft);border-radius:12px}
+.mt-facts li{display:grid;grid-template-columns:78px minmax(0,1fr);gap:10px;align-items:start;font-size:14.5px;line-height:1.45}
+.mt-facts .k{display:inline-flex;align-items:center;gap:6px;color:var(--mk-muted);font-size:13.5px;padding-top:1px}
+.mt-facts .k .mt-ico{width:15px;height:15px}
+.mt-facts b{font-weight:700;color:var(--mk-ink);word-break:keep-all}
+.mt-facts b.tba,.mt-fund-info li b.tba{font-weight:500;color:var(--mk-muted)}
+.mt-ev-dd .dl{margin:8px 0 0;font-size:13px;color:rgba(255,255,255,.75)}
+@media(max-width:960px){.mt-f{grid-template-columns:1fr;gap:22px;padding:20px}.mt-f-tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.mt-f-tile .im{aspect-ratio:1/1}}
