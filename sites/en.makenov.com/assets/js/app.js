@@ -953,6 +953,47 @@ function mtHeroSlides(){
   </a>`;
   return [{ html, cls: 'light', link: mkUrl('meetings.html') + '#trip-' + tr.id }];
 }
+/* 제품 페이지 히어로의 나머지 슬라이드 — 2026-09-30 예전 어두운 SVG 일러스트 4장(hero_slides)을 내리고
+   미팅 포스터와 같은 밝은 형식으로 다시 만들었다. 그림 대신 실제 제품·공급사 데이터를 쓴다.
+   문구는 i18n.js 의 hs_* 키. products.html renderHero 가 이 목록을 그대로 그린다. */
+function mkHeroSlides(){
+  const out = [];
+  const shell = (cls, href, left, right) => `<a class="mt-hs ${cls}" href="${href}"><div class="mt-hs-l">${left}</div><div class="mt-hs-r">${right}</div></a>`;
+  const leftHtml = (kick, title, line, cta) => `<div class="mt-hs-chips"><span class="k">${esc(t(kick))}</span></div>
+      <h2>${esc(t(title))}</h2><p class="line">${esc(t(line))}</p><span class="btn btn-primary">${esc(t(cta))} →</span>`;
+  const prods = (typeof MK_PRODUCTS !== 'undefined' ? MK_PRODUCTS : []).filter(p => p && p.img);
+
+  /* 1) 미팅이 어떻게 확정되나 — 좌석 5개 중 3개가 찬 신청 카드 */
+  const hit = typeof MkMeet !== 'undefined' ? MkMeet.upcoming().find(x => x.open && MkMeet.itemsOf(x).length) : null;
+  if(hit){
+    const it = MkMeet.itemsOf(hit)[0], p = mkProduct(it.product_id);
+    const seats = [0, 1, 2, 3, 4].map(n => `<i class="${n < 3 ? 'on' : ''}">${n < 3 ? MT_ICO.users : '+'}</i>`).join('');
+    out.push({ cls: 'light', html: shell('hs-how', `${mkUrl('meetings.html')}#trip-${esc(hit.id)}`,
+      leftHtml('hs_how_kick', 'hs_how_t', 'hs_how_p', 'hs_how_cta'),
+      `<div class="hs-card"><div class="hs-card-top"><img src="${esc(p.img)}" alt=""><div><b>${esc(p.brand)}</b><span>${esc(L(p.name))}</span></div></div>
+        <div class="hs-seats">${seats}</div>
+        <div class="hs-bar"><i style="width:60%"></i></div>
+        <div class="hs-card-foot"><span>${esc(mtRep('mt_joined', { n: 3, g: 5 }))}</span><em>60%</em></div>
+        <div class="hs-note">${MT_ICO.check}<span>${esc(t('hs_how_note'))}</span></div></div>`) });
+  }
+
+  /* 2) 제품 — 실제 제품 사진 4장 */
+  if(prods.length){
+    const pics = prods.slice(0, 4).map(p => `<figure><img src="${esc(p.img)}" alt="${esc(L(p.name))}" loading="lazy"><figcaption>${esc(p.brand)}</figcaption></figure>`);
+    out.push({ cls: 'light', html: shell('hs-prod', mkUrl('products.html'),
+      leftHtml('hs_prod_kick', 'hs_prod_t', 'hs_prod_p', 'hs_prod_cta'),
+      `<div class="col">${pics.filter((_, n) => n % 2 === 0).join('')}</div><div class="col off">${pics.filter((_, n) => n % 2 === 1).join('')}</div>`) });
+  }
+
+  /* 3) 공급사 — 로고·지역 카드 */
+  const cos = (typeof MK_COMPANIES !== 'undefined' ? MK_COMPANIES : []).filter(c => c && (c.logo || c.cover)).slice(0, 3);
+  if(cos.length){
+    out.push({ cls: 'light', html: shell('hs-co', mkUrl('companies.html'),
+      leftHtml('hs_co_kick', 'hs_co_t', 'hs_co_p', 'hs_co_cta'),
+      `<div class="hs-cos">${cos.map(c => `<div class="hs-co-row"><span class="lg">${c.logo ? `<img src="${esc(c.logo)}" alt="">` : ''}</span><div><b>${esc(c.brand || L(c.name))}</b><span>${esc(L(c.location))}</span></div><em>${MT_ICO.check}</em></div>`).join('')}</div>`) });
+  }
+  return out;
+}
 /* 일정 하나를 한 줄 요약 — 홈 섹션용. 막대는 공급사 전체 합계 */
 function mtMini(tr){
   const items = MkMeet.itemsOf(tr);
