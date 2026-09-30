@@ -1719,9 +1719,9 @@ body.mkedit-on .omc-hero .slide.on .shot{pointer-events:none}
 
 /* 홈 섹션 주인공 카드(8차) — 흰 카드: 왼쪽 정보, 오른쪽 공급사 제품 사진 타일 */
 .mt-f{display:grid;grid-template-columns:minmax(300px,380px) minmax(0,1fr);gap:32px;align-items:center;padding:28px;border:1px solid var(--mk-line);border-radius:20px;background:#fff;color:inherit;box-shadow:0 1px 2px rgba(0,0,0,.03);transition:box-shadow .2s,border-color .2s}
-.mt-f:hover{border-color:var(--mk-primary);box-shadow:0 12px 30px rgba(4,20,63,.08)}
+.mt-f-slide{position:relative;min-width:0}
 .mt-f-info .kick{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.1em;color:var(--mk-primary-dark);background:var(--mk-primary-soft);padding:5px 10px;border-radius:var(--r-pill)}
-.mt-f .mt-f-info h3{font-size:22px;font-weight:800;line-height:1.35;letter-spacing:-.02em;margin:14px 0 16px;color:var(--mk-ink)}
+.mt-f .mt-f-info h3{font-size:24px;font-weight:800;line-height:1.35;letter-spacing:-.02em;margin:0 0 16px;color:var(--mk-ink)}
 .mt-f-nums{display:flex;margin:18px 0 20px;padding:14px 0;background:var(--mk-bg-soft);border-radius:12px}
 .mt-f-nums>div{flex:1;text-align:center}
 .mt-f-nums>div+div{border-left:1px solid rgba(0,0,0,.06)}
@@ -1729,10 +1729,17 @@ body.mkedit-on .omc-hero .slide.on .shot{pointer-events:none}
 .mt-f-nums b small{font-size:13px;font-weight:600;color:var(--mk-body);margin-left:2px}
 .mt-f-nums span{font-size:12.5px;color:var(--mk-muted)}
 .mt-f .btn{display:flex;justify-content:center;width:100%;padding:15px 18px;font-size:15.5px}
-.mt-f-tiles{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:14px}
+.mt-f-tiles{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.mt-f-tiles::-webkit-scrollbar{display:none}
+.mt-f-tile{flex:0 0 calc((100% - 42px)/4);min-width:0;scroll-snap-align:start;color:inherit}
+.mt-f-nav{position:absolute;top:calc(50% - 30px);width:40px;height:40px;border-radius:50%;border:1px solid var(--mk-line);background:#fff;box-shadow:0 4px 14px rgba(4,20,63,.14);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2;transition:opacity .2s}
+.mt-f-nav svg{width:18px;height:18px;fill:none;stroke:var(--mk-ink);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.mt-f-nav.prev{left:-14px}.mt-f-nav.next{right:-14px}
+.mt-f-nav:hover{border-color:var(--mk-primary)}
+.mt-f-slide.at-start .prev,.mt-f-slide.at-end .next{opacity:0;pointer-events:none}
 .mt-f-tile .im{position:relative;aspect-ratio:4/5;border-radius:14px;overflow:hidden;background:var(--mk-bg-soft)}
 .mt-f-tile img{width:100%;height:100%;object-fit:cover;transition:transform .35s ease}
-.mt-f:hover .mt-f-tile img{transform:scale(1.03)}
+.mt-f-tile:hover img{transform:scale(1.03)}
 .mt-f-tile .cnt{position:absolute;left:10px;bottom:10px;display:inline-flex;align-items:center;gap:3px;padding:5px 10px;border-radius:var(--r-pill);background:rgba(255,255,255,.94);font-size:12.5px;font-weight:600;color:var(--mk-body);box-shadow:0 2px 8px rgba(0,0,0,.12)}
 .mt-f-tile .cnt b{font-size:15px;font-weight:800;color:var(--mk-ink)}
 .mt-f-tile.done .cnt{background:var(--mk-navy);color:rgba(255,255,255,.8)}
@@ -1747,4 +1754,4 @@ body.mkedit-on .omc-hero .slide.on .shot{pointer-events:none}
 .mt-facts b{font-weight:600;color:var(--mk-ink);word-break:keep-all}
 .mt-facts b.tba,.mt-fund-info li b.tba{font-weight:500;color:var(--mk-muted)}
 .mt-ev-dd .dl{margin:8px 0 0;font-size:13px;color:rgba(255,255,255,.75)}
-@media(max-width:960px){.mt-f{grid-template-columns:1fr;gap:22px;padding:20px}.mt-f-tiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.mt-f-tile .im{aspect-ratio:1/1}}
+@media(max-width:960px){.mt-f{grid-template-columns:1fr;gap:22px;padding:20px}.mt-f-tiles{gap:10px}.mt-f-tile{flex-basis:calc((100% - 10px)/2.3)}.mt-f-nav{display:none}.mt-f-tile .im{aspect-ratio:1/1}}

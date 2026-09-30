@@ -887,7 +887,7 @@ function mtEventHero(tr){
   const left = !tr.open ? `<b class="sm">${esc(t('mt_st_' + mtTripState(tr)))}</b>`
     : tr.days_left == null ? `<b class="sm">${esc(t('mt_st_open'))}</b>`
     : tr.days_left <= 0 ? `<b class="sm">${esc(t('mt_dday_today'))}</b>`
-    : `<b>${tr.days_left}</b><small>${esc(t('mt_pd_days'))}</small>`;
+    : `<b>D-${tr.days_left}</b>`;
   return `<div class="mt-ev" id="trip-${esc(tr.id)}">
     <div class="mt-ev-l">
       <div class="kick">${esc(t('mt_next_kick'))}</div>
@@ -928,21 +928,37 @@ function mtFeatured(tr){
   const items = MkMeet.itemsOf(tr);
   const joined = items.reduce((a, i) => a + i.count, 0);
   const left = tr.open && tr.days_left != null && tr.days_left > 0
-    ? `<div><b>${tr.days_left}<small>${esc(t('mt_pd_days'))}</small></b><span>${esc(t('mt_pd_left'))}</span></div>` : '';
-  const tiles = items.slice(0, 4).map(it => {
+    ? `<div><b>D-${tr.days_left}</b><span>${esc(t('mt_ev_until'))}</span></div>` : '';
+  /* 공급사 사진은 전부 — 4개 넘으면 좌우 슬라이드(화살표 + 가로 스크롤). 사진을 누르면 그 제품의 펀딩 패널로 */
+  const tiles = items.map(it => {
     const p = mkProduct(it.product_id);
-    return `<div class="mt-f-tile ${it.confirmed ? 'done' : ''}"><div class="im"><img src="${esc(p.img)}" alt="${esc(L(p.name))}" loading="lazy"><span class="cnt">${it.confirmed ? MT_ICO.check : ''}<b>${it.count}</b>/${it.goal}</span></div><div class="cap">${esc(p.brand)}</div></div>`;
+    return `<a class="mt-f-tile ${it.confirmed ? 'done' : ''}" href="${mkDocUrl('product', p.id)}#meet"><div class="im"><img src="${esc(p.img)}" alt="${esc(L(p.name))}" loading="lazy"><span class="cnt">${it.confirmed ? MT_ICO.check : ''}<b>${it.count}</b>/${it.goal}</span></div><div class="cap">${esc(p.brand)}</div></a>`;
   }).join('');
-  return `<a class="mt-f" href="${mkUrl('meetings.html')}#trip-${esc(tr.id)}">
+  const arrow = d => `<button type="button" class="mt-f-nav ${d < 0 ? 'prev' : 'next'}" onclick="mtSlide(this,${d})" aria-label="${d < 0 ? 'prev' : 'next'}"><svg viewBox="0 0 24 24"><path d="${d < 0 ? 'M15 5l-7 7 7 7' : 'M9 5l7 7-7 7'}"/></svg></button>`;
+  return `<div class="mt-f">
     <div class="mt-f-info">
-      <span class="kick">${esc(t('mt_next_kick'))}</span>
       <h3>${esc(L(tr.title) || t('mt_page_kick'))}</h3>
       ${mtFacts(tr)}
       <div class="mt-f-nums"><div><b>${items.length}</b><span>${esc(t('mt_ev_sup'))}</span></div><div><b>${joined}</b><span>${esc(t('mt_ev_joined'))}</span></div>${left}</div>
-      <span class="btn btn-primary">${esc(t('mt_ev_cta'))} →</span>
+      <a class="btn btn-primary" href="${mkUrl('meetings.html')}#trip-${esc(tr.id)}">${esc(t('mt_ev_cta'))} →</a>
     </div>
-    <div class="mt-f-tiles" style="--n:${Math.max(1, Math.min(4, items.length))}">${tiles}</div>
-  </a>`;
+    <div class="mt-f-slide">
+      <div class="mt-f-tiles" onscroll="mtSlideSync(this)">${tiles}</div>
+      ${arrow(-1)}${arrow(1)}
+    </div>
+  </div>`;
+}
+function mtSlide(btn, dir){
+  const tr = btn.parentElement.querySelector('.mt-f-tiles');
+  const tile = tr && tr.firstElementChild;
+  if(!tile) return;
+  tr.scrollBy({ left: dir * (tile.getBoundingClientRect().width + 14), behavior: 'smooth' });
+}
+/* 끝에 닿은 쪽 화살표는 숨긴다 — 다 보이면(4개 이하) 둘 다 숨김 */
+function mtSlideSync(tr){
+  const box = tr.parentElement;
+  box.classList.toggle('at-start', tr.scrollLeft <= 2);
+  box.classList.toggle('at-end', tr.scrollLeft + tr.clientWidth >= tr.scrollWidth - 2);
 }
 function mtHomeHtml(){
   const list = MkMeet.upcoming().filter(tr => MkMeet.itemsOf(tr).length).slice(0, 4);
@@ -964,7 +980,7 @@ function mtFundingPanel(pid){
   const left = !tr.open ? `<b class="sm">${esc(t('mt_st_' + mtTripState(tr)))}</b>`
     : tr.days_left == null ? `<b class="sm">—</b>`
     : tr.days_left <= 0 ? `<b class="sm">${esc(t('mt_dday_today'))}</b>`
-    : `<b>${tr.days_left}</b><small>${esc(t('mt_pd_days'))}</small>`;
+    : `<b>D-${tr.days_left}</b>`;
   return `<div class="mt-fund ${it.confirmed ? 'done' : ''}" id="meet">
     <div class="mt-fund-kick">${MT_ICO.cal}<span>${esc(t('mt_box_kick'))}</span></div>
     <div class="mt-fund-stats">
@@ -1004,6 +1020,7 @@ function mtFillSlots(){
     const h = mtHomeHtml();
     el.innerHTML = h ? `<div class="wrap">${h}</div>` : '';
     el.hidden = !h;
+    el.querySelectorAll('.mt-f-tiles').forEach(mtSlideSync);
   });
   document.querySelectorAll('[data-mt-product]').forEach(el => { el.innerHTML = mtFundingPanel(el.dataset.mtProduct); });
 }
