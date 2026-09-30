@@ -218,9 +218,8 @@ class Meet extends BaseApiController
         if (! $this->uid()) {
             return $this->err('login_required', 'Vui lòng đăng nhập để đăng ký gặp mặt.', 401);
         }
-        if (! $this->isVerified()) {
-            return $this->err('verify_required', 'Chỉ doanh nghiệp đã xác thực mới đăng ký gặp mặt được.', 403);
-        }
+        /* 2026-09-30 사업자 인증은 신청 조건에서 뺐다 — 가입과 동시에 신청할 수 있게(사용자 결정).
+           대신 회사명·담당자·연락처는 필수로 받는다. 인증 여부는 관리자 신청자 목록에 표시된다. */
         $in   = $this->input();
         if ($in === null) {
             return $this->err('bad_json', 'bad json', 400);
@@ -248,10 +247,30 @@ class Meet extends BaseApiController
 
         $prof = $db->table('profiles')->where('id', $this->uid())->get()->getRowArray() ?: [];
         $now  = date('Y-m-d H:i:s');
+        /* 신청 창에서 받은 회사 정보 — 프로필에 비어 있는 칸만 채운다(인증으로 확정된 값은 덮지 않는다) */
+        $company = trim((string) ($in['company'] ?? '')) ?: (string) ($prof['company'] ?? '');
+        $contact = trim((string) ($in['contact_name'] ?? '')) ?: (string) ($prof['contact_name'] ?? '');
+        $phone   = trim((string) ($in['phone'] ?? '')) ?: (string) ($prof['phone'] ?? '');
+        if ($company === '' || $contact === '' || $phone === '') {
+            return $this->err('info_required', 'Vui lòng nhập tên công ty, người liên hệ và số điện thoại.', 422);
+        }
+        $fill = [];
+        $country = strtoupper(substr(preg_replace('/[^A-Za-z]/', '', (string) ($in['country'] ?? '')), 0, 2));
+        foreach (['company' => [$company, 200], 'contact_name' => [$contact, 120], 'phone' => [$phone, 60], 'country' => [$country, 2]] as $k => [$v, $max]) {
+            if ($v === '') {
+                continue;
+            }
+            if (trim((string) ($prof[$k] ?? '')) === '') {
+                $fill[$k] = $this->cut($v, $max);
+            }
+        }
+        if ($fill) {
+            $db->table('profiles')->where('id', $this->uid())->update($fill + ['updated_at' => $now]);
+        }
         $row  = [
-            'company'      => $this->cut($prof['company'] ?? '', 200),
-            'contact_name' => $this->cut($prof['contact_name'] ?? '', 120),
-            'phone'        => $this->cut($prof['phone'] ?? '', 60),
+            'company'      => $this->cut($company, 200),
+            'contact_name' => $this->cut($contact, 120),
+            'phone'        => $this->cut($phone, 60),
             'email'        => $this->cut($prof['email'] ?? ($this->user['email'] ?? ''), 200),
             'channel'      => $this->cut($in['channel'] ?? '', 200),
             'volume'       => $this->cut($in['volume'] ?? '', 200),
@@ -382,7 +401,20 @@ class Meet extends BaseApiController
         if ($tid !== '') {
             $b->where('trip_id', $tid);
         }
-        return $this->json($b->orderBy('created_at', 'DESC')->get()->getResultArray());
+        $rows = $b->orderBy('created_at', 'DESC')->get()->getResultArray();
+        /* 사업자 인증 여부 — 인증 없이도 신청할 수 있게 바꿔서(2026-09-30) 관리자가 구분해 볼 수 있게 */
+        $ids = array_values(array_unique(array_column($rows, 'buyer_id')));
+        $ver = [];
+        if ($ids) {
+            foreach (db_connect()->table('profiles')->select('id, status')->whereIn('id', $ids)->get()->getResultArray() as $p) {
+                $ver[$p['id']] = ($p['status'] ?? '') === 'verified';
+            }
+        }
+        foreach ($rows as &$r) {
+            $r['verified'] = $ver[$r['buyer_id']] ?? false;
+        }
+        unset($r);
+        return $this->json($rows);
     }
 
     private function adminSetRequest(string $id): ResponseInterface

@@ -86,7 +86,7 @@ function meetReqTable(tr){
   if(!list.length) return `<p class="sub" style="padding:8px">아직 신청이 없습니다.</p>`;
   return `<table><thead><tr><th style="width:120px">신청일</th><th>제품</th><th>회사 · 담당자</th><th>채널 · 예상 수량</th><th style="width:150px">상태</th></tr></thead><tbody>${list.map(r => `
     <tr><td>${esc(String(r.created_at || '').slice(0, 16))}</td><td>${esc(meetPname(r.product_id))}</td>
-      <td><b>${esc(r.company || '')}</b><div class="sub">${esc(r.contact_name || '')} · ${esc(r.phone || '')}<br>${esc(r.email || '')}</div>${r.message ? `<div class="sub" style="white-space:pre-wrap">“${esc(r.message)}”</div>` : ''}${r.aff_ref ? `<div class="sub">CTV ${esc(r.aff_ref)}</div>` : ''}</td>
+      <td><b>${esc(r.company || '')}</b> ${r.verified ? '<span class="sub" style="color:#0b7a5c;font-weight:700">인증</span>' : '<span class="sub" style="color:#B02A37">미인증</span>'}<div class="sub">${esc(r.contact_name || '')} · ${esc(r.phone || '')}<br>${esc(r.email || '')}</div>${r.message ? `<div class="sub" style="white-space:pre-wrap">“${esc(r.message)}”</div>` : ''}${r.aff_ref ? `<div class="sub">CTV ${esc(r.aff_ref)}</div>` : ''}</td>
       <td>${esc(MEET_CH[r.channel] || r.channel || '')}<div class="sub">${esc(r.volume || '')}</div></td>
       <td><select onchange="meetSetReq('${esc(r.id)}',{status:this.value})">${Object.entries(MEET_REQ_ST).map(([v, l]) => `<option value="${v}" ${r.status === v ? 'selected' : ''}>${l}</option>`).join('')}</select>
         <input style="margin-top:6px" placeholder="메모" value="${esc(r.memo || '')}" onchange="meetSetReq('${esc(r.id)}',{memo:this.value})"></td></tr>`).join('')}

@@ -1042,40 +1042,76 @@ function mtNeedVerify(){
     <a class="btn btn-primary btn-block btn-lg" href="${mkUrl('mypage.html')}">${esc(t('mt_need_verify_btn'))}</a>`);
 }
 const MT_CHANNELS = ['pharmacy', 'cosmetic', 'mart', 'online', 'dist', 'other'];
+/* 미팅 신청 — 2026-09-30 가입·회사 정보·신청을 한 창에서 끝낸다(사업자 인증은 나중에 해도 됨).
+   비로그인: 회사 정보 + 이메일·비밀번호 + 미팅 정보 → 가입하고 바로 신청
+   로그인했는데 회사 정보가 비어 있으면: 회사 정보 칸만 더해서 신청 */
 function openMeetApply(tripId, pid){
   const tr = MkMeet.trip(tripId), p = mkProduct(pid);
   if(!tr || !p) return;
-  if(!MkMeet._dev('mk_meet_tok')){
-    const s = (typeof Store !== 'undefined' && Store.session) ? Store.session() : null;
-    if(!s){ toast(t('auth_need')); openAuth('signup'); return; }
-    if(s.status && s.status !== 'verified'){ mtNeedVerify(); return; }
-  }
+  const dev = !!MkMeet._dev('mk_meet_tok');
+  const s = (!dev && typeof Store !== 'undefined' && Store.session) ? Store.session() : null;
+  const needAcct = !dev && !s;
+  const needInfo = needAcct || (!dev && (!s.company || !s.contactName || !s.phone));
   try{ mkTrack('InitiateCheckout', { content_ids:[pid], content_type:'product', content_category:'meeting' }); }catch(e){}
+  const row = (id, key, attrs, val) => `<div class="f-row"><label>${esc(t(key))}</label><input id="${id}" ${attrs || ''} value="${esc(val || '')}"></div>`;
   mkModal(`<h2>${esc(t('mt_apply_h'))}</h2>
-    <p class="sub">${esc(p.brand)} · ${esc(L(p.name))}<br>${esc(mtLong(tr.visit_date))}${L(tr.city) ? ' · ' + esc(L(tr.city)) : ''}</p>
-    <div class="f-row"><label>${esc(t('mt_apply_channel'))}</label><select id="mt-ch">${MT_CHANNELS.map(k => `<option value="${k}">${esc(t('mt_ch_' + k))}</option>`).join('')}</select></div>
-    <div class="f-row"><label>${esc(t('mt_apply_volume'))}</label><input id="mt-vol" maxlength="200" placeholder="${esc(t('mt_apply_volume_ph'))}"></div>
-    <div class="f-row"><label>${esc(t('mt_apply_msg'))}</label><textarea id="mt-msg" rows="3" maxlength="2000"></textarea></div>
-    <p class="inq-auto">${esc(t('mt_apply_note'))}</p>
-    <button class="btn btn-primary btn-block btn-lg" id="mt-send" onclick="sendMeetApply('${esc(tr.id)}','${esc(pid)}')">${esc(t('mt_apply_send'))}</button>`);
+    <p class="sub">${esc(p.brand)} · ${esc(L(p.name))}<br>${esc(mtLong(tr.visit_date))}${mtWhere(tr) ? ' · ' + esc(mtWhere(tr)) : ''}</p>
+    ${needInfo ? `<div class="fs"><div class="fs-t">${esc(t('mt_q_info_h'))}</div>
+      ${row('mq-company', 'mt_q_company', 'autocomplete="organization" maxlength="200"', s && s.company)}
+      <div class="f-2col">${row('mq-name', 'mt_q_name', 'autocomplete="name" maxlength="120"', s && s.contactName)}${row('mq-phone', 'mt_q_phone', 'inputmode="tel" autocomplete="tel" maxlength="60"', s && s.phone)}</div></div>` : ''}
+    ${needAcct ? `<div class="fs"><div class="fs-t">${esc(t('mt_q_acct_h'))}</div>
+      <div class="f-2col">${row('mq-email', 'mt_q_email', 'type="email" autocomplete="email" placeholder="name@company.com"')}${row('mq-pw', 'mt_q_pw', 'type="password" autocomplete="new-password"')}</div></div>` : ''}
+    <div class="fs"><div class="fs-t">${esc(t('mt_q_meet_h'))}</div>
+      <div class="f-row"><label>${esc(t('mt_apply_channel'))}</label><select id="mt-ch">${MT_CHANNELS.map(k => `<option value="${k}">${esc(t('mt_ch_' + k))}</option>`).join('')}</select></div>
+      <div class="f-row"><label>${esc(t('mt_apply_volume'))}</label><input id="mt-vol" maxlength="200" placeholder="${esc(t('mt_apply_volume_ph'))}"></div>
+      <div class="f-row"><label>${esc(t('mt_apply_msg'))}</label><textarea id="mt-msg" rows="2" maxlength="2000"></textarea></div></div>
+    <div class="mst-result err" id="mq-err" style="display:none"></div>
+    <p class="inq-auto">${esc(t(needAcct ? 'mt_q_note' : 'mt_apply_note'))}</p>
+    <button class="btn btn-primary btn-block btn-lg" id="mt-send" onclick="sendMeetApply('${esc(tr.id)}','${esc(pid)}')">${esc(t(needAcct ? 'mt_q_send' : 'mt_apply_send'))}</button>
+    ${needAcct ? `<p class="switch-auth"><span>${esc(t('mt_q_have'))}</span> <a onclick="openAuth('login')">${esc(t('login'))}</a></p>` : ''}`);
 }
 async function sendMeetApply(tripId, pid){
   const btn = document.getElementById('mt-send');
   if(btn){ if(btn.disabled) return; btn.disabled = true; }
+  const done = () => { if(btn) btn.disabled = false; };
   const v = id => ((document.getElementById(id) || {}).value || '').trim();
+  const has = id => !!document.getElementById(id);
+  const errBox = msg => { const e = document.getElementById('mq-err'); if(e){ e.textContent = msg; e.style.display = 'block'; } else toast(msg); done(); };
   const body = { trip_id: tripId, product_id: pid, channel: v('mt-ch'), volume: v('mt-vol'), message: v('mt-msg') };
+  if(has('mq-company')){
+    Object.assign(body, { company: v('mq-company'), contact_name: v('mq-name'), phone: v('mq-phone'),
+      country: MK_LANG === 'ko' ? 'KR' : MK_LANG === 'en' ? '' : 'VN' });
+    if(!body.company || !body.contact_name || !body.phone) return errBox(t('mt_q_err_fill'));
+  }
   try{ const a = mkAffRef(); if(a && a.code) body.aff_ref = a.code; }catch(e){}
+
+  /* 1) 비로그인이면 여기서 가입 — 이메일 확인 절차가 없어 바로 세션이 생긴다(Api\Auth::signup) */
+  if(has('mq-email')){
+    const email = v('mq-email'), pw = (document.getElementById('mq-pw') || {}).value || '';
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return errBox(t('mt_q_err_email'));
+    if(pw.length < 6) return errBox(t('mt_q_err_pw'));
+    let res;
+    try{ res = await SB.auth.signUp({ email, password: pw }); }catch(e){ res = { error: e }; }
+    if(!res || res.error){
+      return errBox(/already|registered|exists/i.test(String((res && res.error && res.error.message) || '')) ? t('mt_q_err_exists') : t('mt_err'));
+    }
+    try{ await MkData.boot(); }catch(e){}
+    try{ mkPixelIdentify({ em: email }); mkTrack('CompleteRegistration', { content_category: 'meeting' }); }catch(e){}
+    try{ renderChrome(); applyI18n(); }catch(e){}
+  }
+
+  /* 2) 신청 */
   let r;
   try{ r = await MkMeet.call('POST', 'apply', body); }catch(e){ r = { ok: false, data: null }; }
-  if(btn) btn.disabled = false;
+  done();
   if(!r.ok){
     const code = r.data && r.data.error;
     if(code === 'login_required'){ closeModal(); toast(t('auth_need')); openAuth('login'); return; }
-    if(code === 'verify_required'){ mtNeedVerify(); return; }
-    toast(t(code === 'already' ? 'mt_err_already' : code === 'closed' ? 'mt_err_closed' : 'mt_err'));
-    return;
+    if(code === 'info_required') return errBox(t('mt_q_err_fill'));
+    return errBox(t(code === 'already' ? 'mt_err_already' : code === 'closed' ? 'mt_err_closed' : 'mt_err'));
   }
   try{ mkTrack('Lead', { content_ids:[pid], content_type:'product', content_category:'meeting' }); }catch(e){}
+  try{ await MkData.boot(); }catch(e){}            // 신청 때 채운 회사 정보를 프로필로 다시 읽는다
   const d = r.data || {};
   let url = '';
   try{ url = new URL(mkUrl('meetings.html'), document.baseURI).href.split('#')[0] + '#trip-' + tripId; }catch(e){}
