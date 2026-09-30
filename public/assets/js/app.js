@@ -759,6 +759,8 @@ const MkMeet = {
   },
   async token(){
     const dev = this._dev('mk_meet_tok'); if(dev) return dev;
+    /* 부팅이 잡아 둔 세션이 있으면 그걸 쓴다 — 인증 잠금을 한 번 더 잡지 않도록 */
+    if(typeof MkData !== 'undefined' && MkData.session && MkData.session.access_token) return MkData.session.access_token;
     try{
       if(typeof SB !== 'undefined' && SB && SB.auth){
         const { data } = await SB.auth.getSession();
@@ -1257,7 +1259,8 @@ document.addEventListener('DOMContentLoaded', async ()=>{
       await MkData.boot();
       /* 이메일 확인 후 첫 진입이면 보관해 둔 인증 결과를 프로필에 반영한다 */
       if(Store._flushPendingProfile) await Store._flushPendingProfile();
-      await Store.loadCart();
+      /* 관심제품 목록이 늦거나 멈춰도 페이지 그리기는 막지 않는다(최대 5초) */
+      await Promise.race([Store.loadCart(), new Promise(r => setTimeout(r, 5000))]);
     }
     catch(e){ console.error('MAKENOV 백엔드 연결 실패 — 시드 데이터로 표시합니다', e); }
   }

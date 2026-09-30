@@ -212,18 +212,25 @@ window.MkData = MkData;
 /* 세션이 갱신·교체되면(토큰 회전, 다른 탭 로그인/로그아웃 포함) 캐시를 따라간다.
    부팅 때 잡아둔 세션을 계속 쓰면 실제 토큰 주인과 buyer_id 가 어긋나
    문의·관심제품 저장이 RLS 403 에 걸린다 (2026-08-26 문의 실패 원인 ②). */
-SB.auth.onAuthStateChange(async (event, session) => {
+/* ⚠️ 2026-09-30 이 콜백은 Supabase 인증 잠금(lock) 안에서 불린다. 여기서 SB.from()을 await 하면
+   그 요청이 같은 잠금을 기다려 교착(deadlock)된다 → 로그인 상태에서 부팅이 Store.loadCart 에서 멈춰
+   홈 방문 일정 카드 등이 안 그려졌다. 조회는 setTimeout 으로 잠금 밖에서 한다(Supabase 권장 방식). */
+SB.auth.onAuthStateChange((event, session) => {
   const prev = MkData.session && MkData.session.user && MkData.session.user.id;
   MkData.session = session;
   const now = session && session.user && session.user.id;
   if(!session){ MkData.profile = null; MkData.admin = false; return; }
   if(now && now !== prev){
-    const [{ data:prof }, { data:adm }] = await Promise.all([
-      SB.from('profiles').select('*').eq('id', now).maybeSingle(),
-      SB.from('admins').select('user_id').eq('user_id', now).maybeSingle(),
-    ]);
-    MkData.profile = prof || null;
-    MkData.admin   = !!adm;
+    setTimeout(async () => {
+      try{
+        const [{ data:prof }, { data:adm }] = await Promise.all([
+          SB.from('profiles').select('*').eq('id', now).maybeSingle(),
+          SB.from('admins').select('user_id').eq('user_id', now).maybeSingle(),
+        ]);
+        MkData.profile = prof || null;
+        MkData.admin   = !!adm;
+      }catch(e){ console.warn('auth change reload', e); }
+    }, 0);
   }
 });
 
