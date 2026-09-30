@@ -1,0 +1,112 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 560" width="1600" height="560">
+  <!-- MAKENOV hero 00 — 미팅 펀딩 : 한국 → 베트남 항로 + 5석 미팅 테이블(3석 채움) + 달력
+       ※ 카피가 좌하단을 덮으므로 주요 도형은 x>980 또는 y<180 안에 배치 (다른 hero-*.svg 와 같은 규칙)
+       ※ 날짜·숫자는 넣지 않는다 — 일정이 바뀌어도 그림을 다시 그릴 필요가 없게 -->
+  <defs>
+    <linearGradient id="m-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#04143F"/>
+      <stop offset=".55" stop-color="#022E7D"/>
+      <stop offset="1" stop-color="#0B45B4"/>
+    </linearGradient>
+    <radialGradient id="m-glow" cx=".69" cy=".52" r=".5">
+      <stop offset="0" stop-color="#27CAA1" stop-opacity=".34"/>
+      <stop offset=".5" stop-color="#0097E0" stop-opacity=".14"/>
+      <stop offset="1" stop-color="#0097E0" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="m-arc" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0097E0" stop-opacity=".2"/>
+      <stop offset=".5" stop-color="#3FE9C0" stop-opacity=".9"/>
+      <stop offset="1" stop-color="#27CAA1" stop-opacity=".5"/>
+    </linearGradient>
+    <linearGradient id="m-bar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#0097E0"/>
+      <stop offset="1" stop-color="#3FE9C0"/>
+    </linearGradient>
+    <pattern id="m-grid" width="44" height="44" patternUnits="userSpaceOnUse">
+      <path d="M44 0H0v44" fill="none" stroke="#fff" stroke-opacity=".05" stroke-width="1"/>
+    </pattern>
+    <radialGradient id="m-node">
+      <stop offset="0" stop-color="#fff"/>
+      <stop offset=".35" stop-color="#27CAA1"/>
+      <stop offset="1" stop-color="#27CAA1" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="m-soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="14"/>
+    </filter>
+    <!-- 사람(좌석에 앉은 바이어) -->
+    <g id="m-person">
+      <circle cy="-7" r="8" fill="#04205C"/>
+      <path d="M-13 13c1.5-8 7-12 13-12s11.5 4 13 12z" fill="#04205C"/>
+    </g>
+  </defs>
+
+  <rect width="1600" height="560" fill="url(#m-bg)"/>
+  <rect width="1600" height="560" fill="url(#m-grid)"/>
+  <rect width="1600" height="560" fill="url(#m-glow)"/>
+
+  <!-- 제품 페이지 히어로 프레임이 오른쪽을 잘라서 그림 전체를 왼쪽으로 110 당긴다 -->
+  <g transform="translate(-110 0)">
+
+  <!-- 항로 : 한국 → 베트남 -->
+  <g>
+    <path d="M1000 150C1120 30 1360 26 1496 128" fill="none" stroke="url(#m-arc)" stroke-width="2.4" stroke-dasharray="2 10" stroke-linecap="round"/>
+    <circle cx="1000" cy="150" r="22" fill="url(#m-node)" opacity=".5"/>
+    <circle cx="1000" cy="150" r="6" fill="#3FE9C0"/>
+    <circle cx="1496" cy="128" r="26" fill="url(#m-node)" opacity=".6"/>
+    <circle cx="1496" cy="128" r="7" fill="#3FE9C0"/>
+    <circle cx="1496" cy="128" r="15" fill="none" stroke="#3FE9C0" stroke-opacity=".6" stroke-width="1.4"/>
+    <!-- 비행기 -->
+    <g transform="translate(1262 58) rotate(8) scale(-1 1)" fill="#EFFFFA">
+      <path d="M-22 0l12-3 10-14h7l-5 13 16-2 5-6h5l-3 9 3 9h-5l-5-6-16-2 5 13h-7L-10 3z"/>
+    </g>
+  </g>
+
+  <!-- 달력 카드 -->
+  <g transform="translate(1398 196)">
+    <rect width="142" height="132" rx="16" fill="#08307F" fill-opacity=".85" stroke="#7FF0D4" stroke-opacity=".6" stroke-width="1.4"/>
+    <rect width="142" height="30" rx="16" fill="#27CAA1"/>
+    <rect y="16" width="142" height="14" fill="#27CAA1"/>
+    <rect x="34" y="-8" width="6" height="20" rx="3" fill="#EFFFFA"/>
+    <rect x="102" y="-8" width="6" height="20" rx="3" fill="#EFFFFA"/>
+    <g fill="#7FF0D4" fill-opacity=".35">
+      <rect x="18" y="46" width="16" height="12" rx="3"/><rect x="44" y="46" width="16" height="12" rx="3"/><rect x="70" y="46" width="16" height="12" rx="3"/><rect x="96" y="46" width="16" height="12" rx="3"/>
+      <rect x="18" y="70" width="16" height="12" rx="3"/><rect x="44" y="70" width="16" height="12" rx="3"/><rect x="96" y="70" width="16" height="12" rx="3"/>
+      <rect x="18" y="94" width="16" height="12" rx="3"/><rect x="44" y="94" width="16" height="12" rx="3"/><rect x="70" y="94" width="16" height="12" rx="3"/><rect x="96" y="94" width="16" height="12" rx="3"/>
+    </g>
+    <rect x="66" y="64" width="24" height="24" rx="6" fill="#3FE9C0"/>
+    <circle cx="78" cy="76" r="17" fill="none" stroke="#3FE9C0" stroke-opacity=".5" stroke-width="1.4"/>
+  </g>
+
+  <!-- 미팅 테이블 : 5석 중 3석 채움 -->
+  <g transform="translate(1198 356)">
+    <ellipse rx="190" ry="120" fill="url(#m-node)" opacity=".18" filter="url(#m-soft)"/>
+    <ellipse rx="150" ry="54" fill="#073199" fill-opacity=".85" stroke="#27CAA1" stroke-opacity=".8" stroke-width="1.8"/>
+    <ellipse rx="112" ry="36" fill="none" stroke="#6FEAC9" stroke-opacity=".3" stroke-width="1.2"/>
+    <!-- 채운 좌석 -->
+    <g>
+      <circle cx="-168" cy="-6" r="26" fill="#3FE9C0"/><use href="#m-person" x="-168" y="-6"/>
+      <circle cx="-96" cy="-80" r="26" fill="#3FE9C0"/><use href="#m-person" x="-96" y="-80"/>
+      <circle cx="0" cy="-100" r="26" fill="#3FE9C0"/><use href="#m-person" x="0" y="-100"/>
+    </g>
+    <!-- 빈 좌석 -->
+    <g fill="#04205C" fill-opacity=".6" stroke="#7FF0D4" stroke-opacity=".75" stroke-width="1.6" stroke-dasharray="5 5">
+      <circle cx="96" cy="-80" r="26"/>
+      <circle cx="168" cy="-6" r="26"/>
+    </g>
+    <g fill="none" stroke="#7FF0D4" stroke-opacity=".7" stroke-width="2" stroke-linecap="round">
+      <path d="M96 -88v16M88 -80h16"/>
+      <path d="M168 -14v16M160 -6h16"/>
+    </g>
+  </g>
+
+  <!-- 달성 막대 -->
+  <g transform="translate(1048 476)">
+    <rect width="300" height="10" rx="5" fill="#fff" fill-opacity=".12"/>
+    <rect width="180" height="10" rx="5" fill="url(#m-bar)"/>
+    <circle cx="180" cy="5" r="9" fill="#EFFFFA"/>
+    <circle cx="180" cy="5" r="16" fill="none" stroke="#3FE9C0" stroke-opacity=".5" stroke-width="1.4"/>
+  </g>
+
+  </g>
+  <rect width="1600" height="560" fill="#02061F" opacity=".08"/>
+</svg>

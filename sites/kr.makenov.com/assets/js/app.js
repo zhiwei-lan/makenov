@@ -922,6 +922,21 @@ function mtEventHero(tr){
     </div>
   </div>`;
 }
+/* 제품 페이지 히어로의 첫 슬라이드 — 다가오는 방문 일정에서 만든다(2026-09-30).
+   DB 슬라이드(hero_slides)에 넣지 않은 이유: 관리자 '문구 수정'이 슬라이드를 순번(hero.0.title …)으로
+   덮어쓰고 있어 맨 앞에 끼우면 기존 문구가 한 칸씩 밀린다. 행사명·날짜·장소가 바뀌면 자동으로 따라간다. */
+function mtHeroSlides(){
+  if(typeof MkMeet === 'undefined') return [];
+  const tr = MkMeet.upcoming().find(x => x.open && MkMeet.itemsOf(x).length);
+  if(!tr) return [];
+  const when = [mtFmt(tr.visit_date, { month:'long', day:'numeric', weekday:'short' }), mtTime(tr), mtWhere(tr)].filter(Boolean).join(' · ');
+  return [{
+    art: 'assets/img/hero/hero-meeting.svg',
+    link: mkUrl('meetings.html') + '#trip-' + tr.id,
+    title: (L(tr.title) || t('mt_page_kick')) + '\n' + t('mt_hero_line'),
+    sub: when,
+  }];
+}
 /* 일정 하나를 한 줄 요약 — 홈 섹션용. 막대는 공급사 전체 합계 */
 function mtMini(tr){
   const items = MkMeet.itemsOf(tr);

@@ -1761,3 +1761,5 @@ body.mkedit-on .omc-hero .slide.on .shot{pointer-events:none}
 .mt-ev-dd .dl{margin:8px 0 0;font-size:13px;color:rgba(255,255,255,.75)}
 @media(max-width:1199px) and (min-width:961px){.mt-f-tile{flex-basis:calc((100% - 28px)/3)}}
 @media(max-width:960px){.mt-f{grid-template-columns:1fr;gap:22px;padding:20px}.mt-f-tiles{gap:10px}.mt-f-tile{flex-basis:calc((100% - 10px)/2.3)}.mt-f-nav{display:none}}
+/* 히어로 문구는 단어 단위로 줄바꿈 — 한국어 끝 글자만 다음 줄로 떨어지지 않게 */
+#hero-frame .copy h1,#hero-frame .copy h2,#hero-frame .copy p{word-break:keep-all}
