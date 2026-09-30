@@ -27,6 +27,8 @@ const MeetAdmin = {
   deleteTrip(id){ return this.call('DELETE', 'admin/trips/' + encodeURIComponent(id)); },
   requests(tid){ return this.call('GET', 'admin/requests' + (tid ? '?trip_id=' + encodeURIComponent(tid) : '')); },
   setRequest(id, patch){ return this.call('POST', 'admin/requests/' + encodeURIComponent(id), patch); },
+  addRequests(body){ return this.call('POST', 'admin/requests', body); },
+  clearSeed(tid){ return this.call('DELETE', 'admin/requests/seed' + (tid ? '?trip_id=' + encodeURIComponent(tid) : '')); },
 };
 
 let meetCache = { trips: [], reqs: [] };
@@ -81,12 +83,36 @@ function meetListHtml(){
       </tbody></table></div></div>`;
 }
 
+/* 임시(시드) 신청 도구줄 — 실제 신청이 들어오기 전 카드가 전부 0으로 보이지 않게 채워 두는 용도 */
+function meetSeedBar(tr){
+  const items = tr.items || [];
+  const seeds = meetCache.reqs.filter(r => r.trip_id === tr.id && String(r.buyer_id || '').startsWith('seed-')).length;
+  return `<div class="bar" style="gap:8px;flex-wrap:wrap;padding:8px;background:#F6F8F7;border-radius:10px;margin-bottom:10px">
+    <span class="sub" style="font-weight:700">임시 신청</span>
+    <select id="seed-pid-${esc(tr.id)}">${items.map(i => `<option value="${esc(i.product_id)}">${esc(meetPname(i.product_id))}</option>`).join('')}</select>
+    <input id="seed-n-${esc(tr.id)}" type="number" min="1" max="10" value="2" style="width:64px">곳
+    <button class="btn btn-ghost btn-sm" onclick="meetSeedAdd('${esc(tr.id)}')">추가</button>
+    <span class="grow"></span>
+    <span class="sub">임시 ${seeds}건</span>
+    ${seeds ? `<button class="btn btn-ghost btn-sm" style="color:#B02A37" onclick="meetSeedClear('${esc(tr.id)}')">임시 신청 모두 지우기</button>` : ''}
+  </div>`;
+}
+async function meetSeedAdd(tid){
+  const pid = av('seed-pid-' + tid), n = Number(av('seed-n-' + tid)) || 1;
+  try{ await MeetAdmin.addRequests({ trip_id: tid, product_id: pid, count: n }); toastA(`임시 신청 ${n}곳 추가`); meetReqTrip = tid; renderMeet(); }
+  catch(e){ toastA('실패: ' + e.message); }
+}
+async function meetSeedClear(tid){
+  if(!confirm('이 일정의 임시 신청을 모두 지울까요? (실제 바이어 신청은 남습니다)')) return;
+  try{ const r = await MeetAdmin.clearSeed(tid); toastA(`임시 신청 ${r.deleted}건 삭제`); meetReqTrip = tid; renderMeet(); }
+  catch(e){ toastA('실패: ' + e.message); }
+}
 function meetReqTable(tr){
   const list = meetCache.reqs.filter(r => r.trip_id === tr.id);
-  if(!list.length) return `<p class="sub" style="padding:8px">아직 신청이 없습니다.</p>`;
-  return `<table><thead><tr><th style="width:120px">신청일</th><th>제품</th><th>회사 · 담당자</th><th>채널 · 예상 수량</th><th style="width:150px">상태</th></tr></thead><tbody>${list.map(r => `
+  if(!list.length) return meetSeedBar(tr) + `<p class="sub" style="padding:8px">아직 신청이 없습니다.</p>`;
+  return meetSeedBar(tr) + `<table><thead><tr><th style="width:120px">신청일</th><th>제품</th><th>회사 · 담당자</th><th>채널 · 예상 수량</th><th style="width:150px">상태</th></tr></thead><tbody>${list.map(r => `
     <tr><td>${esc(String(r.created_at || '').slice(0, 16))}</td><td>${esc(meetPname(r.product_id))}</td>
-      <td><b>${esc(r.company || '')}</b> ${r.verified ? '<span class="sub" style="color:#0b7a5c;font-weight:700">인증</span>' : '<span class="sub" style="color:#B02A37">미인증</span>'}<div class="sub">${esc(r.contact_name || '')} · ${esc(r.phone || '')}<br>${esc(r.email || '')}</div>${r.message ? `<div class="sub" style="white-space:pre-wrap">“${esc(r.message)}”</div>` : ''}${r.aff_ref ? `<div class="sub">CTV ${esc(r.aff_ref)}</div>` : ''}</td>
+      <td><b>${esc(r.company || '')}</b> ${String(r.buyer_id || '').startsWith('seed-') ? '<span class="sub" style="color:#6c757d;font-weight:700">임시</span>' : r.verified ? '<span class="sub" style="color:#0b7a5c;font-weight:700">인증</span>' : '<span class="sub" style="color:#B02A37">미인증</span>'}<div class="sub">${esc(r.contact_name || '')} · ${esc(r.phone || '')}<br>${esc(r.email || '')}</div>${r.message ? `<div class="sub" style="white-space:pre-wrap">“${esc(r.message)}”</div>` : ''}${r.aff_ref ? `<div class="sub">CTV ${esc(r.aff_ref)}</div>` : ''}</td>
       <td>${esc(MEET_CH[r.channel] || r.channel || '')}<div class="sub">${esc(r.volume || '')}</div></td>
       <td><select onchange="meetSetReq('${esc(r.id)}',{status:this.value})">${Object.entries(MEET_REQ_ST).map(([v, l]) => `<option value="${v}" ${r.status === v ? 'selected' : ''}>${l}</option>`).join('')}</select>
         <input style="margin-top:6px" placeholder="메모" value="${esc(r.memo || '')}" onchange="meetSetReq('${esc(r.id)}',{memo:this.value})"></td></tr>`).join('')}

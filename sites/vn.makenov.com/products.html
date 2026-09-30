@@ -116,7 +116,7 @@
 <script src="assets/js/upload.js?v=20260918a"></script>
 <script src="assets/js/store-supabase.js?v=20260930b"></script>
 <script src="assets/js/copy-edit.js?v=20260918c"></script>
-<script src="assets/js/app.js?v=20260930o"></script>
+<script src="assets/js/app.js?v=20260930p"></script>
 <script>
 let heroIdx = 0, heroTimer = null;
 
@@ -191,7 +191,8 @@ function pageInit(){
 
   /* 추천 */
   document.getElementById('featured-grid').innerHTML =
-    MK_PRODUCTS.filter(p=>p.featured).slice(0,4).map(productCard).join('');
+    /* 순서 = 다가오는 방문 일정의 공급사 순서(관리자 › 미팅 펀딩에서 바꿀 수 있다). 일정에 없는 제품은 뒤에 등록순 */
+    mkFeaturedOrder(MK_PRODUCTS.filter(p=>p.featured)).slice(0,4).map(productCard).join('');
 
   /* 전체 제품(최신순) — 4열 × 4줄 = 16개. 헤딩은 i18n sec_new("전체 제품") */
   document.getElementById('new-list').innerHTML =

@@ -993,6 +993,14 @@ function mkHeroSlides(){
   }
   return out;
 }
+/* 주목할 제품 순서 — 다가오는 방문 일정(items)의 공급사 순서를 따른다. 일정에 없는 제품은 원래 순서대로 뒤에 */
+function mkFeaturedOrder(list){
+  const tr = typeof MkMeet !== 'undefined' ? MkMeet.upcoming().find(x => MkMeet.itemsOf(x).length) : null;
+  if(!tr) return list;
+  const order = tr.items.map(i => i.product_id);
+  const rank = p => { const i = order.indexOf(p.id); return i < 0 ? 999 : i; };
+  return list.slice().sort((a, b) => rank(a) - rank(b));
+}
 /* 일정 하나를 한 줄 요약 — 홈 섹션용. 막대는 공급사 전체 합계 */
 function mtMini(tr){
   const items = MkMeet.itemsOf(tr);

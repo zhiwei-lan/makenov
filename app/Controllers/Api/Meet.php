@@ -65,8 +65,9 @@ class Meet extends BaseApiController
                     if ($method === 'DELETE') return $this->adminDeleteTrip($c);
                 }
                 if ($b === 'requests') {
-                    if ($method === 'GET')  return $this->adminRequests();
-                    if ($method === 'POST') return $this->adminSetRequest($c);
+                    if ($method === 'GET')    return $this->adminRequests();
+                    if ($method === 'POST')   return $c === '' ? $this->adminAddRequests() : $this->adminSetRequest($c);
+                    if ($method === 'DELETE' && $c === 'seed') return $this->adminClearSeed();
                 }
             }
         } catch (\Throwable $e) {
@@ -435,6 +436,72 @@ class Meet extends BaseApiController
         }
         db_connect()->table('meet_requests')->where('id', $id)->update($upd);
         return $this->json(['ok' => true]);
+    }
+
+    /* ---- 임시(시드) 신청 — 2026-09-30 사용자 요청: 실제 신청이 들어오기 전 카드가 전부 0으로 보이지 않게
+       관리자가 공급사별로 몇 곳씩 채워 둔다. buyer_id 가 'seed-' 로 시작하는 행이 임시 신청이고,
+       DELETE admin/requests/seed 로 한 번에 지운다. 개수 집계(counts)에는 실제 신청과 같이 들어간다. */
+    private const SEED_PREFIX = 'seed-';
+
+    private function adminAddRequests(): ResponseInterface
+    {
+        $in = $this->input();
+        if ($in === null) {
+            return $this->err('bad_json', 'bad json', 400);
+        }
+        $tid = trim((string) ($in['trip_id'] ?? ''));
+        $pid = trim((string) ($in['product_id'] ?? ''));
+        $n   = min(10, max(1, (int) ($in['count'] ?? 1)));
+        $db  = db_connect();
+        $trip = $db->table('meet_trips')->where('id', $tid)->get()->getRowArray();
+        if (! $trip) {
+            return $this->err('not_found', '일정이 없습니다', 404);
+        }
+        $ok = false;
+        foreach ((array) $this->jdec($trip['items'] ?? null, []) as $it) {
+            if ((string) (((array) $it)['product_id'] ?? '') === $pid) {
+                $ok = true;
+            }
+        }
+        if (! $ok) {
+            return $this->err('not_found', '이 일정에 없는 제품입니다', 404);
+        }
+        $now  = date('Y-m-d H:i:s');
+        $have = $db->table('meet_requests')->where('trip_id', $tid)->where('product_id', $pid)
+            ->like('buyer_id', self::SEED_PREFIX, 'after')->countAllResults();
+        for ($i = 1; $i <= $n; $i++) {
+            $k = $have + $i;
+            $db->table('meet_requests')->insert([
+                'id'           => $this->uuid(),
+                'trip_id'      => $tid,
+                'product_id'   => $pid,
+                'buyer_id'     => self::SEED_PREFIX . $this->uuid(),
+                'company'      => $this->cut(($in['company'] ?? '') ?: "임시 신청 {$k}", 200),
+                'contact_name' => $this->cut($in['contact_name'] ?? '', 120),
+                'phone'        => $this->cut($in['phone'] ?? '', 60),
+                'email'        => '',
+                'channel'      => $this->cut(($in['channel'] ?? '') ?: 'other', 200),
+                'volume'       => '',
+                'message'      => '',
+                'memo'         => $this->cut(($in['memo'] ?? '') ?: '임시(시드) — 실제 신청 아님', 500),
+                'status'       => 'applied',
+                'created_at'   => $now,
+                'updated_at'   => $now,
+            ]);
+        }
+        return $this->json(['ok' => true, 'added' => $n, 'count' => $this->counts()[$tid . '|' . $pid] ?? 0], 201);
+    }
+
+    private function adminClearSeed(): ResponseInterface
+    {
+        $tid = (string) (service('request')->getGet('trip_id') ?? '');
+        $b   = db_connect()->table('meet_requests')->like('buyer_id', self::SEED_PREFIX, 'after');
+        if ($tid !== '') {
+            $b->where('trip_id', $tid);
+        }
+        $n = (clone $b)->countAllResults();
+        $b->delete();
+        return $this->json(['ok' => true, 'deleted' => $n]);
     }
 
     /* ================= 도우미 ================= */
