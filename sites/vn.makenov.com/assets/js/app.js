@@ -922,20 +922,36 @@ function mtEventHero(tr){
     </div>
   </div>`;
 }
-/* 제품 페이지 히어로의 첫 슬라이드 — 다가오는 방문 일정에서 만든다(2026-09-30).
+/* 제품 페이지 히어로의 첫 슬라이드 — 다가오는 방문 일정으로 만든 '행사 포스터'(2026-09-30).
+   다른 슬라이드(어두운 SVG 일러스트 + 흰 글씨)와 일부러 다르게: 밝은 바탕 · 큰 날짜 · 실제 공급사 제품 사진.
    DB 슬라이드(hero_slides)에 넣지 않은 이유: 관리자 '문구 수정'이 슬라이드를 순번(hero.0.title …)으로
-   덮어쓰고 있어 맨 앞에 끼우면 기존 문구가 한 칸씩 밀린다. 행사명·날짜·장소가 바뀌면 자동으로 따라간다. */
+   덮어쓰고 있어 맨 앞에 끼우면 기존 문구가 한 칸씩 밀린다. 행사명·날짜·장소가 바뀌면 자동으로 따라간다.
+   products.html renderHero 가 s.html 이 있으면 그대로 그리고, cls 의 light 로 점·화살표 색을 바꾼다. */
 function mtHeroSlides(){
   if(typeof MkMeet === 'undefined') return [];
   const tr = MkMeet.upcoming().find(x => x.open && MkMeet.itemsOf(x).length);
   if(!tr) return [];
-  const when = [mtFmt(tr.visit_date, { month:'long', day:'numeric', weekday:'short' }), mtTime(tr), mtWhere(tr)].filter(Boolean).join(' · ');
-  return [{
-    art: 'assets/img/hero/hero-meeting.svg',
-    link: mkUrl('meetings.html') + '#trip-' + tr.id,
-    title: (L(tr.title) || t('mt_page_kick')) + '\n' + t('mt_hero_line'),
-    sub: when,
-  }];
+  const items = MkMeet.itemsOf(tr);
+  const d = mtDate(tr.visit_date);
+  const mm = d ? String(d.getMonth() + 1).padStart(2, '0') : '', dd = d ? String(d.getDate()).padStart(2, '0') : '';
+  const dday = tr.days_left != null && tr.days_left > 0 ? `<span class="dd">D-${tr.days_left}</span>` : '';
+  const pics = items.slice(0, 4).map(it => {
+    const p = mkProduct(it.product_id);
+    return `<figure><img src="${esc(p.img)}" alt="${esc(L(p.name))}" loading="lazy"><figcaption>${esc(p.brand)}</figcaption></figure>`;
+  });
+  const where = [mtTime(tr), mtWhere(tr)].filter(Boolean).join(' · ');
+  const html = `<a class="mt-hs" href="${mkUrl('meetings.html')}#trip-${esc(tr.id)}">
+    <div class="mt-hs-l">
+      <div class="mt-hs-chips"><span class="k">${esc(t('mt_hs_kick'))}</span>${dday}</div>
+      <h2>${esc(L(tr.title) || t('mt_page_kick'))}</h2>
+      <p class="line">${esc(t('mt_hero_line'))}</p>
+      <div class="mt-hs-when"><b>${mm}.${dd}</b><span><em>${esc(mtFmt(tr.visit_date, { weekday:'long' }))}</em>${where ? `<i>${esc(where)}</i>` : ''}</span></div>
+      <span class="btn btn-primary">${esc(t('mt_ev_cta'))} →</span>
+    </div>
+    <div class="mt-hs-r"><div class="col">${pics.filter((_, n) => n % 2 === 0).join('')}</div><div class="col off">${pics.filter((_, n) => n % 2 === 1).join('')}</div>
+      <span class="cnt">${esc(mtRep('mt_suppliers', { n: items.length }))}</span></div>
+  </a>`;
+  return [{ html, cls: 'light', link: mkUrl('meetings.html') + '#trip-' + tr.id }];
 }
 /* 일정 하나를 한 줄 요약 — 홈 섹션용. 막대는 공급사 전체 합계 */
 function mtMini(tr){
