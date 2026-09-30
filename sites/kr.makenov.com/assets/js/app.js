@@ -849,7 +849,7 @@ function mtBar(it){
 }
 function mtNeedTxt(it){ return it.confirmed ? t('mt_st_confirmed') : mtRep('mt_need_more', { n: Math.max(0, it.goal - it.count) }); }
 function mtProg(it, right){
-  return `<div class="mt-prog"><b>${it.count}<small> / ${it.goal}</small></b>${right != null ? right : `<span class="need ${it.confirmed ? 'done' : ''}">${esc(mtNeedTxt(it))}</span>`}</div>`;
+  return `<div class="mt-prog"><b>${it.count}</b>${right != null ? right : `<span class="need ${it.confirmed ? 'done' : ''}">${esc(mtNeedTxt(it))}</span>`}</div>`;
 }
 /* 신청 버튼 — 확정된 뒤에도 마감 전이면 더 받는다(공급사 입장에선 미팅이 늘수록 좋다) */
 function mtAction(tr, it){
@@ -859,7 +859,7 @@ function mtAction(tr, it){
   if(tr.open) return `<button class="btn btn-primary" onclick="event.preventDefault();openMeetApply(${a})">${esc(t('mt_btn_apply'))}</button>`;
   return `<button class="btn btn-ghost" disabled>${esc(t('mt_st_' + mtTripState(tr)))}</button>`;
 }
-/* '2/5곳 신청' — 신청 수(2)만 크게, 나머지는 작게. 문구 틀(mt_joined)은 언어별로 그대로 쓴다 */
+/* '2곳 신청' — 신청 수(2)만 크게(2026-09-30 목표 '/5' 표기는 뺐다), 나머지는 작게. 문구 틀(mt_joined)은 언어별로 그대로 쓴다 */
 function mtJoinedHtml(it){
   const parts = mtRep('mt_joined', { n: '\u0000', g: it.goal }).split('\u0000');
   return `<span class="mt-jn">${esc(parts[0] || '')}<b>${it.count}</b><small>${esc(parts[1] || '')}</small></span>`;
@@ -940,7 +940,7 @@ function mtFeatured(tr){
   /* 공급사 사진은 전부 — 4개 넘으면 좌우 슬라이드(화살표 + 가로 스크롤). 사진을 누르면 그 제품의 펀딩 패널로 */
   const tiles = items.map(it => {
     const p = mkProduct(it.product_id);
-    return `<a class="mt-f-tile ${it.confirmed ? 'done' : ''}" href="${mkDocUrl('product', p.id)}#meet"><div class="im"><img src="${esc(p.img)}" alt="${esc(L(p.name))}" loading="lazy">${it.confirmed ? `<span class="ok">${MT_ICO.check}</span>` : ''}</div><div class="bd"><div class="br">${esc(p.brand)}</div><div class="nm">${esc(L(p.name))}</div>${mtBar(it)}<div class="pr"><span><b>${it.count}</b>/${it.goal}</span><em>${mtPct(it)}%</em></div></div></a>`;
+    return `<a class="mt-f-tile ${it.confirmed ? 'done' : ''}" href="${mkDocUrl('product', p.id)}#meet"><div class="im"><img src="${esc(p.img)}" alt="${esc(L(p.name))}" loading="lazy">${it.confirmed ? `<span class="ok">${MT_ICO.check}</span>` : ''}</div><div class="bd"><div class="br">${esc(p.brand)}</div><div class="nm">${esc(L(p.name))}</div>${mtBar(it)}<div class="pr">${mtJoinedHtml(it)}<em>${mtPct(it)}%</em></div></div></a>`;
   }).join('');
   const arrow = d => `<button type="button" class="mt-f-nav ${d < 0 ? 'prev' : 'next'}" onclick="mtSlide(this,${d})" aria-label="${d < 0 ? 'prev' : 'next'}"><svg viewBox="0 0 24 24"><path d="${d < 0 ? 'M15 5l-7 7 7 7' : 'M9 5l7 7-7 7'}"/></svg></button>`;
   return `<div class="mt-f">

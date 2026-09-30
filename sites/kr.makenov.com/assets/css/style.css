@@ -1746,7 +1746,9 @@ body.mkedit-on .omc-hero .slide.on .shot{pointer-events:none}
 .mt-f-tile .br{font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--mk-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mt-f-tile .nm{margin:3px 0 10px;font-size:14px;font-weight:600;line-height:1.35;color:var(--mk-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mt-f-tile .pr{display:flex;align-items:baseline;justify-content:space-between;gap:6px;margin-top:8px;font-size:12.5px;color:var(--mk-body)}
-.mt-f-tile .pr b{font-size:16px;font-weight:800;color:var(--mk-ink);margin-right:1px}
+.mt-f-tile .pr b{font-size:16px;font-weight:800;color:var(--mk-ink);margin-right:2px}
+.mt-f-tile .pr .mt-jn{white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis;flex-wrap:nowrap}
+.mt-f-tile .pr .mt-jn small{font-size:12px}
 .mt-f-tile .pr em{font-style:normal;font-weight:700;color:var(--mk-primary-dark)}
 .mt-f-tile.done .pr em{color:var(--mk-navy)}
 /* 행사 기본 정보(일자·시간·행사장) — 홈 카드 */
