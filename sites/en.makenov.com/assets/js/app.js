@@ -843,8 +843,11 @@ function mtDdayChip(tr){
   const txt = tr.days_left <= 0 ? t('mt_dday_today') : mtRep('mt_dday', { n: tr.days_left });
   return `<span class="mt-chip dday">${MT_ICO.clock}${esc(txt)}</span>`;
 }
+/* 달성률 — 2026-09-30 사용자 결정: 신청 1곳당 20% 고정(목표 인원과 무관). 100% 넘게 쌓일 수 있고 막대는 100%에서 멈춘다.
+   공급사별 항목(product_id 있음)에만 적용. 일정 전체 합계 막대(mtMini)는 종전대로 합계/목표 비율. */
+const MT_PCT_PER = 20;
 function mtBar(it){
-  const pct = Math.min(100, Math.round((it.count || 0) / Math.max(1, it.goal) * 100));
+  const pct = Math.min(100, it.product_id ? mtPct(it) : Math.round((it.count || 0) / Math.max(1, it.goal) * 100));
   return `<div class="mt-bar ${it.confirmed ? 'done' : ''}"><i style="width:${pct}%"></i></div>`;
 }
 function mtNeedTxt(it){ return it.confirmed ? t('mt_st_confirmed') : mtRep('mt_need_more', { n: Math.max(0, it.goal - it.count) }); }
@@ -864,7 +867,7 @@ function mtJoinedHtml(it){
   const parts = mtRep('mt_joined', { n: '\u0000', g: it.goal }).split('\u0000');
   return `<span class="mt-jn">${esc(parts[0] || '')}<b>${it.count}</b><small>${esc(parts[1] || '')}</small></span>`;
 }
-function mtPct(it){ return Math.round((it.count || 0) / Math.max(1, it.goal) * 100); }
+function mtPct(it){ return (it.count || 0) * MT_PCT_PER; }
 function mtDdayTxt(tr){
   if(!tr.open) return t('mt_st_' + mtTripState(tr));
   if(tr.days_left == null) return t('mt_st_open');
