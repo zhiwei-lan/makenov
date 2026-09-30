@@ -707,7 +707,7 @@ function cardMeta(p){
 
 function productCard(p){
   const inCart = Store.cartHas(p.id);
-  const flag = p.isNew ? `<span class="flag" data-i18n="spot_new"></span>` : (p.featured?`<span class="flag">FEATURED</span>`:'');
+  const flag = '';   // 2026-09-30 '신제품 등록'·FEATURED 배지 삭제(사용자 요청) — 카드 사진 위 표시 없음
   return `
   <a class="p-card" href="${mkDocUrl('product',p.id)}" data-cat="${esc(p.cat||'')}"><div class="thumb"><img src="${p.img}" alt="${esc(L(p.name))}" loading="lazy">${flag}
       <button class="heart ${inCart?'on':''}" onclick="event.preventDefault();event.stopPropagation();toggleCart('${p.id}',this)">${inCart?'♥':'♡'}</button></div><div class="body"><span class="brand">${esc(p.brand)}</span><h3>${esc(L(p.name))}</h3><div class="meta">${cardMeta(p)}<span class="left">${esc(p.origin)}</span></div>${mtCardLine(p.id)}</div></a>`;
@@ -1030,7 +1030,6 @@ function mtFeatured(tr){
       <h3>${esc(L(tr.title) || t('mt_page_kick'))}</h3>
       ${mtFacts(tr)}
       <div class="mt-f-nums"><div><b>${items.length}</b><span>${esc(t('mt_ev_sup'))}</span></div><div><b>${joined}</b><span>${esc(t('mt_ev_joined'))}</span></div>${left}</div>
-      <a class="btn btn-primary" href="${mkUrl('meetings.html')}#trip-${esc(tr.id)}">${esc(t('mt_ev_cta'))} →</a>
     </div>
     <div class="mt-f-slide">
       <div class="mt-f-tiles" onscroll="mtSlideSync(this)">${tiles}</div>
