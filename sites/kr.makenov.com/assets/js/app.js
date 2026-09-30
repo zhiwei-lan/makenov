@@ -935,7 +935,7 @@ function mtHeroSlides(){
   const d = mtDate(tr.visit_date);
   const mm = d ? String(d.getMonth() + 1).padStart(2, '0') : '', dd = d ? String(d.getDate()).padStart(2, '0') : '';
   const dday = tr.days_left != null && tr.days_left > 0 ? `<span class="dd">D-${tr.days_left}</span>` : '';
-  const pics = items.slice(0, 4).map(it => {
+  const pics = items.slice(0, 3).map(it => {
     const p = mkProduct(it.product_id);
     return `<figure><img src="${esc(p.img)}" alt="${esc(L(p.name))}" loading="lazy"><figcaption>${esc(p.brand)}</figcaption></figure>`;
   });
@@ -948,8 +948,7 @@ function mtHeroSlides(){
       <div class="mt-hs-when"><b>${mm}.${dd}</b><span><em>${esc(mtFmt(tr.visit_date, { weekday:'long' }))}</em>${where ? `<i>${esc(where)}</i>` : ''}</span></div>
       <span class="btn btn-primary">${esc(t('mt_ev_cta'))} →</span>
     </div>
-    <div class="mt-hs-r"><div class="col">${pics.filter((_, n) => n % 2 === 0).join('')}</div><div class="col off">${pics.filter((_, n) => n % 2 === 1).join('')}</div>
-      <span class="cnt">${esc(mtRep('mt_suppliers', { n: items.length }))}</span></div>
+    <div class="mt-hs-r">${pics.join('')}<span class="cnt">${esc(mtRep('mt_suppliers', { n: items.length }))}</span></div>
   </a>`;
   return [{ html, cls: 'light', link: mkUrl('meetings.html') + '#trip-' + tr.id }];
 }
@@ -979,10 +978,10 @@ function mkHeroSlides(){
 
   /* 2) 제품 — 실제 제품 사진 4장 */
   if(prods.length){
-    const pics = prods.slice(0, 4).map(p => `<figure><img src="${esc(p.img)}" alt="${esc(L(p.name))}" loading="lazy"><figcaption>${esc(p.brand)}</figcaption></figure>`);
+    const pics = prods.slice(0, 3).map(p => `<figure><img src="${esc(p.img)}" alt="${esc(L(p.name))}" loading="lazy"><figcaption>${esc(p.brand)}</figcaption></figure>`);
     out.push({ cls: 'light', html: shell('hs-prod', mkUrl('products.html'),
       leftHtml('hs_prod_kick', 'hs_prod_t', 'hs_prod_p', 'hs_prod_cta'),
-      `<div class="col">${pics.filter((_, n) => n % 2 === 0).join('')}</div><div class="col off">${pics.filter((_, n) => n % 2 === 1).join('')}</div>`) });
+      pics.join('')) });
   }
 
   /* 3) 공급사 — 로고·지역 카드 */
