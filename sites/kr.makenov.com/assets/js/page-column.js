@@ -133,7 +133,7 @@ function pageInit(){
   document.getElementById('col-root').innerHTML = `
     <nav class="blog-breadcrumb"><a href="index.html" data-i18n="col_home"></a> -
       <a href="columns.html" data-i18n="nav_columns"></a> -
-      <span>${esc(L(c.title))}</span></nav><span class="blog-single-cat">${esc(L(c.cat))}</span><h1>${esc(L(c.title))}</h1><div class="blog-single-meta"><span>${esc(c.date)}</span><i></i><span>${readTime(L(c.body))}</span></div><div class="blog-cover"><img src="${c.img}" alt="${esc(L(c.title))}" fetchpriority="high" decoding="async"></div><div class="blog-body">${colScopeBody(L(c.body), !!L(c.cat))}</div><div class="blog-nav">
+      <span>${esc(L(c.title))}</span></nav><span class="blog-single-cat">${esc(L(c.cat))}</span><h1>${esc(L(c.title))}</h1><div class="blog-single-meta"><span>${esc(c.date)}</span><i></i><span>${colRead(c)}</span></div><div class="blog-cover"><img src="${c.img}" alt="${esc(L(c.title))}" fetchpriority="high" decoding="async"></div><div class="blog-body">${colScopeBody(L(c.body), !!L(c.cat))}</div><div class="blog-nav">
       ${prev ? `<a href="${mkDocUrl('column',prev.id)}"><div class="dir" data-i18n="col_prev"></div><b>${esc(L(prev.title))}</b></a>` : '<span></span>'}
       ${next ? `<a class="next" href="${mkDocUrl('column',next.id)}"><div class="dir" data-i18n="col_next"></div><b>${esc(L(next.title))}</b></a>` : '<span></span>'}
     </div>${colFaq(c.id)}<div class="blog-cta"><h3 data-i18n="promo_title"></h3><p data-i18n="promo_desc"></p><button class="btn btn-primary btn-lg" onclick="openAuth('signup')" data-i18n="promo_btn"></button></div>`;
@@ -148,7 +148,7 @@ function pageInit(){
     el.id = 'col-others';
     el.style.marginTop = '56px';
     el.innerHTML = `<div class="sec-head"><h2 data-i18n="col_related"></h2><a class="more" href="columns.html" data-i18n="view_more"></a></div><div class="blog-list">${others.map(o=>`
-        <div class="blog-item"><a class="blog-item-link" href="${mkDocUrl('column',o.id)}"><div class="blog-item-thumb"><img src="${o.img}" alt="${esc(L(o.title))}" loading="lazy" decoding="async"></div><div class="blog-item-info"><div class="blog-item-cat">${esc(L(o.cat))}</div><h3 class="blog-item-tit">${esc(L(o.title))}</h3><div class="blog-item-meta"><span>${esc(o.date)}</span><i></i><span>${readTime(L(o.body))}</span></div></div></a></div>`).join('')}</div>`;
+        <div class="blog-item"><a class="blog-item-link" href="${mkDocUrl('column',o.id)}"><div class="blog-item-thumb"><img src="${o.img}" alt="${esc(L(o.title))}" loading="lazy" decoding="async"></div><div class="blog-item-info"><div class="blog-item-cat">${esc(L(o.cat))}</div><h3 class="blog-item-tit">${esc(L(o.title))}</h3><div class="blog-item-meta"><span>${esc(o.date)}</span><i></i><span>${colRead(o)}</span></div></div></a></div>`).join('')}</div>`;
     document.querySelector('main').appendChild(el);
     applyI18n(el);
   }

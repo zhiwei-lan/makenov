@@ -95,10 +95,18 @@ const MkData = {
     const pSe = later(SB.from('settings').select('*').eq('key', 'seo').maybeSingle());
     const pCp = later(SB.from('settings').select('*').eq('key', 'copy').maybeSingle());
 
+    /* 칼럼 본문은 목록에 필요 없다 — 이미지가 base64 로 박힌 글 때문에 본문 합이 10MB 가 되어
+       모든 페이지 부팅이 1분 가까이 멈췄다(2026-09-30). 목록은 본문 대신 읽기 시간(read_min)만 받고,
+       본문은 칼럼 상세를 다시 그려야 할 때 그 글 하나만 받는다. 관리자 화면은 편집하려면 본문이 필요하다. */
+    const colSel = adminView ? '*' : 'id,cat,title,excerpt,img,date,slug,seo_title,seo_desc,read_min';
+    const colId = window.MK_CID || (/\/column\.html$/.test(location.pathname) ? new URLSearchParams(location.search).get('id') : null);
+    const needBody = !adminView && colId && (!window.MK_CID
+      || (document.documentElement.getAttribute('lang') || 'vi').toLowerCase() !== (typeof MK_LANG !== 'undefined' ? MK_LANG : 'vi'));
+    const pBody = needBody ? later(SB.from('columns_post').select('id,body').eq('id', colId).maybeSingle()) : null;
     const [co, pr, cl, he] = await Promise.all([
       SB.from('companies').select('*').order('sort'),
       prq.order('created_at', {ascending:false}),
-      SB.from('columns_post').select('*').eq('published', true).order('date', {ascending:false}),
+      SB.from('columns_post').select(colSel).eq('published', true).order('date', {ascending:false}),
       SB.from('hero_slides').select('*').eq('active', true).order('sort'),
     ]);
     if(co.error || pr.error) { console.error('MAKENOV 콘텐츠 로드 실패', co.error || pr.error); return; }
@@ -141,8 +149,13 @@ const MkData = {
     (cl.data||[]).forEach(c => MK_COLUMNS.push({
       id:c.id, cat:c.cat, title:c.title, excerpt:c.excerpt, body:c.body,
       img:c.img, date:String(c.date||'').slice(0,10),
-      slug:c.slug||'', seoTitle:c.seo_title||'', seoDesc:c.seo_desc||'',
+      slug:c.slug||'', seoTitle:c.seo_title||'', seoDesc:c.seo_desc||'', readMin:c.read_min||null,
     }));
+    if(pBody){
+      const one = await pBody;
+      const cc = one && one.data && MK_COLUMNS.find(x => x.id === one.data.id);
+      if(cc) cc.body = one.data.body;
+    }
 
     /* FAQ — 06_faq_seo.sql 미적용이면 테이블이 없으므로 시드(data.js)를 그대로 둔다 */
     try{

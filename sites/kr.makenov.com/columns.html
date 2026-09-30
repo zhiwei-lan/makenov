@@ -101,9 +101,9 @@
 <script src="assets/js/store.js?v=20260817b"></script>
 <script src="assets/js/verify.js?v=20260817b"></script>
 <script src="assets/js/upload.js?v=20260918a"></script>
-<script src="assets/js/store-supabase.js?v=20260930a"></script>
+<script src="assets/js/store-supabase.js?v=20260930b"></script>
 <script src="assets/js/copy-edit.js?v=20260918c"></script>
-<script src="assets/js/app.js?v=20260930f"></script>
+<script src="assets/js/app.js?v=20260930g"></script>
 <script>
 let colCat = 'all', colQ = '';
 
@@ -144,7 +144,7 @@ function renderCols(){
   });
 
   document.getElementById('blog-list').innerHTML = list.length ? list.map(c=>`
-    <div class="blog-item"><a class="blog-item-link" href="${mkDocUrl('column',c.id)}"><div class="blog-item-img"><img src="${c.img}" alt="${esc(L(c.title))}" loading="lazy"><div class="veil"></div><div class="on-cover"><span class="badge">MAKENOV INSIGHTS</span><div class="brand">MAKENOV</div></div></div><div class="blog-item-info"><div class="blog-item-cat">${esc(L(c.cat))}</div><h3 class="blog-item-tit">${esc(L(c.title))}</h3><div class="blog-item-meta"><span>${esc(c.date)}</span><i></i><span>${readTime(L(c.body))}</span></div></div></a></div>`).join('') : `<div class="blog-empty" data-i18n="col_empty"></div>`;
+    <div class="blog-item"><a class="blog-item-link" href="${mkDocUrl('column',c.id)}"><div class="blog-item-img"><img src="${c.img}" alt="${esc(L(c.title))}" loading="lazy"><div class="veil"></div><div class="on-cover"><span class="badge">MAKENOV INSIGHTS</span><div class="brand">MAKENOV</div></div></div><div class="blog-item-info"><div class="blog-item-cat">${esc(L(c.cat))}</div><h3 class="blog-item-tit">${esc(L(c.title))}</h3><div class="blog-item-meta"><span>${esc(c.date)}</span><i></i><span>${colRead(c)}</span></div></div></a></div>`).join('') : `<div class="blog-empty" data-i18n="col_empty"></div>`;
 
   applyI18n(document.querySelector('.blog-layout'));
 }

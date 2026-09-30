@@ -21,6 +21,12 @@ function readTime(html){
   const min = Math.max(1, Math.round(txt.length / 450));
   return min + t('read_min');
 }
+/* 칼럼 읽기 시간 — 본문이 있으면 직접 세고, 없으면(목록은 본문을 안 받는다) 서버가 센 read_min */
+function colRead(c){
+  if(c && c.body) return readTime(L(c.body));
+  const m = c && c.readMin ? Number(L(c.readMin)) : 0;
+  return m ? m + t('read_min') : '';
+}
 /* 에셋 캐시 버전 — HTML의 ?v= 를 그대로 물려받는다.
    이미지·SVG처럼 HTML에 직접 안 적히는 파일에도 같은 버전을 붙이기 위함. */
 const MK_V = (()=>{

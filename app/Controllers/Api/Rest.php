@@ -109,6 +109,9 @@ class Rest extends BaseApiController
 
     /* ================= 진입점 (라우트에서 table 세그먼트로 온다) ================= */
 
+    /** ?select= 로 컬럼을 좁혀 받을 수 있는 테이블 (read 참고) */
+    private const SELECT_TABLES = ['columns_post'];
+
     public function handle(string $table): ResponseInterface
     {
         if ($fail = $this->requirePublic()) {
@@ -158,6 +161,25 @@ class Rest extends BaseApiController
 
         $b = db_connect()->table($table);
         $this->applyQuery($b, self::SCHEMA[$table]['cols'], self::SCHEMA[$table]['bool']);
+        /* ?select=a,b,c — 지정한 컬럼만 보낸다. 2026-09-30 칼럼 본문(이미지가 base64 로 박힌 글 포함)이
+           합쳐서 10MB 가 되어 모든 페이지 부팅이 1분 가까이 멈췄다. 목록에는 본문이 필요 없다.
+           다른 테이블은 지금까지 select 를 무시해 왔고 프론트가 그 동작에 기대고 있을 수 있어 이 테이블만. */
+        if (in_array($table, self::SELECT_TABLES, true)) {
+            $sel  = trim((string) (service('request')->getGet('select') ?? '*'));
+            $want = array_values(array_intersect(
+                array_map('trim', explode(',', $sel)),
+                self::SCHEMA[$table]['cols'],
+                $this->dbFields($table)
+            ));
+            /* read_min(가상 컬럼): 본문은 안 보내고 읽기 시간(분)만 언어별로 — app.js readTime 과 같은 규칙 */
+            $readMin = $sel !== '*' && in_array('read_min', array_map('trim', explode(',', $sel)), true);
+            if ($readMin && ! in_array('body', $want, true)) {
+                $want[] = 'body';
+            }
+            if ($sel !== '*' && $want) {
+                $b->select($want);
+            }
+        }
 
         /* own 계열이면 소유자 필터를 강제로 덧붙인다 (요청 필터와 무관하게) */
         if (in_array($pol['read'], ['own', 'own_or_admin'], true) && ! $this->isAdmin) {
@@ -172,7 +194,30 @@ class Rest extends BaseApiController
             fn ($r) => $this->decode($table, $r),
             $b->get()->getResultArray()
         );
+        if (! empty($readMin)) {
+            $keepBody = in_array('body', array_map('trim', explode(',', $sel)), true);
+            foreach ($rows as &$r) {
+                $rm = [];
+                foreach ((array) ($r['body'] ?? []) as $lang => $html) {
+                    $rm[$lang] = $this->readMinutes((string) $html);
+                }
+                $r['read_min'] = (object) $rm;
+                if (! $keepBody) {
+                    unset($r['body']);
+                }
+            }
+            unset($r);
+        }
         return $this->rows($rows);
+    }
+
+    /** 읽기 시간(분) — HTML 제거 후 글자수/450, 최소 1. app.js readTime · bake-columns.js stripHtml 과 같은 규칙 */
+    private function readMinutes(string $html): int
+    {
+        $txt = preg_replace('#<(style|script)[^>]*>.*?</\1\s*>#is', ' ', $html);
+        $txt = preg_replace('/<[^>]*>/', ' ', (string) $txt);
+        $txt = trim((string) preg_replace('/\s+/u', ' ', (string) $txt));
+        return max(1, (int) round(mb_strlen($txt) / 450));
     }
 
     /* ================= INSERT (+ upsert) ================= */
