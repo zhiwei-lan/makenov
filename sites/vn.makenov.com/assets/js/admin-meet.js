@@ -65,7 +65,7 @@ function meetListHtml(){
         <span style="display:inline-block;width:80px;height:6px;border-radius:9px;background:#E9ECEF;overflow:hidden"><i style="display:block;height:100%;width:${Math.min(100, Math.round(i.count / i.goal * 100))}%;background:${i.confirmed ? '#022E7D' : '#27CAA1'}"></i></span>
         <b style="min-width:40px;text-align:right">${i.count}/${i.goal}</b></div>`).join('');
     const dl = tr.days_left;
-    return `<tr class="row-hover"><td><b>${esc(tr.visit_date || '')}</b>${tr.visit_end && tr.visit_end !== tr.visit_date ? `<div class="sub">~ ${esc(tr.visit_end)}</div>` : ''}<div class="sub">마감 ${esc(tr.deadline || '없음')}${tr.open && dl != null ? ` (D-${dl})` : ''}</div></td>
+    return `<tr class="row-hover"><td><b>${esc(tr.visit_date || '미정')}</b>${tr.visit_end && tr.visit_end !== tr.visit_date ? `<div class="sub">~ ${esc(tr.visit_end)}</div>` : ''}<div class="sub">마감 ${esc(tr.deadline || '없음')}${tr.open && dl != null ? ` (D-${dl})` : ''}</div></td>
       <td><b>${esc(triText(tr.title) || tr.id)}</b><div class="sub">${esc(triText(tr.city))} · ${esc(tr.id)}</div>${prog}</td>
       <td>${esc(MEET_ST[tr.status] || tr.status)}<div class="sub">${tr.published ? '사이트 노출' : '<span style="color:#B02A37">숨김</span>'}</div><div class="sub">확정 ${done}/${items.length}</div></td>
       <td><button class="btn btn-ghost btn-sm" onclick="meetReqTrip=meetReqTrip==='${esc(tr.id)}'?null:'${esc(tr.id)}';document.getElementById('tab-meet').innerHTML=meetListHtml()">신청자 ${reqN}</button>
@@ -139,7 +139,7 @@ function meetForm(id){
       <button class="btn btn-ghost btn-sm" onclick="meetEdit=null;renderMeet()">취소</button><button class="btn btn-primary btn-sm" onclick="meetSave(${tr ? `'${esc(tr.id)}'` : 'null'})">저장</button></div>
       <div class="fgrid">
         <div class="fld"><label>일정 ID (영문 소문자·숫자·하이픈)</label><input id="mt-id" value="${esc(tr ? tr.id : '')}" ${tr ? 'disabled' : ''} placeholder="visit-20261203"></div>
-        <div class="fld"><label>방문일 (필수)</label><input id="mt-visit" type="date" value="${esc(tr ? tr.visit_date || '' : '')}" onchange="if(!document.getElementById('mt-id').value&&this.value)document.getElementById('mt-id').value='visit-'+this.value.replace(/-/g,'')"></div>
+        <div class="fld"><label>방문일 (비우면 ‘미정’)</label><input id="mt-visit" type="date" value="${esc(tr ? tr.visit_date || '' : '')}" onchange="if(!document.getElementById('mt-id').value&&this.value)document.getElementById('mt-id').value='visit-'+this.value.replace(/-/g,'')"></div>
         <div class="fld"><label>방문 마지막 날 (하루면 비움)</label><input id="mt-end" type="date" value="${esc(tr ? tr.visit_end || '' : '')}"></div>
         <div class="fld"><label>시작 시각 (베트남 시간)</label><input id="mt-t1" type="time" value="${esc(tr ? tr.time_start || '' : '')}"></div>
         <div class="fld"><label>종료 시각 (비워도 됨)</label><input id="mt-t2" type="time" value="${esc(tr ? tr.time_end || '' : '')}"></div>
@@ -173,9 +173,8 @@ async function meetSave(id){
       product_id: r.querySelector('.mi-pid').value, goal: Number(r.querySelector('.mi-goal').value) || 5,
     })),
   };
-  if(!body.visit_date){ toastA('방문일을 입력하세요'); return; }
   if(!/^[a-z0-9][a-z0-9-]{2,39}$/.test(tid)){ toastA('일정 ID 는 영문 소문자·숫자·하이픈 3~40자 (예: visit-20261203)'); return; }
-  if(body.deadline && body.deadline > body.visit_date){ toastA('마감일이 방문일보다 늦습니다'); return; }
+  if(body.deadline && body.visit_date && body.deadline > body.visit_date){ toastA('마감일이 방문일보다 늦습니다'); return; }
   if(!body.items.length){ toastA('공급사(제품)를 하나 이상 넣으세요'); return; }
   toastA('저장하는 중…');
   try{ await MeetAdmin.saveTrip(tid, body); toastA('저장했습니다'); meetEdit = null; renderMeet(); }

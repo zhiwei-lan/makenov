@@ -794,7 +794,10 @@ const MkMeet = {
   reload(){ this._p = null; return this.load(); },
   trip(id){ return this.trips.find(x => x.id === id) || null; },
   /* 방문일이 오늘 이후(또는 미정)인 일정 — 취소 제외, 방문일 순 */
-  upcoming(){ return this.trips.filter(x => x.status !== 'cancelled' && (x.days_to_visit == null || x.days_to_visit >= 0)); },
+  upcoming(){
+    return this.trips.filter(x => x.status !== 'cancelled' && (x.days_to_visit == null || x.days_to_visit >= 0))
+      .sort((a, b) => (a.visit_date ? 0 : 1) - (b.visit_date ? 0 : 1));    // 방문일 미정은 뒤로(나머지는 서버 순서 유지)
+  },
   past(){ return this.trips.filter(x => x.status !== 'cancelled' && x.days_to_visit != null && x.days_to_visit < 0).reverse(); },
   /* 공개 제품만 — 비공개·삭제된 제품은 일정에서 조용히 뺀다 */
   itemsOf(tr){ return (tr.items || []).filter(it => mkProduct(it.product_id)); },
@@ -815,6 +818,7 @@ function mtShort(iso){ return MK_LANG === 'ko' ? mtFmt(iso, { month:'long', day:
 function mtRep(key, map){ let s = t(key); for(const k in map) s = s.split('{' + k + '}').join(map[k]); return s; }
 /* 행사 기본 정보 — 일자 · 시간 · 장소. 비어 있으면 '추후 안내' (관리자 › 미팅 펀딩에서 입력) */
 function mtWhen(tr){
+  if(!tr.visit_date) return '';                       // 방문일 미정
   const end = tr.visit_end && tr.visit_end !== tr.visit_date ? ' – ' + mtLong(tr.visit_end) : '';
   return mtLong(tr.visit_date) + end;
 }
@@ -824,12 +828,13 @@ function mtTime(tr){
 }
 function mtWhere(tr){ return [L(tr.venue), L(tr.city)].filter(x => String(x || '').trim()).join(' · '); }
 function mtFacts(tr, cls){
-  const row = (ico, k, v) => `<li><span class="k">${ico}${esc(t(k))}</span><b class="${v ? '' : 'tba'}">${esc(v || t('mt_tba'))}</b></li>`;
-  return `<ul class="mt-facts ${cls || ''}">${row(MT_ICO.cal, 'mt_f_date', mtWhen(tr))}${row(MT_ICO.clock, 'mt_f_time', mtTime(tr))}${row(MT_ICO.pin, 'mt_f_venue', mtWhere(tr))}</ul>`;
+  const row = (ico, k, v, none) => `<li><span class="k">${ico}${esc(t(k))}</span><b class="${v ? '' : 'tba'}">${esc(v || t(none || 'mt_tba'))}</b></li>`;
+  return `<ul class="mt-facts ${cls || ''}">${row(MT_ICO.cal, 'mt_f_date', mtWhen(tr), 'mt_tbd')}${row(MT_ICO.clock, 'mt_f_time', mtTime(tr))}${row(MT_ICO.pin, 'mt_f_venue', mtWhere(tr))}</ul>`;
 }
 
 function mtDateBadge(iso){
   const d = mtDate(iso);
+  if(!d) return `<div class="mt-date tbd"><span class="d">${esc(t('mt_tbd'))}</span></div>`;   // 방문일 미정
   return `<div class="mt-date"><span class="mo">${esc(mtFmt(iso, { month:'short' }))}</span><span class="d">${d ? d.getDate() : ''}</span><span class="dw">${esc(mtFmt(iso, { weekday:'short' }))}</span></div>`;
 }
 function mtTripState(tr){
@@ -902,7 +907,7 @@ function mtEventHero(tr){
   return `<div class="mt-ev" id="trip-${esc(tr.id)}">
     <div class="mt-ev-l">
       <div class="kick">${esc(t('mt_next_kick'))}</div>
-      <div class="mt-ev-date"><b>${esc(mtFmt(tr.visit_date, { month:'long', day:'numeric' }))}${end}</b><span>${esc(mtFmt(tr.visit_date, { weekday:'long' }))}</span></div>
+      <div class="mt-ev-date">${tr.visit_date ? `<b>${esc(mtFmt(tr.visit_date, { month:'long', day:'numeric' }))}${end}</b><span>${esc(mtFmt(tr.visit_date, { weekday:'long' }))}</span>` : `<b>${esc(t('mt_date_tbd'))}</b>`}</div>
       <h1>${esc(L(tr.title) || t('mt_page_kick'))}</h1>
       <div class="mt-ev-meta">
         ${mtTime(tr) ? `<span>${MT_ICO.clock}${esc(mtTime(tr))}</span>` : ''}
@@ -995,9 +1000,9 @@ function mkHeroSlides(){
 }
 /* 주목할 제품 순서 — 다가오는 방문 일정(items)의 공급사 순서를 따른다. 일정에 없는 제품은 원래 순서대로 뒤에 */
 function mkFeaturedOrder(list){
-  const tr = typeof MkMeet !== 'undefined' ? MkMeet.upcoming().find(x => MkMeet.itemsOf(x).length) : null;
-  if(!tr) return list;
-  const order = tr.items.map(i => i.product_id);
+  /* 일정이 여럿이면 일정 순서대로 이어 붙인다(날짜 정해진 일정 → 미정 일정) */
+  const order = typeof MkMeet !== 'undefined' ? MkMeet.upcoming().flatMap(x => MkMeet.itemsOf(x).map(i => i.product_id)) : [];
+  if(!order.length) return list;
   const rank = p => { const i = order.indexOf(p.id); return i < 0 ? 999 : i; };
   return list.slice().sort((a, b) => rank(a) - rank(b));
 }
@@ -1032,7 +1037,7 @@ function mtFeatured(tr){
       <div class="mt-f-nums"><div><b>${items.length}</b><span>${esc(t('mt_ev_sup'))}</span></div><div><b>${joined}</b><span>${esc(t('mt_ev_joined'))}</span></div>${left}</div>
     </div>
     <div class="mt-f-slide">
-      <div class="mt-f-tiles" onscroll="mtSlideSync(this)">${tiles}</div>
+      <div class="mt-f-tiles ${items.length <= 3 ? 'few' : ''}" onscroll="mtSlideSync(this)">${tiles}</div>
       ${arrow(-1)}${arrow(1)}
     </div>
   </div>`;
@@ -1052,10 +1057,9 @@ function mtSlideSync(tr){
 function mtHomeHtml(){
   const list = MkMeet.upcoming().filter(tr => MkMeet.itemsOf(tr).length).slice(0, 4);
   if(!list.length) return '';
-  const rest = list.slice(1);
+  /* 일정마다 같은 큰 카드로 — 날짜가 정해진 일정 먼저, '방문일 미정' 일정은 그 아래 */
   return `<div class="sec-head"><h2>${esc(t('mt_home_h'))}</h2><a class="more" href="${mkUrl('meetings.html')}">${esc(t('mt_home_more'))}</a></div>`
-    + mtFeatured(list[0])
-    + (rest.length ? `<div class="mt-home" style="margin-top:16px">${rest.map(mtMini).join('')}</div>` : '');
+    + list.map(mtFeatured).join('');
 }
 /* 제품 상세 = 펀딩 페이지. 텀블벅 프로젝트 오른쪽처럼
    '신청한 기업 n곳 · 달성률' / '남은 기간' / '목표' 를 크게, 그 아래 방문일·마감·규칙, 맨 아래 큰 신청 버튼.
@@ -1079,7 +1083,7 @@ function mtFundingPanel(pid){
     </div>
     ${mtBar(it)}
     <ul class="mt-fund-info">
-      <li><span>${esc(t('mt_f_date'))}</span><b>${esc(mtWhen(tr))}</b></li>
+      <li><span>${esc(t('mt_f_date'))}</span><b class="${mtWhen(tr) ? '' : 'tba'}">${esc(mtWhen(tr) || t('mt_tbd'))}</b></li>
       <li><span>${esc(t('mt_f_time'))}</span><b class="${mtTime(tr) ? '' : 'tba'}">${esc(mtTime(tr) || t('mt_tba'))}</b></li>
       <li><span>${esc(t('mt_f_venue'))}</span><b class="${mtWhere(tr) ? '' : 'tba'}">${esc(mtWhere(tr) || t('mt_tba'))}</b></li>
       ${tr.deadline ? `<li><span>${esc(t('mt_deadline'))}</span><b>${esc(mtLong(tr.deadline))}</b></li>` : ''}
@@ -1100,7 +1104,7 @@ function mtCardLine(pid){
   const hit = MkMeet.forProduct(pid);
   if(!hit) return '';
   const { trip: tr, item: it } = hit;
-  return `<div class="mt-cardline ${it.confirmed ? 'done' : ''}">${mtJoinedHtml(it)}<em class="mt-pc">${mtPct(it)}%</em>${mtBar(it)}<span class="dd">${MT_ICO.cal}${esc(mtRep('mt_card_line', { d: mtShort(tr.visit_date) }))}</span></div>`;
+  return `<div class="mt-cardline ${it.confirmed ? 'done' : ''}">${mtJoinedHtml(it)}<em class="mt-pc">${mtPct(it)}%</em>${mtBar(it)}<span class="dd">${MT_ICO.cal}${esc(tr.visit_date ? mtRep('mt_card_line', { d: mtShort(tr.visit_date) }) : t('mt_date_tbd'))}</span></div>`;
 }
 
 /* 페이지 안의 미팅 자리들을 채운다. pageInit 뒤마다 부른다(언어 전환·신청 후 포함) */
@@ -1136,7 +1140,7 @@ function openMeetApply(tripId, pid){
   try{ mkTrack('InitiateCheckout', { content_ids:[pid], content_type:'product', content_category:'meeting' }); }catch(e){}
   const row = (id, key, attrs, val) => `<div class="f-row"><label>${esc(t(key))}</label><input id="${id}" ${attrs || ''} value="${esc(val || '')}"></div>`;
   mkModal(`<h2>${esc(t('mt_apply_h'))}</h2>
-    <p class="sub">${esc(p.brand)} · ${esc(L(p.name))}<br>${esc(mtLong(tr.visit_date))}${mtWhere(tr) ? ' · ' + esc(mtWhere(tr)) : ''}</p>
+    <p class="sub">${esc(p.brand)} · ${esc(L(p.name))}<br>${esc([mtWhen(tr) || t('mt_date_tbd'), mtWhere(tr)].filter(Boolean).join(' · '))}</p>
     ${needInfo ? `<div class="fs"><div class="fs-t">${esc(t('mt_q_info_h'))}</div>
       ${row('mq-company', 'mt_q_company', 'autocomplete="organization" maxlength="200"', s && s.company)}
       <div class="f-2col">${row('mq-name', 'mt_q_name', 'autocomplete="name" maxlength="120"', s && s.contactName)}${row('mq-phone', 'mt_q_phone', 'inputmode="tel" autocomplete="tel" maxlength="60"', s && s.phone)}</div></div>` : ''}

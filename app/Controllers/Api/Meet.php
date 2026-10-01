@@ -115,6 +115,14 @@ class Meet extends BaseApiController
             $b->where('published', 1);
         }
         $rows   = $b->orderBy('visit_date', 'ASC')->orderBy('sort', 'ASC')->get()->getResultArray();
+        /* 방문일 미정(visit_date NULL) 일정은 날짜가 정해진 일정 뒤로 — MySQL 은 NULL 을 앞에 세운다 */
+        usort($rows, static function ($x, $y) {
+            $ex = empty($x['visit_date']); $ey = empty($y['visit_date']);
+            if ($ex !== $ey) {
+                return $ex ? 1 : -1;
+            }
+            return [$x['visit_date'] ?? '', (int) ($x['sort'] ?? 99)] <=> [$y['visit_date'] ?? '', (int) ($y['sort'] ?? 99)];
+        });
         $counts = $this->counts();
         $mine   = $this->mineKeys();
         return $this->json(array_map(fn ($r) => $this->tripOut($r, $counts, $mine), $rows));
@@ -341,9 +349,7 @@ class Meet extends BaseApiController
                 return $this->err('bad_time', "$tk 는 HH:MM", 400);
             }
         }
-        if (empty($in['visit_date'])) {
-            return $this->err('bad_date', '방문일(visit_date)은 필수입니다', 400);
-        }
+        /* 2026-10-01 방문일은 비워 둘 수 있다 = '미정'. 사이트에는 '방문일 미정'으로 나온다 */
         $status = (string) ($in['status'] ?? 'open');
         if (! in_array($status, self::STATUSES_TRIP, true)) {
             return $this->err('bad_status', 'status: ' . implode('|', self::STATUSES_TRIP), 400);
@@ -360,7 +366,7 @@ class Meet extends BaseApiController
             $items[] = ['product_id' => $pid, 'goal' => min(50, max(1, (int) ($it['goal'] ?? 5)))];
         }
         $row = [
-            'visit_date' => $in['visit_date'],
+            'visit_date' => ($in['visit_date'] ?? '') ?: null,
             'visit_end'  => ($in['visit_end'] ?? '') ?: null,
             'time_start' => ($in['time_start'] ?? '') ?: null,
             'time_end'   => ($in['time_end'] ?? '') ?: null,
