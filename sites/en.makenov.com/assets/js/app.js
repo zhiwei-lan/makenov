@@ -934,7 +934,7 @@ function mtEventHero(tr){
    products.html renderHero 가 s.html 이 있으면 그대로 그리고, cls 의 light 로 점·화살표 색을 바꾼다. */
 function mtHeroSlides(){
   if(typeof MkMeet === 'undefined') return [];
-  const tr = MkMeet.upcoming().find(x => x.open && MkMeet.itemsOf(x).length);
+  const tr = MkMeet.upcoming().find(x => x.open && x.visit_date && MkMeet.itemsOf(x).length);   // 날짜가 정해진 일정만 포스터로
   if(!tr) return [];
   const items = MkMeet.itemsOf(tr);
   const d = mtDate(tr.visit_date);
@@ -1055,7 +1055,8 @@ function mtSlideSync(tr){
   box.classList.toggle('at-end', tr.scrollLeft + tr.clientWidth >= tr.scrollWidth - 2);
 }
 function mtHomeHtml(){
-  const list = MkMeet.upcoming().filter(tr => MkMeet.itemsOf(tr).length).slice(0, 4);
+  /* 방문일이 정해진 일정만 — '방문일 미정' 일정은 이 섹션에 안 나온다(제품 카드·상세에서만 '방문일 미정'으로 신청받는다) */
+  const list = MkMeet.upcoming().filter(tr => tr.visit_date && MkMeet.itemsOf(tr).length).slice(0, 4);
   if(!list.length) return '';
   /* 일정마다 같은 큰 카드로 — 날짜가 정해진 일정 먼저, '방문일 미정' 일정은 그 아래 */
   return `<div class="sec-head"><h2>${esc(t('mt_home_h'))}</h2><a class="more" href="${mkUrl('meetings.html')}">${esc(t('mt_home_more'))}</a></div>`
