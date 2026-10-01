@@ -25,6 +25,7 @@ Languages: Vietnamese, Korean, English
 
 ## Articles
 Guides for distributors sourcing from Korea — importing, contracts, MOQ, exclusivity, samples, quotations.
+- Thuế tiêu thụ đặc biệt đối với hàng nhập khẩu (vi): https://vn.makenov.com/columns/c45.html
 - Thuê kho hay tự vận hành kho, nên chọn cách nào? (vi): https://vn.makenov.com/columns/c43.html
 - Cách kiểm tra mỹ phẩm Hàn Quốc chính hãng (vi): https://vn.makenov.com/columns/c44.html
 - FCL và LCL khác gì, nhập hàng nên chọn loại nào? (vi): https://vn.makenov.com/columns/c41.html
