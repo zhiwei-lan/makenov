@@ -15,6 +15,7 @@ window.MK_BAKED = {
     "wellbeing"
   ],
   "columns": {
+      "c47": "c47",
       "c45": "c45",
       "c46": "c46",
       "c43": "c43",

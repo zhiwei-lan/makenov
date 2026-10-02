@@ -34,7 +34,7 @@
   </url>
   <url>
     <loc>https://vn.makenov.com/columns.html</loc>
-    <lastmod>2026-10-01</lastmod>
+    <lastmod>2026-10-02</lastmod>
       <xhtml:link rel="alternate" hreflang="vi" href="https://vn.makenov.com/columns.html"/>
       <xhtml:link rel="alternate" hreflang="ko" href="https://kr.makenov.com/columns.html"/>
       <xhtml:link rel="alternate" hreflang="en" href="https://en.makenov.com/columns.html"/>
@@ -82,6 +82,12 @@
   </url>
   <url><loc>https://vn.makenov.com/sitemap.html</loc><lastmod>2026-08-06</lastmod></url>
   <url><loc>https://vn.makenov.com/products.html</loc></url>
+  <url>
+    <loc>https://vn.makenov.com/columns/c47.html</loc>
+    <lastmod>2026-10-02</lastmod>
+      <xhtml:link rel="alternate" hreflang="vi" href="https://vn.makenov.com/columns/c47.html"/>
+      <xhtml:link rel="alternate" hreflang="x-default" href="https://vn.makenov.com/columns/c47.html"/>
+  </url>
   <url>
     <loc>https://vn.makenov.com/columns/c45.html</loc>
     <lastmod>2026-10-01</lastmod>
