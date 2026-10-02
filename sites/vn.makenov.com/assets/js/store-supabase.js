@@ -135,6 +135,7 @@ const MkData = {
       MK_PRODUCTS.push({
         id:p.id, companyId:p.company_id, cat:p.cat, brand:p.brand, origin:p.origin,
         name:p.name, tagline:p.tagline, brandStory:p.brand_story,
+        hook:(p.hook && typeof p.hook==='object') ? p.hook : null,   // 상세 상단 후킹 제목·서브 카피 {title,sub}
         img:p.img, gallery:p.gallery||[], video:p.video||'', catalog:p.catalog||'', detail:p.detail||[],
         dist:(p.dist && typeof p.dist==='object') ? p.dist : null,   // 제품별 유통 파트너 섹션 (null=공통)
         inquiries:p.inquiries||0, views:p.views||0, wish:p.wish_count||0,
@@ -554,7 +555,7 @@ Object.assign(Admin, {
   async upsertProduct(p){
     const row = {
       id:p.id, company_id:p.companyId||null, cat:p.cat, brand:p.brand, origin:p.origin,
-      name:p.name, tagline:p.tagline, brand_story:p.brandStory,
+      name:p.name, tagline:p.tagline, brand_story:p.brandStory, hook:p.hook||null,
       img:p.img, gallery:p.gallery, video:p.video, catalog:p.catalog||null, detail:p.detail,
       dist:p.dist||null,
       featured:p.featured, is_new:p.isNew, created_at:p.createdAt,

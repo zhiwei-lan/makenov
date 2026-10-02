@@ -126,6 +126,8 @@ function card(o, lang){
 function productPage(p, co, related, lang){
   const L = LB[lang];
   const name = T(p.name, lang), tagline = T(p.tagline, lang);
+  /* 후킹 제목·서브 카피 — page-product.js 와 같은 마크업 */
+  const hkT = p.hook ? T(p.hook.title, lang) : '', hkS = p.hook ? T(p.hook.sub, lang) : '';
   const relVi = `products/${p.id}.html`, canonical = pageUrl(relVi, lang);
   const title = `${name} — ${p.brand} | MAKENOV`;
   const jsonld = [{ '@context':'https://schema.org', '@type':'Product', name,
@@ -179,8 +181,9 @@ ${FAVICON}
     <aside class="pd-side">
       <div class="box">
         <div class="brand">${esc(p.brand)}</div>
-        <h1>${esc(name)}</h1>
-        <p class="tagline">${esc(tagline)}</p>
+        ${hkT ? `<div class="pd-name">${esc(name)}</div>` : ''}
+        <h1 class="${hkT ? 'hooked' : ''}">${esc(hkT || name)}</h1>
+        <p class="tagline">${esc(hkS || tagline)}</p>
       </div>
     </aside>
   </div>
@@ -217,7 +220,7 @@ ${PAGE_PROD}
   const pr = await get('products?select=*&published=eq.true&order=created_at.desc');
   const co = await get('companies?select=*&order=sort');
   const products = pr.map(p => ({ id:p.id, companyId:p.company_id, cat:p.cat, brand:p.brand, origin:p.origin,
-    name:p.name, tagline:p.tagline, brandStory:p.brand_story, img:p.img, gallery:p.gallery || [], dist:(p.dist && typeof p.dist === 'object') ? p.dist : null,
+    name:p.name, tagline:p.tagline, hook:(p.hook && typeof p.hook === 'object') ? p.hook : null, brandStory:p.brand_story, img:p.img, gallery:p.gallery || [], dist:(p.dist && typeof p.dist === 'object') ? p.dist : null,
     video:p.video || '', detail:p.detail || [] }));
   const companies = Object.fromEntries(co.map(c => [c.id, c]));
   /* 공통 섹션 — DB(site 설정) 우선, 없으면 data.js 시드(런타임 Object.assign 과 같은 우선순위) */

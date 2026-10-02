@@ -26,7 +26,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 class Meet extends BaseApiController
 {
     /** 마이그레이션을 추가하면 올린다 — writable/meet_schema_ok 에 적힌 값과 다르면 latest() 를 다시 돈다 */
-    private const SCHEMA_VER = '4';
+    private const SCHEMA_VER = '5';
     /** 마감·D-day 계산 기준 시간대 — 바이어가 베트남에 있다 */
     private const TZ = 'Asia/Ho_Chi_Minh';
     private const TRIP_JSON = ['title', 'city', 'venue', 'summary'];

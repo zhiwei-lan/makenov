@@ -114,19 +114,20 @@ const LND = {
    "en": "Browse innovative products from around the world and find official distribution opportunities — no trade shows or overseas trips required."
   },
   "s2k": {
-   "vi": "Xem điều kiện giao dịch",
-   "ko": "거래 조건 확인",
-   "en": "Trade terms"
+   "vi": "Gặp gỡ kinh doanh",
+   "ko": "비즈니스 미팅",
+   "en": "Business meetings"
   },
   "s2h": {
-   "vi": "Xem nhanh mọi điều kiện\ncần thiết cho việc phân phối",
-   "ko": "유통에 필요한 조건을\n한눈에 확인해 보세요",
-   "en": "Everything you need to decide,\non a single screen"
+   "vi": "Không chỉ dừng lại ở việc tìm sản phẩm\nHãy gặp trực tiếp đối tác kinh doanh",
+   "ko": "제품을 찾는 것에서 끝나지 않습니다\n비즈니스 파트너를 직접 만나보세요",
+   "en": "It doesn't end with finding products\nMeet your business partners in person",
+   "_br": 1
   },
   "s2p": {
-   "vi": "Giá cung cấp, số lượng đặt hàng tối thiểu, thời gian giao hàng theo từng sản phẩm — mọi điều kiện cần để quyết định phân phối đều xem được dễ dàng và nhanh chóng.",
-   "ko": "제품별 공급가와 최소 주문 수량, 납기 등 유통을 결정하는 데 필요한 거래 조건을 쉽고 빠르게 확인할 수 있습니다.",
-   "en": "Quickly check the trade terms that decide a deal — supply price, minimum order quantity and lead time for each product."
+   "vi": "MAKENOV kết nối các buổi gặp trực tiếp để nhà cung cấp Hàn Quốc và nhà phân phối Việt Nam cùng trao đổi về cơ hội kinh doanh thực tế.",
+   "ko": "MAKENOV는 한국 공급사와 베트남 유통사가 실제 비즈니스 기회를 논의할 수 있도록 직접 미팅을 연결합니다.",
+   "en": "MAKENOV arranges in-person meetings so Korean suppliers and Vietnamese distributors can discuss real business opportunities."
   },
   "s3k": {
    "vi": "Hỗ trợ toàn bộ quá trình kết nối",

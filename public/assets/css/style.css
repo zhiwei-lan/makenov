@@ -497,6 +497,9 @@ button{font-family:var(--font-body);cursor:pointer;border:none;background:none;c
 .pd-side .brand{font-size:13px;font-weight:600;color:var(--mk-primary)}
 .pd-side h1{font-size:24px;font-weight:700;line-height:1.4;letter-spacing:-.02em;margin:8px 0 12px}
 .pd-side .tagline{font-size:15px;color:var(--mk-body);line-height:1.65;margin-bottom:20px}
+/* 후킹 제목이 있을 때: 제품명은 브랜드 아래 작게, h1 은 문장형이라 조금 작게·단어 단위 줄바꿈 */
+.pd-side .pd-name{margin-top:6px;font-size:13.5px;font-weight:600;color:var(--mk-muted);line-height:1.5}
+.pd-side h1.hooked{font-size:22px;line-height:1.42;margin:6px 0 12px;word-break:keep-all}
 .pd-side .stat{display:flex;gap:26px;padding:18px 0;border-top:1px solid var(--mk-line);
   border-bottom:1px solid var(--mk-line);margin-bottom:18px}
 .pd-side .stat b{display:block;font-size:20px;font-weight:700;color:var(--mk-primary);line-height:1.2}

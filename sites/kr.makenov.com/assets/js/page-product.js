@@ -64,6 +64,10 @@ function pageInit(){
   /* 미팅 펀딩 — 이 제품이 다가오는 방문 일정에 걸려 있으면 이 페이지가 곧 펀딩 페이지다 */
   const mtOn = typeof MkMeet !== 'undefined' && !!MkMeet.forProduct(p.id);
 
+  /* 후킹 제목·서브 카피(관리자 › 제품) — 있으면 h1 자리에 후킹 제목, 제품명은 그 위에 작게.
+     bake-products.js 의 정적 마크업과 같아야 하이드레이션 교체가 안 보인다. */
+  const hkT = p.hook ? L(p.hook.title) : '', hkS = p.hook ? L(p.hook.sub) : '';
+
   document.getElementById('pd-root').innerHTML = `
   <div class="pd-row ${mtOn ? 'mt-on' : ''}">
 
@@ -107,8 +111,9 @@ function pageInit(){
     <aside class="pd-side">
       <div class="box ${mtOn ? 'mt-box-on' : ''}">
         <div class="brand">${esc(p.brand)}</div>
-        <h1>${esc(L(p.name))}</h1>
-        <p class="tagline">${esc(L(p.tagline))}</p>
+        ${hkT ? `<div class="pd-name">${esc(L(p.name))}</div>` : ''}
+        <h1 class="${hkT ? 'hooked' : ''}">${esc(hkT || L(p.name))}</h1>
+        <p class="tagline">${esc(hkS || L(p.tagline))}</p>
 
         ${mtOn ? `
         <!-- 미팅 펀딩 중(2026-09-29): 이 박스는 펀딩 패널 하나만 — 숫자 · 일정 · [관심][공유][미팅 신청].
