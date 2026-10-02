@@ -935,7 +935,7 @@ function companyForm(id){
     ${tri3('co-tag','한 줄 소개',tg)}
     ${tri3('co-intro','회사 소개',it,'ta')}
     ${tri3('co-loc','소재지 (예: Incheon, Korea)',lc)}
-    <div class="sect"><h4>기본 정보</h4><div class="fgrid"><div class="fld"><label>설립연도</label><input id="co-since" value="${esc(c?c.since||'':'')}" placeholder="2015"></div><div class="fld"><label>임직원 수</label><input id="co-staff" value="${esc(c?c.staff||'':'')}" placeholder="20+"></div><div class="fld"><label>수출 실적·국가</label><input id="co-export" value="${esc(c?c.export||'':'')}" placeholder="VN · JP · US"></div></div><div class="fgrid"><div class="fld"><label>사업자등록번호</label><input id="co-brn" value="${esc(c?c.brn||'':'')}"></div><div class="fld"><label>대표자</label><input id="co-ceo" value="${esc(c?c.ceo||'':'')}"></div><div class="fld"><label>대표 전화</label><input id="co-tel" value="${esc(c?c.tel||'':'')}"></div></div><div class="fgrid two"><div class="fld"><label>웹사이트</label><input id="co-site" value="${esc(c?c.site||'':'')}" placeholder="https://..."></div><div class="fld"><label>인증·허가 (쉼표로 구분)</label><input id="co-certs" value="${esc(c?(c.certs||[]).join(', '):'')}" placeholder="화장품 제조판매업, ISO 22716"></div></div><div class="fld"><label>MOQ 정책 메모</label><input id="co-moq" value="${esc(c?c.moqPolicy||'':'')}" placeholder="소량 협의 가능"></div></div>
+    <div class="sect"><h4>기본 정보</h4><div class="fgrid"><div class="fld"><label>설립연도</label><input id="co-since" value="${esc(c?c.since||'':'')}" placeholder="2015"></div><div class="fld"><label>임직원 수</label><input id="co-staff" value="${esc(c?c.staff||'':'')}" placeholder="20+"></div><div class="fld"><label>수출 실적·국가</label><input id="co-export" value="${esc(c?c.export||'':'')}" placeholder="VN · JP · US"></div></div><div class="fgrid"><div class="fld"><label>사업자등록번호</label><input id="co-brn" value="${esc(c?c.brn||'':'')}"></div><div class="fld"><label>대표자</label><input id="co-ceo" value="${esc(c?c.ceo||'':'')}"></div><div class="fld"><label>대표 전화</label><input id="co-tel" value="${esc(c?c.tel||'':'')}"></div></div><div class="fgrid two"><div class="fld"><label>웹사이트</label><input id="co-site" value="${esc(c?c.site||'':'')}" placeholder="https://..."></div><div class="fld"><label>인증·허가 (쉼표로 구분)</label><input id="co-certs" value="${esc(c?(c.certs||[]).map(certKo).join(', '):'')}" placeholder="화장품 제조판매업, ISO 22716"></div></div><div class="fld"><label>MOQ 정책 메모</label><input id="co-moq" value="${esc(c?c.moqPolicy||'':'')}" placeholder="소량 협의 가능"></div></div>
     <div class="sect"><h4>연결 제품 <span style="color:var(--adm-sub);font-size:11px"> 체크하면 이 공급사의 제품이 됩니다. 제품 상세에 회사 소개가 붙습니다</span></h4>${MK_PRODUCTS.length ? `<div class="fgrid two">${MK_PRODUCTS.map(p=>{
       const mine = id && p.companyId===id;
       const other = p.companyId && p.companyId!==id ? (MK_COMPANIES.find(x=>x.id===p.companyId)||{}) : null;
@@ -946,6 +946,13 @@ function companyForm(id){
     <div class="bar" style="margin-top:22px"><span class="grow"></span><button class="btn btn-ghost" onclick="coEditing=null;renderCompanies()">취소</button><button class="btn btn-primary" onclick="saveCompany('${id}')">저장</button></div></div>`;
 }
 
+/* 인증 항목 = 문자열 또는 {vi,ko,en}. 관리자 입력칸은 한국어로 보여주고,
+   저장 때 한국어가 그대로인 항목은 기존 다국어 객체를 유지한다(새로 쓴 항목만 문자열) */
+const certKo = x => (x && typeof x === 'object') ? (x.ko || x.vi || x.en || '') : String(x ?? '');
+function certsFromInput(text, prev){
+  const keep = new Map((prev||[]).filter(x=>x && typeof x==='object').map(x=>[certKo(x), x]));
+  return text.split(',').map(s=>s.trim()).filter(Boolean).map(s=>keep.get(s) || s);
+}
 async function saveCompany(id){
   await viSync(['co-name','co-tag','co-intro','co-loc'], false);
   const name = tri('co-name');
@@ -967,7 +974,7 @@ async function saveCompany(id){
       name, tagline: tri('co-tag'), intro: tri('co-intro'), location: tri('co-loc'),
       since: av('co-since'), staff: av('co-staff'), export: av('co-export'),
       brn: av('co-brn'), ceo: av('co-ceo'), tel: av('co-tel'), site: av('co-site'),
-      certs: av('co-certs').split(',').map(s=>s.trim()).filter(Boolean),
+      certs: certsFromInput(av('co-certs'), (MK_COMPANIES.find(c=>c.id===id)||{}).certs),
       moqPolicy: av('co-moq'), logo: av('co-logo'), cover: av('co-cover'),
     });
     for(const [pid, co] of jobs) await Admin.setProductCompany(pid, co);

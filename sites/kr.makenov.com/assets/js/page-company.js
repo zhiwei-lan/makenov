@@ -53,7 +53,7 @@ function pageInit(){
 
           <section class="co-sec">
             <h2 data-i18n="co_certs_title"></h2>
-            <div class="co-certs">${(c.certs||[]).map(x=>`<span>${esc(x)}</span>`).join('')}</div>
+            <div class="co-certs">${(c.certs||[]).map(x=>`<span>${esc(L(x))}</span>`).join('')}</div>
           </section>
 
           <section class="co-sec">

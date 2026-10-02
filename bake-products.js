@@ -142,7 +142,7 @@ function productPage(p, co, related, lang){
       { '@type':'ListItem', position:2, name:L.dir, item:pageUrl('directory.html', lang) },
       { '@type':'ListItem', position:3, name, item:canonical } ] }];
   delete jsonld[0].alternativeHeadline;
-  const coLine = co ? `${T(co.name, lang)} · ${T(co.location, lang)}${(co.certs || []).length ? ' · ' + co.certs.slice(0, 3).join(' · ') : ''}` : '';
+  const coLine = co ? `${T(co.name, lang)} · ${T(co.location, lang)}${(co.certs || []).length ? ' · ' + co.certs.slice(0, 3).map(x => T(x, lang)).join(' · ') : ''}` : '';
   const coLink = co && fs.existsSync(path.join(PUB, 'companies', co.id + '.html'))
     ? `\n    <a href="companies/${co.id}.html">${esc(T(co.name, lang))}</a>` : '';
   return `<!DOCTYPE html>

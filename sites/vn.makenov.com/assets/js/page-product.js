@@ -96,7 +96,7 @@ function pageInit(){
           <img src="${co.logo}" alt="" loading="lazy">
           <div class="tx">
             <div class="nm">${esc(L(co.name))}</div>
-            <div class="sub">${esc(L(co.location))} · ${(co.certs||[]).slice(0,3).join(' · ')}</div>
+            <div class="sub">${esc(L(co.location))} · ${(co.certs||[]).slice(0,3).map(x=>esc(L(x))).join(' · ')}</div>
           </div>
           <span class="go" data-i18n="co_view"></span>
         </a>`:''}
