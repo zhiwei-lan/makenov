@@ -137,7 +137,7 @@ function renderChrome(active){
         onkeydown="if(event.key==='Enter'){${doSearch}}"><span class="ico" role="button" tabindex="0" onclick="${doSearch}">${MK_ICO.search}</span></div><div class="mk-head-right"><div class="mk-lang"><a data-lang="vi" href="${esc(mkLangHref('vi') || location.href)}" onclick="localStorage.setItem('mk_lang','vi')">VI</a><a data-lang="ko" href="${esc(mkLangHref('ko') || location.href)}" onclick="localStorage.setItem('mk_lang','ko')">KO</a><a data-lang="en" href="${esc(mkLangHref('en') || location.href)}" onclick="localStorage.setItem('mk_lang','en')">EN</a></div>${mobileLangMenu}<a class="mk-util" href="mypage.html">${MK_ICO.heart}<span class="badge" id="cart-badge">0</span><span class="lb" data-i18n="util_wish"></span></a>
       ${s
         ? `<a class="mk-util" href="mypage.html">${MK_ICO.user}<span class="lb">${esc(s.contactName||s.email.split('@')[0])}</span></a><a class="mk-util" onclick="Store.logout();location.reload()" style="cursor:pointer">${MK_ICO.logout}<span class="lb" data-i18n="logout"></span></a>`
-        : `<a class="mk-util" href="mypage.html" onclick="event.preventDefault();openAuth('login')">${MK_ICO.user}<span class="lb" data-i18n="login"></span></a><button class="btn btn-primary btn-sm" style="margin-left:6px;height:40px;padding:0 18px" onclick="openAuth('signup')" data-i18n="signup"></button>`}
+        : `<a class="mk-util" href="mypage.html" onclick="event.preventDefault();openAuth('login')">${MK_ICO.user}<span class="lb" data-i18n="login"></span></a><a class="btn btn-primary btn-sm mk-head-cta" href="${mkUrl('meetings.html')}" data-i18n="nav_apply"></a>`}
     </div></div><nav class="mk-nav mk-head-nav"><a href="${mkUrl('products.html')}" data-i18n="nav_directory"></a><a href="${mkUrl('companies.html')}" data-i18n="nav_companies"></a><a href="${mkUrl('meetings.html')}" data-i18n="nav_meetings"></a><a href="${mkUrl('columns.html')}" data-i18n="nav_columns"></a><span class="gnb"><a href="${mkUrl('guide.html')}" data-i18n="nav_guide"></a><span class="drop"><a href="${mkUrl('support.html')}" data-i18n="nav_support"></a><span class="menu"><a href="${mkUrl('support.html#notice')}" data-i18n="nav_sp_notice"></a><a href="${mkUrl('support.html#faq')}" data-i18n="nav_sp_faq"></a><a href="${mkUrl('support.html#ask')}" data-i18n="nav_sp_ask"></a></span></span></span></nav></div>`;
   document.getElementById('mk-footer').innerHTML = `
   <div class="wrap"><div class="brand"><div class="logo"><img src="${mkAsset('assets/img/logo.png')}" alt="MAKENOV"
@@ -862,8 +862,9 @@ function mtProg(it, right){
 /* 신청 버튼 — 확정된 뒤에도 마감 전이면 더 받는다(공급사 입장에선 미팅이 늘수록 좋다) */
 function mtAction(tr, it){
   const a = `'${esc(tr.id)}','${esc(it.product_id)}'`;
-  if(it.mine) return `<div class="mt-mine"><button class="btn btn-ghost" disabled>${MT_ICO.check} ${esc(t('mt_btn_applied'))}</button>`
-    + (tr.open ? `<a href="#" class="mt-cancel" onclick="event.preventDefault();mtCancel(${a})">${esc(t('mt_btn_cancel'))}</a>` : '') + `</div>`;
+  /* 회원 신청(it.mine)은 취소 링크까지, 간편 신청(이 기기에 기록)은 '신청 완료' 표시만 — 취소는 메이크노브에 연락 */
+  if(it.mine || mtIsMine(tr.id, it.product_id)) return `<div class="mt-mine"><button class="btn btn-ghost" disabled>${MT_ICO.check} ${esc(t('mt_btn_applied'))}</button>`
+    + (it.mine && tr.open ? `<a href="#" class="mt-cancel" onclick="event.preventDefault();mtCancel(${a})">${esc(t('mt_btn_cancel'))}</a>` : '') + `</div>`;
   if(tr.open) return `<button class="btn btn-primary" onclick="event.preventDefault();openMeetApply(${a})">${esc(t('mt_btn_apply'))}</button>`;
   return `<button class="btn btn-ghost" disabled>${esc(t('mt_st_' + mtTripState(tr)))}</button>`;
 }
@@ -1128,81 +1129,74 @@ function mtNeedVerify(){
     <a class="btn btn-primary btn-block btn-lg" href="${mkUrl('mypage.html')}">${esc(t('mt_need_verify_btn'))}</a>`);
 }
 const MT_CHANNELS = ['pharmacy', 'cosmetic', 'mart', 'online', 'dist', 'other'];
-/* 미팅 신청 — 2026-09-30 가입·회사 정보·신청을 한 창에서 끝낸다(사업자 인증은 나중에 해도 됨).
-   비로그인: 회사 정보 + 이메일·비밀번호 + 미팅 정보 → 가입하고 바로 신청
-   로그인했는데 회사 정보가 비어 있으면: 회사 정보 칸만 더해서 신청 */
+/* 미팅 신청 = 간편 신청 — 2026-10-03 계정·로그인 없이 신청한다(사용자 결정: 가입은 보조, 간편 신청이 메인).
+   받는 것: 회사명 / 홈페이지(선택) · 업종 · 담당자 이름 / 직함(선택) · 연락처 / 이메일
+   로그인한 회원이면 프로필 값으로 미리 채운다. 신청하면 그 자리에서 신청 수가 올라간다.
+   이 기기에서 신청한 것은 localStorage(mk_meet_mine)에 적어 두고 버튼을 '신청 완료'로 바꾼다. */
+function mtMineLocal(){
+  try{ return JSON.parse(localStorage.getItem('mk_meet_mine') || '[]'); }catch(e){ return []; }
+}
+function mtIsMine(tripId, pid){ return mtMineLocal().includes(tripId + '|' + pid); }
+function mtMarkMine(tripId, pid){
+  try{ const a = mtMineLocal(); const k = tripId + '|' + pid; if(!a.includes(k)){ a.push(k); localStorage.setItem('mk_meet_mine', JSON.stringify(a.slice(-200))); } }catch(e){}
+}
 function openMeetApply(tripId, pid){
   const tr = MkMeet.trip(tripId), p = mkProduct(pid);
   if(!tr || !p) return;
-  const dev = !!MkMeet._dev('mk_meet_tok');
-  const s = (!dev && typeof Store !== 'undefined' && Store.session) ? Store.session() : null;
-  const needAcct = !dev && !s;
-  const needInfo = needAcct || (!dev && (!s.company || !s.contactName || !s.phone));
+  const s = (typeof Store !== 'undefined' && Store.session) ? Store.session() : null;
   try{ mkTrack('InitiateCheckout', { content_ids:[pid], content_type:'product', content_category:'meeting' }); }catch(e){}
-  const row = (id, key, attrs, val) => `<div class="f-row"><label>${esc(t(key))}</label><input id="${id}" ${attrs || ''} value="${esc(val || '')}"></div>`;
+  const row = (id, key, attrs, val, opt) => `<div class="f-row"><label>${esc(t(key))}${opt ? ` <span class="f-opt">${esc(t('mt_q_opt'))}</span>` : ''}</label><input id="${id}" ${attrs || ''} value="${esc(val || '')}"></div>`;
   mkModal(`<h2>${esc(t('mt_apply_h'))}</h2>
     <p class="sub">${esc(p.brand)} · ${esc(L(p.name))}<br>${esc([mtWhen(tr) || t('mt_date_tbd'), mtWhere(tr)].filter(Boolean).join(' · '))}</p>
-    ${needInfo ? `<div class="fs"><div class="fs-t">${esc(t('mt_q_info_h'))}</div>
-      ${row('mq-company', 'mt_q_company', 'autocomplete="organization" maxlength="200"', s && s.company)}
-      <div class="f-2col">${row('mq-name', 'mt_q_name', 'autocomplete="name" maxlength="120"', s && s.contactName)}${row('mq-phone', 'mt_q_phone', 'inputmode="tel" autocomplete="tel" maxlength="60"', s && s.phone)}</div></div>` : ''}
-    ${needAcct ? `<div class="fs"><div class="fs-t">${esc(t('mt_q_acct_h'))}</div>
-      <div class="f-2col">${row('mq-email', 'mt_q_email', 'type="email" autocomplete="email" placeholder="name@company.com"')}${row('mq-pw', 'mt_q_pw', 'type="password" autocomplete="new-password"')}</div></div>` : ''}
-    <div class="fs"><div class="fs-t">${esc(t('mt_q_meet_h'))}</div>
-      <div class="f-row"><label>${esc(t('mt_apply_channel'))}</label><select id="mt-ch">${MT_CHANNELS.map(k => `<option value="${k}">${esc(t('mt_ch_' + k))}</option>`).join('')}</select></div>
-      <div class="f-row"><label>${esc(t('mt_apply_volume'))}</label><input id="mt-vol" maxlength="200" placeholder="${esc(t('mt_apply_volume_ph'))}"></div>
-      <div class="f-row"><label>${esc(t('mt_apply_msg'))}</label><textarea id="mt-msg" rows="2" maxlength="2000"></textarea></div></div>
+    <div class="fs"><div class="fs-t">${esc(t('mt_q_info_h'))}</div>
+      <div class="f-2col">${row('mq-company', 'mt_q_company', 'autocomplete="organization" maxlength="200"', s && s.company)}${row('mq-site', 'mt_q_site', 'inputmode="url" autocomplete="url" maxlength="300" placeholder="company.vn"', '', true)}</div>
+      ${row('mq-industry', 'mt_q_industry', `maxlength="200" placeholder="${esc(t('mt_q_industry_ph'))}"`, '')}</div>
+    <div class="fs"><div class="fs-t">${esc(t('mt_q_person_h'))}</div>
+      <div class="f-2col">${row('mq-name', 'mt_q_name', 'autocomplete="name" maxlength="120"', s && s.contactName)}${row('mq-position', 'mt_q_position', 'autocomplete="organization-title" maxlength="120"', s && s.position, true)}</div>
+      <div class="f-2col">${row('mq-phone', 'mt_q_phone', 'inputmode="tel" autocomplete="tel" maxlength="60"', s && s.phone)}${row('mq-email', 'mt_q_email', 'type="email" autocomplete="email" maxlength="200" placeholder="name@company.com"', s && s.email)}</div></div>
+    <input id="mq-hp" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
     <div class="mst-result err" id="mq-err" style="display:none"></div>
-    <p class="inq-auto">${esc(t(needAcct ? 'mt_q_note' : 'mt_apply_note'))}</p>
-    <button class="btn btn-primary btn-block btn-lg" id="mt-send" onclick="sendMeetApply('${esc(tr.id)}','${esc(pid)}')">${esc(t(needAcct ? 'mt_q_send' : 'mt_apply_send'))}</button>
-    ${needAcct ? `<p class="switch-auth"><span>${esc(t('mt_q_have'))}</span> <a onclick="openAuth('login')">${esc(t('login'))}</a></p>` : ''}`);
+    <p class="inq-auto">${esc(t('mt_q_note'))}</p>
+    <button class="btn btn-primary btn-block btn-lg" id="mt-send" onclick="sendMeetApply('${esc(tr.id)}','${esc(pid)}')">${esc(t('mt_q_send'))}</button>`);
 }
 async function sendMeetApply(tripId, pid){
   const btn = document.getElementById('mt-send');
   if(btn){ if(btn.disabled) return; btn.disabled = true; }
   const done = () => { if(btn) btn.disabled = false; };
   const v = id => ((document.getElementById(id) || {}).value || '').trim();
-  const has = id => !!document.getElementById(id);
-  const errBox = msg => { const e = document.getElementById('mq-err'); if(e){ e.textContent = msg; e.style.display = 'block'; } else toast(msg); done(); };
-  const body = { trip_id: tripId, product_id: pid, channel: v('mt-ch'), volume: v('mt-vol'), message: v('mt-msg') };
-  if(has('mq-company')){
-    Object.assign(body, { company: v('mq-company'), contact_name: v('mq-name'), phone: v('mq-phone'),
-      country: MK_LANG === 'ko' ? 'KR' : MK_LANG === 'en' ? '' : 'VN' });
-    if(!body.company || !body.contact_name || !body.phone) return errBox(t('mt_q_err_fill'));
+  { const e0 = document.getElementById('mq-err'); if(e0) e0.style.display = 'none'; }   // 이전 오류 문구는 지우고 시작
+  const errBox = (msg, focusId) => {
+    const e = document.getElementById('mq-err'); if(e){ e.textContent = msg; e.style.display = 'block'; } else toast(msg);
+    const f = focusId && document.getElementById(focusId); if(f) f.focus();
+    done();
+  };
+  const body = { trip_id: tripId, product_id: pid,
+    company: v('mq-company'), homepage: v('mq-site'), channel: v('mq-industry'),
+    contact_name: v('mq-name'), position: v('mq-position'), phone: v('mq-phone'), email: v('mq-email'), hp: v('mq-hp'),
+    country: MK_LANG === 'ko' ? 'KR' : MK_LANG === 'en' ? '' : 'VN' };
+  for(const [id, val] of [['mq-company', body.company], ['mq-industry', body.channel], ['mq-name', body.contact_name], ['mq-phone', body.phone], ['mq-email', body.email]]){
+    if(!val) return errBox(t('mt_q_err_fill'), id);
   }
+  if(body.phone.replace(/\D/g, '').length < 8) return errBox(t('mt_q_err_phone'), 'mq-phone');
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)) return errBox(t('mt_q_err_email'), 'mq-email');
   try{ const a = mkAffRef(); if(a && a.code) body.aff_ref = a.code; }catch(e){}
 
-  /* 1) 비로그인이면 여기서 가입 — 이메일 확인 절차가 없어 바로 세션이 생긴다(Api\Auth::signup) */
-  if(has('mq-email')){
-    const email = v('mq-email'), pw = (document.getElementById('mq-pw') || {}).value || '';
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return errBox(t('mt_q_err_email'));
-    if(pw.length < 6) return errBox(t('mt_q_err_pw'));
-    let res;
-    try{ res = await SB.auth.signUp({ email, password: pw }); }catch(e){ res = { error: e }; }
-    if(!res || res.error){
-      return errBox(/already|registered|exists/i.test(String((res && res.error && res.error.message) || '')) ? t('mt_q_err_exists') : t('mt_err'));
-    }
-    try{ await MkData.boot(); }catch(e){}
-    try{ mkPixelIdentify({ em: email }); mkTrack('CompleteRegistration', { content_category: 'meeting' }); }catch(e){}
-    try{ renderChrome(); applyI18n(); }catch(e){}
-  }
-
-  /* 2) 신청 */
   let r;
   try{ r = await MkMeet.call('POST', 'apply', body); }catch(e){ r = { ok: false, data: null }; }
   done();
   if(!r.ok){
     const code = r.data && r.data.error;
-    if(code === 'login_required'){ closeModal(); toast(t('auth_need')); openAuth('login'); return; }
-    if(code === 'info_required') return errBox(t('mt_q_err_fill'));
-    return errBox(t(code === 'already' ? 'mt_err_already' : code === 'closed' ? 'mt_err_closed' : 'mt_err'));
+    if(code === 'already'){ mtMarkMine(tripId, pid); }
+    return errBox(t(code === 'already' ? 'mt_err_already' : code === 'closed' ? 'mt_err_closed' : code === 'info_required' ? 'mt_q_err_fill'
+      : code === 'bad_phone' ? 'mt_q_err_phone' : code === 'rate' ? 'mt_err_rate' : 'mt_err'));
   }
-  try{ mkTrack('Lead', { content_ids:[pid], content_type:'product', content_category:'meeting' }); }catch(e){}
-  try{ await MkData.boot(); }catch(e){}            // 신청 때 채운 회사 정보를 프로필로 다시 읽는다
+  mtMarkMine(tripId, pid);
+  try{ mkPixelIdentify({ em: body.email, ph: body.phone, fn: body.contact_name }); mkTrack('Lead', { content_ids:[pid], content_type:'product', content_category:'meeting' }); }catch(e){}
   const d = r.data || {};
   let url = '';
   try{ url = new URL(mkUrl('meetings.html'), document.baseURI).href.split('#')[0] + '#trip-' + tripId; }catch(e){}
   const msg = d.confirmed ? mtRep('mt_apply_ok_confirmed', { g: d.goal }) : mtRep('mt_apply_ok_p', { n: d.count, g: d.goal });
-  mkModal(`<div class="mt-ok"><div class="ic">${MT_ICO.check}</div><h2>${esc(t('mt_apply_ok_h'))}</h2><p class="sub">${esc(msg)}</p></div>
+  mkModal(`<div class="mt-ok"><div class="ic">${MT_ICO.check}</div><h2>${esc(t('mt_apply_ok_h'))}</h2><p class="sub">${esc(msg)}</p><p class="sub">${esc(t('mt_apply_ok_next'))}</p></div>
     ${url ? `<div class="mt-share"><p>${esc(t('mt_share'))}</p><button class="btn btn-ghost btn-block" style="margin-top:10px" onclick="mtCopy('${esc(url)}')">${esc(t('mt_share_btn'))}</button></div>` : ''}`);
   await MkMeet.reload();
   mtRerender();

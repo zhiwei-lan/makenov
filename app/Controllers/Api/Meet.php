@@ -26,7 +26,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 class Meet extends BaseApiController
 {
     /** 마이그레이션을 추가하면 올린다 — writable/meet_schema_ok 에 적힌 값과 다르면 latest() 를 다시 돈다 */
-    private const SCHEMA_VER = '8';
+    private const SCHEMA_VER = '9';
     /** 마감·D-day 계산 기준 시간대 — 바이어가 베트남에 있다 */
     private const TZ = 'Asia/Ho_Chi_Minh';
     private const TRIP_JSON = ['title', 'city', 'venue', 'summary'];
@@ -224,11 +224,10 @@ class Meet extends BaseApiController
 
     private function apply(): ResponseInterface
     {
-        if (! $this->uid()) {
-            return $this->err('login_required', 'Vui lòng đăng nhập để đăng ký gặp mặt.', 401);
-        }
-        /* 2026-09-30 사업자 인증은 신청 조건에서 뺐다 — 가입과 동시에 신청할 수 있게(사용자 결정).
-           대신 회사명·담당자·연락처는 필수로 받는다. 인증 여부는 관리자 신청자 목록에 표시된다. */
+        /* 2026-10-03 '간편 신청'이 기본이다(사용자 결정) — 계정·로그인 없이 회사명·업종·담당자·연락처·이메일만으로 신청한다.
+           로그인한 회원은 종전대로 자기 계정으로 신청된다. 사업자 인증은 신청 조건이 아니다(관리자 목록에 구분 표시).
+           간편 신청의 buyer_id = 'lead-' + md5(전화번호 숫자) → 같은 번호는 한 공급사에 한 번만 센다. */
+        $uid  = $this->uid();
         $in   = $this->input();
         if ($in === null) {
             return $this->err('bad_json', 'bad json', 400);
@@ -254,7 +253,7 @@ class Meet extends BaseApiController
             return $this->err('not_found', 'Sản phẩm này không có trong lịch gặp mặt.', 404);
         }
 
-        $prof = $db->table('profiles')->where('id', $this->uid())->get()->getRowArray() ?: [];
+        $prof = $uid ? ($db->table('profiles')->where('id', $uid)->get()->getRowArray() ?: []) : [];
         $now  = date('Y-m-d H:i:s');
         /* 신청 창에서 받은 회사 정보 — 프로필에 비어 있는 칸만 채운다(인증으로 확정된 값은 덮지 않는다) */
         $company = trim((string) ($in['company'] ?? '')) ?: (string) ($prof['company'] ?? '');
@@ -262,6 +261,37 @@ class Meet extends BaseApiController
         $phone   = trim((string) ($in['phone'] ?? '')) ?: (string) ($prof['phone'] ?? '');
         if ($company === '' || $contact === '' || $phone === '') {
             return $this->err('info_required', 'Vui lòng nhập tên công ty, người liên hệ và số điện thoại.', 422);
+        }
+        $email    = strtolower(trim((string) ($in['email'] ?? ''))) ?: (string) ($prof['email'] ?? ($this->user['email'] ?? ''));
+        $industry = $this->cut($in['channel'] ?? '', 200);
+        $homepage = $this->cut($in['homepage'] ?? '', 300);
+        $position = $this->cut($in['position'] ?? '', 120) ?: $this->cut($prof['position'] ?? '', 120);
+        $ip       = (string) service('request')->getIPAddress();
+        if ($uid) {
+            $buyer = $uid;
+        } else {
+            /* 봇이 채우는 숨은 칸 — 사람은 못 본다. 채워져 있으면 저장하지 않고 성공처럼 답한다 */
+            if (trim((string) ($in['hp'] ?? '')) !== '') {
+                return $this->json(['ok' => true, 'count' => $item['count'], 'goal' => $item['goal'], 'confirmed' => $item['confirmed']], 201);
+            }
+            if ($industry === '' || ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                return $this->err('info_required', 'Vui lòng nhập ngành nghề và email hợp lệ.', 422);
+            }
+            $digits = preg_replace('/\D/', '', $phone);
+            if (strlen($digits) < 8) {
+                return $this->err('bad_phone', 'Số điện thoại chưa đúng.', 422);
+            }
+            /* '+84 90…' · '090…' · '8490…' 를 같은 번호로 본다 — 앞의 0 과 국가번호(84·82)를 뗀다 */
+            $norm  = ltrim((string) preg_replace('/^(84|82)/', '', ltrim($digits, '0')), '0');
+            $buyer = 'lead-' . md5($norm !== '' ? $norm : $digits);
+            /* 남용 방지 — 한 IP 에서 한 시간에 간편 신청 20건까지 */
+            if ($ip !== '' && in_array('ip', $db->getFieldNames('meet_requests'), true)) {
+                $recent = $db->table('meet_requests')->where('ip', $ip)->like('buyer_id', 'lead-', 'after')
+                    ->where('created_at >=', date('Y-m-d H:i:s', time() - 3600))->countAllResults();
+                if ($recent >= 20) {
+                    return $this->err('rate', 'Bạn đã gửi quá nhiều đăng ký. Vui lòng thử lại sau.', 429);
+                }
+            }
         }
         $fill = [];
         $country = strtoupper(substr(preg_replace('/[^A-Za-z]/', '', (string) ($in['country'] ?? '')), 0, 2));
@@ -273,23 +303,30 @@ class Meet extends BaseApiController
                 $fill[$k] = $this->cut($v, $max);
             }
         }
-        if ($fill) {
-            $db->table('profiles')->where('id', $this->uid())->update($fill + ['updated_at' => $now]);
+        if ($uid && $fill) {
+            $db->table('profiles')->where('id', $uid)->update($fill + ['updated_at' => $now]);
         }
         $row  = [
             'company'      => $this->cut($company, 200),
             'contact_name' => $this->cut($contact, 120),
             'phone'        => $this->cut($phone, 60),
-            'email'        => $this->cut($prof['email'] ?? ($this->user['email'] ?? ''), 200),
-            'channel'      => $this->cut($in['channel'] ?? '', 200),
+            'email'        => $this->cut($email, 200),
+            'channel'      => $industry,
             'volume'       => $this->cut($in['volume'] ?? '', 200),
             'message'      => $this->cut($in['message'] ?? '', 2000),
             'aff_ref'      => $this->cut($in['aff_ref'] ?? '', 40) ?: null,
             'status'       => 'applied',
             'updated_at'   => $now,
         ];
+        /* 새 칸은 마이그레이션(000039)이 돈 뒤에만 쓴다 */
+        $cols = $db->getFieldNames('meet_requests');
+        foreach (['homepage' => $homepage, 'position' => $position, 'ip' => $ip] as $k => $v) {
+            if (in_array($k, $cols, true)) {
+                $row[$k] = $v !== '' ? $v : null;
+            }
+        }
         $prev = $db->table('meet_requests')->where('trip_id', $tid)->where('product_id', $pid)
-            ->where('buyer_id', $this->uid())->get()->getRowArray();
+            ->where('buyer_id', $buyer)->get()->getRowArray();
         if ($prev && $prev['status'] !== 'cancelled') {
             return $this->err('already', 'Bạn đã đăng ký gặp nhà cung cấp này.', 409);
         }
@@ -298,7 +335,7 @@ class Meet extends BaseApiController
         } else {
             $db->table('meet_requests')->insert($row + [
                 'id' => $this->uuid(), 'trip_id' => $tid, 'product_id' => $pid,
-                'buyer_id' => $this->uid(), 'created_at' => $now,
+                'buyer_id' => $buyer, 'created_at' => $now,
             ]);
         }
         $n = $this->counts()[$tid . '|' . $pid] ?? 0;

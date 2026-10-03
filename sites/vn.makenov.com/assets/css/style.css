@@ -1906,3 +1906,8 @@ body.mkedit-on .omc-hero .slide.on .shot{pointer-events:none}
   .more-btn{margin-top:18px;padding:12px}
 }
 .col-card .cat:empty{display:none}
+/* 신청 창의 '(선택)' 표시 */
+.f-opt{font-weight:400;font-size:12px;color:var(--mk-muted);margin-left:2px}
+/* 헤더의 '미팅 신청' 버튼 — 모바일에서는 .mk-head-right > .btn{display:none} 규칙으로 숨는다(인라인 display 금지) */
+.mk-head-cta{display:inline-flex;align-items:center;margin-left:6px;height:40px;padding:0 18px;white-space:nowrap}
+@media(max-width:860px){.mk-head-right > .mk-head-cta{display:none}}
