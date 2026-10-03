@@ -137,7 +137,7 @@ function renderChrome(active){
         onkeydown="if(event.key==='Enter'){${doSearch}}"><span class="ico" role="button" tabindex="0" onclick="${doSearch}">${MK_ICO.search}</span></div><div class="mk-head-right"><div class="mk-lang"><a data-lang="vi" href="${esc(mkLangHref('vi') || location.href)}" onclick="localStorage.setItem('mk_lang','vi')">VI</a><a data-lang="ko" href="${esc(mkLangHref('ko') || location.href)}" onclick="localStorage.setItem('mk_lang','ko')">KO</a><a data-lang="en" href="${esc(mkLangHref('en') || location.href)}" onclick="localStorage.setItem('mk_lang','en')">EN</a></div>${mobileLangMenu}<a class="mk-util" href="mypage.html">${MK_ICO.heart}<span class="badge" id="cart-badge">0</span><span class="lb" data-i18n="util_wish"></span></a>
       ${s
         ? `<a class="mk-util" href="mypage.html">${MK_ICO.user}<span class="lb">${esc(s.contactName||s.email.split('@')[0])}</span></a><a class="mk-util" onclick="Store.logout();location.reload()" style="cursor:pointer">${MK_ICO.logout}<span class="lb" data-i18n="logout"></span></a>`
-        : `<a class="mk-util" href="mypage.html" onclick="event.preventDefault();openAuth('login')">${MK_ICO.user}<span class="lb" data-i18n="login"></span></a><a class="btn btn-primary btn-sm mk-head-cta" href="${mkUrl('meetings.html')}" data-i18n="nav_apply"></a>`}
+        : `<a class="mk-util" href="mypage.html" onclick="event.preventDefault();openAuth('login')">${MK_ICO.user}<span class="lb" data-i18n="login"></span></a><button class="btn btn-ghost btn-sm mk-head-join" onclick="openAuth('signup')" data-i18n="signup"></button><a class="btn btn-primary btn-sm mk-head-cta" href="${mkUrl('meetings.html')}" data-i18n="nav_apply"></a>`}
     </div></div><nav class="mk-nav mk-head-nav"><a href="${mkUrl('products.html')}" data-i18n="nav_directory"></a><a href="${mkUrl('companies.html')}" data-i18n="nav_companies"></a><a href="${mkUrl('meetings.html')}" data-i18n="nav_meetings"></a><a href="${mkUrl('columns.html')}" data-i18n="nav_columns"></a><span class="gnb"><a href="${mkUrl('guide.html')}" data-i18n="nav_guide"></a><span class="drop"><a href="${mkUrl('support.html')}" data-i18n="nav_support"></a><span class="menu"><a href="${mkUrl('support.html#notice')}" data-i18n="nav_sp_notice"></a><a href="${mkUrl('support.html#faq')}" data-i18n="nav_sp_faq"></a><a href="${mkUrl('support.html#ask')}" data-i18n="nav_sp_ask"></a></span></span></span></nav></div>`;
   document.getElementById('mk-footer').innerHTML = `
   <div class="wrap"><div class="brand"><div class="logo"><img src="${mkAsset('assets/img/logo.png')}" alt="MAKENOV"
@@ -1018,48 +1018,39 @@ function mtMini(tr){
     <div style="margin-top:10px">${mtBar({ count: n, goal: Math.max(1, g), confirmed: done })}${mtProg({ count: n, goal: g }, `<span>${esc(mtRep('mt_suppliers', { n: items.length }))}</span>`)}</div>
   </div></a>`;
 }
-/* 홈 섹션의 주인공 카드(8차) — 흰 카드. 왼쪽: 큰 날짜·제목·숫자 3개·버튼, 오른쪽: 오는 공급사 제품 사진을 크게.
-   (7차의 어두운 배너는 글씨·사진이 너무 작고 빽빽하다는 피드백으로 교체) */
+/* 홈 '예정된 행사 일정' 카드(9차, 2026-10-03) — 행사 일정표처럼: 왼쪽 날짜 블록 · 가운데 행사 정보 · 오른쪽 참가 공급사 목록.
+   8차(정보 + 큰 사진 타일 슬라이드)는 공급사가 2곳이면 오른쪽이 비고 일정 카드로 안 보였다.
+   공급사는 3곳까지 줄로 보여 주고 나머지는 '외 n곳'으로 일정 페이지에 보낸다. 줄을 누르면 그 제품의 신청 패널로. */
 function mtFeatured(tr){
   const items = MkMeet.itemsOf(tr);
   const joined = items.reduce((a, i) => a + i.count, 0);
-  const left = tr.open && tr.days_left != null && tr.days_left > 0
-    ? `<div><b>D-${tr.days_left}</b><span>${esc(t('mt_ev_until'))}</span></div>` : '';
-  /* 공급사 사진은 전부 — 4개 넘으면 좌우 슬라이드(화살표 + 가로 스크롤). 사진을 누르면 그 제품의 펀딩 패널로 */
-  const tiles = items.map(it => {
+  const d = mtDate(tr.visit_date);
+  const href = `${mkUrl('meetings.html')}#trip-${esc(tr.id)}`;
+  const dday = tr.open && tr.days_left != null && tr.days_left > 0 ? `<span class="dd">D-${tr.days_left}</span>` : '';
+  const rows = items.slice(0, 3).map(it => {
     const p = mkProduct(it.product_id);
-    return `<a class="mt-f-tile ${it.confirmed ? 'done' : ''}" href="${mkDocUrl('product', p.id)}#meet"><div class="im"><img src="${esc(p.img)}" alt="${esc(L(p.name))}" loading="lazy">${it.confirmed ? `<span class="ok">${MT_ICO.check}</span>` : ''}</div><div class="bd"><div class="br">${esc(p.brand)}</div><div class="nm">${esc(L(p.name))}</div>${mtBar(it)}<div class="pr">${mtJoinedHtml(it)}<em>${mtPct(it)}%</em></div></div></a>`;
+    return `<a class="mt-evc-sup ${it.confirmed ? 'done' : ''}" href="${mkDocUrl('product', p.id)}#meet"><img src="${esc(p.img)}" alt="${esc(L(p.name))}" loading="lazy"><div class="tx"><span class="br">${esc(p.brand)}</span><span class="nm">${esc(L(p.name))}</span>${mtBar(it)}<div class="pr">${mtJoinedHtml(it)}<em>${mtPct(it)}%</em></div></div></a>`;
   }).join('');
-  const arrow = d => `<button type="button" class="mt-f-nav ${d < 0 ? 'prev' : 'next'}" onclick="mtSlide(this,${d})" aria-label="${d < 0 ? 'prev' : 'next'}"><svg viewBox="0 0 24 24"><path d="${d < 0 ? 'M15 5l-7 7 7 7' : 'M9 5l7 7-7 7'}"/></svg></button>`;
-  return `<div class="mt-f">
-    <div class="mt-f-info">
-      <h3>${esc(L(tr.title) || t('mt_page_kick'))}</h3>
-      ${mtFacts(tr)}
-      <div class="mt-f-nums"><div><b>${items.length}</b><span>${esc(t('mt_ev_sup'))}</span></div><div><b>${joined}</b><span>${esc(t('mt_ev_joined'))}</span></div>${left}</div>
+  const more = items.length > 3 ? `<a class="mt-evc-more" href="${href}">${esc(mtRep('mt_evc_more', { n: items.length - 3 }))} →</a>` : '';
+  return `<div class="mt-evc">
+    <a class="mt-evc-date" href="${href}"><span class="mo">${esc(mtFmt(tr.visit_date, { month:'long' }))}</span><b>${d ? String(d.getDate()).padStart(2, '0') : ''}</b><span class="dw">${esc(mtFmt(tr.visit_date, { weekday:'long' }))}</span></a>
+    <div class="mt-evc-info">
+      <div class="chips"><span class="st ${tr.open ? '' : 'off'}">${esc(t('mt_st_' + mtTripState(tr)))}</span>${dday}</div>
+      <h3><a href="${href}">${esc(L(tr.title) || t('mt_page_kick'))}</a></h3>
+      <ul class="meta">
+        <li>${MT_ICO.clock}<span>${esc(mtTime(tr) || t('mt_tba'))}</span></li>
+        <li>${MT_ICO.pin}<span>${esc(mtWhere(tr) || t('mt_tba'))}</span></li>
+        ${tr.deadline ? `<li>${MT_ICO.cal}<span>${esc(t('mt_deadline'))} · ${esc(mtFmt(tr.deadline, { month:'long', day:'numeric', weekday:'short' }))}</span></li>` : ''}
+      </ul>
+      <div class="foot"><span class="cnt">${MT_ICO.users}${esc(mtRep('mt_evc_joined', { n: joined }))}</span><a class="go" href="${href}">${esc(t('mt_evc_detail'))} →</a></div>
     </div>
-    <div class="mt-f-slide">
-      <div class="mt-f-tiles ${items.length <= 3 ? 'few' : ''}" onscroll="mtSlideSync(this)">${tiles}</div>
-      ${arrow(-1)}${arrow(1)}
-    </div>
+    <div class="mt-evc-sups"><div class="hd">${esc(mtRep('mt_evc_sups', { n: items.length }))}</div>${rows}${more}</div>
   </div>`;
-}
-function mtSlide(btn, dir){
-  const tr = btn.parentElement.querySelector('.mt-f-tiles');
-  const tile = tr && tr.firstElementChild;
-  if(!tile) return;
-  tr.scrollBy({ left: dir * (tile.getBoundingClientRect().width + 14), behavior: 'smooth' });
-}
-/* 끝에 닿은 쪽 화살표는 숨긴다 — 다 보이면(4개 이하) 둘 다 숨김 */
-function mtSlideSync(tr){
-  const box = tr.parentElement;
-  box.classList.toggle('at-start', tr.scrollLeft <= 2);
-  box.classList.toggle('at-end', tr.scrollLeft + tr.clientWidth >= tr.scrollWidth - 2);
 }
 function mtHomeHtml(){
   /* 방문일이 정해진 일정만 — '방문일 미정' 일정은 이 섹션에 안 나온다(제품 카드·상세에서만 '방문일 미정'으로 신청받는다) */
   const list = MkMeet.upcoming().filter(tr => tr.visit_date && MkMeet.itemsOf(tr).length).slice(0, 4);
   if(!list.length) return '';
-  /* 일정마다 같은 큰 카드로 — 날짜가 정해진 일정 먼저, '방문일 미정' 일정은 그 아래 */
   return `<div class="sec-head"><h2>${esc(t('mt_home_h'))}</h2><a class="more" href="${mkUrl('meetings.html')}">${esc(t('mt_home_more'))}</a></div>`
     + list.map(mtFeatured).join('');
 }
@@ -1115,7 +1106,6 @@ function mtFillSlots(){
     const h = mtHomeHtml();
     el.innerHTML = h ? `<div class="wrap">${h}</div>` : '';
     el.hidden = !h;
-    el.querySelectorAll('.mt-f-tiles').forEach(mtSlideSync);
   });
   document.querySelectorAll('[data-mt-product]').forEach(el => { el.innerHTML = mtFundingPanel(el.dataset.mtProduct); });
 }

@@ -1911,3 +1911,63 @@ body.mkedit-on .omc-hero .slide.on .shot{pointer-events:none}
 /* 헤더의 '미팅 신청' 버튼 — 모바일에서는 .mk-head-right > .btn{display:none} 규칙으로 숨는다(인라인 display 금지) */
 .mk-head-cta{display:inline-flex;align-items:center;margin-left:6px;height:40px;padding:0 18px;white-space:nowrap}
 @media(max-width:860px){.mk-head-right > .mk-head-cta{display:none}}
+
+/* ===== 홈 '예정된 행사 일정' 카드 (app.js mtFeatured, 9차) — 날짜 블록 · 행사 정보 · 참가 공급사 목록 ===== */
+.mt-evc{display:grid;grid-template-columns:168px minmax(0,1fr) minmax(0,1.05fr);border:1px solid var(--mk-line);border-radius:20px;background:#fff;overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,.03)}
+.mt-evc+.mt-evc{margin-top:16px}
+.mt-evc-date{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:28px 12px;background:linear-gradient(160deg,#0B45B4 0%,#022E7D 72%);color:#fff;text-align:center}
+.mt-evc-date .mo{font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.86}
+.mt-evc-date b{font-size:72px;font-weight:800;line-height:1;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.mt-evc-date .dw{font-size:14px;font-weight:600;opacity:.86}
+.mt-evc-info{display:flex;flex-direction:column;justify-content:center;min-width:0;padding:28px 30px}
+.mt-evc-info .chips{display:flex;gap:6px;margin-bottom:12px}
+.mt-evc-info .chips span{display:inline-flex;align-items:center;height:26px;padding:0 11px;border-radius:var(--r-pill);font-size:12.5px;font-weight:700;letter-spacing:.02em}
+.mt-evc-info .chips .st{background:var(--mk-primary-soft);color:var(--mk-primary-dark)}
+.mt-evc-info .chips .st.off{background:#EEF1F4;color:var(--mk-muted)}
+.mt-evc-info .chips .dd{background:var(--mk-navy);color:#fff}
+.mt-evc .mt-evc-info h3{font-size:26px;font-weight:800;line-height:1.25;letter-spacing:-.03em;margin:0 0 14px;color:var(--mk-ink);word-break:keep-all}
+.mt-evc-info h3 a{color:inherit}
+.mt-evc-info .meta{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.mt-evc-info .meta li{display:flex;align-items:flex-start;gap:9px;font-size:14.5px;line-height:1.45;color:var(--mk-body)}
+.mt-evc-info .meta .mt-ico{flex:none;width:16px;height:16px;margin-top:2px;color:var(--mk-muted)}
+.mt-evc-info .foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:18px;padding-top:16px;border-top:1px solid var(--mk-line)}
+.mt-evc-info .cnt{display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:600;color:var(--mk-ink)}
+.mt-evc-info .cnt .mt-ico{width:17px;height:17px;color:var(--mk-primary)}
+.mt-evc-info .go{font-size:14px;font-weight:700;color:var(--mk-primary-dark);white-space:nowrap}
+.mt-evc-info .go:hover{text-decoration:underline}
+.mt-evc-sups{display:flex;flex-direction:column;justify-content:center;gap:10px;min-width:0;padding:22px 24px;background:#FAFBFB;border-left:1px solid var(--mk-line)}
+.mt-evc-sups .hd{font-size:12.5px;font-weight:700;letter-spacing:.03em;color:var(--mk-muted);margin-bottom:2px}
+.mt-evc-sup{display:grid;grid-template-columns:76px minmax(0,1fr);gap:14px;align-items:center;padding:10px;border-radius:14px;background:#fff;border:1px solid var(--mk-line);color:inherit;transition:border-color .15s,box-shadow .15s}
+.mt-evc-sup:hover{border-color:var(--mk-primary);box-shadow:0 6px 18px rgba(4,20,63,.08)}
+.mt-evc-sup img{width:76px;height:76px;border-radius:10px;object-fit:cover;background:var(--mk-bg-soft)}
+.mt-evc-sup .tx{min-width:0}
+.mt-evc-sup .br{display:block;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--mk-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mt-evc-sup .nm{display:block;font-size:14.5px;font-weight:600;line-height:1.35;color:var(--mk-ink);margin:1px 0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mt-evc-sup .mt-bar{height:6px}
+.mt-evc-sup .pr{display:flex;align-items:baseline;justify-content:space-between;gap:6px;margin-top:6px;font-size:12.5px;color:var(--mk-body)}
+.mt-evc-sup .pr .mt-jn b{font-size:15px}
+.mt-evc-sup .pr .mt-jn small{font-size:12px}
+.mt-evc-sup .pr em{font-style:normal;font-weight:800;color:var(--mk-primary-dark)}
+.mt-evc-sup.done .pr em{color:var(--mk-navy)}
+.mt-evc-more{align-self:flex-start;font-size:13.5px;font-weight:700;color:var(--mk-primary-dark);padding:2px 4px}
+@media(max-width:1024px){
+  .mt-evc{grid-template-columns:140px minmax(0,1fr)}
+  .mt-evc-sups{grid-column:1/-1;border-left:0;border-top:1px solid var(--mk-line);display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .mt-evc-sups .hd,.mt-evc-more{grid-column:1/-1}
+  .mt-evc-date b{font-size:60px}
+}
+@media(max-width:640px){
+  .mt-evc{grid-template-columns:1fr;border-radius:16px}
+  .mt-evc-date{flex-direction:row;align-items:baseline;justify-content:flex-start;gap:8px;padding:14px 18px}
+  .mt-evc-date b{font-size:34px;order:-1}
+  .mt-evc-date .mo,.mt-evc-date .dw{font-size:14px}
+  .mt-evc-info{padding:18px}
+  .mt-evc .mt-evc-info h3{font-size:21px;margin-bottom:12px}
+  .mt-evc-info .meta li{font-size:14px}
+  .mt-evc-info .foot{margin-top:14px;padding-top:12px}
+  .mt-evc-sups{grid-template-columns:1fr;padding:14px}
+  .mt-evc-sup{grid-template-columns:64px minmax(0,1fr);gap:12px;padding:9px}
+  .mt-evc-sup img{width:64px;height:64px}
+}
+/* 헤더의 '회원가입'(보조, 테두리 버튼) — '미팅 신청' 옆. 모바일에서는 .mk-head-right > .btn 규칙으로 숨는다 */
+.mk-head-join{margin-left:6px;height:40px;padding:0 14px;white-space:nowrap}

@@ -479,12 +479,31 @@ function renderNav(){
     NAV.slice(0,4).map(n=>navBtn(n,counts)).join('') +
     `<div class="grp">미팅 펀딩</div>` +
     NAV.filter(n=>n.grp==='meet').map(n=>navBtn(n,counts)).join('') +
-    `<div class="grp">제휴 <span class="grp-sub">CTV</span></div>` +
-    NAV.filter(n=>n.grp==='aff').map(n=>navBtn(n,counts)).join('') +
     `<div class="grp">콘텐츠</div>` +
     NAV.slice(9,14).map(n=>navBtn(n,counts)).join('') +
     `<div class="grp">시스템</div>` +
-    NAV.slice(14).filter(n=>!n.grp).map(n=>navBtn(n,counts)).join('');
+    NAV.slice(14).filter(n=>!n.grp).map(n=>navBtn(n,counts)).join('') +
+    /* 제휴(CTV)는 맨 아래에 접어 둔다(2026-10-03 사용자 요청). 제휴 탭을 보고 있으면 자동으로 펼친다.
+       접혀 있어도 처리할 건(리드 승인 대기 + 출금 신청)이 있으면 제목 옆에 합계를 보여 준다. */
+    (() => {
+      const open = affNavOpen();
+      const todo = (Number(counts.aff_leads) || 0) + (Number(counts.aff_withdrawals) || 0);
+      return `<div class="grp tog ${open ? 'open' : ''}" onclick="toggleAffNav()" role="button" aria-expanded="${open}">
+          <span>제휴 <span class="grp-sub">CTV</span></span>${!open && todo ? `<span class="cnt">${todo}</span>` : ''}
+          <svg class="chev" viewBox="0 0 24 24" width="14" height="14"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>`
+        + (open ? NAV.filter(n=>n.grp==='aff').map(n=>navBtn(n,counts)).join('') : '');
+    })();
+}
+function affNavOpen(){
+  if(String(curTab || '').startsWith('aff_')) return true;
+  try{ return localStorage.getItem('adm_aff_nav') === '1'; }catch(e){ return false; }
+}
+function toggleAffNav(){
+  const open = affNavOpen();
+  /* 제휴 탭을 보는 중에는 접지 않는다(현재 위치가 사라지면 헷갈린다) */
+  if(String(curTab || '').startsWith('aff_')) return;
+  try{ localStorage.setItem('adm_aff_nav', open ? '0' : '1'); }catch(e){}
+  renderNav();
 }
 function navBtn(n, counts){
   const c = counts[n.id];
