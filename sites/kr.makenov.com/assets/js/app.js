@@ -1019,8 +1019,9 @@ function mtMini(tr){
   </div></a>`;
 }
 /* 홈 '예정된 행사 일정' 카드(10차, 2026-10-03) — 위아래 2단.
-   위: 날짜 배지 · 행사명 · 시간/장소/마감 한 줄 · '행사 일정 자세히' 버튼
-   아래: 참가 공급사 카드(사진 크게, 달성 막대, '미팅 신청') — 공급사 수만큼 칸을 나눠 폭을 채운다(최대 4칸).
+   위: 날짜 배지 · 행사명 · 시간/장소/마감/공급사·신청 수 한 줄 · '행사 일정 자세히' 버튼
+   아래: 참가 공급사(사진 크게, 달성 막대, '미팅 신청') — 공급사 수만큼 칸을 나눠 폭을 채운다(최대 4칸).
+   카드 안은 선·상자로 나누지 않는다(사용자 요청: 구분하지 말고 한 섹션으로) — 여백으로만 구분.
    9차(날짜 | 정보 | 공급사 목록 3칸)는 가운데가 비고 사진이 작다는 피드백으로 교체. */
 function mtFeatured(tr){
   const items = MkMeet.itemsOf(tr);
@@ -1049,11 +1050,11 @@ function mtFeatured(tr){
           <li>${MT_ICO.clock}<span>${esc(mtTime(tr) || t('mt_tba'))}</span></li>
           <li>${MT_ICO.pin}<span>${esc(mtWhere(tr) || t('mt_tba'))}</span></li>
           ${tr.deadline ? `<li>${MT_ICO.cal}<span>${esc(t('mt_deadline'))} · ${esc(mtFmt(tr.deadline, { month:'long', day:'numeric', weekday:'short' }))}</span></li>` : ''}
+          <li>${MT_ICO.users}<span>${esc(mtRep('mt_evc_sups', { n: items.length }))} · ${esc(mtRep('mt_evc_joined', { n: joined }))}</span></li>
         </ul>
       </div>
       <a class="btn btn-ghost mt-evd-go" href="${href}">${esc(t('mt_evc_detail'))} →</a>
     </div>
-    <div class="mt-evd-line"><span class="hd">${esc(mtRep('mt_evc_sups', { n: items.length }))}</span><span class="cnt">${MT_ICO.users}${esc(mtRep('mt_evc_joined', { n: joined }))}</span></div>
     <div class="mt-evd-sups ${shown.length >= 3 ? 'many' : ''}" style="--n:${Math.max(1, shown.length)}">${cards}</div>${more}
   </div>`;
 }
