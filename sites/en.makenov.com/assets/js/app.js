@@ -1018,33 +1018,43 @@ function mtMini(tr){
     <div style="margin-top:10px">${mtBar({ count: n, goal: Math.max(1, g), confirmed: done })}${mtProg({ count: n, goal: g }, `<span>${esc(mtRep('mt_suppliers', { n: items.length }))}</span>`)}</div>
   </div></a>`;
 }
-/* 홈 '예정된 행사 일정' 카드(9차, 2026-10-03) — 행사 일정표처럼: 왼쪽 날짜 블록 · 가운데 행사 정보 · 오른쪽 참가 공급사 목록.
-   8차(정보 + 큰 사진 타일 슬라이드)는 공급사가 2곳이면 오른쪽이 비고 일정 카드로 안 보였다.
-   공급사는 3곳까지 줄로 보여 주고 나머지는 '외 n곳'으로 일정 페이지에 보낸다. 줄을 누르면 그 제품의 신청 패널로. */
+/* 홈 '예정된 행사 일정' 카드(10차, 2026-10-03) — 위아래 2단.
+   위: 날짜 배지 · 행사명 · 시간/장소/마감 한 줄 · '행사 일정 자세히' 버튼
+   아래: 참가 공급사 카드(사진 크게, 달성 막대, '미팅 신청') — 공급사 수만큼 칸을 나눠 폭을 채운다(최대 4칸).
+   9차(날짜 | 정보 | 공급사 목록 3칸)는 가운데가 비고 사진이 작다는 피드백으로 교체. */
 function mtFeatured(tr){
   const items = MkMeet.itemsOf(tr);
   const joined = items.reduce((a, i) => a + i.count, 0);
   const d = mtDate(tr.visit_date);
   const href = `${mkUrl('meetings.html')}#trip-${esc(tr.id)}`;
   const dday = tr.open && tr.days_left != null && tr.days_left > 0 ? `<span class="dd">D-${tr.days_left}</span>` : '';
-  const rows = items.slice(0, 3).map(it => {
+  const shown = items.slice(0, 4);
+  const cards = shown.map(it => {
     const p = mkProduct(it.product_id);
-    return `<a class="mt-evc-sup ${it.confirmed ? 'done' : ''}" href="${mkDocUrl('product', p.id)}#meet"><img src="${esc(p.img)}" alt="${esc(L(p.name))}" loading="lazy"><div class="tx"><span class="br">${esc(p.brand)}</span><span class="nm">${esc(L(p.name))}</span>${mtBar(it)}<div class="pr">${mtJoinedHtml(it)}<em>${mtPct(it)}%</em></div></div></a>`;
+    const mine = it.mine || mtIsMine(tr.id, p.id);
+    return `<a class="mt-evd-sup ${it.confirmed ? 'done' : ''}" href="${mkDocUrl('product', p.id)}#meet">
+      <div class="im"><img src="${esc(p.img)}" alt="${esc(L(p.name))}" loading="lazy"></div>
+      <div class="tx"><span class="br">${esc(p.brand)}</span><span class="nm">${esc(L(p.name))}</span>${mtBar(it)}
+        <div class="pr">${mtJoinedHtml(it)}<em>${mtPct(it)}%</em></div>
+        <span class="act ${mine ? 'on' : ''}">${mine ? MT_ICO.check + esc(t('mt_btn_applied')) : esc(t('mt_btn_apply')) + ' →'}</span></div></a>`;
   }).join('');
-  const more = items.length > 3 ? `<a class="mt-evc-more" href="${href}">${esc(mtRep('mt_evc_more', { n: items.length - 3 }))} →</a>` : '';
-  return `<div class="mt-evc">
-    <a class="mt-evc-date" href="${href}"><span class="mo">${esc(mtFmt(tr.visit_date, { month:'long' }))}</span><b>${d ? String(d.getDate()).padStart(2, '0') : ''}</b><span class="dw">${esc(mtFmt(tr.visit_date, { weekday:'long' }))}</span></a>
-    <div class="mt-evc-info">
-      <div class="chips"><span class="st ${tr.open ? '' : 'off'}">${esc(t('mt_st_' + mtTripState(tr)))}</span>${dday}</div>
-      <h3><a href="${href}">${esc(L(tr.title) || t('mt_page_kick'))}</a></h3>
-      <ul class="meta">
-        <li>${MT_ICO.clock}<span>${esc(mtTime(tr) || t('mt_tba'))}</span></li>
-        <li>${MT_ICO.pin}<span>${esc(mtWhere(tr) || t('mt_tba'))}</span></li>
-        ${tr.deadline ? `<li>${MT_ICO.cal}<span>${esc(t('mt_deadline'))} · ${esc(mtFmt(tr.deadline, { month:'long', day:'numeric', weekday:'short' }))}</span></li>` : ''}
-      </ul>
-      <div class="foot"><span class="cnt">${MT_ICO.users}${esc(mtRep('mt_evc_joined', { n: joined }))}</span><a class="go" href="${href}">${esc(t('mt_evc_detail'))} →</a></div>
+  const more = items.length > shown.length ? `<a class="mt-evd-more" href="${href}">${esc(mtRep('mt_evc_more', { n: items.length - shown.length }))} →</a>` : '';
+  return `<div class="mt-evd">
+    <div class="mt-evd-top">
+      <a class="mt-evd-date" href="${href}"><span class="mo">${esc(mtFmt(tr.visit_date, { month:'long' }))}</span><b>${d ? String(d.getDate()).padStart(2, '0') : ''}</b><span class="dw">${esc(mtFmt(tr.visit_date, { weekday:'long' }))}</span></a>
+      <div class="mt-evd-main">
+        <div class="chips"><span class="st ${tr.open ? '' : 'off'}">${esc(t('mt_st_' + mtTripState(tr)))}</span>${dday}</div>
+        <h3><a href="${href}">${esc(L(tr.title) || t('mt_page_kick'))}</a></h3>
+        <ul class="meta">
+          <li>${MT_ICO.clock}<span>${esc(mtTime(tr) || t('mt_tba'))}</span></li>
+          <li>${MT_ICO.pin}<span>${esc(mtWhere(tr) || t('mt_tba'))}</span></li>
+          ${tr.deadline ? `<li>${MT_ICO.cal}<span>${esc(t('mt_deadline'))} · ${esc(mtFmt(tr.deadline, { month:'long', day:'numeric', weekday:'short' }))}</span></li>` : ''}
+        </ul>
+      </div>
+      <a class="btn btn-ghost mt-evd-go" href="${href}">${esc(t('mt_evc_detail'))} →</a>
     </div>
-    <div class="mt-evc-sups"><div class="hd">${esc(mtRep('mt_evc_sups', { n: items.length }))}</div>${rows}${more}</div>
+    <div class="mt-evd-line"><span class="hd">${esc(mtRep('mt_evc_sups', { n: items.length }))}</span><span class="cnt">${MT_ICO.users}${esc(mtRep('mt_evc_joined', { n: joined }))}</span></div>
+    <div class="mt-evd-sups ${shown.length >= 3 ? 'many' : ''}" style="--n:${Math.max(1, shown.length)}">${cards}</div>${more}
   </div>`;
 }
 function mtHomeHtml(){
