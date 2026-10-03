@@ -129,9 +129,9 @@ window.MK_COPY_BAKED = {
     "en": "Meet global innovative products"
   },
   "ui.promo_f2": {
-    "en": "Request a quote directly from the supplier",
-    "ko": "공급사에 직접 견적 요청",
-    "vi": "Yêu cầu báo giá trực tiếp từ nhà cung cấp"
+    "vi": "Gặp trực tiếp 1:1 với nhà cung cấp",
+    "ko": "공급사와 1:1 대면 미팅",
+    "en": "1:1 in-person meetings with suppliers"
   },
   "about.vs.tag": {
     "en": "Differences in Sourcing Methods",
@@ -174,9 +174,9 @@ window.MK_COPY_BAKED = {
     "en": "Supplier store opening inquiry"
   },
   "ui.promo_desc": {
-    "vi": "Người mua đã được xác minh có thể xem giá, MOQ và thời gian giao hàng, đồng thời gửi yêu cầu báo giá trực tiếp đến nhà cung cấp cho sản phẩm mong muốn.",
-    "ko": "인증된 바이어는 가격·MOQ·납기를 확인하고, 원하는 제품의 견적을 공급사에 직접 요청할 수 있습니다.",
-    "en": "Certified buyers can check the price, MOQ, and delivery date, and request a quote for the desired product directly from the supplier."
+    "vi": "Hãy đăng ký gặp nhà cung cấp bạn quan tâm. Khi đủ số lượng, đại diện Hàn Quốc sẽ sang Việt Nam gặp trực tiếp 1:1.",
+    "ko": "만나고 싶은 공급사에 미팅을 신청하세요. 목표 인원이 차면 한국 담당자가 베트남에 와서 1:1로 만납니다.",
+    "en": "Request a meeting with the suppliers you want. Once enough buyers join, their team comes to Vietnam to meet you 1:1."
   },
   "about.lock.tag": {
     "en": "Transaction conditions disclosure method",
@@ -194,9 +194,9 @@ window.MK_COPY_BAKED = {
     "en": "When you register a product on MAKENOV, it will be introduced to certified buyers, and quotation inquiries will be sent directly to the supplier."
   },
   "ui.promo_title": {
-    "vi": "Xác minh doanh nghiệp một lần – Dễ dàng xem giá và yêu cầu báo giá",
-    "ko": "사업자 인증 한 번으로\n가격 확인부터 견적 요청까지",
-    "en": "With one business verification\nFrom price confirmation to quote request"
+    "vi": "Đủ 5 doanh nghiệp,\nnhà cung cấp Hàn Quốc sang tận nơi",
+    "ko": "5곳이 모이면\n한국 공급사가 직접 찾아옵니다",
+    "en": "Five sign-ups,\nand the Korean supplier comes to you"
   },
   "about.hero.kick": {
     "en": "What if you are a buyer?",
@@ -449,9 +449,9 @@ window.MK_COPY_BAKED = {
     "en": "Check production capacity, certifications and export record before you inquire."
   },
   "ui.promo_f1": {
-    "vi": "Xem giá · MOQ · Thời gian giao hàng",
-    "ko": "가격 · MOQ · 납기 열람",
-    "en": "Unlock price · MOQ · lead time"
+    "vi": "Đăng ký 1 phút, không cần tài khoản",
+    "ko": "가입 없이 1분 신청",
+    "en": "One-minute request, no account"
   },
   "ui.mk_f1": {
     "vi": "Không mất phí đăng ký",
