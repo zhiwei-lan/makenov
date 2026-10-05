@@ -1489,6 +1489,8 @@ function openMeetApply(tripId, pid){
     <div class="fs"><div class="fs-t">${esc(t('mt_q_person_h'))}</div>
       <div class="f-2col">${row('mq-name', 'mt_q_name', 'autocomplete="name" maxlength="120"', s && s.contactName)}${row('mq-position', 'mt_q_position', 'autocomplete="organization-title" maxlength="120"', s && s.position, true)}</div>
       <div class="f-2col">${row('mq-phone', 'mt_q_phone', 'inputmode="tel" autocomplete="tel" maxlength="60"', s && s.phone)}${row('mq-email', 'mt_q_email', 'type="email" autocomplete="email" maxlength="200" placeholder="name@company.com"', s && s.email)}</div></div>
+    <div class="fs"><div class="fs-t">${esc(t('mt_q_msg'))} <span class="f-opt">${esc(t('mt_q_opt'))}</span></div>
+      <div class="f-row"><textarea id="mq-msg" rows="3" maxlength="2000" placeholder="${esc(t('mt_q_msg_ph'))}"></textarea></div></div>
     <input id="mq-hp" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
     <div class="mst-result err" id="mq-err" style="display:none"></div>
     <p class="inq-auto">${esc(t('mt_q_note'))}</p>
@@ -1508,6 +1510,7 @@ async function sendMeetApply(tripId, pid){
   const body = { trip_id: tripId, product_id: pid,
     company: v('mq-company'), homepage: v('mq-site'), channel: v('mq-industry'),
     contact_name: v('mq-name'), position: v('mq-position'), phone: v('mq-phone'), email: v('mq-email'), hp: v('mq-hp'),
+    message: v('mq-msg'),   // 문의 내용(선택)
     country: MK_LANG === 'ko' ? 'KR' : MK_LANG === 'en' ? '' : 'VN' };
   for(const [id, val] of [['mq-company', body.company], ['mq-industry', body.channel], ['mq-name', body.contact_name], ['mq-phone', body.phone], ['mq-email', body.email]]){
     if(!val) return errBox(t('mt_q_err_fill'), id);

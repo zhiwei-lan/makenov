@@ -629,8 +629,9 @@ class Meet extends BaseApiController
                 '이메일: ' . ($row['email'] ?? ''),
                 '홈페이지: ' . ($row['homepage'] ?? ''),
                 '업종: ' . ($row['channel'] ?? ''),
+                '문의 내용: ' . (trim((string) ($row['message'] ?? '')) !== '' ? $row['message'] : '(없음)'),
                 '',
-                '관리자 › 방문 일정에서 확인: https://vn.makenov.com/admin/',
+                '관리자 › 행사 일정에서 확인: https://makenov.com/admin/',
             ];
             $this->sendMail($to, '[MAKENOV] 새 미팅 신청 — ' . ($row['company'] ?? ''), implode("\n", $lines));
         } catch (\Throwable $e) {
