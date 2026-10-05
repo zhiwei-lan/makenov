@@ -277,7 +277,7 @@ button{font-family:var(--font-body);cursor:pointer;border:none;background:none;c
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:24px;align-items:start}
 @media(max-width:1024px){.grid{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:768px){.grid{grid-template-columns:repeat(2,1fr);gap:16px}}
-@media(max-width:460px){.grid{grid-template-columns:1fr}}
+@media(max-width:460px){.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}}
 .p-card{background:transparent;border-radius:4px;display:flex;flex-direction:column;position:relative;min-width:0}
 .p-card .thumb{position:relative;aspect-ratio:4/3;overflow:hidden;border-radius:var(--r-card);background:var(--mk-bg-soft)}
 .p-card .thumb img{width:100%;height:100%;object-fit:cover;transition:transform .35s}
@@ -933,7 +933,7 @@ button{font-family:var(--font-body);cursor:pointer;border:none;background:none;c
 
 /* 제품 리스트(본문 745 안 2열) */
 .co-prods{display:grid;grid-template-columns:1fr 1fr;gap:28px 24px}
-@media(max-width:640px){.co-prods{grid-template-columns:1fr}}
+@media(max-width:640px){.co-prods{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 12px}}
 
 /* 사이드 문의 박스 */
 .co-box{border:1px solid var(--mk-line);border-radius:8px;padding:22px 20px;background:#fff}
@@ -1655,7 +1655,7 @@ body.mkedit-on .omc-hero .slide.on .shot{pointer-events:none}
 /* 모바일: 펀딩 중인 제품은 사진 바로 아래에 펀딩 패널(원래는 긴 상세 설명 맨 아래로 밀렸다) */
 @media(max-width:960px){
   .pd-row.mt-on .pd-main{display:contents}
-  .pd-row.mt-on>.pd-main>*{order:3}
+  .pd-row.mt-on>.pd-main>*{order:3;align-self:stretch;min-width:0}
   .pd-row.mt-on>.pd-main>.pd-gallery{order:0}
   .pd-row.mt-on>.pd-main>.pd-thumbs{order:1}
   .pd-row.mt-on>.pd-side{order:2}
@@ -2239,7 +2239,7 @@ img.lg-trim{object-fit:contain!important;box-sizing:border-box;padding:7px;backg
 .grid.roll>*{scroll-snap-align:start}
 @media(max-width:1024px){.grid.roll{grid-template-columns:none;grid-auto-columns:calc((100% - 48px)/3)}}
 @media(max-width:768px){.grid.roll{grid-template-columns:none;grid-auto-columns:calc((100% - 16px)/2)}}
-@media(max-width:460px){.grid.roll{grid-template-columns:none;grid-auto-columns:78%}}
+@media(max-width:460px){.grid.roll{grid-template-columns:none;grid-auto-columns:calc((100% - 12px)/2)}}
 
 /* 메인(랜딩) 모바일 글자 크기(2026-10-06) — 중간 구역 제목(34px)이 히어로 제목보다 커서 화면을 다 차지했다.
    모바일(640px 미만)에서만 줄인다. PC·태블릿은 그대로. 인라인 스타일·랜딩 CSS 를 이기려고 !important. */
