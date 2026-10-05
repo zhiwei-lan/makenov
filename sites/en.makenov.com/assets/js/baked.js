@@ -3,6 +3,7 @@
    정식 주소(products/…html)로 링크하고, 없으면 ?id= 뷰어로 보낸다. */
 window.MK_BAKED = {
   "products": [
+      "p3",
       "p2",
       "p1",
       "p11",
@@ -498,45 +499,10 @@ window.MK_COPY_BAKED = {
     "ko": "문의만 남겨주시면 공급사 연결과 통역부터 온·오프라인 미팅까지 필요한 소통과 일정을 함께 조율해 드립니다.",
     "en": "Leave an inquiry and we coordinate everything needed — supplier connection, interpretation, and online or in-person meetings."
   },
-  "landing.pain.h1": {
-    "vi": "Năng lực cạnh tranh trong phân phối",
-    "ko": "유통의 경쟁력은",
-    "en": "Competitive distribution starts with"
-  },
-  "landing.pain.h2": {
-    "vi": " Bắt đầu từ việc bạn bán sản phẩm nào",
-    "ko": "무엇을 파느냐에서 시작됩니다",
-    "en": "what you choose to sell"
-  },
-  "landing.pain.p": {
-    "vi": "MAKENOV tìm kiếm những sản phẩm tiên phong toàn cầu chưa được phân phối chính thức tại Việt Nam. Hãy chủ động khám phá tiềm năng của sản phẩm và chuẩn bị cho những cơ hội thị trường mới.",
-    "ko": "메이크노브는 아직 베트남에 공식 유통되지 않은 글로벌 혁신 제품을 발굴합니다.\n제품이 가진 가능성을 먼저 살펴보고 새로운 시장을 준비해 보세요.",
-    "en": "MAKENOV discovers global innovative products not yet officially distributed in Vietnam.\nSee a product's potential first and get ready for a new market."
-  },
-  "landing.cost.kick": {
-    "vi": "Chi phí dịch vụ",
-    "ko": "비용 안내",
-    "en": "Pricing"
-  },
-  "landing.cost.h1": {
-    "vi": "Từ tìm kiếm sản phẩm đến kết nối với nhà cung cấp",
-    "ko": "제품을 찾고 연결되는 과정까지",
-    "en": "The process of finding and connecting to a product"
-  },
-  "landing.cost.h2": {
-    "vi": "MAKENOV hỗ trợ hoàn toàn miễn phí",
-    "ko": "메이크노브는 무료입니다",
-    "en": "MAKENOV is free"
-  },
-  "landing.cost.p": {
-    "vi": "Từ khám phá sản phẩm toàn cầu, xem điều kiện giao dịch đến gửi yêu cầu báo giá cho nhà cung cấp — tất cả đều không mất phí sử dụng.\nKhi cần, MAKENOV cũng hỗ trợ miễn phí việc kết nối, trao đổi với nhà cung cấp và sắp xếp lịch gặp.",
-    "ko": "글로벌 제품 탐색부터 거래 조건 확인, 공급사 견적 문의까지 별도의 이용료 없이 이용할 수 있습니다.\n필요한 경우 공급사 연결과 소통, 미팅 조율까지 무료로 지원합니다.",
-    "en": "Product discovery, trade-term checks and supplier quote requests come with no usage fee.\nWhen needed, supplier connection, communication and meeting coordination are also supported for free."
-  },
   "landing.cta.p": {
-    "vi": "Gặp gỡ những sản phẩm tiên phong toàn cầu đang tìm nhà phân phối chính thức tại Việt Nam.",
-    "ko": "베트남 공식 유통 파트너를 찾고 있는 글로벌 혁신 제품을 만나보세요.",
-    "en": "Meet global innovative products looking for their official distribution partner in Vietnam."
+    "vi": "Đăng ký miễn phí, không cần tạo tài khoản, chỉ mất 1 phút.",
+    "ko": "신청은 무료이고, 가입 없이 1분이면 됩니다.",
+    "en": "It is free, needs no account and takes a minute."
   },
   "landing.float.btn": {
     "vi": "Khám phá sản phẩm tiên phong",
