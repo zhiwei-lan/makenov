@@ -1067,8 +1067,7 @@ const MT_EVENT_X = {
   'hcm-20261203': {
     photo: 'https://kfesta.vn/assets/img/beauty/day1-vip.webp',
     logos: [
-      { src: 'https://kfesta.vn/assets/img/daegu-ci.webp', alt: 'Daegu Metropolitan City' },
-      { src: 'https://kfesta.vn/assets/img/b85af70e2ee60.webp', alt: 'KFESTA' },
+      { src: 'https://kfesta.vn/assets/img/daegu-ci.webp', alt: 'Daegu Metropolitan City' },   // KFESTA 로고는 뺐다(2026-10-05 사용자 지시) — 대구시 로고만
     ],
     sub:  { ko: '한국–베트남 비즈니스 상담회', vi: 'Hội nghị kết nối giao thương Hàn – Việt', en: 'Korea–Vietnam Business Matching' },   // 바이어가 보는 페이지라 '수출상담회' 대신
     band: { ko: '한국 대구의 혁신기업을 {y}호치민에서 직접{/y} 만나보세요', vi: 'Gặp {y}trực tiếp tại TP.HCM{/y} các doanh nghiệp đổi mới đến từ Daegu, Hàn Quốc', en: 'Meet innovative companies from Daegu, Korea {y}in person in Ho Chi Minh City{/y}' },
