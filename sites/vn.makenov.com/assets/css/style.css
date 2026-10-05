@@ -166,7 +166,15 @@ button{font-family:var(--font-body);cursor:pointer;border:none;background:none;c
 @media(max-width:1024px){.mk-search{display:none}}
 @media(max-width:860px){
   .mk-head-top{height:62px;gap:14px}
-  .mk-nav.mk-head-nav{display:none}
+  /* 2026-10-06: 예전에는 여기서 메뉴를 통째로 숨겨(display:none) 모바일에는 메뉴가 없었다 — 푸터까지 내려가야 이동할 수 있었다.
+     머리 아래에 옆으로 넘기는 한 줄 메뉴로 보여 준다(드롭다운은 접고 고객센터로 바로 간다). */
+  .mk-nav.mk-head-nav{height:44px;gap:22px;font-size:14.5px;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .mk-nav.mk-head-nav::-webkit-scrollbar{display:none}
+  .mk-nav.mk-head-nav>a,.mk-nav.mk-head-nav .gnb a{flex:none}
+  .mk-nav.mk-head-nav .gnb{margin-left:0;gap:22px;flex:none;padding-right:16px}
+  .mk-nav.mk-head-nav .gnb a{font-size:14.5px;font-weight:700}
+  .mk-nav.mk-head-nav .drop .menu{display:none}
+  .mk-nav.mk-head-nav .drop>a::after{display:none}
   .mk-lang{margin-right:2px}
   .mk-lang a{padding:4px 6px;font-size:11px}
 }
@@ -2277,4 +2285,58 @@ img.lg-trim{object-fit:contain!important;box-sizing:border-box;padding:7px;backg
   main [data-section-id="bottom_cta"] h2>br{display:none}
   main [data-section-id="bottom_cta"] .flex.flex-row{flex-direction:column!important;align-items:stretch!important;width:100%;gap:10px!important}
   main [data-section-id="bottom_cta"] .flex.flex-row>a{justify-content:center!important;height:48px!important;font-size:15px!important;white-space:nowrap}
+}
+
+/* ===== 모바일 전 페이지 점검(2026-10-06) — 375px 기준으로 16개 페이지를 재서 큰 덩어리·넘침·여백을 정리 ===== */
+@media(max-width:640px){
+  /* 메인 히어로: 버튼 두 개가 본문 폭(343px)보다 넓어(369px) 화면 가장자리에 붙었다 */
+  #hero .flex.flex-row:has([data-mkl="landing.hero.cta1"]){width:100%;max-width:100%}
+  #hero .flex.flex-row:has([data-mkl="landing.hero.cta1"])>a{min-width:0;padding:14px 8px!important;font-size:13px!important}
+
+  /* 제품 페이지 히어로 배너: 좁은 사진 칸에서 브랜드 이름표가 'FIRE…'로 잘렸다 */
+  .hb-ph.n3 .pi em,.hb-ph.n4 .pi em{display:none}
+
+  /* 제품 상세·행사 상세: 사진을 16:9 → 4:3(제품 사진 위아래가 잘렸다), 구역 사이 간격 축소 */
+  .pd-gallery .main{aspect-ratio:4/3}
+  .pd-main .pd-sec{margin-top:52px}
+  .ev-row .pd-main .pd-sec{margin-top:56px}
+  .ev-row .pd-main .pd-gallery+.pd-sec{margin-top:40px}
+  .p-card .heart{width:32px;height:32px}
+
+  /* 칼럼 목록: 카드 한 장이 347px(47편 = 22화면) → 작은 사진 + 제목 한 줄 목록(약 7화면) */
+  .blog-layout{gap:20px}
+  .blog-list{grid-template-columns:1fr;gap:0}
+  .blog-item{border-bottom:1px solid var(--mk-line)}
+  .blog-item-link{display:grid;grid-template-columns:112px minmax(0,1fr);gap:14px;align-items:center;padding:14px 0;background:none;border-radius:0;overflow:visible;box-shadow:none}
+  .blog-item-link:hover{transform:none;box-shadow:none}
+  .blog-item-img{aspect-ratio:4/3;border-radius:8px}
+  .blog-item-img .on-cover,.blog-item-img .veil{display:none}
+  .blog-item-info{padding:0}
+  .blog-item-cat:empty{display:none}
+  .blog-item-tit{font-size:15px;line-height:1.42;margin:0 0 6px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .blog-item-meta{font-size:12px}
+  .blog-float{font-size:12.5px;padding:11px 16px}
+
+  /* 고객센터: 탭 글자가 두 줄로 어긋났고, 공지 표가 640px 고정이라 옆으로 밀어야 제목이 보였다 */
+  .nb-tabs a{height:48px;padding:0 6px;font-size:13.5px;line-height:1.25;text-align:center}
+  .nb-tabs a.on{height:50px}
+  .nb-body{padding:22px 0 48px}
+  .nb-table{min-width:0;table-layout:fixed}
+  .nb-table .no,.nb-table .cat{display:none}
+  .nb-table th,.nb-table td{padding-left:4px;padding-right:4px}
+  .nb-table td{height:auto;padding-top:14px;padding-bottom:14px;font-size:14.5px;line-height:1.45;word-break:break-word}
+  .nb-table .dt{width:86px;font-size:12.5px;text-align:right}
+
+  /* 이용 가이드 · 공급사 안내 */
+  .gdoc-main h1{font-size:24px}
+  .lp-last{padding-top:56px;padding-bottom:56px}
+  .lp-last h2{font-size:24px}
+  .lp-last .btn{height:50px;padding:0 28px;font-size:15.5px}
+  .lp-stat .num{font-size:28px}
+
+  /* 신청·가입 창: 안쪽 여백 32/30px 이라 입력 칸이 275px 뿐이었다. 입력 글자는 16px(아이폰이 16px 미만 칸을 누르면 화면을 확대한다) */
+  .modal-back{padding:12px}
+  .modal{padding:24px 18px 20px;max-height:94vh}
+  .modal h2{font-size:19px}
+  .modal input,.modal select,.modal textarea{font-size:16px}
 }
