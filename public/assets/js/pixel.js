@@ -9,19 +9,30 @@
    표준 이벤트는 유통 파트너(buyer) 흐름에만 쓰고, 공급사·CTV 는 맞춤 이벤트.
    (CTV 가입을 CompleteRegistration 으로 쏘면 유통 파트너 가입 광고가 CTV 를 찾아간다)
 
-   ① 유통 파트너(buyer)                 ② 공급사(maker)           ③ CTV(affiliate)
-     PageView          모든 페이지          MakerStartApplication     CtvViewCampaign
-     ViewCategory      디렉토리 카테고리    SubmitApplication         CtvSignup
-     Search            헤더 검색                                      CtvLogin
-     ViewContent       제품·공급사·칼럼                               CtvShareLink
-     AddToWishlist     관심제품                                       CtvWithdraw
-     StartRegistration 가입 창 열기
-     VerifyBusiness    사업자 인증 통과
-     CompleteRegistration 가입 완료
-     InitiateCheckout  견적 문의 창 열기
-     RequestCatalog    카탈로그 요청
-     Lead              문의 발송 / 간편문의
+   ★ 2026-10 다시 세팅 — 사이트가 '가입·사업자 인증 → 가격 확인 → 견적 문의'에서
+     '가입 없이 미팅 신청'으로 바뀌어, 주 전환을 미팅 신청으로 옮겼다.
+
+   ① 유통 파트너(buyer) — 지금의 주 흐름
+     PageView          모든 페이지 (page_type 으로 구분: home · products · product · meetings · event …)
+     ViewContent       제품(product) · 행사 상세(event) · 공급사(company) · 칼럼(article)
+     ViewCategory      제품 목록의 카테고리
+     Search            헤더 검색
+     AddToWishlist     관심제품 저장
+     InitiateCheckout  미팅 신청 창 열기            content_category:'meeting'
+     Lead              ★주 전환 — 미팅 신청 접수     content_category:'meeting'
      Contact           고객센터 문의 / mailto·tel·zalo 클릭
+     RequestCatalog    카탈로그 요청
+
+     미팅 이벤트에는 trip_id(행사) · trip_name · content_ids(제품) · content_name · supplier(브랜드)가 붙는다
+     → 광고 관리자에서 "Lead 이면서 content_category = meeting" 으로 맞춤 전환을 만들면 미팅 신청만 센다.
+
+   ①-b 예전 흐름(지금도 동작하면 그대로 나간다 — 주 전환 아님)
+     StartRegistration · VerifyBusiness · CompleteRegistration   회원 가입(관심제품 저장용)
+     InitiateCheckout · Lead (content_category:'inquiry_*' · 'easy_lead')   옛 문의 창
+
+   ② 공급사(maker)            ③ CTV(affiliate)
+     MakerStartApplication      CtvViewCampaign · CtvSignup · CtvLogin
+     SubmitApplication          CtvShareLink · CtvWithdraw
 
    모든 이벤트에 자동으로 붙는 파라미터
      funnel     buyer | maker | ctv
@@ -31,13 +42,14 @@
 
    내부 방문 제외:  ?mk_internal=1 로 한 번 열면 그 브라우저는 픽셀이 꺼진다.
                     ?mk_internal=0 으로 다시 켠다. (우리 팀 방문이 학습을 오염시키지 않게)
+                    개발용 주소(localhost 등)와 사본 굽기(헤드리스 브라우저)는 자동으로 꺼진다.
    고급 매칭:       mkPixelIdentify({em, ph, fn, country}) — 가입·문의·로그인 때 호출.
                     Meta 스크립트가 브라우저에서 해시해 보낸다. 원문은 안 나간다.
    서버 전송(CAPI): 전환 이벤트는 같은 eventID 로 서버(/functions/v1/pixel-event)에도
                     보낸다. 서버 토큰이 없으면 서버가 그냥 무시한다 → 중복 집계 없음.
 
-   ★ 초기에는 Lead 전환이 주 50건에 못 미쳐 학습을 못 빠져나온다.
-     ViewContent / InitiateCheckout / CompleteRegistration 로 시작해서 위로 올려야 한다.
+   ★ 초기에는 Lead(미팅 신청)가 주 50건에 못 미쳐 학습을 못 빠져나온다.
+     ViewContent(제품·행사) → InitiateCheckout(신청 창 열기) → Lead 순으로 올린다.
    ============================================================ */
 (function(){
   /* 내부 방문 제외 스위치 */
@@ -48,6 +60,9 @@
   }catch(e){}
   window.MK_PIXEL_INTERNAL = false;
   try{ window.MK_PIXEL_INTERNAL = localStorage.getItem('mk_px_off') === '1'; }catch(e){}
+  /* 개발용 주소와 사본 굽기(prerender.js 의 헤드리스 크롬)는 실제 방문이 아니다 — 자동 제외(2026-10) */
+  if(/^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname) || /\.(localhost|test)$/.test(location.hostname)
+     || /HeadlessChrome/.test(navigator.userAgent)) window.MK_PIXEL_INTERNAL = true;
 
   const ID = (typeof MK_PIXEL_ID !== 'undefined' && MK_PIXEL_ID) ? String(MK_PIXEL_ID).trim() : '';
   window.MK_PIXEL_ON = !!ID && !window.MK_PIXEL_INTERNAL;
@@ -89,6 +104,7 @@ function mkPageType(){
   if(/\/products\/|\/product\.html/.test(p)) return 'product';
   if(/\/companies\/|\/company\.html/.test(p)) return 'company';
   if(/\/columns\/|\/column\.html/.test(p)) return 'column';
+  if(/\/meetings\.html$/.test(p) && /^#trip-/.test(location.hash)) return 'event';   // 행사 상세(주소의 #trip-…)
   const m = p.match(/([a-z0-9_-]+)\.html$/);
   if(!m || m[1] === 'index') return 'home';
   return m[1];                         // directory | products | companies | columns | maker | support | guide | mypage | sitemap | about
@@ -210,6 +226,21 @@ function mkProductParams(p){
     content_category: p.cat || '',
     contents: [{ id: p.id, quantity: 1 }],
   };
+}
+
+/* 행사(일정) → 파라미터. 미팅 신청 이벤트(InitiateCheckout · Lead)와 행사 상세 조회(ViewContent)에 붙인다.
+   p 를 주면 그 제품(=만나려는 공급사) 정보까지. trip_id 로 행사별, supplier 로 공급사별 성과를 나눠 본다. */
+function mkMeetParams(tr, p){
+  const lt = v => (typeof L === 'function' ? L(v) : '') || '';
+  const o = { content_category: 'meeting' };
+  if(tr){ o.trip_id = tr.id; o.trip_name = lt(tr.title); if(tr.visit_date) o.trip_date = String(tr.visit_date).slice(0, 10); }
+  if(p){
+    o.content_ids = [p.id]; o.content_type = 'product'; o.content_name = lt(p.name);
+    o.contents = [{ id: p.id, quantity: 1 }];
+    if(p.brand) o.supplier = p.brand;
+    if(p.cat) o.product_category = p.cat;
+  }
+  return o;
 }
 
 /* ---------- 연락 링크 클릭(mailto·tel·zalo) — 페이지 어디서든 Contact ----------

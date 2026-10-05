@@ -1181,6 +1181,8 @@ function mtKfGo(){ const el = document.getElementById('mt-kf-sups'); if(el) el.s
    2026-10-05: 따로 만든 히어로(그라데이션 · 알약 배지 · 떠 있는 날짜 배지)는 'AI 티가 난다'는 피드백으로 버리고 사이트 기존 컴포넌트로 통일.
    구역 순서(바이어 시점): 참가 공급사 → 행사 개요 → 무엇이 다른가 → 진행 방식 → 지원 내용 → 오시는 길 → FAQ */
 function mtEventPage(tr){
+  /* 행사 상세 조회 — 행사마다 한 번(같은 화면을 다시 그려도 또 세지 않는다) */
+  if(window._mtEvSeen !== tr.id){ window._mtEvSeen = tr.id; try{ mkTrack('ViewContent', Object.assign(mkMeetParams(tr), { content_type: 'event', content_ids: [tr.id], content_name: L(tr.title) || '' })); }catch(e){} }
   const x = mtEvX(tr);
   const items = MkMeet.itemsOf(tr);
   const title = L(tr.title) || t('mt_page_kick');
@@ -1477,7 +1479,7 @@ function openMeetApply(tripId, pid){
   const tr = MkMeet.trip(tripId), p = mkProduct(pid);
   if(!tr || !p) return;
   const s = (typeof Store !== 'undefined' && Store.session) ? Store.session() : null;
-  try{ mkTrack('InitiateCheckout', { content_ids:[pid], content_type:'product', content_category:'meeting' }); }catch(e){}
+  try{ mkTrack('InitiateCheckout', mkMeetParams(tr, p)); }catch(e){}   // 미팅 신청 창 열기
   const row = (id, key, attrs, val, opt) => `<div class="f-row"><label>${esc(t(key))}${opt ? ` <span class="f-opt">${esc(t('mt_q_opt'))}</span>` : ''}</label><input id="${id}" ${attrs || ''} value="${esc(val || '')}"></div>`;
   mkModal(`<h2>${esc(t('mt_apply_h'))}</h2>
     <p class="sub">${esc(p.brand)} · ${esc(L(p.name))}<br>${esc([mtWhen(tr) || t('mt_date_tbd'), mtWhere(tr)].filter(Boolean).join(' · '))}</p>
@@ -1524,7 +1526,8 @@ async function sendMeetApply(tripId, pid){
       : code === 'bad_phone' ? 'mt_q_err_phone' : code === 'rate' ? 'mt_err_rate' : 'mt_err'));
   }
   mtMarkMine(tripId, pid);
-  try{ mkPixelIdentify({ em: body.email, ph: body.phone, fn: body.contact_name }); mkTrack('Lead', { content_ids:[pid], content_type:'product', content_category:'meeting' }); }catch(e){}
+  /* ★주 전환 — 접수 성공을 확인한 뒤에만. 고급 매칭(이메일·전화)은 Meta 스크립트·서버가 해시해서 보낸다 */
+  try{ mkPixelIdentify({ em: body.email, ph: body.phone, fn: body.contact_name, country: body.country, dial: body.country === 'VN' ? '84' : body.country === 'KR' ? '82' : '' }); mkTrack('Lead', mkMeetParams(MkMeet.trip(tripId), mkProduct(pid))); }catch(e){}
   const d = r.data || {};
   let url = '';
   try{ url = new URL(mkUrl('meetings.html'), document.baseURI).href.split('#')[0] + '#trip-' + tripId; }catch(e){}
