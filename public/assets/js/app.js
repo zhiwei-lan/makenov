@@ -975,69 +975,54 @@ function mtEventHero(tr){
    DB 슬라이드(hero_slides)에 넣지 않은 이유: 관리자 '문구 수정'이 슬라이드를 순번(hero.0.title …)으로
    덮어쓰고 있어 맨 앞에 끼우면 기존 문구가 한 칸씩 밀린다. 행사명·날짜·장소가 바뀌면 자동으로 따라간다.
    products.html renderHero 가 s.html 이 있으면 그대로 그리고, cls 의 light 로 점·화살표 색을 바꾼다. */
+/* ===== 제품 페이지 히어로 배너(3차, 2026-10-05) — 왼쪽 글 칸 + 오른쪽은 실제 사진을 칸에 꽉 채운 타일 =====
+   2차(연한 그라데이션 바탕 · 알약 라벨 · 떠 있는 카드)는 장식이 많아 보인다는 피드백으로 교체.
+   알약·그림자 카드·그라데이션 없이 사이트 톤(평평한 면, 4~8px 모서리)으로. products.html renderHero 가 그린다. */
+function mkHbShell(cls, href, kick, title, line, cta, tiles){
+  return `<a class="hb ${cls || ''}" href="${href}">
+    <div class="hb-tx"><span class="hb-k">${esc(kick)}</span><h2>${esc(title)}</h2><p>${esc(line)}</p><span class="hb-cta">${esc(cta)} →</span></div>
+    <div class="hb-ph n${Math.min(4, Math.max(1, tiles.length))}">${tiles.slice(0, 4).join('')}</div>
+  </a>`;
+}
+function mkHbTile(img, cap, extra){
+  return `<span class="pi" style="background-image:url('${esc(img)}')">${cap ? `<em>${esc(cap)}</em>` : ''}${extra || ''}</span>`;
+}
 function mtHeroSlides(){
   if(typeof MkMeet === 'undefined') return [];
-  const tr = MkMeet.upcoming().find(x => x.open && x.visit_date && MkMeet.itemsOf(x).length);   // 날짜가 정해진 일정만 포스터로
+  const tr = MkMeet.upcoming().find(x => x.open && x.visit_date && MkMeet.itemsOf(x).length);   // 날짜가 정해진 일정만
   if(!tr) return [];
   const items = MkMeet.itemsOf(tr);
-  const d = mtDate(tr.visit_date);
-  const mm = d ? String(d.getMonth() + 1).padStart(2, '0') : '', dd = d ? String(d.getDate()).padStart(2, '0') : '';
-  const dday = tr.days_left != null && tr.days_left > 0 ? `<span class="dd">D-${tr.days_left}</span>` : '';
-  const pics = items.slice(0, 3).map(it => {
-    const p = mkProduct(it.product_id);
-    return `<figure><img src="${esc(p.img)}" alt="${esc(L(p.name))}" loading="lazy"><figcaption>${esc(p.brand)}</figcaption></figure>`;
-  });
-  const where = [mtTime(tr), mtWhere(tr)].filter(Boolean).join(' · ');
-  const html = `<a class="mt-hs" href="${mkUrl('meetings.html')}#trip-${esc(tr.id)}">
-    <div class="mt-hs-l">
-      <div class="mt-hs-chips"><span class="k">${esc(t('mt_hs_kick'))}</span>${dday}</div>
-      <h2>${esc(L(tr.title) || t('mt_page_kick'))}</h2>
-      <p class="line">${esc(t('mt_hero_line'))}</p>
-      <div class="mt-hs-when"><b>${mm}.${dd}</b><span><em>${esc(mtFmt(tr.visit_date, { weekday:'long' }))}</em>${where ? `<i>${esc(where)}</i>` : ''}</span></div>
-      <span class="btn btn-primary">${esc(t('mt_ev_cta'))} →</span>
-    </div>
-    <div class="mt-hs-r">${pics.join('')}<span class="cnt">${esc(mtRep('mt_suppliers', { n: items.length }))}</span></div>
-  </a>`;
-  return [{ html, cls: 'light', link: mkUrl('meetings.html') + '#trip-' + tr.id }];
+  const href = mkUrl('meetings.html') + '#trip-' + tr.id;
+  const kick = [mtFmt(tr.visit_date, { month:'long', day:'numeric', weekday:'short' }), L(tr.city)].filter(Boolean).join(' · ');
+  const line = t('mt_hero_line') + (tr.deadline ? ' · ' + t('mt_deadline') + ' ' + mtFmt(tr.deadline, { month:'long', day:'numeric' }) : '');
+  const tiles = items.map((it, i) => { const p = mkProduct(it.product_id); return mkHbTile(p.img, p.brand, i === 3 && items.length > 4 ? `<b>+${items.length - 4}</b>` : ''); });
+  return [{ cls: 'light', link: href, html: mkHbShell('ev', href, kick, L(tr.title) || t('mt_page_kick'), line, t('mt_evc_detail'), tiles) }];
 }
-/* 제품 페이지 히어로의 나머지 슬라이드 — 2026-09-30 예전 어두운 SVG 일러스트 4장(hero_slides)을 내리고
-   미팅 포스터와 같은 밝은 형식으로 다시 만들었다. 그림 대신 실제 제품·공급사 데이터를 쓴다.
-   문구는 i18n.js 의 hs_* 키. products.html renderHero 가 이 목록을 그대로 그린다. */
 function mkHeroSlides(){
   const out = [];
-  const shell = (cls, href, left, right) => `<a class="mt-hs ${cls}" href="${href}"><div class="mt-hs-l">${left}</div><div class="mt-hs-r">${right}</div></a>`;
-  const leftHtml = (kick, title, line, cta) => `<div class="mt-hs-chips"><span class="k">${esc(t(kick))}</span></div>
-      <h2>${esc(t(title))}</h2><p class="line">${esc(t(line))}</p><span class="btn btn-primary">${esc(t(cta))} →</span>`;
   const prods = (typeof MK_PRODUCTS !== 'undefined' ? MK_PRODUCTS : []).filter(p => p && p.img);
 
-  /* 1) 미팅이 어떻게 확정되나 — 좌석 5개 중 3개가 찬 신청 카드 */
+  /* 1) 미팅이 어떻게 확정되나 — 실제 신청 현황이 붙은 제품 사진 한 장 */
   const hit = typeof MkMeet !== 'undefined' ? MkMeet.upcoming().find(x => x.open && MkMeet.itemsOf(x).length) : null;
   if(hit){
     const it = MkMeet.itemsOf(hit)[0], p = mkProduct(it.product_id);
-    const seats = [0, 1, 2, 3, 4].map(n => `<i class="${n < 3 ? 'on' : ''}">${n < 3 ? MT_ICO.users : '+'}</i>`).join('');
-    out.push({ cls: 'light', html: shell('hs-how', `${mkUrl('meetings.html')}#trip-${esc(hit.id)}`,
-      leftHtml('hs_how_kick', 'hs_how_t', 'hs_how_p', 'hs_how_cta'),
-      `<div class="hs-card"><div class="hs-card-top"><img src="${esc(p.img)}" alt=""><div><b>${esc(p.brand)}</b><span>${esc(L(p.name))}</span></div></div>
-        <div class="hs-seats">${seats}</div>
-        <div class="hs-bar"><i style="width:60%"></i></div>
-        <div class="hs-card-foot"><span>${esc(mtRep('mt_joined', { n: 3, g: 5 }))}</span><em>60%</em></div>
-        <div class="hs-note">${MT_ICO.check}<span>${esc(t('hs_how_note'))}</span></div></div>`) });
+    const bar = `<span class="hb-bar"><span class="t"><b>${esc(p.brand)}</b>${mtJoinedHtml(it)}<i>${mtPct(it)}%</i></span>${mtBar(it)}</span>`;
+    out.push({ cls: 'light', html: mkHbShell('', `${mkUrl('meetings.html')}#trip-${esc(hit.id)}`,
+      t('hs_how_kick'), t('hs_how_t'), t('hs_how_p'), t('hs_how_cta'), [mkHbTile(p.img, '', bar)]) });
   }
 
-  /* 2) 제품 — 실제 제품 사진 4장 */
+  /* 2) 제품 — 실제 제품 사진 */
   if(prods.length){
-    const pics = prods.slice(0, 3).map(p => `<figure><img src="${esc(p.img)}" alt="${esc(L(p.name))}" loading="lazy"><figcaption>${esc(p.brand)}</figcaption></figure>`);
-    out.push({ cls: 'light', html: shell('hs-prod', mkUrl('products.html'),
-      leftHtml('hs_prod_kick', 'hs_prod_t', 'hs_prod_p', 'hs_prod_cta'),
-      pics.join('')) });
+    out.push({ cls: 'light', html: mkHbShell('', mkUrl('products.html'),
+      t('hs_prod_kick'), t('hs_prod_t'), t('hs_prod_p'), t('hs_prod_cta'), prods.slice(0, 3).map(p => mkHbTile(p.img, p.brand))) });
   }
 
-  /* 3) 공급사 — 로고·지역 카드 */
-  const cos = (typeof MK_COMPANIES !== 'undefined' ? MK_COMPANIES : []).filter(c => c && (c.logo || c.cover)).slice(0, 3);
+  /* 3) 공급사 — 공급사 대표 사진 + 로고 */
+  const cos = (typeof MK_COMPANIES !== 'undefined' ? MK_COMPANIES : []).filter(c => c && c.cover).slice(0, 3);
   if(cos.length){
-    out.push({ cls: 'light', html: shell('hs-co', mkUrl('companies.html'),
-      leftHtml('hs_co_kick', 'hs_co_t', 'hs_co_p', 'hs_co_cta'),
-      `<div class="hs-cos">${cos.map(c => `<div class="hs-co-row"><span class="lg">${c.logo ? `<img src="${esc(c.logo)}" alt="" onload="window.mkLogoTrim&&mkLogoTrim(this)">` : ''}</span><div><b>${esc(c.brand || L(c.name))}</b><span>${esc(L(c.location))}</span></div><em>${MT_ICO.check}</em></div>`).join('')}</div>`) });
+    out.push({ cls: 'light', html: mkHbShell('', mkUrl('companies.html'),
+      t('hs_co_kick'), t('hs_co_t'), t('hs_co_p'), t('hs_co_cta'),
+      cos.map(c => mkHbTile(c.cover, '', c.logo ? `<span class="lgc"><img src="${esc(c.logo)}" alt="${esc(c.brand || '')}" onload="window.mkLogoTrim&&mkLogoTrim(this)"></span>` : `<em>${esc(c.brand || L(c.name))}</em>`))) });
   }
   return out;
 }
