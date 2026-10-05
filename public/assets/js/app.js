@@ -1304,13 +1304,14 @@ function mtFeatured(tr){
   const joined = items.reduce((a, i) => a + i.count, 0);
   const d = mtDate(tr.visit_date);
   const href = `${mkUrl('meetings.html')}#trip-${esc(tr.id)}`;
-  /* 공급사가 4곳 이상이면 좌우 슬라이드(모두 표시), 3곳 이하는 폭을 나눠 채운다 */
-  const slide = items.length >= 4;
+  /* 공급사가 3곳 이상이면 슬라이드, 2곳 이하는 폭을 나눠 채운다.
+     2026-10-06: 슬라이드는 한 화면에 2칸 고정 — 3칸을 한 줄에 넣으면 제목이 잘려서(사용자 지적). 한 쪽씩 넘기고 5초마다 자동으로 넘어간다 */
+  const slide = items.length >= 3;
   const cards = items.map(it => mtSupCard(tr, it)).join('');
   const nav = d => `<button type="button" class="mt-evd-nav ${d < 0 ? 'prev' : 'next'}" aria-label="${d < 0 ? 'Previous' : 'Next'}" onclick="mtEvdGo(this,${d})"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="${d < 0 ? 'M15 5l-7 7 7 7' : 'M9 5l7 7-7 7'}"/></svg></button>`;
   const sups = slide
-    ? `<div class="mt-evd-rail at-start">${nav(-1)}<div class="mt-evd-sups slide" onscroll="mtEvdSync(this)">${cards}</div>${nav(1)}</div>`
-    : `<div class="mt-evd-sups ${items.length === 3 ? 'many' : ''}" style="--n:${Math.max(1, items.length)}">${cards}</div>`;
+    ? `<div class="mt-evd-rail at-start" onpointerdown="this._t=Date.now()">${nav(-1)}<div class="mt-evd-sups slide" onscroll="mtEvdSync(this)">${cards}</div>${nav(1)}</div>`
+    : `<div class="mt-evd-sups" style="--n:${Math.max(1, items.length)}">${cards}</div>`;
   return `<div class="mt-evd">
     <div class="mt-evd-top">
       <a class="mt-evd-date" href="${href}"><span class="mo">${esc(mtFmt(tr.visit_date, { month:'long' }))}</span><b>${d ? String(d.getDate()).padStart(2, '0') : ''}</b><span class="dw">${esc(mtFmt(tr.visit_date, { weekday:'long' }))}</span></a>
@@ -1328,10 +1329,28 @@ function mtFeatured(tr){
     ${sups}
   </div>`;
 }
-function mtEvdGo(btn, dir){
-  const sc = btn.parentNode.querySelector('.mt-evd-sups');
-  if(sc) sc.scrollBy({ left: dir * Math.max(240, sc.clientWidth * .8), behavior: 'smooth' });
+/* 한 쪽(보이는 칸 수만큼)씩 넘긴다. loop 면 끝에서 처음으로 돌아간다(자동 넘김용) */
+function mtEvdStep(sc, dir, loop){
+  if(!sc) return;
+  const gap = parseFloat(getComputedStyle(sc).columnGap) || 0;
+  const end = sc.scrollLeft + sc.clientWidth > sc.scrollWidth - 8;
+  if(loop && dir > 0 && end) return sc.scrollTo({ left: 0, behavior: 'smooth' });
+  sc.scrollBy({ left: dir * (sc.clientWidth + gap), behavior: 'smooth' });
 }
+function mtEvdGo(btn, dir){
+  btn.parentNode._t = Date.now();
+  mtEvdStep(btn.parentNode.querySelector('.mt-evd-sups'), dir);
+}
+/* 자동 넘김 — 5초마다. 마우스를 올렸거나, 방금 직접 넘겼거나, 화면 밖이면 쉰다 */
+if(!window._mtEvdAuto && !/HeadlessChrome/.test(navigator.userAgent)) window._mtEvdAuto = setInterval(() => {
+  if(document.hidden || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+  document.querySelectorAll('.mt-evd-rail').forEach(r => {
+    if(r.matches(':hover') || Date.now() - (r._t || 0) < 10000) return;
+    const b = r.getBoundingClientRect();
+    if(b.bottom < 0 || b.top > innerHeight) return;
+    mtEvdStep(r.querySelector('.mt-evd-sups'), 1, true);
+  });
+}, 5000);
 function mtEvdSync(sc){
   const r = sc.parentNode;
   r.classList.toggle('at-start', sc.scrollLeft < 8);
