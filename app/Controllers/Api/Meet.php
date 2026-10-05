@@ -533,13 +533,74 @@ class Meet extends BaseApiController
         return $r ? (string) ($r['v'] ?? '') : '';
     }
 
+    private function cfgSet(string $k, string $v): void
+    {
+        $db  = db_connect();
+        $now = date('Y-m-d H:i:s');
+        if ($db->table('meet_config')->where('k', $k)->countAllResults()) {
+            $db->table('meet_config')->where('k', $k)->update(['v' => $v, 'updated_at' => $now]);
+        } else {
+            $db->table('meet_config')->insert(['k' => $k, 'v' => $v, 'updated_at' => $now]);
+        }
+    }
+
+    /* ---- 메일 서버(SMTP) — 2026-10-06: 서버 .env 를 고치지 않고 관리자 화면에서 넣는다(구글 · 네이버웍스 등).
+       meet_config 는 REST 로 노출되지 않는 테이블이고, 비밀번호는 암호화해서 저장한다(화면에는 다시 내려보내지 않는다). */
+    private function secretKey(): string
+    {
+        $d = config('Database')->default ?? [];
+        return hash('sha256', 'mk-mail|' . ($d['password'] ?? '') . '|' . ($d['database'] ?? ''), true);
+    }
+
+    private function enc(string $plain): string
+    {
+        $iv = random_bytes(16);
+        return 'enc:' . base64_encode($iv . openssl_encrypt($plain, 'aes-256-cbc', $this->secretKey(), OPENSSL_RAW_DATA, $iv));
+    }
+
+    private function dec(string $stored): string
+    {
+        if (strncmp($stored, 'enc:', 4) !== 0) {
+            return $stored;
+        }
+        $raw = base64_decode(substr($stored, 4), true);
+        if ($raw === false || strlen($raw) < 17) {
+            return '';
+        }
+        $out = openssl_decrypt(substr($raw, 16), 'aes-256-cbc', $this->secretKey(), OPENSSL_RAW_DATA, substr($raw, 0, 16));
+        return $out === false ? '' : $out;
+    }
+
+    /** @return array{host:string,port:int,user:string,pass:string,crypto:string,from:string,from_name:string} */
+    private function smtpConf(): array
+    {
+        return [
+            'host'      => $this->cfgGet('smtp_host'),
+            'port'      => (int) ($this->cfgGet('smtp_port') ?: 587),
+            'user'      => $this->cfgGet('smtp_user'),
+            'pass'      => $this->dec($this->cfgGet('smtp_pass')),
+            'crypto'    => $this->cfgGet('smtp_crypto'),
+            'from'      => $this->cfgGet('mail_from'),
+            'from_name' => $this->cfgGet('mail_from_name'),
+        ];
+    }
+
     private function adminConfig(): ResponseInterface
     {
         $cfg = config('Email');
+        $m   = $this->smtpConf();
+        $on  = $m['host'] !== '';
         return $this->json([
-            'notify_email' => $this->cfgGet('notify_email'),
-            'mail_via'     => (string) ($cfg->protocol ?? 'mail'),            // mail | sendmail | smtp (서버 설정)
-            'mail_from'    => (string) ($cfg->fromEmail ?: 'no-reply@makenov.com'),
+            'notify_email'   => $this->cfgGet('notify_email'),
+            'mail_via'       => $on ? 'smtp(관리자 설정)' : (string) ($cfg->protocol ?? 'mail'),   // mail | sendmail | smtp
+            'mail_from'      => $on ? ($m['from'] ?: $m['user']) : (string) ($cfg->fromEmail ?: 'no-reply@makenov.com'),
+            'smtp_host'      => $m['host'],
+            'smtp_port'      => $m['port'],
+            'smtp_user'      => $m['user'],
+            'smtp_crypto'    => $m['crypto'],
+            'has_password'   => $m['pass'] !== '',
+            'from_email'     => $m['from'],
+            'from_name'      => $m['from_name'],
         ]);
     }
 
@@ -549,18 +610,44 @@ class Meet extends BaseApiController
         if ($in === null) {
             return $this->err('bad_json', 'bad json', 400);
         }
-        $list = $this->emails((string) ($in['notify_email'] ?? ''));
-        $db   = db_connect();
+        $db = db_connect();
         if (! $db->tableExists('meet_config')) {
             return $this->err('schema_missing', '설정 테이블을 만드는 중입니다. 잠시 뒤 다시 시도해 주세요.', 503);
         }
-        $v = implode(', ', $list);
-        if ($db->table('meet_config')->where('k', 'notify_email')->countAllResults()) {
-            $db->table('meet_config')->where('k', 'notify_email')->update(['v' => $v, 'updated_at' => date('Y-m-d H:i:s')]);
-        } else {
-            $db->table('meet_config')->insert(['k' => 'notify_email', 'v' => $v, 'updated_at' => date('Y-m-d H:i:s')]);
+        $out = ['ok' => true];
+        if (array_key_exists('notify_email', $in)) {
+            $v = implode(', ', $this->emails((string) $in['notify_email']));
+            $this->cfgSet('notify_email', $v);
+            $out['notify_email'] = $v;
         }
-        return $this->json(['ok' => true, 'notify_email' => $v]);
+        /* 메일 서버 — 보낸 칸만 바꾼다. 비밀번호는 값이 있을 때만 바꾸고, 빈 값이면 그대로 둔다 */
+        if (array_key_exists('smtp_host', $in)) {
+            $host = strtolower(trim((string) $in['smtp_host']));
+            if ($host !== '' && ! preg_match('/^[a-z0-9.-]{3,120}$/', $host)) {
+                return $this->err('bad_host', '메일 서버 주소를 확인하세요 (예: smtp.gmail.com)', 422);
+            }
+            $port   = (int) ($in['smtp_port'] ?? 587);
+            $crypto = (string) ($in['smtp_crypto'] ?? 'tls');
+            $from   = strtolower(trim((string) ($in['from_email'] ?? '')));
+            if ($from !== '' && ! filter_var($from, FILTER_VALIDATE_EMAIL)) {
+                return $this->err('bad_from', '보내는 주소를 확인하세요', 422);
+            }
+            $this->cfgSet('smtp_host', $host);
+            $this->cfgSet('smtp_port', (string) ($port >= 1 && $port <= 65535 ? $port : 587));
+            $this->cfgSet('smtp_user', $this->cut($in['smtp_user'] ?? '', 200));
+            $this->cfgSet('smtp_crypto', in_array($crypto, ['tls', 'ssl'], true) ? $crypto : '');
+            $this->cfgSet('mail_from', $from);
+            $this->cfgSet('mail_from_name', $this->cut($in['from_name'] ?? '', 60));
+            $pass = (string) ($in['smtp_pass'] ?? '');
+            if ($pass !== '') {
+                /* 구글 앱 비밀번호는 'abcd efgh ijkl mnop' 처럼 띄어 보여 준다 — 그대로 붙여 넣어도 되게 공백을 뗀다 */
+                $this->cfgSet('smtp_pass', $this->enc($host === 'smtp.gmail.com' ? (string) preg_replace('/\s+/', '', $pass) : $pass));
+            }
+            if ($host === '') {
+                $this->cfgSet('smtp_pass', '');
+            }
+        }
+        return $this->json($out);
     }
 
     private function adminNotifyTest(): ResponseInterface
@@ -570,7 +657,19 @@ class Meet extends BaseApiController
             return $this->err('no_rcpt', '알림 받을 메일 주소를 먼저 저장하세요', 400);
         }
         [$ok, $dbg] = $this->sendMail($to, '[MAKENOV] 미팅 신청 알림 테스트', "미팅 신청 알림 테스트 메일입니다.\n이 메일이 보이면 새 신청이 들어올 때 같은 주소로 알림이 갑니다.\n\n" . date('Y-m-d H:i:s'));
-        return $this->json(['ok' => $ok, 'to' => $to, 'detail' => $ok ? '' : $this->cut($dbg, 600)], $ok ? 200 : 502);
+        if ($ok) {
+            return $this->json(['ok' => true, 'to' => $to]);
+        }
+        /* 실패 이유를 사람이 읽을 말로 — 관리자 화면은 message 를 그대로 보여 준다 */
+        $why = '메일 서버가 발송을 거부했습니다.';
+        if (preg_match('/535|not accepted|authentication failed|auth.*fail/i', $dbg)) {
+            $why = '아이디 또는 비밀번호가 맞지 않습니다. 구글은 계정 비밀번호가 아니라 앱 비밀번호를 넣어야 합니다.';
+        } elseif (preg_match('/unable to connect|connection (refused|timed out)|fsockopen|getaddrinfo/i', $dbg)) {
+            $why = '메일 서버에 연결하지 못했습니다. 서버 주소 · 포트 · 보안 연결을 확인하세요.';
+        } elseif ($this->cfgGet('smtp_host') === '') {
+            $why = '메일 서버가 설정되지 않았습니다. 아래 메일 서버 칸을 채우고 저장하세요.';
+        }
+        return $this->json(['ok' => false, 'error' => 'send_failed', 'message' => $why, 'to' => $to, 'detail' => $this->cut($dbg, 600)], 502);
     }
 
     /** 쉼표·공백으로 나눈 메일 주소 중 형식이 맞는 것만 (최대 5개) */
@@ -586,14 +685,36 @@ class Meet extends BaseApiController
         return array_slice($out, 0, 5);
     }
 
-    /** @return array{0:bool,1:string} [성공 여부, 실패 시 디버그 문자열] — 보내는 방법은 app/Config/Email.php(.env 의 email.*) */
+    /** @return array{0:bool,1:string} [성공 여부, 실패 시 디버그 문자열]
+     *  보내는 방법: 관리자 화면에서 넣은 메일 서버(meet_config 의 smtp_*)가 있으면 그것으로, 없으면 app/Config/Email.php(.env 의 email.*) */
     private function sendMail(array $to, string $subject, string $body): array
     {
         try {
             $cfg   = config('Email');
             $email = \Config\Services::email();
+            $m     = $this->smtpConf();
+            if ($m['host'] !== '') {
+                $email->initialize([
+                    'protocol'    => 'smtp',
+                    'SMTPHost'    => $m['host'],
+                    'SMTPPort'    => $m['port'],
+                    'SMTPUser'    => $m['user'],
+                    'SMTPPass'    => $m['pass'],
+                    'SMTPCrypto'  => $m['crypto'],
+                    'SMTPTimeout' => 12,
+                    'mailType'    => 'text',
+                    'charset'     => 'UTF-8',
+                    'newline'     => "\r\n",
+                    'CRLF'        => "\r\n",
+                    'wordWrap'    => false,
+                ]);
+            }
             $email->clear(true);
-            $email->setFrom($cfg->fromEmail ?: 'no-reply@makenov.com', $cfg->fromName ?: 'MAKENOV');
+            if ($m['host'] !== '') {
+                $email->setFrom($m['from'] ?: $m['user'], $m['from_name'] ?: 'MAKENOV');
+            } else {
+                $email->setFrom($cfg->fromEmail ?: 'no-reply@makenov.com', $cfg->fromName ?: 'MAKENOV');
+            }
             $email->setTo($to);
             $email->setSubject($subject);
             $email->setMessage($body);

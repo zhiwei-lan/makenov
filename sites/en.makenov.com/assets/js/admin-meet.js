@@ -79,26 +79,72 @@ function meetCsv(tid){
 }
 
 /* 새 신청 알림 메일 */
+/* 메일 서비스별 기본값 — 고르면 서버 주소 · 포트 · 보안 연결이 채워진다 */
+const MEET_MAIL_PRESETS = {
+  '':         { label: '직접 입력' },
+  gmail:      { label: '구글(Gmail · 워크스페이스)', host: 'smtp.gmail.com', port: 587, crypto: 'tls',
+                hint: '구글 계정에서 <b>2단계 인증</b>을 켠 뒤 <b>앱 비밀번호</b>를 발급받아 넣으세요. 계정 비밀번호로는 보내지지 않습니다. 아이디는 전체 메일 주소입니다.' },
+  naverworks: { label: '네이버웍스', host: 'smtp.worksmobile.com', port: 587, crypto: 'tls',
+                hint: '네이버웍스 메일 설정에서 IMAP/SMTP 사용을 켜고 외부 앱 비밀번호를 넣으세요. 아이디는 전체 메일 주소입니다.' },
+  naver:      { label: '네이버', host: 'smtp.naver.com', port: 587, crypto: 'tls',
+                hint: '네이버 메일 → 환경설정 → POP3/IMAP 설정에서 IMAP/SMTP 사용을 켜야 합니다.' },
+};
+function meetMailPreset(k){
+  const v = MEET_MAIL_PRESETS[k] || {};
+  const h = document.getElementById('mc-hint'); if(h) h.innerHTML = v.hint || '';
+  if(!v.host) return;
+  document.getElementById('mc-host').value = v.host;
+  document.getElementById('mc-port').value = v.port;
+  document.getElementById('mc-crypto').value = v.crypto;
+}
 async function meetCfgSave(){
-  try{ const r = await MeetAdmin.saveConfig({ notify_email: av('mc-email') }); if(meetCache.cfg) meetCache.cfg.notify_email = r.notify_email; document.getElementById('mc-email').value = r.notify_email; toastA(r.notify_email ? '알림 메일 주소를 저장했습니다' : '알림을 껐습니다 (주소 없음)'); }
-  catch(e){ toastA('저장 실패: ' + e.message); }
+  const body = { notify_email: av('mc-email'),
+    smtp_host: av('mc-host'), smtp_port: Number(av('mc-port')) || 587, smtp_user: av('mc-user'), smtp_crypto: av('mc-crypto'),
+    from_email: av('mc-from'), from_name: av('mc-fromname') };
+  const pw = (document.getElementById('mc-pass') || {}).value || '';
+  if(pw) body.smtp_pass = pw;                       // 비워 두면 저장된 비밀번호를 그대로 둔다
+  try{
+    await MeetAdmin.saveConfig(body);
+    meetCache.cfg = await MeetAdmin.config();
+    toastA(meetCache.cfg.notify_email ? '알림 설정을 저장했습니다' : '저장했습니다 (알림 받을 주소가 없어 알림은 꺼져 있습니다)');
+    renderMeet();
+  }catch(e){ toastA('저장 실패: ' + e.message); }
 }
 async function meetCfgTest(btn){
   const orig = btn.textContent; btn.disabled = true; btn.textContent = '보내는 중…';
   const out = document.getElementById('mc-result');
   try{ const r = await MeetAdmin.testNotify(); out.innerHTML = `<span style="color:#0b7a5c;font-weight:700">테스트 메일을 보냈습니다</span> → ${esc((r.to || []).join(', '))} · 받은편지함(스팸함 포함)을 확인하세요.`; }
-  catch(e){ out.innerHTML = `<span style="color:#B02A37;font-weight:700">보내지 못했습니다.</span> ${esc(e.message)}<br>서버의 메일 발송 설정이 필요합니다 — 서버 .env 에 email.protocol = smtp, email.SMTPHost / SMTPUser / SMTPPass / SMTPPort / fromEmail 을 넣어야 합니다.`; }
+  catch(e){ out.innerHTML = `<span style="color:#B02A37;font-weight:700">보내지 못했습니다.</span> ${esc(e.message)}<br>아래 <b>메일 서버</b> 칸의 주소 · 아이디 · 비밀번호를 확인하세요. 테스트는 <b>저장한 설정</b>으로 보내니 값을 바꿨다면 먼저 저장하세요.`; }
   btn.disabled = false; btn.textContent = orig;
 }
 function meetCfgCard(){
   const c = meetCache.cfg;
   if(!c) return '';
+  const cur = Object.keys(MEET_MAIL_PRESETS).find(k => k && MEET_MAIL_PRESETS[k].host === c.smtp_host) || '';
+  const fld = (label, inner, w) => `<div class="fld" style="flex:1;min-width:${w || 180}px"><label>${label}</label>${inner}</div>`;
   return `<div class="card"><div class="bar"><h3 style="margin:0">새 신청 알림 메일</h3><span class="grow"></span></div>
     <p class="note" style="margin:6px 0 10px">미팅 신청이 들어올 때마다 아래 주소로 메일을 보냅니다(임시 신청 제외). 여러 주소는 쉼표로 구분, 최대 5개. 비우고 저장하면 알림을 끕니다.</p>
-    <div class="bar" style="gap:8px;flex-wrap:wrap"><input id="mc-email" class="srch" style="flex:1;min-width:260px" placeholder="notice@makenov.com, sales@…" value="${esc(c.notify_email || '')}">
-      <button class="btn btn-primary btn-sm" onclick="meetCfgSave()">저장</button>
+    <div class="fld"><label>알림 받을 주소</label><input id="mc-email" placeholder="notice@makenov.com, sales@…" value="${esc(c.notify_email || '')}"></div>
+    <div class="sect" style="margin-top:14px"><h4>메일 서버 (SMTP) <span class="sub">메일을 실제로 보내는 계정입니다</span></h4>
+      <div class="fld"><label>사용 중인 메일 서비스</label><select id="mc-preset" onchange="meetMailPreset(this.value)">${Object.entries(MEET_MAIL_PRESETS).map(([k, v]) => `<option value="${k}" ${k === cur ? 'selected' : ''}>${v.label}</option>`).join('')}</select>
+        <p class="hint" id="mc-hint" style="margin:6px 0 0">${(MEET_MAIL_PRESETS[cur] || {}).hint || ''}</p></div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        ${fld('서버 주소', `<input id="mc-host" placeholder="smtp.gmail.com" value="${esc(c.smtp_host || '')}">`, 220)}
+        ${fld('포트', `<input id="mc-port" type="number" placeholder="587" value="${esc(c.smtp_port || 587)}">`, 90)}
+        ${fld('보안 연결', `<select id="mc-crypto"><option value="tls" ${c.smtp_crypto === 'tls' || !c.smtp_host ? 'selected' : ''}>TLS (포트 587)</option><option value="ssl" ${c.smtp_crypto === 'ssl' ? 'selected' : ''}>SSL (포트 465)</option><option value="" ${c.smtp_host && !c.smtp_crypto ? 'selected' : ''}>사용 안 함</option></select>`, 150)}
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        ${fld('아이디', `<input id="mc-user" autocomplete="off" placeholder="보통 전체 메일 주소" value="${esc(c.smtp_user || '')}">`, 220)}
+        ${fld('비밀번호' + (c.has_password ? ' <span style="color:#0b7a5c">· 저장됨</span>' : ''), `<input id="mc-pass" type="password" autocomplete="new-password" placeholder="${c.has_password ? '바꿀 때만 입력하세요' : '앱 비밀번호'}">`, 220)}
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        ${fld('보내는 주소', `<input id="mc-from" placeholder="비우면 아이디와 같은 주소" value="${esc(c.from_email || '')}">`, 220)}
+        ${fld('보내는 사람 이름', `<input id="mc-fromname" placeholder="MAKENOV" value="${esc(c.from_name || '')}">`, 180)}
+      </div>
+    </div>
+    <div class="bar" style="gap:8px;flex-wrap:wrap;margin-top:6px"><button class="btn btn-primary btn-sm" onclick="meetCfgSave()">저장</button>
       <button class="btn btn-ghost btn-sm" onclick="meetCfgTest(this)">테스트 메일 보내기</button></div>
-    <p class="hint" id="mc-result" style="margin:8px 0 0">보내는 방식: ${esc(c.mail_via)} · 보내는 주소: ${esc(c.mail_from)}</p></div>`;
+    <p class="hint" id="mc-result" style="margin:8px 0 0">보내는 방식: ${esc(c.mail_via)} · 보내는 주소: ${esc(c.mail_from)} · 비밀번호는 저장만 되고 이 화면에 다시 표시되지 않습니다.</p></div>`;
 }
 
 function meetListHtml(){
