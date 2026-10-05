@@ -1060,11 +1060,9 @@ function mtMini(tr){
     <div style="margin-top:10px">${mtBar({ count: n, goal: Math.max(1, g), confirmed: done })}${mtProg({ count: n, goal: g }, `<span>${esc(mtRep('mt_suppliers', { n: items.length }))}</span>`)}</div>
   </div></a>`;
 }
-/* ===== 방문 일정 페이지(meetings.html) — 행사 안내 문서형 레이아웃 (2026-10-05) =====
-   kfesta.vn 의 수출상담회 안내 페이지 구성을 따른다: 사진 히어로 + 주최 로고 띠 → 남색 모집 띠 → 개요 표 →
-   참가 공급사 → 무엇이 다른가 → 진행 방식(번호 절차) → 참가 바이어 지원 내용.
-   행사별 부가 정보(주최 로고·주관·운영·세부 장소·사진)는 일정 데이터에 칸이 없어 아래 표에 일정 ID 로 적는다.
-   표에 없는 일정은 로고·주관 줄 없이 같은 틀로 나온다. */
+/* ===== 방문 일정 페이지(meetings.html)의 행사별 부가 정보 =====
+   주최 로고 · 주관 · 운영 · 세부 장소 · 지도 · 사진은 일정 데이터에 칸이 없어 일정 ID 로 여기 적는다(내용은 kfesta.vn 행사 안내문 기준).
+   표에 없는 일정은 로고·주관 줄 없이 같은 틀로 나온다. 화면은 아래 mtEventPage. */
 const MT_EVENT_X = {
   'hcm-20261203': {
     photo: 'https://kfesta.vn/assets/img/beauty/day1-vip.webp',
@@ -1095,105 +1093,105 @@ function mtSupCard(tr, it){
         <div class="pr">${mtJoinedHtml(it)}<em>${mtPct(it)}%</em></div>
         <span class="act ${mine ? 'on' : ''}">${mine ? MT_ICO.check + esc(t('mt_btn_applied')) : esc(t('mt_btn_apply')) + ' →'}</span></div></a>`;
 }
-function mtKfHead(kick, title){ return `<div class="kf-hd"><span class="kf-k">${esc(kick)}</span><h2>${title}</h2></div>`; }
 function mtKfGo(){ const el = document.getElementById('mt-kf-sups'); if(el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+/* 일정 페이지 본문 — 제품 상세(page-product.js)와 같은 틀을 그대로 쓴다: 왼쪽 사진 + 본문 구역(.pd-main/.pd-sec), 오른쪽 신청 상자(.pd-side .box).
+   2026-10-05: 따로 만든 히어로(그라데이션 · 알약 배지 · 떠 있는 날짜 배지)는 'AI 티가 난다'는 피드백으로 버리고 사이트 기존 컴포넌트로 통일.
+   구역 순서(바이어 시점): 참가 공급사 → 행사 개요 → 무엇이 다른가 → 진행 방식 → 지원 내용 → 오시는 길 → FAQ */
 function mtEventPage(tr){
   const x = MT_EVENT_X[tr.id] || {};
   const items = MkMeet.itemsOf(tr);
   const title = L(tr.title) || t('mt_page_kick');
-  const when = tr.visit_date ? mtFmt(tr.visit_date, { year:'numeric', month:'long', day:'numeric', weekday:'short' }) : t('mt_date_tbd');
-  const dl = tr.deadline ? mtFmt(tr.deadline, { month:'long', day:'numeric', weekday:'short' }) : '';
-  const state = mtTripState(tr);
-  const dday = tr.open && tr.days_left != null ? (tr.days_left > 0 ? mtRep('mt_kf_dday', { n: tr.days_left }) : t('mt_dday_today')) : '';
-  const bandH = esc(x.band ? L(x.band) : t('mt_kf_band_h')).split('{y}').join('<span class="y">').split('{/y}').join('</span>');
-  const row = (k, v) => v ? `<tr><th>${esc(t(k))}</th><td>${v}</td></tr>` : '';
+  const long = { year:'numeric', month:'long', day:'numeric', weekday:'short' };
+  const when = tr.visit_date ? mtFmt(tr.visit_date, long) : t('mt_date_tbd');
+  const dlLong = tr.deadline ? mtFmt(tr.deadline, long) : '';
   const time = mtTime(tr);
+  const state = mtTripState(tr);
+  const lead = (x.band ? L(x.band) : t('mt_kf_band_h')).split('{y}').join('').split('{/y}').join('');
+  const left = !tr.open ? `<b class="sm">${esc(t('mt_st_' + state))}</b>`
+    : tr.days_left == null ? `<b class="sm">${esc(t('mt_st_open'))}</b>`
+    : tr.days_left <= 0 ? `<b class="sm">${esc(t('mt_dday_today'))}</b>`
+    : `<b>D-${tr.days_left}</b>`;
+  const note = [t('mt_kf_free'), x.booth ? t('mt_kf_interp') : ''].filter(Boolean).join(' · ');
+  const row = (k, v) => v ? `<tr><th>${esc(t(k))}</th><td>${v}</td></tr>` : '';
+  const info = (k, v) => v ? `<li><span>${esc(t(k))}</span><b>${esc(v)}</b></li>` : '';
   const step = (n, h, p) => `<li><span class="n">${n}</span><div><h3>${esc(h)}</h3><p>${esc(p)}</p></div></li>`;
   const steps = x.fixed
     ? [1, 2, 3].map(n => step(n, t('mt_kf_s' + n + '_h'), t('mt_kf_s' + n + '_p'))).join('')
       + step(4, t('mt_kf_s4_h'), mtRep('mt_kf_s4_p', { d: tr.visit_date ? mtFmt(tr.visit_date, { month:'long', day:'numeric' }) : t('mt_date_tbd'), v: L(tr.venue) || L(tr.city) || '' }) + (x.booth ? ' ' + t('mt_kf_s4_interp') : ''))
     : [1, 2, 3].map(n => step(n, t('mt_step' + n + '_h'), t('mt_step' + n + '_p'))).join('');
-  /* 행사용 FAQ(바이어 시점) — 비용 · 대상 · 신청 방법 · 신청 후 · 마감 · 통역 · 여러 공급사 · 준비물. 첫 질문은 펼쳐 둔다 */
-  const dlLong = tr.deadline ? mtFmt(tr.deadline, { year:'numeric', month:'long', day:'numeric', weekday:'short' }) : '';
-  const faq = x.fixed ? `<section class="kf-sec"><div class="kf-doc">
-    ${mtKfHead('FAQ', esc(t('mt_faq_h')))}
-    <div class="kf-faq">${[1, 2, 3, 4, dlLong ? 5 : 0, x.booth ? 6 : 0, 7, 8].filter(Boolean).map((n, i) => `<details${i ? '' : ' open'}><summary><span>${esc(t('mt_kf_q' + n))}</span></summary><p>${esc(mtRep('mt_kf_a' + n, { d: dlLong }))}</p></details>`).join('')}</div>
-  </div></section>` : '';
   const perks = ['mt_kf_b1', x.booth ? 'mt_kf_b2' : '', x.booth ? 'mt_kf_b3' : '', 'mt_kf_b4', 'mt_kf_b5'].filter(Boolean)
-    .map(k => `<li>${MT_ICO.check}<span>${esc(t(k))}</span></li>`).join('');
+    .map(k => `<li><span class="ck">✓</span><span>${esc(t(k))}</span></li>`).join('');
   /* 오시는 길 — 구글 지도(키 없이 되는 embed). 행사 표에 map 이 없으면 행사장·도시 이름으로 찾는다 */
   const mapQ = (x.map && x.map.q) || [tr.venue && (tr.venue.en || L(tr.venue)), tr.city && (tr.city.en || L(tr.city))].filter(Boolean).join(', ');
-  const mapSec = mapQ && (x.map || String(L(tr.venue) || '').trim()) ? `<section class="kf-sec"><div class="kf-doc">
-    ${mtKfHead('Location', esc(t('mt_kf_map_h')))}
-    <div class="kf-map"><iframe src="https://www.google.com/maps?q=${encodeURIComponent(mapQ)}&hl=${MK_LANG}&z=16&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="${esc(L(tr.venue) || 'Map')}" allowfullscreen></iframe></div>
-    <div class="kf-map-info"><div><b>${esc(L(tr.venue) || '')}</b>${x.map && x.map.addr ? `<span>${esc(L(x.map.addr))}</span>` : ''}</div>
-      <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQ)}" target="_blank" rel="noopener">${MT_ICO.pin}${esc(t('mt_kf_map_open'))}</a></div>
-  </div></section>` : '';
-  /* 히어로 — 메이크노브 톤(밝은 바탕 · 왼쪽 글 · 오른쪽 사진 + 날짜 배지 · 민트 버튼). 2026-10-05: 사진 가운데 정렬 + 남색/노랑 띠는 '메이크노브스럽지 않다'는 피드백으로 교체 */
-  const hd = mtDate(tr.visit_date);
-  const badge = hd ? `<div class="mt-evd-date"><span class="mo">${esc(mtFmt(tr.visit_date, { month:'long' }))}</span><b>${String(hd.getDate()).padStart(2, '0')}</b><span class="dw">${esc(mtFmt(tr.visit_date, { weekday:'long' }))}</span></div>` : '';
-  const note = [t('mt_kf_free'), x.booth ? t('mt_kf_interp') : ''].filter(Boolean).join(' · ');
-  return `<section class="kf-hero" id="trip-${esc(tr.id)}"><div class="wrap kf-hero-in">
-    <div class="kf-hero-tx">
-      ${x.logos && x.logos.length ? `<div class="kf-logos">${x.logos.map(l => `<img src="${esc(l.src)}" alt="${esc(l.alt)}">`).join('<i></i>')}</div>` : ''}
-      <h1>${esc(title)}${x.sub ? `<span>${esc(L(x.sub))}</span>` : ''}</h1>
-      <p class="kf-lead">${bandH}</p>
-      <ul class="kf-hero-meta">
-        <li><span class="k">${esc(t('mt_kf_o_date'))}</span><span class="v">${esc(when + (time ? ' · ' + time : ''))}</span></li>
-        <li><span class="k">${esc(t('mt_kf_o_venue'))}</span><span class="v">${esc(mtWhere(tr) || t('mt_tba'))}</span></li>
-        ${dl ? `<li><span class="k">${esc(t('mt_deadline'))}</span><span class="v">${esc(dl)}${dday ? `<em>${esc(dday)}</em>` : ''}</span></li>` : ''}
-      </ul>
-      <div class="kf-hero-cta">
-        ${items.length && tr.open ? `<button type="button" class="btn btn-primary btn-lg" onclick="mtKfGo()">${esc(t('mt_kf_cta'))} →</button>` : `<span class="kf-closed">${esc(t('mt_st_' + state))}</span>`}
-        <span class="kf-cta-note">${esc(note)}</span>
-      </div>
+  const mapSec = mapQ && (x.map || String(L(tr.venue) || '').trim()) ? `<section class="pd-sec">
+      <h2>${esc(t('mt_kf_map_h'))}</h2>
+      <div class="kf-map"><iframe src="https://www.google.com/maps?q=${encodeURIComponent(mapQ)}&hl=${MK_LANG}&z=16&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="${esc(L(tr.venue) || 'Map')}" allowfullscreen></iframe></div>
+      <div class="kf-map-info"><div><b>${esc(L(tr.venue) || '')}</b>${x.map && x.map.addr ? `<span>${esc(L(x.map.addr))}</span>` : ''}</div>
+        <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQ)}" target="_blank" rel="noopener">${esc(t('mt_kf_map_open'))} →</a></div>
+    </section>` : '';
+  /* 행사용 FAQ(바이어 시점) — 비용 · 대상 · 신청 방법 · 신청 후 · 마감 · 통역 · 여러 공급사 · 준비물. 첫 질문은 펼쳐 둔다 */
+  const faq = x.fixed ? `<section class="pd-sec">
+      <h2>${esc(t('mt_faq_h'))}</h2>
+      <div class="kf-faq">${[1, 2, 3, 4, dlLong ? 5 : 0, x.booth ? 6 : 0, 7, 8].filter(Boolean).map((n, i) => `<details${i ? '' : ' open'}><summary><span>${esc(t('mt_kf_q' + n))}</span></summary><p>${esc(mtRep('mt_kf_a' + n, { d: dlLong }))}</p></details>`).join('')}</div>
+    </section>` : '';
+  return `<div class="wrap"><div class="pd-row mt-on ev-row" id="trip-${esc(tr.id)}">
+    <div class="pd-main">
+      <div class="pd-gallery ${x.photo ? '' : 'ev-nophoto'}"><div class="main">${x.photo ? `<img src="${esc(x.photo)}" alt="${esc(title)}">` : `<span>${esc(when)}</span>`}</div></div>
+      <section class="pd-sec" id="mt-kf-sups">
+        <h2>${esc(t('mt_kf_sup_h'))}</h2>
+        <div class="mt-evd-sups kf-sups">${items.map(it => mtSupCard(tr, it)).join('')}</div>
+        ${x.growing && tr.open ? `<p class="kf-note">${esc(t('mt_kf_sup_note'))}</p>` : ''}
+      </section>
+      <section class="pd-sec">
+        <h2>${esc(t('mt_kf_over_h'))}</h2>
+        <table class="kf-table">
+          ${row('mt_kf_o_name', esc(x.name ? L(x.name) : title))}
+          ${row('mt_kf_o_date', esc(when + (time ? ' · ' + time : '')))}
+          ${row('mt_kf_o_venue', esc(x.venue ? L(x.venue) : (mtWhere(tr) || t('mt_tba'))))}
+          ${row('mt_kf_o_host', x.host ? esc(L(x.host)) : '')}
+          ${row('mt_kf_o_org', x.org ? esc(L(x.org)) : '')}
+          ${row('mt_kf_o_who', esc(t('mt_kf_o_who_v')))}
+          ${row('mt_kf_o_fee', esc(t('mt_kf_o_fee_v')))}
+          ${row('mt_deadline', esc(dlLong))}
+        </table>
+      </section>
+      <section class="pd-sec">
+        <h2>${esc(t('mt_kf_diff_h'))}</h2>
+        <div class="ev-text"><p>${esc(t('mt_kf_diff_p1'))}</p><p><b>${esc(t('mt_kf_diff_b'))}</b> ${esc(t('mt_kf_diff_p2'))}</p></div>
+      </section>
+      <section class="pd-sec">
+        <h2>${esc(t('mt_how_h'))}</h2>
+        <ol class="kf-steps">${steps}</ol>
+      </section>
+      <section class="pd-sec pd-dist">
+        <h2>${esc(t('mt_kf_ben_h'))}</h2>
+        <ul class="pd-checks">${perks}</ul>
+      </section>
+      ${mapSec}
+      ${faq}
     </div>
-    <div class="kf-hero-ph ${x.photo ? '' : 'none'}">${x.photo ? `<img src="${esc(x.photo)}" alt="${esc(title)}">` : ''}${badge}</div>
-  </div></section>
-  <section class="kf-sec"><div class="kf-doc">
-    ${mtKfHead('Overview', esc(t('mt_kf_over_h')))}
-    <table class="kf-table">
-      ${row('mt_kf_o_name', esc(x.name ? L(x.name) : title))}
-      ${row('mt_kf_o_date', esc(when + (time ? ' · ' + time : '')))}
-      ${row('mt_kf_o_venue', esc(x.venue ? L(x.venue) : (mtWhere(tr) || t('mt_tba'))))}
-      ${row('mt_kf_o_host', x.host ? esc(L(x.host)) : '')}
-      ${row('mt_kf_o_org', x.org ? esc(L(x.org)) : '')}
-      ${row('mt_kf_o_who', esc(t('mt_kf_o_who_v')))}
-      ${row('mt_kf_o_fee', `<b>${esc(t('mt_kf_o_fee_v'))}</b>`)}
-      ${row('mt_deadline', dl ? esc(mtFmt(tr.deadline, { year:'numeric', month:'long', day:'numeric', weekday:'short' })) : '')}
-    </table>
-  </div></section>
-  <section class="kf-sec" id="mt-kf-sups"><div class="kf-doc wide">
-    ${mtKfHead('Suppliers', esc(mtRep('mt_sup_h', { n: items.length })))}
-    <div class="mt-evd-sups kf-sups">${items.map(it => mtSupCard(tr, it)).join('')}</div>
-    ${x.growing && tr.open ? `<p class="kf-note">${esc(t('mt_kf_sup_note'))}</p>` : ''}
-  </div></section>
-  <section class="kf-sec"><div class="kf-doc">
-    ${mtKfHead("What's Different", esc(t('mt_kf_diff_h')))}
-    <div class="kf-quote"><p>${esc(t('mt_kf_diff_p1'))}</p><p><b>${esc(t('mt_kf_diff_b'))}</b> ${esc(t('mt_kf_diff_p2'))}</p></div>
-  </div></section>
-  <section class="kf-sec"><div class="kf-doc">
-    ${mtKfHead('Process', esc(t('mt_how_h')))}
-    <ol class="kf-steps">${steps}</ol>
-  </div></section>
-  <section class="kf-sec"><div class="kf-doc">
-    ${mtKfHead('Benefits', esc(t('mt_kf_ben_h')))}
-    <ul class="kf-checks">${perks}</ul>
-  </div></section>
-  ${mapSec}
-  ${faq}`;
+    <aside class="pd-side"><div class="box mt-box-on">
+      ${x.logos && x.logos.length ? `<div class="ev-logos">${x.logos.map(l => `<img src="${esc(l.src)}" alt="${esc(l.alt)}">`).join('<i></i>')}</div>` : ''}
+      ${x.sub ? `<div class="brand">${esc(L(x.sub))}</div>` : ''}
+      <h1>${esc(title)}</h1>
+      <p class="tagline">${esc(lead)}</p>
+      <div class="mt-fund">
+        <div class="mt-fund-kick">${MT_ICO.cal}<span>${esc(t('mt_ev_until'))}</span></div>
+        <div class="mt-fund-stats ev-stats"><div class="st"><div class="v">${left}</div></div></div>
+        <ul class="mt-fund-info">
+          ${info('mt_f_date', when)}
+          ${info('mt_f_time', time)}
+          ${info('mt_f_venue', mtWhere(tr) || t('mt_tba'))}
+          ${info('mt_deadline', dlLong)}
+          <li class="rule">${esc(note)}</li>
+        </ul>
+        ${items.length && tr.open ? `<div class="mt-fund-cta"><button type="button" class="btn btn-primary" onclick="mtKfGo()">${esc(t('mt_kf_cta'))}</button></div>` : ''}
+      </div>
+    </div></aside>
+  </div></div>`;
 }
-/* 페이지 맨 아래 마무리 띠(자주 묻는 질문 다음) */
-function mtEventEnd(tr){
-  const items = MkMeet.itemsOf(tr);
-  if(!items.length || !tr.open) return '';
-  const dl = tr.deadline ? mtFmt(tr.deadline, { year:'numeric', month:'long', day:'numeric', weekday:'short' }) : '';
-  return `<section class="kf-end"><div class="kf-doc">
-    ${dl ? `<p class="d">${esc(t('mt_deadline'))} <b>${esc(dl)}</b></p>` : ''}
-    <p>${esc(t('mt_kf_end_p'))}</p>
-    <button type="button" class="btn btn-primary btn-lg" onclick="mtKfGo()">${esc(t('mt_kf_cta'))} →</button>
-  </div></section>`;
-}
+/* 예전 문서형의 맨 아래 마무리 띠 — 오른쪽 신청 상자가 따라다니므로 지금은 내지 않는다(meetings.html 이 부르므로 함수는 둔다) */
+function mtEventEnd(tr){ return ''; }
 /* 홈 '예정된 행사 일정' 카드(10차, 2026-10-03) — 위아래 2단.
    위: 날짜 배지 · 행사명 · 시간/장소/마감/공급사·신청 수 한 줄 · '행사 일정 자세히' 버튼
    아래: 참가 공급사(사진 크게, 달성 막대, '미팅 신청') — 공급사 수만큼 칸을 나눠 폭을 채운다(최대 4칸).
