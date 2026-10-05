@@ -1113,9 +1113,11 @@ function mtEventPage(tr){
     ? [1, 2, 3].map(n => step(n, t('mt_kf_s' + n + '_h'), t('mt_kf_s' + n + '_p'))).join('')
       + step(4, t('mt_kf_s4_h'), mtRep('mt_kf_s4_p', { d: tr.visit_date ? mtFmt(tr.visit_date, { month:'long', day:'numeric' }) : t('mt_date_tbd'), v: L(tr.venue) || L(tr.city) || '' }) + (x.booth ? ' ' + t('mt_kf_s4_interp') : ''))
     : [1, 2, 3].map(n => step(n, t('mt_step' + n + '_h'), t('mt_step' + n + '_p'))).join('');
-  const faq = x.fixed ? `<section class="kf-sec"><div class="kf-doc mt-faq">
+  /* 행사용 FAQ(바이어 시점) — 비용 · 대상 · 신청 방법 · 신청 후 · 마감 · 통역 · 여러 공급사 · 준비물. 첫 질문은 펼쳐 둔다 */
+  const dlLong = tr.deadline ? mtFmt(tr.deadline, { year:'numeric', month:'long', day:'numeric', weekday:'short' }) : '';
+  const faq = x.fixed ? `<section class="kf-sec"><div class="kf-doc">
     ${mtKfHead('FAQ', esc(t('mt_faq_h')))}
-    ${[1, 2, 3, x.booth ? 4 : 0, 5].filter(Boolean).map(n => `<details><summary>${esc(t('mt_kf_q' + n))}</summary><p>${esc(t('mt_kf_a' + n))}</p></details>`).join('')}
+    <div class="kf-faq">${[1, 2, 3, 4, dlLong ? 5 : 0, x.booth ? 6 : 0, 7, 8].filter(Boolean).map((n, i) => `<details${i ? '' : ' open'}><summary><span>${esc(t('mt_kf_q' + n))}</span></summary><p>${esc(mtRep('mt_kf_a' + n, { d: dlLong }))}</p></details>`).join('')}</div>
   </div></section>` : '';
   const perks = ['mt_kf_b1', x.booth ? 'mt_kf_b2' : '', x.booth ? 'mt_kf_b3' : '', 'mt_kf_b4', 'mt_kf_b5'].filter(Boolean)
     .map(k => `<li>${MT_ICO.check}<span>${esc(t(k))}</span></li>`).join('');
