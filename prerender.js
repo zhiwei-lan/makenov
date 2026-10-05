@@ -51,13 +51,16 @@ const HUBS = ['index.html', 'directory.html', 'companies.html', 'about.html', 'g
 const LANGS = ['', 'ko/', 'en/'];
 const withLangs = f => LANGS.map(pre => pre + f);
 
+/* 급할 때 일부만: PRERENDER_ONLY=meetings.html,products.html node prerender.js (공급사 상세는 건너뛴다) */
+const ONLY = (process.env.PRERENDER_ONLY || '').split(',').map(x => x.trim()).filter(Boolean);
 const PAGES = [
   ...HUBS.flatMap(withLangs),
   'maker.html',
   /* ★ko/en 도 굽는다 — 예전엔 vi 만 굽혀서 kr·en 제품 페이지 첫 화면이 옛 시드(카테고리 6개·제품 13개)였다 (2026-09-22) */
   ...withLangs('products.html'),
   ...withLangs('support.html').map(page => ({ page, extraHashes: ['#faq', '#ask'] })),
-].filter(e => fs.existsSync(path.join(ROOT, typeof e === 'string' ? e : e.page)));
+].filter(e => fs.existsSync(path.join(ROOT, typeof e === 'string' ? e : e.page)))
+ .filter(e => !ONLY.length || ONLY.some(o => (typeof e === 'string' ? e : e.page).endsWith(o)));
 
 const CHROME = [
   process.env.CHROME_PATH || '',
@@ -196,7 +199,7 @@ child.stdout.once('data', () => {
      통째로 다시 그리므로 사본 블록 없이 <main> 안을 직접 교체한다. */
   const coDir = path.join(ROOT, 'companies');
   const coFiles = fs.existsSync(coDir) ? fs.readdirSync(coDir).filter(f => f.endsWith('.html')) : [];
-  for (const f of coFiles.flatMap(f => withLangs('companies/' + f))) {
+  for (const f of (ONLY.length ? [] : coFiles.flatMap(f => withLangs('companies/' + f)))) {
     const file = path.join(ROOT, f);
     if (!fs.existsSync(file)) continue;
     process.stdout.write(`  ${f} … `);
