@@ -1425,7 +1425,7 @@ function mtFundingPanel(pid){
       <li><span>${esc(t('mt_f_time'))}</span><b class="${mtTime(tr) ? '' : 'tba'}">${esc(mtTime(tr) || t('mt_tba'))}</b></li>
       <li><span>${esc(t('mt_f_venue'))}</span><b class="${mtWhere(tr) ? '' : 'tba'}">${esc(mtWhere(tr) || t('mt_tba'))}</b></li>
       ${tr.deadline ? `<li><span>${esc(t('mt_deadline'))}</span><b>${esc(mtLong(tr.deadline))}</b></li>` : ''}
-      <li class="rule">${esc(it.confirmed ? mtRep('mt_apply_ok_confirmed', { g: it.goal }) : mtRep('mt_pd_rule', { g: it.goal }))}</li>
+      ${it.confirmed ? `<li class="rule">${esc(mtRep('mt_apply_ok_confirmed', { g: it.goal }))}</li>` : ''}
     </ul>
     <!-- 행동은 두 층: 주 행동(미팅 신청) 하나만 크게, 나머지는 아래 조용한 아이콘 줄 -->
     <div class="mt-fund-cta">${mtAction(tr, it)}</div>
