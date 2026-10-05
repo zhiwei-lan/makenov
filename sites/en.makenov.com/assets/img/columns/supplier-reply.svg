@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675" role="img" aria-label="바이어 문의 회신">
+  <defs>
+    <linearGradient id="rbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#04143F"/>
+      <stop offset="0.62" stop-color="#022E7D"/>
+      <stop offset="1" stop-color="#0B45B4"/>
+    </linearGradient>
+    <linearGradient id="rmint" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#27CAA1"/>
+      <stop offset="1" stop-color="#3AD8B4"/>
+    </linearGradient>
+    <pattern id="rgrid" width="44" height="44" patternUnits="userSpaceOnUse">
+      <path d="M44 0H0v44" fill="none" stroke="#fff" stroke-opacity=".05" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="675" fill="url(#rbg)"/>
+  <rect width="1200" height="675" fill="url(#rgrid)"/>
+  <circle cx="1010" cy="560" r="250" fill="#32D1B1" fill-opacity=".10"/>
+
+  <!-- 받은 문의 -->
+  <g transform="translate(126 130)">
+    <path d="M18 0h404a18 18 0 0 1 18 18v126a18 18 0 0 1-18 18H74l-40 38v-38H18A18 18 0 0 1 0 144V18A18 18 0 0 1 18 0z"
+          fill="#fff" fill-opacity=".16"/>
+    <rect x="34" y="34" width="110" height="12" rx="6" fill="#fff" fill-opacity=".42"/>
+    <rect x="34" y="70" width="300" height="14" rx="7" fill="#fff" fill-opacity=".78"/>
+    <rect x="34" y="102" width="228" height="14" rx="7" fill="#fff" fill-opacity=".78"/>
+  </g>
+
+  <!-- 보낸 회신 : 항목이 채워진 카드 -->
+  <g transform="translate(300 336)">
+    <path d="M18 0h666a18 18 0 0 1 18 18v192a18 18 0 0 1-18 18H128l-40 38v-38H18A18 18 0 0 1 0 210V18A18 18 0 0 1 18 0z"
+          fill="#fff" fill-opacity=".97"/>
+    <rect x="38" y="34" width="126" height="13" rx="6.5" fill="#27CAA1"/>
+
+    <!-- 2열 항목 -->
+    <g fill="#212529" fill-opacity=".14">
+      <rect x="38" y="80" width="82" height="11" rx="5.5"/>
+      <rect x="38" y="126" width="82" height="11" rx="5.5"/>
+      <rect x="38" y="172" width="82" height="11" rx="5.5"/>
+      <rect x="384" y="80" width="82" height="11" rx="5.5"/>
+      <rect x="384" y="126" width="82" height="11" rx="5.5"/>
+      <rect x="384" y="172" width="82" height="11" rx="5.5"/>
+    </g>
+    <g fill="#212529" fill-opacity=".55">
+      <rect x="140" y="78" width="152" height="15" rx="7.5"/>
+      <rect x="140" y="124" width="104" height="15" rx="7.5"/>
+      <rect x="140" y="170" width="176" height="15" rx="7.5"/>
+      <rect x="486" y="78" width="130" height="15" rx="7.5"/>
+      <rect x="486" y="124" width="182" height="15" rx="7.5"/>
+      <rect x="486" y="170" width="96" height="15" rx="7.5"/>
+    </g>
+    <path d="M348 70v128" stroke="#E9ECEF" stroke-width="1"/>
+  </g>
+
+  <!-- 빠른 회신 = 시계 -->
+  <g transform="translate(700 148)">
+    <circle cx="88" cy="88" r="86" fill="none" stroke="#32D1B1" stroke-opacity=".32" stroke-width="5"/>
+    <path d="M88 2a86 86 0 0 1 74 43" fill="none" stroke="url(#rmint)" stroke-width="9" stroke-linecap="round"/>
+    <g stroke="#fff" stroke-opacity=".82" stroke-width="7" stroke-linecap="round">
+      <path d="M88 46v44"/>
+      <path d="M88 90l32 19"/>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 560" width="1600" height="560">
+  <!-- MAKENOV hero 03 — 가격·MOQ·납기를 한 화면에 : 스펙 패널 + 잠금 해제 -->
+  <defs>
+    <linearGradient id="d-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#04143F"/>
+      <stop offset=".55" stop-color="#022E7D"/>
+      <stop offset="1" stop-color="#022E7D"/>
+    </linearGradient>
+    <radialGradient id="d-glow" cx=".7" cy=".4" r=".55">
+      <stop offset="0" stop-color="#0097E0" stop-opacity=".24"/>
+      <stop offset=".55" stop-color="#27CAA1" stop-opacity=".13"/>
+      <stop offset="1" stop-color="#27CAA1" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="d-panel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#08307F" stop-opacity=".92"/>
+      <stop offset="1" stop-color="#04205C" stop-opacity=".78"/>
+    </linearGradient>
+    <linearGradient id="d-bar" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#27CAA1"/>
+      <stop offset="1" stop-color="#0097E0"/>
+    </linearGradient>
+    <pattern id="d-grid" width="44" height="44" patternUnits="userSpaceOnUse">
+      <path d="M44 0H0v44" fill="none" stroke="#fff" stroke-opacity=".04" stroke-width="1"/>
+    </pattern>
+    <filter id="d-soft" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="12"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="560" fill="url(#d-bg)"/>
+  <rect width="1600" height="560" fill="url(#d-grid)"/>
+  <rect width="1600" height="560" fill="url(#d-glow)"/>
+
+  <!-- 뒤쪽 보조 패널 -->
+  <g opacity=".4">
+    <rect x="1176" y="118" width="330" height="300" rx="18" fill="url(#d-panel)"
+          stroke="#3FE0BB" stroke-opacity=".18"/>
+  </g>
+  <g opacity=".6">
+    <rect x="1114" y="96" width="330" height="330" rx="18" fill="url(#d-panel)"
+          stroke="#3FE0BB" stroke-opacity=".2"/>
+  </g>
+
+  <!-- 메인 스펙 패널 -->
+  <g transform="translate(796 84)">
+    <rect width="480" height="376" rx="20" fill="url(#d-panel)" stroke="#3FE0BB" stroke-opacity=".34" stroke-width="1.4"/>
+    <!-- 헤더 -->
+    <rect x="34" y="36" width="128" height="9" rx="4.5" fill="#7FF0D4" fill-opacity=".55"/>
+    <rect x="34" y="60" width="210" height="7" rx="3.5" fill="#fff" fill-opacity=".16"/>
+    <line x1="34" y1="94" x2="446" y2="94" stroke="#fff" stroke-opacity=".1"/>
+
+    <!-- 스펙 4행 -->
+    <g>
+      <rect x="34" y="122" width="74" height="8" rx="4" fill="#fff" fill-opacity=".2"/>
+      <rect x="264" y="118" width="182" height="16" rx="8" fill="url(#d-bar)" fill-opacity=".9"/>
+
+      <rect x="34" y="180" width="96" height="8" rx="4" fill="#fff" fill-opacity=".2"/>
+      <rect x="308" y="176" width="138" height="16" rx="8" fill="url(#d-bar)" fill-opacity=".72"/>
+
+      <rect x="34" y="238" width="60" height="8" rx="4" fill="#fff" fill-opacity=".2"/>
+      <rect x="336" y="234" width="110" height="16" rx="8" fill="url(#d-bar)" fill-opacity=".56"/>
+
+      <rect x="34" y="296" width="86" height="8" rx="4" fill="#fff" fill-opacity=".2"/>
+      <rect x="286" y="292" width="160" height="16" rx="8" fill="url(#d-bar)" fill-opacity=".42"/>
+    </g>
+    <g stroke="#fff" stroke-opacity=".07">
+      <line x1="34" y1="152" x2="446" y2="152"/>
+      <line x1="34" y1="210" x2="446" y2="210"/>
+      <line x1="34" y1="268" x2="446" y2="268"/>
+    </g>
+  </g>
+
+  <!-- 잠금 해제 체크 -->
+  <g transform="translate(1272 448)">
+    <circle r="42" fill="#27CAA1" fill-opacity=".2" filter="url(#d-soft)"/>
+    <circle r="30" fill="#04205C" stroke="#27CAA1" stroke-width="2"/>
+    <path d="M-13 1l9 10 18-20" fill="none" stroke="#27CAA1" stroke-width="3.4"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <!-- 데이터 흐름 라인 : 카피 위쪽(y<180)으로 지나가게 배치 -->
+  <g fill="none" stroke="#27CAA1" stroke-opacity=".28" stroke-width="1.6" stroke-linecap="round">
+    <path d="M150 60h380c26 0 26 44 52 44h180"/>
+    <path d="M150 132h300c26 0 26-46 52-46h260" stroke-opacity=".45"/>
+    <path d="M150 196h436c26 0 26 26 52 26h124" stroke-opacity=".18"/>
+  </g>
+  <g fill="#27CAA1">
+    <circle cx="150" cy="60"  r="4.5" fill-opacity=".7"/>
+    <circle cx="150" cy="132" r="5.5"/>
+    <circle cx="150" cy="196" r="4" fill-opacity=".45"/>
+  </g>
+
+  <rect width="1600" height="560" fill="#02061F" opacity=".08"/>
+</svg>

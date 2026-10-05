@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 560" width="1600" height="560">
+  <!-- MAKENOV hero 02 — 출장 다섯 곳 vs 수백 개 : 제품 타일이 우측으로 끝없이 펼쳐짐
+       ※ 카피가 좌하단을 덮으므로 밀도·밝기를 오른쪽으로 몰았다 -->
+  <defs>
+    <linearGradient id="s-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#04143F"/>
+      <stop offset=".5" stop-color="#022E7D"/>
+      <stop offset="1" stop-color="#0B45B4"/>
+    </linearGradient>
+    <radialGradient id="s-glow" cx=".8" cy=".46" r=".52">
+      <stop offset="0" stop-color="#27CAA1" stop-opacity=".34"/>
+      <stop offset=".55" stop-color="#0097E0" stop-opacity=".15"/>
+      <stop offset="1" stop-color="#0097E0" stop-opacity="0"/>
+    </radialGradient>
+    <!-- 제품 타일 -->
+    <pattern id="s-tile" width="62" height="62" patternUnits="userSpaceOnUse">
+      <rect x="7" y="7" width="44" height="44" rx="8" fill="#08307F" fill-opacity=".5"
+            stroke="#7FF0D4" stroke-opacity=".5" stroke-width="1.2"/>
+      <rect x="15" y="34" width="28" height="3.5" rx="1.75" fill="#7FF0D4" fill-opacity=".38"/>
+    </pattern>
+    <!-- 왼쪽으로 갈수록 흐려지는 마스크 -->
+    <linearGradient id="s-fade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity="0"/>
+      <stop offset=".34" stop-color="#fff" stop-opacity=".18"/>
+      <stop offset=".62" stop-color="#fff" stop-opacity=".7"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="1"/>
+    </linearGradient>
+    <mask id="s-mask"><rect width="1600" height="560" fill="url(#s-fade)"/></mask>
+    <pattern id="s-grid" width="44" height="44" patternUnits="userSpaceOnUse">
+      <path d="M44 0H0v44" fill="none" stroke="#fff" stroke-opacity=".04" stroke-width="1"/>
+    </pattern>
+    <filter id="s-soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="16"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="560" fill="url(#s-bg)"/>
+  <rect width="1600" height="560" fill="url(#s-grid)"/>
+  <rect width="1600" height="560" fill="url(#s-glow)"/>
+
+  <!-- 끝없이 펼쳐지는 제품 필드 -->
+  <rect width="1600" height="560" fill="url(#s-tile)" mask="url(#s-mask)"/>
+
+  <!-- 강조 타일 -->
+  <g>
+    <rect x="1067" y="131" width="44" height="44" rx="8" fill="#27CAA1" fill-opacity=".95"/>
+    <rect x="1253" y="255" width="44" height="44" rx="8" fill="#0097E0" fill-opacity=".9"/>
+    <rect x="1439" y="69"  width="44" height="44" rx="8" fill="#27CAA1" fill-opacity=".7"/>
+    <rect x="1129" y="441" width="44" height="44" rx="8" fill="#0097E0" fill-opacity=".62"/>
+    <rect x="1377" y="379" width="44" height="44" rx="8" fill="#27CAA1" fill-opacity=".55"/>
+  </g>
+  <g fill="none" stroke="#7FF0D4" stroke-opacity=".55" stroke-width="1.4">
+    <rect x="1055" y="119" width="68" height="68" rx="14"/>
+    <rect x="1241" y="243" width="68" height="68" rx="14"/>
+  </g>
+  <circle cx="1089" cy="153" r="52" fill="#27CAA1" fill-opacity=".2" filter="url(#s-soft)"/>
+
+  <!-- 카운터 눈금 : 수백 개를 암시하는 상단 러너 -->
+  <g stroke="#7FF0D4" stroke-opacity=".35" stroke-width="2" stroke-linecap="round">
+    <path d="M1000 42h1000"/>
+  </g>
+  <g fill="#7FF0D4" fill-opacity=".5">
+    <rect x="1000" y="34" width="3" height="16" rx="1.5"/>
+    <rect x="1124" y="34" width="3" height="16" rx="1.5"/>
+    <rect x="1248" y="34" width="3" height="16" rx="1.5"/>
+    <rect x="1372" y="34" width="3" height="16" rx="1.5"/>
+    <rect x="1496" y="34" width="3" height="16" rx="1.5"/>
+  </g>
+
+  <rect width="1600" height="560" fill="#02061F" opacity=".08"/>
+</svg>

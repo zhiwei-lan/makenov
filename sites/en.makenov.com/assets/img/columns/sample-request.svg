@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675" role="img" aria-label="샘플 요청 체크리스트">
+  <defs>
+    <linearGradient id="sbg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#04143F"/>
+      <stop offset="0.62" stop-color="#022E7D"/>
+      <stop offset="1" stop-color="#0B45B4"/>
+    </linearGradient>
+    <linearGradient id="smint" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#27CAA1"/>
+      <stop offset="1" stop-color="#3AD8B4"/>
+    </linearGradient>
+    <pattern id="sgrid" width="44" height="44" patternUnits="userSpaceOnUse">
+      <path d="M44 0H0v44" fill="none" stroke="#fff" stroke-opacity=".05" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="675" fill="url(#sbg)"/>
+  <rect width="1200" height="675" fill="url(#sgrid)"/>
+  <circle cx="140" cy="580" r="230" fill="#32D1B1" fill-opacity=".10"/>
+
+  <!-- 열린 샘플 박스 -->
+  <g transform="translate(148 176)">
+    <!-- 뚜껑 두 짝 -->
+    <path d="M40 96 L4 34 L156 34 L176 96 Z" fill="#fff" fill-opacity=".22"/>
+    <path d="M312 96 L348 34 L196 34 L176 96 Z" fill="#fff" fill-opacity=".14"/>
+    <!-- 몸통 -->
+    <path d="M40 96 h272 v206 a10 10 0 0 1 -10 10 H50 a10 10 0 0 1 -10 -10 Z" fill="#fff" fill-opacity=".96"/>
+    <!-- 테이프 -->
+    <rect x="160" y="96" width="32" height="216" fill="#27CAA1" fill-opacity=".85"/>
+    <!-- 내용물 3종 -->
+    <g fill="#212529" fill-opacity=".14">
+      <rect x="66" y="150" width="66" height="120" rx="9"/>
+      <rect x="220" y="150" width="66" height="120" rx="9"/>
+    </g>
+    <rect x="66" y="150" width="66" height="30" rx="9" fill="#0B45B4" fill-opacity=".45"/>
+    <rect x="220" y="150" width="66" height="30" rx="9" fill="#0B45B4" fill-opacity=".45"/>
+    <!-- 라벨 -->
+    <rect x="60" y="332" width="128" height="13" rx="6.5" fill="#fff" fill-opacity=".55"/>
+  </g>
+
+  <!-- 확인 목록 클립보드 -->
+  <g transform="translate(614 122)">
+    <rect x="0" y="22" width="432" height="440" rx="16" fill="#fff" fill-opacity=".97"/>
+    <!-- 집게 -->
+    <rect x="164" y="0" width="104" height="42" rx="12" fill="#0B45B4" fill-opacity=".55"/>
+    <rect x="40" y="76" width="132" height="13" rx="6.5" fill="#27CAA1"/>
+
+    <g fill="none" stroke="#27CAA1" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="40" y="122" width="26" height="26" rx="7" stroke="#27CAA1" stroke-opacity=".45"/>
+      <path d="M46 135l6 6 11-12"/>
+      <rect x="40" y="188" width="26" height="26" rx="7" stroke="#27CAA1" stroke-opacity=".45"/>
+      <path d="M46 201l6 6 11-12"/>
+      <rect x="40" y="254" width="26" height="26" rx="7" stroke="#27CAA1" stroke-opacity=".45"/>
+      <path d="M46 267l6 6 11-12"/>
+      <rect x="40" y="320" width="26" height="26" rx="7" stroke="#212529" stroke-opacity=".18"/>
+      <rect x="40" y="386" width="26" height="26" rx="7" stroke="#212529" stroke-opacity=".18"/>
+    </g>
+    <g fill="#212529" fill-opacity=".62">
+      <rect x="84" y="128" width="196" height="14" rx="7"/>
+      <rect x="84" y="194" width="252" height="14" rx="7"/>
+      <rect x="84" y="260" width="164" height="14" rx="7"/>
+    </g>
+    <g fill="#212529" fill-opacity=".2">
+      <rect x="84" y="326" width="220" height="14" rx="7"/>
+      <rect x="84" y="392" width="180" height="14" rx="7"/>
+    </g>
+  </g>
+</svg>
