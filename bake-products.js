@@ -128,12 +128,14 @@ function productPage(p, co, related, lang){
   const name = T(p.name, lang), tagline = T(p.tagline, lang);
   /* 후킹 제목·서브 카피 — page-product.js 와 같은 마크업 */
   const hkT = p.hook ? T(p.hook.title, lang) : '', hkS = p.hook ? T(p.hook.sub, lang) : '';
+  /* 검색 설명문 — 한 줄 소개(tagline)가 비어 있는 제품은 후킹 문구로 대신한다(2026-10-06: p3 는 설명문·og 설명이 통째로 빠져 있었다) */
+  const metaDesc = tagline || hkS || hkT || `${name} — ${p.brand}`;
   const relVi = `products/${p.id}.html`, canonical = pageUrl(relVi, lang);
   const title = `${name} — ${p.brand} | MAKENOV`;
   const jsonld = [{ '@context':'https://schema.org', '@type':'Product', name,
       alternativeHeadline: undefined,
       alternateName: LANGS.filter(l => l !== lang).map(l => T(p.name, l)).filter(x => x && x !== name),
-      description: tagline, image: [absUrl(p.img)], url: canonical,
+      description: metaDesc, image: [absUrl(p.img)], url: canonical,
       brand: { '@type':'Brand', name: p.brand },
       ...(co ? { manufacturer: { '@type':'Organization', name: T(co.name, lang) },
                  countryOfOrigin: T(co.location, lang) } : {}) },
@@ -152,7 +154,7 @@ function productPage(p, co, related, lang){
 <meta name="facebook-domain-verification" content="v2c3qvkf2vtfyqntlbv59k1m1oa5x8">
 ${baseTag(langFile(relVi, lang))}
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-${seoBlock({ title, desc: tagline, canonical, ogImage: p.img, jsonld, alt: relVi })}
+${seoBlock({ title, desc: metaDesc, canonical, ogImage: p.img, jsonld, alt: relVi })}
 ${CSS_LINK}
 ${FAVICON}
 </head>
