@@ -2253,4 +2253,28 @@ img.lg-trim{object-fit:contain!important;box-sizing:border-box;padding:7px;backg
   main [data-mkl^="landing.faq.a"]{font-size:15px!important;line-height:1.65!important}
   main [data-section-id="bottom_cta"] h2{font-size:24px!important;line-height:1.35!important}
   main [data-mkl="landing.cta.p"]{font-size:16px!important}
+  #mk-float-cta{font-size:14px!important;padding:10px 18px!important;gap:8px!important}
+  #mk-float-cta img{width:20px!important;height:20px!important}
+  /* 카드·여백도 PC 크기 그대로라 화면을 꽉 채웠다(카테고리 카드 340×420, 칼럼 카드 323×406) → 모바일 크기로 */
+  .cmq{margin-top:28px!important}
+  .cmq-track{gap:14px!important}
+  .ccard{width:232px!important;height:292px!important;border-radius:16px!important}
+  .cbody{left:16px!important;right:16px!important;bottom:16px!important;gap:4px!important}
+  .cbody b{font-size:19px!important}
+  .cbody em,.cbody u{font-size:13px!important}
+  .cbody u{margin-top:4px!important}
+  .mkcolslide{padding:28px 0 64px!important}
+  .mkcol-marq a{flex-basis:264px!important;max-width:72vw!important;margin-right:14px!important;border-radius:14px!important}
+  .mkcol-marq a>img{height:160px!important}
+  .mkcol-marq a>span{padding:16px 18px 18px!important}
+  .mkcol-marq a>span>span:nth-child(2){font-size:16px!important;line-height:1.45!important;margin-top:10px!important}
+  #features{padding-top:56px!important;padding-bottom:56px!important}
+  #features>div{gap:72px!important}
+  main [data-section-id="buyer-starter-kit"]{padding-top:52px!important;padding-bottom:48px!important}
+  /* 마무리 띠 — 장식 아이콘이 제목 위에 겹치고, 버튼 두 개가 한 줄에 못 들어가 글자가 접혔다 */
+  main [data-section-id="bottom_cta"] .cta-ico{display:none!important}
+  main [data-section-id="bottom_cta"] h2>span{display:block;text-wrap:balance}
+  main [data-section-id="bottom_cta"] h2>br{display:none}
+  main [data-section-id="bottom_cta"] .flex.flex-row{flex-direction:column!important;align-items:stretch!important;width:100%;gap:10px!important}
+  main [data-section-id="bottom_cta"] .flex.flex-row>a{justify-content:center!important;height:48px!important;font-size:15px!important;white-space:nowrap}
 }
