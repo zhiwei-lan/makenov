@@ -4,6 +4,7 @@
 window.MK_BAKED = {
   "products": [
       "p3",
+      "p4",
       "p2",
       "p1",
       "p11",
