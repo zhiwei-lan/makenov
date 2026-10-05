@@ -693,10 +693,52 @@ function openCatalog(pid){
 }
 
 /* ---------- shared renderers ---------- */
+/* 로고 여백 잘라내기 — 올린 로고 파일이 '큰 흰 정사각형 가운데 작은 로고'면 상자 안에서 글자가 깨알처럼 보인다.
+   로드된 뒤 내용이 있는 영역만 잘라 다시 그린다(<img onload="mkLogoTrim(this)">). 여백이 적거나 실패(CORS 등)하면 원본 그대로. */
+const MK_LOGO_TRIM = {};
+function mkLogoTrim(img){
+  if(!img || img.dataset.trim || /HeadlessChrome/.test(navigator.userAgent)) return;
+  img.dataset.trim = '1';
+  const src = img.currentSrc || img.src;
+  if(!/^https?:/.test(src)) return;
+  if(!MK_LOGO_TRIM[src]) MK_LOGO_TRIM[src] = new Promise(res => {
+    const im = new Image(); im.crossOrigin = 'anonymous';
+    im.onerror = () => res('');
+    im.onload = () => { try{
+      const W = im.naturalWidth, H = im.naturalHeight, k = Math.min(1, 256 / Math.max(W, H));
+      const w = Math.max(1, Math.round(W * k)), h = Math.max(1, Math.round(H * k));
+      const c = document.createElement('canvas'); c.width = w; c.height = h;
+      const g = c.getContext('2d'); g.drawImage(im, 0, 0, w, h);
+      const d = g.getImageData(0, 0, w, h).data;
+      const clear = d[3] < 20, b0 = d[0], b1 = d[1], b2 = d[2];
+      let x0 = w, y0 = h, x1 = -1, y1 = -1;
+      for(let y = 0; y < h; y++) for(let x = 0; x < w; x++){
+        const i = (y * w + x) * 4;
+        if(d[i+3] < 20) continue;
+        if(!clear && Math.abs(d[i]-b0) < 20 && Math.abs(d[i+1]-b1) < 20 && Math.abs(d[i+2]-b2) < 20) continue;
+        if(x < x0) x0 = x; if(x > x1) x1 = x; if(y < y0) y0 = y; if(y > y1) y1 = y;
+      }
+      if(x1 < 0) return res('');
+      const bw = x1 - x0 + 1, bh = y1 - y0 + 1;
+      if(bw > w * .84 && bh > h * .84) return res('');           // 여백이 거의 없으면 손대지 않는다
+      const pad = Math.max(bw, bh) * .05;
+      const sx = Math.max(0, (x0 - pad) / k), sy = Math.max(0, (y0 - pad) / k);
+      const sw = Math.min(W - sx, (bw + pad * 2) / k), sh = Math.min(H - sy, (bh + pad * 2) / k);
+      const o = Math.min(1, 480 / Math.max(sw, sh));
+      const out = document.createElement('canvas'); out.width = Math.round(sw * o); out.height = Math.round(sh * o);
+      const og = out.getContext('2d');
+      if(!clear){ og.fillStyle = `rgb(${b0},${b1},${b2})`; og.fillRect(0, 0, out.width, out.height); }
+      og.drawImage(im, sx, sy, sw, sh, 0, 0, out.width, out.height);
+      res(out.toDataURL('image/png'));
+    }catch(e){ res(''); } };
+    im.src = src + (src.includes('?') ? '&' : '?') + 'cors=1';   // 일반 요청 캐시(ACAO 없음)와 섞이지 않게
+  });
+  MK_LOGO_TRIM[src].then(u => { if(u && img.isConnected){ img.classList.add('lg-trim'); img.src = u; } });
+}
 function companyCard(c){
   const n = mkCompanyProducts(c.id).length;
   return `
-  <a class="co-card" href="${mkDocUrl('company',c.id)}" data-cat="${esc(c.cat||'')}"><div class="cv"><img src="${c.cover}" alt="" loading="lazy"></div><div class="bd"><img class="lg" src="${c.logo}" alt="${esc(L(c.name))}" loading="lazy"><h3>${esc(L(c.name))}</h3><p class="tag">${esc(L(c.tagline))}</p><div class="meta"><span>${esc(L(c.location))}</span><i></i><span><b>${n}</b> <span data-i18n="co_prod_unit"></span></span>${String(c.since||'').replace(/[\s\-—–]/g,'') ? `<i></i><span>since ${esc(c.since)}</span>` : ''}</div></div></a>`;
+  <a class="co-card" href="${mkDocUrl('company',c.id)}" data-cat="${esc(c.cat||'')}"><div class="cv"><img src="${c.cover}" alt="" loading="lazy"></div><div class="bd"><img class="lg" src="${c.logo}" alt="${esc(L(c.name))}" loading="lazy" onload="mkLogoTrim(this)"><h3>${esc(L(c.name))}</h3><p class="tag">${esc(L(c.tagline))}</p><div class="meta"><span>${esc(L(c.location))}</span><i></i><span><b>${n}</b> <span data-i18n="co_prod_unit"></span></span>${String(c.since||'').replace(/[\s\-—–]/g,'') ? `<i></i><span>since ${esc(c.since)}</span>` : ''}</div></div></a>`;
 }
 /* 카드 지표 — ★2026-09-29 문의수는 뺀다(사용자 지시). 미팅 펀딩 달성률(mtCardLine)과 숫자가 겹쳐
    '43건 문의 · 0% 달성'처럼 헷갈렸다. 관심(wish)만 남기고, 0이면 생략. */
@@ -995,7 +1037,7 @@ function mkHeroSlides(){
   if(cos.length){
     out.push({ cls: 'light', html: shell('hs-co', mkUrl('companies.html'),
       leftHtml('hs_co_kick', 'hs_co_t', 'hs_co_p', 'hs_co_cta'),
-      `<div class="hs-cos">${cos.map(c => `<div class="hs-co-row"><span class="lg">${c.logo ? `<img src="${esc(c.logo)}" alt="">` : ''}</span><div><b>${esc(c.brand || L(c.name))}</b><span>${esc(L(c.location))}</span></div><em>${MT_ICO.check}</em></div>`).join('')}</div>`) });
+      `<div class="hs-cos">${cos.map(c => `<div class="hs-co-row"><span class="lg">${c.logo ? `<img src="${esc(c.logo)}" alt="" onload="mkLogoTrim(this)">` : ''}</span><div><b>${esc(c.brand || L(c.name))}</b><span>${esc(L(c.location))}</span></div><em>${MT_ICO.check}</em></div>`).join('')}</div>`) });
   }
   return out;
 }
@@ -1028,9 +1070,9 @@ function mtFeatured(tr){
   const joined = items.reduce((a, i) => a + i.count, 0);
   const d = mtDate(tr.visit_date);
   const href = `${mkUrl('meetings.html')}#trip-${esc(tr.id)}`;
-  const dday = tr.open && tr.days_left != null && tr.days_left > 0 ? `<span class="dd">D-${tr.days_left}</span>` : '';
-  const shown = items.slice(0, 4);
-  const cards = shown.map(it => {
+  /* 공급사가 4곳 이상이면 좌우 슬라이드(모두 표시), 3곳 이하는 폭을 나눠 채운다 */
+  const slide = items.length >= 4;
+  const cards = items.map(it => {
     const p = mkProduct(it.product_id);
     const mine = it.mine || mtIsMine(tr.id, p.id);
     return `<a class="mt-evd-sup ${it.confirmed ? 'done' : ''}" href="${mkDocUrl('product', p.id)}#meet">
@@ -1039,12 +1081,14 @@ function mtFeatured(tr){
         <div class="pr">${mtJoinedHtml(it)}<em>${mtPct(it)}%</em></div>
         <span class="act ${mine ? 'on' : ''}">${mine ? MT_ICO.check + esc(t('mt_btn_applied')) : esc(t('mt_btn_apply')) + ' →'}</span></div></a>`;
   }).join('');
-  const more = items.length > shown.length ? `<a class="mt-evd-more" href="${href}">${esc(mtRep('mt_evc_more', { n: items.length - shown.length }))} →</a>` : '';
+  const nav = d => `<button type="button" class="mt-evd-nav ${d < 0 ? 'prev' : 'next'}" aria-label="${d < 0 ? 'Previous' : 'Next'}" onclick="mtEvdGo(this,${d})"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="${d < 0 ? 'M15 5l-7 7 7 7' : 'M9 5l7 7-7 7'}"/></svg></button>`;
+  const sups = slide
+    ? `<div class="mt-evd-rail at-start">${nav(-1)}<div class="mt-evd-sups slide" onscroll="mtEvdSync(this)">${cards}</div>${nav(1)}</div>`
+    : `<div class="mt-evd-sups ${items.length === 3 ? 'many' : ''}" style="--n:${Math.max(1, items.length)}">${cards}</div>`;
   return `<div class="mt-evd">
     <div class="mt-evd-top">
       <a class="mt-evd-date" href="${href}"><span class="mo">${esc(mtFmt(tr.visit_date, { month:'long' }))}</span><b>${d ? String(d.getDate()).padStart(2, '0') : ''}</b><span class="dw">${esc(mtFmt(tr.visit_date, { weekday:'long' }))}</span></a>
       <div class="mt-evd-main">
-        <div class="chips"><span class="st ${tr.open ? '' : 'off'}">${esc(t('mt_st_' + mtTripState(tr)))}</span>${dday}</div>
         <h3><a href="${href}">${esc(L(tr.title) || t('mt_page_kick'))}</a></h3>
         <ul class="meta">
           <li>${MT_ICO.clock}<span>${esc(mtTime(tr) || t('mt_tba'))}</span></li>
@@ -1055,8 +1099,17 @@ function mtFeatured(tr){
       </div>
       <a class="btn btn-ghost mt-evd-go" href="${href}">${esc(t('mt_evc_detail'))} →</a>
     </div>
-    <div class="mt-evd-sups ${shown.length >= 3 ? 'many' : ''}" style="--n:${Math.max(1, shown.length)}">${cards}</div>${more}
+    ${sups}
   </div>`;
+}
+function mtEvdGo(btn, dir){
+  const sc = btn.parentNode.querySelector('.mt-evd-sups');
+  if(sc) sc.scrollBy({ left: dir * Math.max(240, sc.clientWidth * .8), behavior: 'smooth' });
+}
+function mtEvdSync(sc){
+  const r = sc.parentNode;
+  r.classList.toggle('at-start', sc.scrollLeft < 8);
+  r.classList.toggle('at-end', sc.scrollLeft + sc.clientWidth > sc.scrollWidth - 8);
 }
 function mtHomeHtml(){
   /* 방문일이 정해진 일정만 — '방문일 미정' 일정은 이 섹션에 안 나온다(제품 카드·상세에서만 '방문일 미정'으로 신청받는다) */

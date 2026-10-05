@@ -1926,12 +1926,7 @@ body.mkedit-on .omc-hero .slide.on .shot{pointer-events:none}
 .mt-evd-date b{font-size:44px;font-weight:800;line-height:1.08;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
 .mt-evd-date .dw{font-size:12.5px;font-weight:600;opacity:.86}
 .mt-evd-main{min-width:0}
-.mt-evd-main .chips{display:flex;gap:6px}
-.mt-evd-main .chips span{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:var(--r-pill);font-size:12px;font-weight:700;letter-spacing:.02em}
-.mt-evd-main .chips .st{background:var(--mk-primary-soft);color:var(--mk-primary-dark)}
-.mt-evd-main .chips .st.off{background:#EEF1F4;color:var(--mk-muted)}
-.mt-evd-main .chips .dd{background:var(--mk-navy);color:#fff}
-.mt-evd .mt-evd-main h3{font-size:26px;font-weight:800;line-height:1.25;letter-spacing:-.03em;margin:8px 0 10px;color:var(--mk-ink);word-break:keep-all}
+.mt-evd .mt-evd-main h3{font-size:26px;font-weight:800;line-height:1.25;letter-spacing:-.03em;margin:0 0 10px;color:var(--mk-ink);word-break:keep-all}
 .mt-evd-main h3 a{color:inherit}
 .mt-evd-main .meta{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 22px}
 .mt-evd-main .meta li{display:inline-flex;align-items:center;gap:7px;font-size:14.5px;line-height:1.45;color:var(--mk-body)}
@@ -1958,7 +1953,6 @@ body.mkedit-on .omc-hero .slide.on .shot{pointer-events:none}
 /* 3곳 이상이면 칸이 좁아지니 사진을 줄인다 */
 .mt-evd-sups.many .mt-evd-sup{grid-template-columns:104px minmax(0,1fr);gap:14px}
 .mt-evd-sups.many .mt-evd-sup .nm{font-size:15px;margin-bottom:10px}
-.mt-evd-more{display:inline-block;margin-top:12px;font-size:13.5px;font-weight:700;color:var(--mk-primary-dark)}
 @media(max-width:1100px){
   .mt-evd-sups{grid-template-columns:repeat(2,minmax(0,1fr))}
   .mt-evd-sup,.mt-evd-sups.many .mt-evd-sup{grid-template-columns:116px minmax(0,1fr);gap:14px}
@@ -1969,7 +1963,7 @@ body.mkedit-on .omc-hero .slide.on .shot{pointer-events:none}
   .mt-evd-date{width:66px;height:76px;border-radius:12px}
   .mt-evd-date b{font-size:30px}
   .mt-evd-date .mo,.mt-evd-date .dw{font-size:11px}
-  .mt-evd .mt-evd-main h3{font-size:20px;margin:6px 0 0}
+  .mt-evd .mt-evd-main h3{font-size:20px;margin:0}
   .mt-evd-main .meta{grid-column:1/-1;flex-direction:column;gap:5px;margin-top:10px}
   .mt-evd-main .meta li{font-size:13.5px}
   .mt-evd-go{grid-column:1/-1;justify-content:center;height:42px}
@@ -1978,3 +1972,26 @@ body.mkedit-on .omc-hero .slide.on .shot{pointer-events:none}
   .mt-evd-sup .nm,.mt-evd-sups.many .mt-evd-sup .nm{font-size:14.5px;margin-bottom:8px}
   .mt-evd-sup .act{height:32px;margin-top:9px}
 }
+
+/* 행사 카드의 공급사가 4곳 이상일 때 — 좌우 슬라이드(app.js mtFeatured · mtEvdGo · mtEvdSync) */
+.mt-evd-rail{position:relative;margin-top:26px}
+.mt-evd-rail .mt-evd-sups{margin-top:0}
+.mt-evd-sups.slide{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:calc((100% - 72px)/2.4);overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+.mt-evd-sups.slide::-webkit-scrollbar{display:none}
+.mt-evd-sups.slide .mt-evd-sup{scroll-snap-align:start}
+.mt-evd-nav{position:absolute;top:50%;z-index:2;display:flex;align-items:center;justify-content:center;width:42px;height:42px;margin-top:-21px;padding:0;border:1px solid var(--mk-line);border-radius:50%;background:#fff;color:var(--mk-ink);box-shadow:0 4px 14px rgba(4,20,63,.14);cursor:pointer}
+.mt-evd-nav:hover{border-color:var(--mk-primary);color:var(--mk-primary-dark)}
+.mt-evd-nav.prev{left:-16px}
+.mt-evd-nav.next{right:-16px}
+.mt-evd-rail.at-start .mt-evd-nav.prev,.mt-evd-rail.at-end .mt-evd-nav.next{display:none}
+@media(max-width:1100px){.mt-evd-sups.slide{grid-auto-columns:calc((100% - 36px)/1.7)}}
+@media(max-width:640px){
+  .mt-evd-rail{margin-top:18px}
+  .mt-evd-sups.slide{grid-auto-columns:86%;gap:14px}
+  .mt-evd-nav{display:none}
+}
+
+/* 여백을 잘라낸 로고(app.js mkLogoTrim) — 상자에 꽉 차게, 잘리지 않게 */
+img.lg-trim{object-fit:contain!important;box-sizing:border-box;padding:7px;background:#fff}
+.co-card img.lg-trim,.co-inline img.lg-trim{padding:4px}
+.hs-co-row .lg img.lg-trim{padding:0;max-width:86%;max-height:86%}
