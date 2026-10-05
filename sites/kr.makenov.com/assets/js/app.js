@@ -1106,8 +1106,6 @@ function mtEventPage(tr){
   const state = mtTripState(tr);
   const dday = tr.open && tr.days_left != null ? (tr.days_left > 0 ? mtRep('mt_kf_dday', { n: tr.days_left }) : t('mt_dday_today')) : '';
   const bandH = esc(x.band ? L(x.band) : t('mt_kf_band_h')).split('{y}').join('<span class="y">').split('{/y}').join('</span>');
-  const bandMeta = [dl ? `${t('mt_deadline')} ${dl}` : '', t('mt_kf_free'), x.booth ? t('mt_kf_interp') : ''].filter(Boolean).join(' · ');
-  const cta = cls => items.length && tr.open ? `<button type="button" class="kf-btn ${cls || ''}" onclick="mtKfGo()">${esc(t('mt_kf_cta'))}</button>` : '';
   const row = (k, v) => v ? `<tr><th>${esc(t(k))}</th><td>${v}</td></tr>` : '';
   const time = mtTime(tr);
   const step = (n, h, p) => `<li><span class="n">${n}</span><div><h3>${esc(h)}</h3><p>${esc(p)}</p></div></li>`;
@@ -1129,24 +1127,26 @@ function mtEventPage(tr){
     <div class="kf-map-info"><div><b>${esc(L(tr.venue) || '')}</b>${x.map && x.map.addr ? `<span>${esc(L(x.map.addr))}</span>` : ''}</div>
       <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQ)}" target="_blank" rel="noopener">${MT_ICO.pin}${esc(t('mt_kf_map_open'))}</a></div>
   </div></section>` : '';
-  return `<section class="kf-hero ${x.photo ? 'has-photo' : ''}" id="trip-${esc(tr.id)}"${x.photo ? ` style="background-image:url('${esc(x.photo)}')"` : ''}>
-    <div class="kf-hero-in">
-      <h1>${esc(title)}${x.sub ? `<br><span>${esc(L(x.sub))}</span>` : ''}</h1>
+  /* 히어로 — 메이크노브 톤(밝은 바탕 · 왼쪽 글 · 오른쪽 사진 + 날짜 배지 · 민트 버튼). 2026-10-05: 사진 가운데 정렬 + 남색/노랑 띠는 '메이크노브스럽지 않다'는 피드백으로 교체 */
+  const hd = mtDate(tr.visit_date);
+  const badge = hd ? `<div class="mt-evd-date"><span class="mo">${esc(mtFmt(tr.visit_date, { month:'long' }))}</span><b>${String(hd.getDate()).padStart(2, '0')}</b><span class="dw">${esc(mtFmt(tr.visit_date, { weekday:'long' }))}</span></div>` : '';
+  const note = [t('mt_kf_free'), x.booth ? t('mt_kf_interp') : ''].filter(Boolean).join(' · ');
+  return `<section class="kf-hero" id="trip-${esc(tr.id)}"><div class="wrap kf-hero-in">
+    <div class="kf-hero-tx">
       ${x.logos && x.logos.length ? `<div class="kf-logos">${x.logos.map(l => `<img src="${esc(l.src)}" alt="${esc(l.alt)}">`).join('<i></i>')}</div>` : ''}
+      <h1>${esc(title)}${x.sub ? `<span>${esc(L(x.sub))}</span>` : ''}</h1>
+      <p class="kf-lead">${bandH}</p>
       <ul class="kf-hero-meta">
-        <li>${MT_ICO.cal}<span>${esc(when)}</span></li>
-        ${time ? `<li>${MT_ICO.clock}<span>${esc(time)}</span></li>` : ''}
-        <li>${MT_ICO.pin}<span>${esc(mtWhere(tr) || t('mt_tba'))}</span></li>
+        <li><span class="k">${esc(t('mt_kf_o_date'))}</span><span class="v">${esc(when + (time ? ' · ' + time : ''))}</span></li>
+        <li><span class="k">${esc(t('mt_kf_o_venue'))}</span><span class="v">${esc(mtWhere(tr) || t('mt_tba'))}</span></li>
+        ${dl ? `<li><span class="k">${esc(t('mt_deadline'))}</span><span class="v">${esc(dl)}${dday ? `<em>${esc(dday)}</em>` : ''}</span></li>` : ''}
       </ul>
+      <div class="kf-hero-cta">
+        ${items.length && tr.open ? `<button type="button" class="btn btn-primary btn-lg" onclick="mtKfGo()">${esc(t('mt_kf_cta'))} →</button>` : `<span class="kf-closed">${esc(t('mt_st_' + state))}</span>`}
+        <span class="kf-cta-note">${esc(note)}</span>
+      </div>
     </div>
-  </section>
-  <section class="kf-band"><div class="kf-doc kf-band-in">
-    <div>
-      <span class="kf-badge">${esc(tr.open ? t('mt_kf_badge') : t('mt_st_' + state))}</span>${dday ? `<span class="kf-dday">${esc(dday)}</span>` : ''}
-      <h2>${bandH}</h2>
-      <p class="kf-band-meta">${esc(bandMeta)}</p>
-    </div>
-    ${cta('yellow')}
+    <div class="kf-hero-ph ${x.photo ? '' : 'none'}">${x.photo ? `<img src="${esc(x.photo)}" alt="${esc(title)}">` : ''}${badge}</div>
   </div></section>
   <section class="kf-sec"><div class="kf-doc">
     ${mtKfHead('Overview', esc(t('mt_kf_over_h')))}
@@ -1189,7 +1189,7 @@ function mtEventEnd(tr){
   return `<section class="kf-end"><div class="kf-doc">
     ${dl ? `<p class="d">${esc(t('mt_deadline'))} <b>${esc(dl)}</b></p>` : ''}
     <p>${esc(t('mt_kf_end_p'))}</p>
-    <button type="button" class="kf-btn navy" onclick="mtKfGo()">${esc(t('mt_kf_cta'))}</button>
+    <button type="button" class="btn btn-primary btn-lg" onclick="mtKfGo()">${esc(t('mt_kf_cta'))} →</button>
   </div></section>`;
 }
 /* 홈 '예정된 행사 일정' 카드(10차, 2026-10-03) — 위아래 2단.
