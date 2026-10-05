@@ -85,7 +85,7 @@ const MEET_MAIL_PRESETS = {
   /* 비밀번호 없이 — 서버가 받는 쪽 메일 서버(makenov.com = 네이버웍스)에 바로 전달한다. 계정 로그인이 없어 앱 비밀번호가 필요 없다.
      받는 주소가 @makenov.com 일 때만 된다(다른 도메인은 그 메일 서버가 받아 주지 않는다). 2026-10-06 사용자 요청 */
   direct:     { label: '비밀번호 없이 보내기 (@makenov.com 주소 전용)', host: 'kr1-aspmx1.worksmobile.com', port: 25, crypto: 'tls', nouser: true,
-                hint: '아이디·비밀번호 없이 서버가 <b>@makenov.com</b> 메일함으로 바로 전달합니다. 알림 받을 주소가 @makenov.com 일 때만 됩니다. 처음에는 스팸함으로 갈 수 있으니 한 번 확인해 주세요.' },
+                hint: '아이디·비밀번호 없이 서버가 <b>@makenov.com</b> 메일함으로 바로 전달합니다. 알림 받을 주소가 @makenov.com 일 때만 됩니다. 보내는 주소는 <b>alert@vn.makenov.com</b> 처럼 @makenov.com 이 아닌 주소여야 도착합니다(@makenov.com 으로 보내면 사칭 메일로 걸러집니다).' },
   gmail:      { label: '구글(Gmail · 워크스페이스)', host: 'smtp.gmail.com', port: 587, crypto: 'tls',
                 hint: '구글 계정에서 <b>2단계 인증</b>을 켠 뒤 <b>앱 비밀번호</b>를 발급받아 넣으세요. 계정 비밀번호로는 보내지지 않습니다. 아이디는 전체 메일 주소입니다.' },
   naverworks: { label: '네이버웍스', host: 'smtp.worksmobile.com', port: 587, crypto: 'tls',
@@ -100,7 +100,9 @@ function meetMailPreset(k){
   document.getElementById('mc-host').value = v.host;
   document.getElementById('mc-port').value = v.port;
   document.getElementById('mc-crypto').value = v.crypto;
-  if(v.nouser){ document.getElementById('mc-user').value = ''; if(!av('mc-from')) document.getElementById('mc-from').value = 'no-reply@makenov.com'; }
+  /* 보내는 주소는 @makenov.com 이면 안 된다 — 받는 쪽(네이버웍스)이 자기 도메인 사칭으로 보고 걸러 메일이 도착하지 않았다(2026-10-06 확인).
+     하위 도메인 주소(alert@vn.makenov.com)는 도착한다. */
+  if(v.nouser){ document.getElementById('mc-user').value = ''; if(!av('mc-from') || /@makenov\.com$/i.test(av('mc-from'))) document.getElementById('mc-from').value = 'alert@vn.makenov.com'; }
 }
 async function meetCfgSave(){
   const body = { notify_email: av('mc-email'),
