@@ -9,48 +9,53 @@
    ============================================================ */
 const LND = {
  "hero": {
+  "kick": {
+   "vi": "NỀN TẢNG NHÀ PHÂN PHỐI TẠI VIỆT NAM",
+   "ko": "베트남 유통 파트너 플랫폼",
+   "en": "DISTRIBUTION PARTNER PLATFORM FOR VIETNAM"
+  },
   "h1a": {
-   "vi": "Gặp trực tiếp nhà cung cấp Hàn Quốc",
-   "ko": "한국 공급사를",
-   "en": "Meet Korean suppliers"
+   "vi": "Ai cũng có thể trở thành nhà phân phối chính thức",
+   "ko": "누구나 글로벌 혁신 제품의",
+   "en": "Anyone can become the official distributor"
   },
   "h1b": {
-   "vi": "ngay tại Việt Nam",
-   "ko": "베트남에서 직접 만나세요",
-   "en": "in person in Vietnam"
+   "vi": "của sản phẩm tiên phong toàn cầu",
+   "ko": "공식 유통사가 될 수 있습니다",
+   "en": "of a global innovative product"
   },
   "sub": {
-   "vi": "Chọn sản phẩm bạn quan tâm và đăng ký gặp mặt\nđể trao đổi 1:1 với đại diện nhà cung cấp.\nĐăng ký miễn phí, không cần tạo tài khoản",
-   "ko": "관심 있는 제품을 고르고 미팅을 신청하면\n공급사 담당자와 1:1로 상담합니다. 신청은 무료, 가입 없이 1분이면 됩니다",
-   "en": "Pick the products you are interested in and request a meeting\nto talk 1:1 with the supplier. Free to request, no account needed.",
+   "vi": "Xem điều kiện phân phối của những sản phẩm chưa có mặt tại Việt Nam\nvà trao đổi trực tiếp với nhà cung cấp. \nChưa có kinh nghiệm nhập khẩu vẫn bắt đầu được",
+   "ko": "아직 베트남에 들어오지 않은 제품의 유통 조건을 확인하고\n공급사와 직접 상담하세요. 수입 경험이 없어도 시작할 수 있습니다",
+   "en": "Check the trade terms of products that have not entered Vietnam yet\nand talk directly with suppliers. No import experience needed.",
    "_br": 1
   },
   "cta1": {
-   "vi": "Xem lịch sự kiện",
-   "ko": "행사 일정 보기",
-   "en": "See the event schedule"
-  },
-  "cta2": {
    "vi": "Khám phá sản phẩm",
    "ko": "제품 둘러보기",
    "en": "Browse products"
+  },
+  "cta2": {
+   "vi": "Xem hướng dẫn sử dụng",
+   "ko": "이용 가이드 보기",
+   "en": "See the user guide"
   }
  },
  "stats": {
   "b1": {
-   "vi": "Miễn phí đăng ký",
-   "ko": "미팅 신청 무료",
-   "en": "Free to request"
+   "vi": "Đăng ký miễn phí",
+   "ko": "가입 무료",
+   "en": "Free to join"
   },
   "b2": {
-   "vi": "Không cần tài khoản",
-   "ko": "가입 없이 1분",
-   "en": "No account, one minute"
+   "vi": "Xác thực doanh nghiệp ~1 phút",
+   "ko": "사업자 인증 약 1분",
+   "en": "Business verification in about a minute"
   },
   "b3": {
-   "vi": "Có phiên dịch",
-   "ko": "한국어–베트남어 통역 지원",
-   "en": "Korean–Vietnamese interpreters"
+   "vi": "Đăng ký·xác thực·hỏi đáp đều miễn phí",
+   "ko": "가입·인증·문의 전부 무료",
+   "en": "Signup, verification and inquiries are all free"
   },
   "l1": {
    "vi": "Thương hiệu đăng ký",
