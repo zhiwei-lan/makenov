@@ -2182,3 +2182,14 @@ img.lg-trim{object-fit:contain!important;box-sizing:border-box;padding:7px;backg
   .omc-hero .frame.light .hero-arrows{left:20px;bottom:16px}
   .omc-hero .frame.light .dots{left:auto;right:20px;bottom:30px}
 }
+
+/* 카드의 후킹 제목(app.js mkHook) — 제품명은 브랜드 아래 작게, 후킹 제목이 제목 자리 */
+.p-card .pname{margin-top:3px;font-size:12.5px;line-height:1.4;color:var(--mk-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p-card h3.hooked{font-weight:600;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal;word-break:keep-all}
+.mt-evd-sup .pn{margin-top:2px;font-size:12.5px;font-weight:600;line-height:1.4;color:var(--mk-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* 미팅 일정이 없는 제품의 상세 안내 상자(page-product.js) */
+.pd-nomeet{margin:2px 0 18px;padding:16px 18px;border-radius:10px;background:var(--mk-bg-soft)}
+.pd-nomeet b{display:block;font-size:15px;font-weight:700;color:var(--mk-ink)}
+.pd-nomeet p{margin:6px 0 0;font-size:13.5px;line-height:1.6;color:var(--mk-body)}
+.pd-ctas a.btn{text-align:center}

@@ -119,21 +119,14 @@ function pageInit(){
         <!-- 미팅 펀딩 중(2026-09-29): 이 박스는 펀딩 패널 하나만 — 숫자 · 일정 · [관심][공유][미팅 신청].
              가격·MOQ 박스와 견적 버튼은 사용자 지시로 뺐다(미팅이 이 페이지의 유일한 행동). app.js mtFundingPanel / mtFillSlots -->
         <div data-mt-product="${esc(p.id)}">${mtFundingPanel(p.id)}</div>` : `
-        <div class="stat">
-          <div><b>${p.inquiries}</b><span data-i18n="inquiries_count"></span></div>
-          <div><b>${p.views.toLocaleString()}</b><span data-i18n="views_label"></span></div>
+        <!-- 미팅 일정이 아직 없는 제품(2026-10-05): 예전 '인증 유통 파트너만 열람' 가격 잠금 상자·문의 수·견적 버튼을 걷어냈다.
+             일정이 생기면 위 펀딩 패널로 바뀐다. 그 전까지는 안내 + 행사 일정 보기 · 관심 · 카탈로그만. -->
+        <div class="pd-nomeet">
+          <b data-i18n="pd_nomeet_t"></b>
+          <p data-i18n="pd_nomeet_p"></p>
         </div>
-
-        <div class="lockbox">
-          <div class="lockrow"><span class="lbl" data-i18n="price"></span><span class="lockval">${esc(lockVal(L(p.price)))}</span>${p.negotiable?`<span class="nego" data-i18n="negotiable_badge"></span>`:''}</div>
-          <div class="lockrow"><span class="lbl" data-i18n="moq"></span><span class="lockval">${esc(lockVal(L(p.moq)))}</span></div>
-          <div class="lockrow"><span class="lbl" data-i18n="lead_time"></span><span class="lockval">${esc(lockVal(L(p.lead)))}</span></div>
-          <div class="lockrow"><span class="lbl" data-i18n="supply_terms"></span><span class="lockval">${esc(lockVal(L(p.terms)))}</span></div>
-          ${Store.session()?'':`<div class="locknote" data-i18n="locked_note"></div>`}
-        </div>
-
         <div class="pd-ctas">
-          <button class="btn btn-primary" onclick="openInquiry(['${p.id}'])" data-i18n="cta_inquiry"></button>
+          <a class="btn btn-primary" href="${mkUrl('meetings.html')}" data-i18n="pd_nomeet_cta"></a>
           <button class="btn btn-ghost" id="pd-cart" onclick="toggleCart('${p.id}');pdCartLabel('${p.id}')">
             <span data-i18n="${inCart?'cta_wishlist_on':'cta_wishlist'}"></span></button>
           ${mkCatalogHidden(p)?'':`<button class="btn btn-soft" onclick="openCatalog('${p.id}')" data-i18n="cta_catalog"></button>`}

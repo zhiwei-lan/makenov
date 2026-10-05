@@ -747,12 +747,15 @@ function cardMeta(p){
   return wish ? `<span class="amt">${t('wish_count').replace('{n}', wish)}</span>` : '';
 }
 
+/* 상세 페이지 후킹 제목(p.hook.title) — 있으면 카드에서도 제목으로 쓰고, 제품명은 그 위에 작게(2026-10-05 사용자 지시) */
+function mkHook(p){ const h = p && p.hook && p.hook.title; return h ? String(L(h) || '').trim() : ''; }
 function productCard(p){
   const inCart = Store.cartHas(p.id);
+  const hook = mkHook(p);
   const flag = '';   // 2026-09-30 '신제품 등록'·FEATURED 배지 삭제(사용자 요청) — 카드 사진 위 표시 없음
   return `
   <a class="p-card" href="${mkDocUrl('product',p.id)}" data-cat="${esc(p.cat||'')}"><div class="thumb"><img src="${p.img}" alt="${esc(L(p.name))}" loading="lazy">${flag}
-      <button class="heart ${inCart?'on':''}" onclick="event.preventDefault();event.stopPropagation();toggleCart('${p.id}',this)">${inCart?'♥':'♡'}</button></div><div class="body"><span class="brand">${esc(p.brand)}</span><h3>${esc(L(p.name))}</h3><div class="meta">${cardMeta(p)}<span class="left">${esc(p.origin)}</span></div>${mtCardLine(p.id)}</div></a>`;
+      <button class="heart ${inCart?'on':''}" onclick="event.preventDefault();event.stopPropagation();toggleCart('${p.id}',this)">${inCart?'♥':'♡'}</button></div><div class="body"><span class="brand">${esc(p.brand)}</span>${hook ? `<span class="pname">${esc(L(p.name))}</span>` : ''}<h3 class="${hook ? 'hooked' : ''}">${esc(hook || L(p.name))}</h3><div class="meta">${cardMeta(p)}<span class="left">${esc(p.origin)}</span></div>${mtCardLine(p.id)}</div></a>`;
 }
 
 /* ============================================================
@@ -1071,9 +1074,10 @@ const MT_EVENT_X = {
 function mtSupCard(tr, it){
   const p = mkProduct(it.product_id);
   const mine = it.mine || mtIsMine(tr.id, p.id);
+  const hook = mkHook(p);
   return `<a class="mt-evd-sup ${it.confirmed ? 'done' : ''}" href="${mkDocUrl('product', p.id)}#meet">
       <div class="im"><img src="${esc(p.img)}" alt="${esc(L(p.name))}" loading="lazy"></div>
-      <div class="tx"><span class="br">${esc(p.brand)}</span><span class="nm">${esc(L(p.name))}</span>${mtBar(it)}
+      <div class="tx"><span class="br">${esc(p.brand)}</span>${hook ? `<span class="pn">${esc(L(p.name))}</span>` : ''}<span class="nm">${esc(hook || L(p.name))}</span>${mtBar(it)}
         <div class="pr">${mtJoinedHtml(it)}<em>${mtPct(it)}%</em></div>
         <span class="act ${mine ? 'on' : ''}">${mine ? MT_ICO.check + esc(t('mt_btn_applied')) : esc(t('mt_btn_apply')) + ' →'}</span></div></a>`;
 }
