@@ -26,7 +26,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 class Meet extends BaseApiController
 {
     /** 마이그레이션을 추가하면 올린다 — writable/meet_schema_ok 에 적힌 값과 다르면 latest() 를 다시 돈다 */
-    private const SCHEMA_VER = '15';
+    private const SCHEMA_VER = '16';
     /** 마감·D-day 계산 기준 시간대 — 바이어가 베트남에 있다 */
     private const TZ = 'Asia/Ho_Chi_Minh';
     private const TRIP_JSON = ['title', 'city', 'venue', 'summary'];
@@ -63,6 +63,10 @@ class Meet extends BaseApiController
                     if ($method === 'GET')    return $this->trips(true);
                     if ($method === 'POST')   return $this->adminSaveTrip($c);
                     if ($method === 'DELETE') return $this->adminDeleteTrip($c);
+                }
+                if ($b === 'config') {
+                    if ($method === 'GET')    return $this->adminConfig();
+                    if ($method === 'POST')   return $c === 'test' ? $this->adminNotifyTest() : $this->adminSaveConfig();
                 }
                 if ($b === 'requests') {
                     if ($method === 'GET')    return $this->adminRequests();
@@ -199,6 +203,8 @@ class Meet extends BaseApiController
             ];
         }
         $r['items']     = $items;
+        /* 행사 상세 페이지의 부가 정보(부제 · 주최 로고 · 주관/운영 · 세부 장소 · 지도 · FAQ …) — 관리자 › 방문 일정에서 넣는다 */
+        $r['extra']     = $this->jdec($r['extra'] ?? null, (object) []);
         $r['published'] = (bool) (int) ($r['published'] ?? 0);
         $r['sort']      = (int) ($r['sort'] ?? 99);
         $r['open']      = $open;
@@ -338,6 +344,7 @@ class Meet extends BaseApiController
                 'buyer_id' => $buyer, 'created_at' => $now,
             ]);
         }
+        $this->notifyNew($tid, $pid, $row);
         $n = $this->counts()[$tid . '|' . $pid] ?? 0;
         return $this->json(['ok' => true, 'count' => $n, 'goal' => $item['goal'], 'confirmed' => $n >= $item['goal']], 201);
     }
@@ -418,12 +425,217 @@ class Meet extends BaseApiController
             $row[$k] = json_encode((object) array_filter((array) ($in[$k] ?? []), fn ($v) => is_string($v)), JSON_UNESCAPED_UNICODE);
         }
         $db = db_connect();
-        if ($db->table('meet_trips')->where('id', $id)->countAllResults()) {
+        if (array_key_exists('extra', $in) && in_array('extra', $db->getFieldNames('meet_trips'), true)) {
+            $row['extra'] = json_encode($this->cleanExtra((array) $in['extra']), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        }
+        $exists = (bool) $db->table('meet_trips')->where('id', $id)->countAllResults();
+        /* 일정 ID 변경(new_id) — 신청 내역의 trip_id 도 같이 옮긴다. 사이트 주소(#trip-아이디)가 바뀐다 */
+        $newId = trim((string) ($in['new_id'] ?? ''));
+        if ($exists && $newId !== '' && $newId !== $id) {
+            if (! preg_match('/^[a-z0-9][a-z0-9-]{2,39}$/', $newId)) {
+                return $this->err('bad_id', '새 ID 는 영문 소문자·숫자·하이픈 3~40자', 400);
+            }
+            if ($db->table('meet_trips')->where('id', $newId)->countAllResults()) {
+                return $this->err('id_taken', "이미 있는 일정 ID 입니다: {$newId}", 409);
+            }
+            $db->transStart();
+            $db->table('meet_trips')->where('id', $id)->update($row + ['id' => $newId]);
+            $db->table('meet_requests')->where('trip_id', $id)->update(['trip_id' => $newId]);
+            $db->transComplete();
+            if (! $db->transStatus()) {
+                return $this->err('server', 'ID 변경에 실패했습니다', 500);
+            }
+            return $this->trip($newId);
+        }
+        if ($exists) {
             $db->table('meet_trips')->where('id', $id)->update($row);
         } else {
             $db->table('meet_trips')->insert($row + ['id' => $id, 'created_at' => date('Y-m-d H:i:s')]);
         }
         return $this->trip($id);
+    }
+
+    /** 행사 부가 정보 정리 — 정해진 칸만, 길이 제한. 3개 언어 칸은 {vi,ko,en} 문자열만 남긴다 */
+    private function cleanExtra(array $in): array
+    {
+        $tri = function ($v, int $max): array {
+            $o = [];
+            foreach (['vi', 'ko', 'en'] as $l) {
+                $t = is_array($v) ? ($v[$l] ?? '') : '';
+                if (is_string($t) && trim($t) !== '') {
+                    $o[$l] = $this->cut($t, $max);
+                }
+            }
+            return $o;
+        };
+        $url = fn ($v) => (is_string($v) && preg_match('#^(https?://|/)#', trim($v))) ? $this->cut($v, 500) : '';
+        $out = [];
+        foreach (['sub' => 200, 'lead' => 300, 'name' => 300, 'venue_detail' => 300, 'host' => 200, 'org' => 200, 'map_addr' => 300] as $k => $max) {
+            $t = $tri($in[$k] ?? null, $max);
+            if ($t) {
+                $out[$k] = $t;
+            }
+        }
+        $logos = [];
+        foreach (array_slice((array) ($in['logos'] ?? []), 0, 4) as $u) {
+            if (($u = $url($u)) !== '') {
+                $logos[] = $u;
+            }
+        }
+        if ($logos) {
+            $out['logos'] = $logos;
+        }
+        if (($ph = $url($in['photo'] ?? '')) !== '') {
+            $out['photo'] = $ph;
+        }
+        if (is_string($in['map_q'] ?? null) && trim($in['map_q']) !== '') {
+            $out['map_q'] = $this->cut($in['map_q'], 300);
+        }
+        foreach (['booth', 'growing', 'fixed'] as $k) {
+            if (! empty($in[$k])) {
+                $out[$k] = true;
+            }
+        }
+        $faq = [];
+        foreach (array_slice((array) ($in['faq'] ?? []), 0, 20) as $f) {
+            $f = (array) $f;
+            $q = $tri($f['q'] ?? null, 300);
+            $a = $tri($f['a'] ?? null, 1500);
+            if ($q && $a) {
+                $faq[] = ['q' => $q, 'a' => $a];
+            }
+        }
+        if ($faq) {
+            $out['faq'] = $faq;
+        }
+        $perks = [];
+        foreach (array_slice((array) ($in['perks'] ?? []), 0, 12) as $pk) {
+            $t = $tri($pk, 300);
+            if ($t) {
+                $perks[] = $t;
+            }
+        }
+        if ($perks) {
+            $out['perks'] = $perks;
+        }
+        return $out;
+    }
+
+    /* ================= 관리자: 알림 설정 (meet_config — REST 로 공개되지 않는 테이블) ================= */
+
+    private function cfgGet(string $k): string
+    {
+        $db = db_connect();
+        if (! $db->tableExists('meet_config')) {
+            return '';
+        }
+        $r = $db->table('meet_config')->where('k', $k)->get()->getRowArray();
+        return $r ? (string) ($r['v'] ?? '') : '';
+    }
+
+    private function adminConfig(): ResponseInterface
+    {
+        $cfg = config('Email');
+        return $this->json([
+            'notify_email' => $this->cfgGet('notify_email'),
+            'mail_via'     => (string) ($cfg->protocol ?? 'mail'),            // mail | sendmail | smtp (서버 설정)
+            'mail_from'    => (string) ($cfg->fromEmail ?: 'no-reply@makenov.com'),
+        ]);
+    }
+
+    private function adminSaveConfig(): ResponseInterface
+    {
+        $in = $this->input();
+        if ($in === null) {
+            return $this->err('bad_json', 'bad json', 400);
+        }
+        $list = $this->emails((string) ($in['notify_email'] ?? ''));
+        $db   = db_connect();
+        if (! $db->tableExists('meet_config')) {
+            return $this->err('schema_missing', '설정 테이블을 만드는 중입니다. 잠시 뒤 다시 시도해 주세요.', 503);
+        }
+        $v = implode(', ', $list);
+        if ($db->table('meet_config')->where('k', 'notify_email')->countAllResults()) {
+            $db->table('meet_config')->where('k', 'notify_email')->update(['v' => $v, 'updated_at' => date('Y-m-d H:i:s')]);
+        } else {
+            $db->table('meet_config')->insert(['k' => 'notify_email', 'v' => $v, 'updated_at' => date('Y-m-d H:i:s')]);
+        }
+        return $this->json(['ok' => true, 'notify_email' => $v]);
+    }
+
+    private function adminNotifyTest(): ResponseInterface
+    {
+        $to = $this->emails($this->cfgGet('notify_email'));
+        if (! $to) {
+            return $this->err('no_rcpt', '알림 받을 메일 주소를 먼저 저장하세요', 400);
+        }
+        [$ok, $dbg] = $this->sendMail($to, '[MAKENOV] 미팅 신청 알림 테스트', "미팅 신청 알림 테스트 메일입니다.\n이 메일이 보이면 새 신청이 들어올 때 같은 주소로 알림이 갑니다.\n\n" . date('Y-m-d H:i:s'));
+        return $this->json(['ok' => $ok, 'to' => $to, 'detail' => $ok ? '' : $this->cut($dbg, 600)], $ok ? 200 : 502);
+    }
+
+    /** 쉼표·공백으로 나눈 메일 주소 중 형식이 맞는 것만 (최대 5개) */
+    private function emails(string $raw): array
+    {
+        $out = [];
+        foreach (preg_split('/[,;\s]+/', $raw) ?: [] as $e) {
+            $e = strtolower(trim($e));
+            if ($e !== '' && filter_var($e, FILTER_VALIDATE_EMAIL) && ! in_array($e, $out, true)) {
+                $out[] = $e;
+            }
+        }
+        return array_slice($out, 0, 5);
+    }
+
+    /** @return array{0:bool,1:string} [성공 여부, 실패 시 디버그 문자열] — 보내는 방법은 app/Config/Email.php(.env 의 email.*) */
+    private function sendMail(array $to, string $subject, string $body): array
+    {
+        try {
+            $cfg   = config('Email');
+            $email = \Config\Services::email();
+            $email->clear(true);
+            $email->setFrom($cfg->fromEmail ?: 'no-reply@makenov.com', $cfg->fromName ?: 'MAKENOV');
+            $email->setTo($to);
+            $email->setSubject($subject);
+            $email->setMessage($body);
+            $ok = (bool) $email->send(false);
+            return [$ok, $ok ? '' : trim(strip_tags((string) $email->printDebugger(['headers'])))];
+        } catch (\Throwable $e) {
+            return [false, $e->getMessage()];
+        }
+    }
+
+    /** 새 미팅 신청 알림 — 실패해도 신청 접수에는 영향을 주지 않는다 */
+    private function notifyNew(string $tid, string $pid, array $row): void
+    {
+        try {
+            $to = $this->emails($this->cfgGet('notify_email'));
+            if (! $to) {
+                return;
+            }
+            $db   = db_connect();
+            $trip = $db->table('meet_trips')->where('id', $tid)->get()->getRowArray() ?: [];
+            $tt   = (array) json_decode((string) ($trip['title'] ?? '{}'), true);
+            $prod = $db->tableExists('products') ? ($db->table('products')->select('brand, name')->where('id', $pid)->get()->getRowArray() ?: []) : [];
+            $pn   = (array) json_decode((string) ($prod['name'] ?? '{}'), true);
+            $lines = [
+                '새 미팅 신청이 들어왔습니다.',
+                '',
+                '행사: ' . (($tt['ko'] ?? '') ?: ($tt['vi'] ?? $tid)) . (! empty($trip['visit_date']) ? ' (' . $trip['visit_date'] . ')' : ''),
+                '제품: ' . trim(($prod['brand'] ?? '') . ' · ' . (($pn['ko'] ?? '') ?: ($pn['vi'] ?? $pid)), ' ·'),
+                '',
+                '회사: ' . ($row['company'] ?? ''),
+                '담당자: ' . ($row['contact_name'] ?? '') . (! empty($row['position']) ? ' (' . $row['position'] . ')' : ''),
+                '연락처: ' . ($row['phone'] ?? ''),
+                '이메일: ' . ($row['email'] ?? ''),
+                '홈페이지: ' . ($row['homepage'] ?? ''),
+                '업종: ' . ($row['channel'] ?? ''),
+                '',
+                '관리자 › 방문 일정에서 확인: https://vn.makenov.com/admin/',
+            ];
+            $this->sendMail($to, '[MAKENOV] 새 미팅 신청 — ' . ($row['company'] ?? ''), implode("\n", $lines));
+        } catch (\Throwable $e) {
+            log_message('error', 'meet notify: ' . $e->getMessage());
+        }
     }
 
     private function adminDeleteTrip(string $id): ResponseInterface

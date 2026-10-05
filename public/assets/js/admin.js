@@ -461,7 +461,7 @@ const NAV = [
   { id:'admins',   label:'관리자',   title:'관리자 계정',     desc:'콘솔에 로그인할 수 있는 계정을 관리합니다' },
   { id:'settings', label:'설정',     title:'설정 · 내보내기', desc:'배포용 데이터와 계정 관리' },
   /* 미팅 펀딩 — grp 로 따로 묶는다(위 slice 인덱스를 건드리지 않게 맨 끝에 둔다). 화면: admin-meet.js renderMeet */
-  { id:'meet', grp:'meet', label:'방문 일정', title:'미팅 펀딩 · 방문 일정', desc:'한국 공급사가 베트남에 오는 날을 올리고, 공급사별 신청 인원(목표 5곳)을 관리합니다' },
+  { id:'meet', grp:'meet', label:'행사 일정', title:'행사 일정 · 미팅 신청', desc:'공급사를 만나는 행사를 올리고, 행사 상세 정보와 공급사별 미팅 신청을 관리합니다' },
 ];
 let curTab = 'dash';
 

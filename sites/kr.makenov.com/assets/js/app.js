@@ -1070,6 +1070,23 @@ const MT_EVENT_X = {
     fixed: true,       // 날짜·장소가 정해져 그대로 열리는 행사 — '5곳이 모이면 확정 / 안 모이면 화상 미팅' 안내 대신 행사 진행 순서·행사용 FAQ 를 쓴다
   },
 };
+/* 행사 부가 정보 — 관리자 › 방문 일정에서 넣은 값(tr.extra)이 있으면 그것을, 없으면 위 표(MT_EVENT_X)를 쓴다.
+   mtEventPage 가 쓰는 모양({sub, band, name, venue, host, org, logos:[{src}], photo, map:{q,addr}, booth, growing, fixed, faq, perks})으로 맞춘다. */
+function mtEvX(tr){
+  const e = tr && tr.extra;
+  if(e && typeof e === 'object' && Object.keys(e).length){
+    const tri = o => (o && typeof o === 'object' && ['vi', 'ko', 'en'].some(l => String(o[l] || '').trim())) ? o : null;
+    return {
+      sub: tri(e.sub), band: tri(e.lead), name: tri(e.name), venue: tri(e.venue_detail), host: tri(e.host), org: tri(e.org),
+      logos: (Array.isArray(e.logos) ? e.logos : []).filter(Boolean).map(src => ({ src, alt: '' })),
+      photo: e.photo || '',
+      map: (e.map_q || tri(e.map_addr)) ? { q: e.map_q || '', addr: tri(e.map_addr) } : null,
+      booth: !!e.booth, growing: !!e.growing, fixed: !!e.fixed,
+      faq: Array.isArray(e.faq) ? e.faq : [], perks: Array.isArray(e.perks) ? e.perks : [],
+    };
+  }
+  return (tr && MT_EVENT_X[tr.id]) || {};
+}
 /* 행사 카드·일정 페이지가 같이 쓰는 공급사 카드(사진 · 달성 막대 · 미팅 신청) */
 function mtSupCard(tr, it){
   const p = mkProduct(it.product_id);
@@ -1116,7 +1133,7 @@ function mtKfGo(){ const el = document.getElementById('mt-kf-sups'); if(el) el.s
    2026-10-05: 따로 만든 히어로(그라데이션 · 알약 배지 · 떠 있는 날짜 배지)는 'AI 티가 난다'는 피드백으로 버리고 사이트 기존 컴포넌트로 통일.
    구역 순서(바이어 시점): 참가 공급사 → 행사 개요 → 무엇이 다른가 → 진행 방식 → 지원 내용 → 오시는 길 → FAQ */
 function mtEventPage(tr){
-  const x = MT_EVENT_X[tr.id] || {};
+  const x = mtEvX(tr);
   const items = MkMeet.itemsOf(tr);
   const title = L(tr.title) || t('mt_page_kick');
   const long = { year:'numeric', month:'long', day:'numeric', weekday:'short' };
@@ -1137,8 +1154,10 @@ function mtEventPage(tr){
     ? [1, 2, 3].map(n => step(n, t('mt_kf_s' + n + '_h'), t('mt_kf_s' + n + '_p'))).join('')
       + step(4, t('mt_kf_s4_h'), mtRep('mt_kf_s4_p', { d: tr.visit_date ? mtFmt(tr.visit_date, { month:'long', day:'numeric' }) : t('mt_date_tbd'), v: L(tr.venue) || L(tr.city) || '' }) + (x.booth ? ' ' + t('mt_kf_s4_interp') : ''))
     : [1, 2, 3].map(n => step(n, t('mt_step' + n + '_h'), t('mt_step' + n + '_p'))).join('');
-  const perks = ['mt_kf_b1', x.booth ? 'mt_kf_b2' : '', x.booth ? 'mt_kf_b3' : '', 'mt_kf_b4', 'mt_kf_b5'].filter(Boolean)
-    .map(k => `<li><span class="ck">✓</span><span>${esc(t(k))}</span></li>`).join('');
+  /* 지원 내용 · FAQ: 행사에 따로 넣은 것이 있으면 그것만, 없으면 사이트 기본 문구 */
+  const perkList = (x.perks && x.perks.length) ? x.perks.map(pk => L(pk)).filter(Boolean)
+    : ['mt_kf_b1', x.booth ? 'mt_kf_b2' : '', x.booth ? 'mt_kf_b3' : '', 'mt_kf_b4', 'mt_kf_b5'].filter(Boolean).map(k => t(k));
+  const perks = perkList.map(v => `<li><span class="ck">✓</span><span>${esc(v)}</span></li>`).join('');
   /* 오시는 길 — 구글 지도(키 없이 되는 embed). 행사 표에 map 이 없으면 행사장·도시 이름으로 찾는다 */
   const mapQ = (x.map && x.map.q) || [tr.venue && (tr.venue.en || L(tr.venue)), tr.city && (tr.city.en || L(tr.city))].filter(Boolean).join(', ');
   const mapSec = mapQ && (x.map || String(L(tr.venue) || '').trim()) ? `<section class="pd-sec">
@@ -1148,9 +1167,11 @@ function mtEventPage(tr){
         <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQ)}" target="_blank" rel="noopener">${esc(t('mt_kf_map_open'))} →</a></div>
     </section>` : '';
   /* 행사용 FAQ(바이어 시점) — 비용 · 대상 · 신청 방법 · 신청 후 · 마감 · 통역 · 여러 공급사 · 준비물. 첫 질문은 펼쳐 둔다 */
-  const faq = x.fixed ? `<section class="pd-sec">
+  const faqRows = (x.faq && x.faq.length) ? x.faq.map(f => [L(f.q), L(f.a)]).filter(r => r[0] && r[1])
+    : x.fixed ? [1, 2, 3, 4, dlLong ? 5 : 0, x.booth ? 6 : 0, 7, 8].filter(Boolean).map(n => [t('mt_kf_q' + n), mtRep('mt_kf_a' + n, { d: dlLong })]) : [];
+  const faq = faqRows.length ? `<section class="pd-sec">
       <h2>${esc(t('mt_faq_h'))}</h2>
-      <div class="kf-faq">${[1, 2, 3, 4, dlLong ? 5 : 0, x.booth ? 6 : 0, 7, 8].filter(Boolean).map((n, i) => `<details${i ? '' : ' open'}><summary><span>${esc(t('mt_kf_q' + n))}</span></summary><p>${esc(mtRep('mt_kf_a' + n, { d: dlLong }))}</p></details>`).join('')}</div>
+      <div class="kf-faq">${faqRows.map(([q, a], i) => `<details${i ? '' : ' open'}><summary><span>${esc(q)}</span></summary><p>${esc(a)}</p></details>`).join('')}</div>
     </section>` : '';
   return `<div class="wrap"><div class="pd-row mt-on ev-row" id="trip-${esc(tr.id)}">
     <div class="pd-main">
@@ -1224,7 +1245,7 @@ function mtEventsAll(){
 function mtEventRow(tr){
   const kind = mtEventKind(tr), d = mtDate(tr.visit_date);
   const items = MkMeet.itemsOf(tr);
-  const x = MT_EVENT_X[tr.id] || {};
+  const x = mtEvX(tr);
   /* 왼쪽 칸: 참가 제품 사진 모음(최대 4칸, 더 있으면 마지막 칸에 +n) — 행사 사진보다 무엇을 만나는지가 먼저 보이게(2026-10-05) */
   const pics = items.slice(0, 4).map((it, i) => `<span class="pi" style="background-image:url('${esc(mkProduct(it.product_id).img)}')">${i === 3 && items.length > 4 ? `<em>+${items.length - 4}</em>` : ''}</span>`).join('');
   const st = kind === 'past' ? t('mt_tab_past') : kind === 'open' ? t('mt_st_open') : t('mt_st_' + mtTripState(tr));
