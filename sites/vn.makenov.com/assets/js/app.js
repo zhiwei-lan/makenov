@@ -1065,7 +1065,7 @@ function mtMini(tr){
    표에 없는 일정은 로고·주관 줄 없이 같은 틀로 나온다. 화면은 아래 mtEventPage. */
 const MT_EVENT_X = {
   'hcm-20261203': {
-    photo: 'https://kfesta.vn/assets/img/beauty/day1-vip.webp',
+    photo: 'https://images.unsplash.com/photo-1663670889635-0aabebf112ba?auto=format&fit=crop&w=1600&q=80',   // 대구 시내 전경(Unsplash 무료 라이선스, HFNY4) — 다른 행사(Beauty KFESTA) 현장 사진 대신
     logos: [
       { src: 'https://kfesta.vn/assets/img/daegu-ci.webp', alt: 'Daegu Metropolitan City' },   // KFESTA 로고는 뺐다(2026-10-05 사용자 지시) — 대구시 로고만
     ],
