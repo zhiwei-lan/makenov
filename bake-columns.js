@@ -339,6 +339,11 @@ function autoLink(html, { lang, selfHref, fileOf, cid }){
 }
 
 /* 살균 → 수리 → CSS 스코핑 순서. 요약 후보(desc)도 같이 돌려준다. */
+/* 본문 끝 안내 상자(<section class="cta">)의 버튼 — 원고에는 옛 방식('사업자 인증하고 공급사 보기' → 첫 화면)으로 들어 있다.
+   가입·인증 없이 미팅을 신청하는 방식으로 바뀌어(2026-10) 버튼만 행사 일정으로 보낸다. 원고(DB)는 건드리지 않는다. */
+const fixBodyCta = (html, lang) => String(html || '').replace(/(<section class="cta">)([\s\S]*?)(<\/section>)/g, (m, a, mid, z) =>
+  a + mid.replace(/<a\b[^>]*class="btn[^"]*"[^>]*>([\s\S]*?)<\/a>/g, (am, txt) =>
+    /xác thực|xác minh|인증|verif/i.test(txt) ? `<a class="btn" href="meetings.html">${esc(t(lang, 'promo_btn'))}</a>` : am) + z);
 const prepBody = (html, cid, opt) => {
   opt = opt || {};
   const r = sanitizeBody(html, cid, opt);
@@ -347,6 +352,7 @@ const prepBody = (html, cid, opt) => {
   if(opt.rel) s = fixFragments(s, opt.rel, cid);
   s = tuneImages(s);
   if(opt.lang && opt.fileOf) s = autoLink(s, { lang: opt.lang, selfHref: opt.rel, fileOf: opt.fileOf, cid });
+  if(opt.lang) s = fixBodyCta(s, opt.lang);
   return { html: scopeBody(s), desc: r.desc };
 };
 const clip = (s, n) => { s = String(s ?? '').trim(); return s.length > n ? s.slice(0, n - 1).trim() + '…' : s; };
@@ -438,12 +444,12 @@ const t = (lang, key) => String(((I18N[lang] || I18N.vi || {})[key]) || '');
 /* 읽는 시간 — app.js readTime() 과 같은 계산 */
 const readTimeOf = (html, lang) => Math.max(1, Math.round(stripHtml(html).length / 450)) + t(lang, 'read_min');
 
-/* 가입 유도 블록 — 예전에는 page-column.js 가 런타임에 붙였다. 구운 페이지를 다시
+/* 안내 블록(미팅 신청 → 행사 일정으로 보낸다. 예전에는 가입 창을 열었다) — 예전에는 page-column.js 가 런타임에 붙였다. 구운 페이지를 다시
    그리지 않게 바꾸면서(2026-08-28) 굽기 쪽으로 옮겼다. 문구는 i18n.js 에서 읽는다. */
 function staticColCta(lang){
   if(!t(lang, 'promo_title')) return '';
   return `\n  <div class="blog-cta"><h3>${esc(t(lang, 'promo_title'))}</h3><p>${esc(t(lang, 'promo_desc'))}</p>` +
-    `<button class="btn btn-primary btn-lg" onclick="openAuth('signup')">${esc(t(lang, 'promo_btn'))}</button></div>`;
+    `<a class="btn btn-primary btn-lg" href="meetings.html">${esc(t(lang, 'promo_btn'))}</a></div>`;
 }
 
 function staticFooter(lang){
@@ -451,7 +457,7 @@ function staticFooter(lang){
   return `
   <div class="wrap"><div class="brand"><div class="logo"><span>MAKE<b>NOV</b></span></div><p class="desc">${esc(t(lang, 'ft_desc'))}</p><a class="mail" href="mailto:notice@makenov.com">notice@makenov.com</a></div>` +
   `<div><h4>${esc(t(lang, 'ft_platform'))}</h4>${a('products.html', 'nav_directory')}${a('companies.html', 'nav_companies')}${a('columns.html', 'nav_columns')}</div>` +
-  `<div><h4>${esc(t(lang, 'ft_partner'))}</h4>${a('mypage.html', 'ft_join')}${a('mypage.html', 'ft_verify')}${a('maker.html', 'util_maker')}</div>` +
+  `<div><h4>${esc(t(lang, 'ft_partner'))}</h4>${a('mypage.html', 'ft_join')}${a('maker.html', 'util_maker')}</div>` +
   `<div><h4>${esc(t(lang, 'ft_support'))}</h4>${a('support.html', 'nav_support')}${a('guide.html', 'nav_guide')}${a('support.html#ask', 'ft_contact')}${a('sitemap.html', 'ft_sitemap')}</div></div>` +
   `<div class="base"><span>© 2026 MAKENOV. All rights reserved.</span></div>`;
 }

@@ -88,7 +88,10 @@ function colSanitizeBody(html, hasCat){
   return s.replace(/^\s+/, '');
 }
 function colScopeBody(html, hasCat){
-  return colSanitizeBody(html, hasCat).replace(/(<style[^>]*>)([\s\S]*?)(<\/style>)/gi,
+  /* 본문 끝 안내 상자의 옛 버튼('사업자 인증하고 공급사 보기')은 행사 일정으로 — bake-columns.js fixBodyCta 와 같은 규칙 */
+  return colSanitizeBody(html, hasCat).replace(/(<section class="cta">)([\s\S]*?)(<\/section>)/g, (m, a, mid, z) =>
+    a + mid.replace(/<a\b[^>]*class="btn[^"]*"[^>]*>([\s\S]*?)<\/a>/g, (am, txt) =>
+      /xác thực|xác minh|인증|verif/i.test(txt) ? `<a class="btn" href="meetings.html">${esc(t('promo_btn'))}</a>` : am) + z).replace(/(<style[^>]*>)([\s\S]*?)(<\/style>)/gi,
     (m, open, css, close) => open + colScopeCss(css) + close);
 }
 /* 칼럼별 FAQ — 관리자 FAQ 탭에서 '위치'를 이 칼럼으로 지정한 항목만 모은다.
@@ -136,7 +139,7 @@ function pageInit(){
       <span>${esc(L(c.title))}</span></nav><span class="blog-single-cat">${esc(L(c.cat))}</span><h1>${esc(L(c.title))}</h1><div class="blog-single-meta"><span>${esc(c.date)}</span><i></i><span>${colRead(c)}</span></div><div class="blog-cover"><img src="${c.img}" alt="${esc(L(c.title))}" fetchpriority="high" decoding="async"></div><div class="blog-body">${colScopeBody(L(c.body), !!L(c.cat))}</div><div class="blog-nav">
       ${prev ? `<a href="${mkDocUrl('column',prev.id)}"><div class="dir" data-i18n="col_prev"></div><b>${esc(L(prev.title))}</b></a>` : '<span></span>'}
       ${next ? `<a class="next" href="${mkDocUrl('column',next.id)}"><div class="dir" data-i18n="col_next"></div><b>${esc(L(next.title))}</b></a>` : '<span></span>'}
-    </div>${colFaq(c.id)}<div class="blog-cta"><h3 data-i18n="promo_title"></h3><p data-i18n="promo_desc"></p><button class="btn btn-primary btn-lg" onclick="openAuth('signup')" data-i18n="promo_btn"></button></div>`;
+    </div>${colFaq(c.id)}<div class="blog-cta"><h3 data-i18n="promo_title"></h3><p data-i18n="promo_desc"></p><a class="btn btn-primary btn-lg" href="meetings.html" data-i18n="promo_btn"></a></div>`;
 
   /* 다른 칼럼 */
   const others = MK_COLUMNS.filter(x=>x.id!==c.id).slice(0,2);
