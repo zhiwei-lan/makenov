@@ -1200,27 +1200,33 @@ function mtEventsAll(){
   const up = MkMeet.upcoming().filter(ok), past = MkMeet.past().filter(ok);
   return up.filter(tr => tr.open).concat(up.filter(tr => !tr.open), past);
 }
+/* 목록의 한 줄(2차, 2026-10-05) — 사진(날짜 배지) | 상태·행사명·일시·장소·마감·참가 제품 | 남은 기간 + 버튼.
+   1차(얇은 한 줄)는 가운데가 텅 비어 보인다는 피드백으로 교체. 사진은 행사 사진, 없으면 첫 참가 제품 사진 */
 function mtEventRow(tr){
   const kind = mtEventKind(tr), d = mtDate(tr.visit_date);
   const items = MkMeet.itemsOf(tr);
-  const st = kind === 'past' ? t('mt_tab_past') : kind === 'open'
-    ? t('mt_st_open') + (tr.days_left != null && tr.days_left > 0 ? ' · D-' + tr.days_left : '')
-    : t('mt_st_' + mtTripState(tr));
-  const thumbs = items.slice(0, 4).map(it => `<img src="${esc(mkProduct(it.product_id).img)}" alt="" loading="lazy">`).join('')
-    + (items.length > 4 ? `<span>+${items.length - 4}</span>` : '');
+  const x = MT_EVENT_X[tr.id] || {};
+  const photo = x.photo || (items[0] && mkProduct(items[0].product_id).img) || '';
+  const st = kind === 'past' ? t('mt_tab_past') : kind === 'open' ? t('mt_st_open') : t('mt_st_' + mtTripState(tr));
+  const thumbs = items.slice(0, 5).map(it => `<img src="${esc(mkProduct(it.product_id).img)}" alt="" loading="lazy">`).join('')
+    + (items.length > 5 ? `<span>+${items.length - 5}</span>` : '');
+  const side = kind === 'open'
+    ? `<span class="lb">${esc(t('mt_ev_until'))}</span><b>${tr.days_left != null && tr.days_left > 0 ? 'D-' + tr.days_left : esc(t('mt_dday_today'))}</b><span class="btn btn-primary">${esc(t('mt_list_go'))}</span>`
+    : `<b class="off">${esc(st)}</b><span class="btn btn-ghost">${esc(t('mt_list_go'))}</span>`;
   return `<a class="mt-evl ${kind}" href="${mkUrl('meetings.html')}#trip-${esc(tr.id)}">
-    <div class="mt-evd-date"><span class="mo">${esc(mtFmt(tr.visit_date, { month:'long' }))}</span><b>${d ? String(d.getDate()).padStart(2, '0') : ''}</b><span class="dw">${esc(mtFmt(tr.visit_date, { weekday:'long' }))}</span></div>
+    <div class="ph">${photo ? `<img src="${esc(photo)}" alt="" loading="lazy">` : ''}
+      <div class="mt-evd-date"><span class="mo">${esc(mtFmt(tr.visit_date, { month:'long' }))}</span><b>${d ? String(d.getDate()).padStart(2, '0') : ''}</b><span class="dw">${esc(mtFmt(tr.visit_date, { weekday:'long' }))}</span></div></div>
     <div class="mt-evl-main">
       <span class="mt-evl-st">${esc(st)}</span>
-      <h3>${esc(L(tr.title) || t('mt_page_kick'))}</h3>
+      <h3>${esc(L(tr.title) || t('mt_page_kick'))}${x.sub ? `<small>${esc(L(x.sub))}</small>` : ''}</h3>
       <ul class="meta">
-        <li>${MT_ICO.cal}<span>${esc(mtFmt(tr.visit_date, { year:'numeric', month:'long', day:'numeric' }))}${mtTime(tr) ? ' · ' + esc(mtTime(tr)) : ''}</span></li>
+        <li>${MT_ICO.cal}<span>${esc(mtFmt(tr.visit_date, { year:'numeric', month:'long', day:'numeric', weekday:'short' }))}${mtTime(tr) ? ' · ' + esc(mtTime(tr)) : ''}</span></li>
         <li>${MT_ICO.pin}<span>${esc(mtWhere(tr) || t('mt_tba'))}</span></li>
         ${tr.deadline && kind !== 'past' ? `<li>${MT_ICO.clock}<span>${esc(t('mt_deadline'))} ${esc(mtFmt(tr.deadline, { month:'long', day:'numeric', weekday:'short' }))}</span></li>` : ''}
       </ul>
+      <div class="mt-evl-thumbs">${thumbs}</div>
     </div>
-    <div class="mt-evl-thumbs">${thumbs}</div>
-    <span class="mt-evl-go">${esc(t('mt_list_go'))} →</span>
+    <div class="mt-evl-side">${side}</div>
   </a>`;
 }
 let _mtListTab = 'all';
