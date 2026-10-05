@@ -160,9 +160,9 @@ const LND = {
    "en": "What is MAKENOV?"
   },
   "a1": {
-   "vi": "MAKENOV là nền tảng B2B kết nối nhà cung cấp Hàn Quốc với nhà phân phối tại Việt Nam.\nBạn xem sản phẩm, đăng ký gặp mặt và trao đổi trực tiếp với đại diện nhà cung cấp.\nChúng tôi cũng hỗ trợ giao tiếp và sắp xếp lịch gặp.",
-   "ko": "메이크노브는 한국 공급사와 베트남 유통사를 연결하는 B2B 플랫폼입니다.\n제품을 살펴보고 미팅을 신청하면 공급사 담당자를 직접 만나 상담할 수 있습니다.\n소통과 일정 조율도 함께 지원합니다.",
-   "en": "MAKENOV is a B2B platform connecting Korean suppliers with distributors in Vietnam.\nBrowse products, request a meeting and talk to the supplier in person.\nWe also support communication and scheduling.",
+   "vi": "MAKENOV là nền tảng B2B kết nối nhà cung cấp sản phẩm tiên phong toàn cầu với nhà phân phối tại Việt Nam.\nBạn xem sản phẩm, đăng ký gặp mặt và trao đổi trực tiếp với đại diện nhà cung cấp.\nChúng tôi cũng hỗ trợ giao tiếp và sắp xếp lịch gặp.",
+   "ko": "메이크노브는 글로벌 혁신 제품의 공급사와 베트남 유통사를 연결하는 B2B 플랫폼입니다.\n제품을 살펴보고 미팅을 신청하면 공급사 담당자를 직접 만나 상담할 수 있습니다.\n소통과 일정 조율도 함께 지원합니다.",
+   "en": "MAKENOV is a B2B platform connecting suppliers of innovative global products with distributors in Vietnam.\nBrowse products, request a meeting and talk to the supplier in person.\nWe also support communication and scheduling.",
    "_br": 1
   },
   "q2": {

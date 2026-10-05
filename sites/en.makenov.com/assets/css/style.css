@@ -127,12 +127,12 @@ button{font-family:var(--font-body);cursor:pointer;border:none;background:none;c
 .mk-lang a{display:flex;align-items:center;justify-content:center;padding:5px 9px;font-size:12px;font-weight:600;color:var(--mk-muted)}
 .mk-lang a.on{background:var(--mk-ink);color:#fff}
 .mk-lang-mobile{display:none;position:relative}
-.mk-lang-mobile summary{list-style:none;width:76px;height:38px;display:flex;align-items:center;justify-content:center;gap:7px;
+.mk-lang-mobile summary{list-style:none;width:58px;height:38px;display:flex;align-items:center;justify-content:center;gap:7px;
   border:1px solid var(--mk-line-strong);border-radius:7px;background:#fff;color:var(--mk-ink);font-size:13px;cursor:pointer}
 .mk-lang-mobile summary::-webkit-details-marker{display:none}
 .mk-lang-mobile summary::after{content:"";width:5px;height:5px;border-right:1.5px solid var(--mk-muted);border-bottom:1.5px solid var(--mk-muted);transform:translateY(-2px) rotate(45deg)}
 .mk-lang-mobile[open] summary::after{transform:translateY(2px) rotate(225deg)}
-.mk-lang-mobile .flag{font-size:16px;line-height:1}
+.mk-lang-mobile .flag{font-size:11.5px;font-weight:700;line-height:1;color:var(--mk-muted);min-width:20px}
 .mk-lang-mobile .menu{position:absolute;right:0;top:44px;width:148px;padding:5px;background:#fff;border:1px solid var(--mk-line);
   border-radius:7px;box-shadow:0 10px 28px rgba(0,0,0,.12);z-index:220}
 .mk-lang-mobile .menu a{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:5px;font-size:13px;color:var(--mk-body)}
@@ -2222,3 +2222,7 @@ img.lg-trim{object-fit:contain!important;box-sizing:border-box;padding:7px;backg
 .co-card .lg,.co-head .lg{object-fit:contain;padding:5px;box-sizing:border-box}
 .co-head .lg{padding:8px}
 .co-inline img{object-fit:contain}
+
+/* 전체 점검(2026-10-05)에서 나온 모바일 가로 넘침 2곳 */
+.nb-search input{min-width:0}
+.blog-body a.btn,section.cta a.btn{max-width:100%;height:auto;white-space:normal;text-align:center;line-height:1.4}

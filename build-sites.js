@@ -135,7 +135,11 @@ function stripLangPrefix(html, dir){
    각 언어의 호스트 절대주소로 바꾼다 */
 function absolutizeLangSwitch(html){
   return html.replace(/(<a data-lang=")(vi|ko|en)(" href=")\/(?:ko\/|en\/)?([^"]*)"/g,
-    (m, a, lang, b, rest) => a + lang + b + 'https://' + HOSTS[lang] + '/' + rest + '"');
+    (m, a, lang, b, rest) => a + lang + b + 'https://' + HOSTS[lang] + '/' + rest + '"')
+    /* 모바일 언어 메뉴(<details class="mk-lang-mobile">)는 data-lang 이 없고 onclick 의 언어로만 구분된다 —
+       사본에 /ko/… /en/… 로 구워져 서브도메인에서 404 였다(2026-10-05 전체 점검) */
+    .replace(/(<a class="[^"]*" href=")\/(?:ko\/|en\/)?([^"]*)(" onclick="localStorage\.setItem\('mk_lang','(vi|ko|en)'\)")/g,
+      (m, a, rest, c, lang) => a + 'https://' + HOSTS[lang] + '/' + rest + c);
 }
 
 function writeLegacyHomeRedirects(dst){
