@@ -38,7 +38,7 @@ let meetCache = { trips: [], reqs: [], cfg: null };
 let meetEdit = null;      // null = 목록, '' = 새 일정, id = 수정
 let meetReqTrip = null;   // 신청자 목록을 펼친 일정 id
 const MEET_ST = { open:'모집 중', confirmed:'방문 확정', closed:'마감', cancelled:'취소' };
-const MEET_REQ_ST = { applied:'신청', met:'미팅 완료', noshow:'불참', cancelled:'바이어 취소' };
+const MEET_REQ_ST = { applied:'신청', contacted:'연락함', met:'미팅 완료', noshow:'불참', cancelled:'바이어 취소' };
 const MEET_CH = { pharmacy:'약국', cosmetic:'화장품 매장', mart:'마트·편의점', online:'온라인', dist:'도매·대리점', other:'기타' };
 
 function meetPname(pid){ const p = (typeof MK_PRODUCTS !== 'undefined' ? MK_PRODUCTS : []).find(x => x.id === pid); return p ? `${p.brand} · ${triText(p.name)}` : pid + ' (없는 제품)'; }

@@ -31,7 +31,7 @@ class Meet extends BaseApiController
     private const TZ = 'Asia/Ho_Chi_Minh';
     private const TRIP_JSON = ['title', 'city', 'venue', 'summary'];
     private const STATUSES_TRIP = ['open', 'confirmed', 'closed', 'cancelled'];
-    private const STATUSES_REQ  = ['applied', 'cancelled', 'met', 'noshow'];
+    private const STATUSES_REQ  = ['applied', 'contacted', 'cancelled', 'met', 'noshow'];   // contacted = 담당자가 연락함(2026-10-06 문의함 통합)
 
     public function handle(string ...$segs): ResponseInterface
     {

@@ -442,7 +442,7 @@ function imgSrc(v){
 const TABS = ['dash','meet','inq','leads','buyers','aff_campaigns','aff_leads','aff_withdrawals','aff_marketers','aff_settings','products','companies','columns','faq','notices','copy','seo','admins','settings'];
 const NAV = [
   { id:'dash',     label:'대시보드', title:'대시보드',      desc:'플랫폼 현황 한눈에 보기' },
-  { id:'inq',      label:'문의함',   title:'문의함',        desc:'유통 파트너가 보낸 견적 문의' },
+  { id:'inq',      label:'문의함',   title:'문의함',        desc:'미팅 신청 · 고객센터 1:1 문의 · 예전 견적 문의를 한곳에서' },
   { id:'leads',    label:'입점문의', title:'입점 문의',      desc:'제품 등록 랜딩(maker.html)으로 들어온 공급사' },
   { id:'buyers',   label:'유통 파트너',   title:'유통 파트너 관리',    desc:'사업자 인증을 통과한 회원' },
   /* 제휴(CTV) — 기능이 계속 붙을 곳이라 한 탭에 합치지 않고 페이지 하나씩. 새 페이지 = 여기 + TABS + index.html section + admin-aff.js renderAff 분기 */
@@ -467,8 +467,9 @@ let curTab = 'dash';
 
 function renderNav(){
   const inqs = ADM.inqs;
-  const newCnt = inqs.filter(i=>Admin.inqMeta(i.id).status==='new').length;
-  const newLeads = ADM.leads.filter(l=>Admin.leadMeta(l.id).status==='new').length;
+  if(inboxMeet === null && !window._inboxLoading){ window._inboxLoading = 1; inboxLoadMeet().then(()=>{ renderNav(); if(curTab==='inq') renderInq(); if(curTab==='dash') renderDash(); }); }
+  const newCnt = inboxNewCount();                                            // 미팅 신청 + 고객센터 문의 + 예전 견적 문의의 신규
+  const newLeads = ADM.leads.filter(l=>l.cat!=='support' && Admin.leadMeta(l.id).status==='new').length;
   const counts = { inq:newCnt||'', leads:newLeads||'', buyers:ADM.buyers.length||'',
                    products:MK_PRODUCTS.length, companies:MK_COMPANIES.length, columns:MK_COLUMNS.length,
                    faq:(typeof MK_FAQ!=='undefined'?MK_FAQ.length:''),
@@ -541,7 +542,7 @@ function renderAll(){
 const LEAD_ST = { new:'신규', contacted:'연락함', onboarding:'등록 진행', done:'입점 완료', drop:'보류' };
 
 function renderLeads(){
-  const leads = ADM.leads;
+  const leads = ADM.leads.filter(l=>l.cat!=='support');   // 고객센터 1:1 문의(cat:'support')는 문의함에서 본다
   const cnt = k => leads.filter(l=>Admin.leadMeta(l.id).status===k).length;
 
   document.getElementById('tab-leads').innerHTML = `
@@ -560,7 +561,7 @@ function catLabel(id){
 }
 function exportLeadsCsv(){
   const rows = [['접수일','회사명','담당자','연락처','이메일','홈페이지','카테고리','제품소개','상태','메모']];
-  ADM.leads.forEach(l=>{
+  ADM.leads.filter(l=>l.cat!=='support').forEach(l=>{
     const m = Admin.leadMeta(l.id);
     rows.push([l.createdAt, l.company, l.name, l.tel, l.email, l.site||'', catLabel(l.cat),
                String(l.message).replace(/\r?\n/g,' '), LEAD_ST[m.status]||m.status, m.memo||'']);
@@ -575,7 +576,8 @@ function exportLeadsCsv(){
 function renderDash(){
   const inqs   = ADM.inqs.sort((a,b)=>b.createdAt.localeCompare(a.createdAt));
   const buyers = ADM.buyers.sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt)));
-  const newCnt = inqs.filter(i=>Admin.inqMeta(i.id).status==='new').length;
+  const inbox  = inboxAll();                                   // 미팅 신청 + 고객센터 문의 + 예전 견적 문의
+  const newCnt = inboxNewCount();
   const vipCnt = buyers.filter(b=>Admin.tier(b.email)==='vip').length;
   const ntsCnt = buyers.filter(b=>['gov','nts'].includes(b.verifiedBy)).length;
 
@@ -584,19 +586,18 @@ function renderDash(){
     const d = new Date(); d.setDate(d.getDate()-(6-i));
     const key = d.toISOString().slice(0,10);
     return { label:(d.getMonth()+1)+'/'+d.getDate(),
-             n: inqs.filter(x=>String(x.createdAt).slice(0,10)===key).length };
+             n: inbox.filter(x=>String(x.at).slice(0,10)===key).length };
   });
   const peak = Math.max(1, ...days.map(d=>d.n));
 
   document.getElementById('tab-dash').innerHTML = `
-    <div class="kpi"><div class="kpi-card"><div class="lbl">누적 문의</div><div class="num">${inqs.length}</div><div class="sub">미처리 <b>${newCnt}</b>건</div></div><div class="kpi-card"><div class="lbl">인증 유통 파트너</div><div class="num">${buyers.length}</div><div class="sub">VIP <b>${vipCnt}</b> · 정부DB인증 <b>${ntsCnt}</b></div></div><div class="kpi-card"><div class="lbl">등록 제품</div><div class="num">${MK_PRODUCTS.length}</div><div class="sub">추천 <b>${MK_PRODUCTS.filter(p=>p.featured).length}</b>건 · 숨김 <b>${MK_PRODUCTS.filter(p=>p.published===false).length}</b>건</div></div><div class="kpi-card"><div class="lbl">칼럼</div><div class="num">${MK_COLUMNS.length}</div><div class="sub">발행됨</div></div></div><div class="card"><div class="card-head"><h3>최근 7일 문의 추이</h3><span class="sp"></span><span class="note" style="margin:0">최대 ${peak}건</span></div><div style="display:flex;align-items:flex-end;gap:10px;height:130px;padding-top:6px">
+    <div class="kpi"><div class="kpi-card"><div class="lbl">누적 문의</div><div class="num">${inbox.length}</div><div class="sub">미처리 <b>${newCnt}</b>건</div></div><div class="kpi-card"><div class="lbl">인증 유통 파트너</div><div class="num">${buyers.length}</div><div class="sub">VIP <b>${vipCnt}</b> · 정부DB인증 <b>${ntsCnt}</b></div></div><div class="kpi-card"><div class="lbl">등록 제품</div><div class="num">${MK_PRODUCTS.length}</div><div class="sub">추천 <b>${MK_PRODUCTS.filter(p=>p.featured).length}</b>건 · 숨김 <b>${MK_PRODUCTS.filter(p=>p.published===false).length}</b>건</div></div><div class="kpi-card"><div class="lbl">칼럼</div><div class="num">${MK_COLUMNS.length}</div><div class="sub">발행됨</div></div></div><div class="card"><div class="card-head"><h3>최근 7일 문의 추이</h3><span class="sp"></span><span class="note" style="margin:0">최대 ${peak}건</span></div><div style="display:flex;align-items:flex-end;gap:10px;height:130px;padding-top:6px">
         ${days.map(d=>`
           <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:7px;height:100%"><div style="flex:1;width:100%;display:flex;align-items:flex-end"><div title="${d.n}건" style="width:100%;height:${Math.round((d.n/peak)*100)}%;min-height:3px;
                 background:${d.n?'var(--mk-primary)':'#E9ECEF'};border-radius:5px 5px 0 0"></div></div><span style="font-size:11px;color:var(--adm-sub)">${d.label}</span></div>`).join('')}
-      </div></div><div class="card"><div class="card-head"><h3>최근 문의</h3><span class="sp"></span><button class="btn btn-ghost btn-sm" onclick="showTab('inq')">전체 보기</button></div><div class="tbl-wrap"><table><thead><tr><th style="width:96px">일시</th><th>제품</th><th>회사</th><th>담당자</th><th style="width:76px">상태</th></tr></thead><tbody>${inqs.length ? inqs.slice(0,5).map(i=>{
-          const p=mkProduct(i.pid), m=Admin.inqMeta(i.id), lb=ST_LABEL[m.status]||ST_LABEL.new;
-          return `<tr><td>${new Date(i.createdAt).toLocaleDateString('ko-KR')}</td><td>${p?esc(p.name.ko||p.name.vi):esc(i.pid)}</td><td>${esc(i.company||'-')}</td><td>${esc(i.contactName||'-')}</td><td><span class="pill-st ${lb[1]}">${lb[0]}</span></td></tr>`;
-        }).join('') : `<tr class="empty-row"><td colspan="5">아직 접수된 문의가 없습니다</td></tr>`}</tbody></table></div></div><div class="card"><div class="card-head"><h3>최근 가입 유통 파트너</h3><span class="sp"></span><button class="btn btn-ghost btn-sm" onclick="showTab('buyers')">전체 보기</button></div><div class="tbl-wrap"><table><thead><tr><th style="width:96px">가입일</th><th>국가</th><th>회사</th><th>인증</th><th style="width:76px">등급</th></tr></thead><tbody>${buyers.length ? buyers.slice(0,5).map(b=>{
+      </div></div><div class="card"><div class="card-head"><h3>최근 문의</h3><span class="sp"></span><button class="btn btn-ghost btn-sm" onclick="showTab('inq')">전체 보기</button></div><div class="tbl-wrap"><table><thead><tr><th style="width:96px">일시</th><th style="width:96px">구분</th><th>제품 · 내용</th><th>회사</th><th>담당자</th><th style="width:86px">상태</th></tr></thead><tbody>${inbox.length ? inbox.slice(0,6).map(x=>
+          `<tr><td>${esc(String(x.at).slice(0,10))}</td><td>${esc(x.kind)}</td><td>${esc(x.title)}</td><td>${esc(x.company||'-')}</td><td>${esc(x.name||'-')}</td><td><span class="pill-st ${x.cls}">${esc(x.st)}</span></td></tr>`
+        ).join('') : `<tr class="empty-row"><td colspan="6">아직 접수된 문의가 없습니다</td></tr>`}</tbody></table></div></div><div class="card"><div class="card-head"><h3>최근 가입 유통 파트너</h3><span class="sp"></span><button class="btn btn-ghost btn-sm" onclick="showTab('buyers')">전체 보기</button></div><div class="tbl-wrap"><table><thead><tr><th style="width:96px">가입일</th><th>국가</th><th>회사</th><th>인증</th><th style="width:76px">등급</th></tr></thead><tbody>${buyers.length ? buyers.slice(0,5).map(b=>{
           const c=b.country?mkCountry(b.country):null, tier=Admin.tier(b.email);
           return `<tr><td>${b.createdAt?new Date(b.createdAt).toLocaleDateString('ko-KR'):'-'}</td><td>${c?c.flag:''} ${esc(b.countryName||'')}</td><td>${esc(b.company)}</td><td>${esc(VERIFY_LABEL[b.verifiedBy]||'-')}</td><td>${tier==='vip'?'<span class="pill-st st-vip">VIP</span>':'<span class="pill-st st-done">인증</span>'}</td></tr>`;
         }).join('') : `<tr class="empty-row"><td colspan="5">아직 가입한 유통 파트너가 없습니다</td></tr>`}</tbody></table></div></div><div class="card"><div class="card-head"><h3>바로가기</h3></div><div class="bar" style="margin:0"><button class="btn btn-primary btn-sm" onclick="showTab('products');pEditing='';pBlocks=[];renderProducts()">+ 제품 등록</button><button class="btn btn-ghost btn-sm" onclick="showTab('columns');cEditing='';renderColumns()">+ 칼럼 작성</button><button class="btn btn-ghost btn-sm" onclick="showTab('settings')">data.js 내보내기</button></div></div>`;
@@ -639,7 +640,7 @@ function filteredInqs(){
   return list.slice().sort(S[inqSort] || S.new);
 }
 
-function renderInq(){
+function renderInqQuote(){
   const all = (ADM.inqs||[]).slice().sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt)));
   const list = filteredInqs();
   const cnt = s => all.filter(i=>Admin.inqMeta(i.id).status===s).length;
@@ -650,8 +651,8 @@ function renderInq(){
   const opt = (v,cur,label)=>`<option value="${esc(v)}" ${cur===v?'selected':''}>${esc(label)}</option>`;
   const filtered = (inqSearch || inqProd!=='all' || inqFilter!=='all' || inqSort!=='new');
 
-  document.getElementById('tab-inq').innerHTML = `
-    <div class="card"><p class="note">유통 파트너가 보낸 견적 문의입니다. <b>행을 누르면 문의 전문과 유통 파트너 정보</b>가 열립니다.</p>
+  document.getElementById('inq-body').innerHTML = `
+    <div class="card"><p class="note">예전 방식(가입 → 견적 문의)으로 들어온 문의입니다. <b>행을 누르면 문의 전문과 유통 파트너 정보</b>가 열립니다.</p>
     <div class="bar"><button class="btn btn-sm ${inqFilter==='all'?'btn-primary':'btn-ghost'}" onclick="inqFilter='all';renderInq()">전체 ${all.length}</button><button class="btn btn-sm ${inqFilter==='new'?'btn-primary':'btn-ghost'}" onclick="inqFilter='new';renderInq()">신규 ${cnt('new')}</button><button class="btn btn-sm ${inqFilter==='doing'?'btn-primary':'btn-ghost'}" onclick="inqFilter='doing';renderInq()">처리중 ${cnt('doing')}</button><button class="btn btn-sm ${inqFilter==='done'?'btn-primary':'btn-ghost'}" onclick="inqFilter='done';renderInq()">완료 ${cnt('done')}</button></div>
     <div class="bar">
       <input class="srch" style="min-width:220px" placeholder="회사·담당자·제품·내용·메모 검색" value="${esc(inqSearch)}" oninput="inqSearch=this.value;renderInq()">
@@ -673,6 +674,104 @@ function renderInq(){
               onclick="if(confirm('이 문의를 삭제할까요?')){admDo(Admin.deleteInquiry('${i.id}'),0);}">삭제</button></td></tr>`;
       }).join('') : `<tr class="empty-row"><td colspan="6">${all.length?'조건에 맞는 문의가 없습니다':'아직 들어온 문의가 없습니다'}</td></tr>`}
       </tbody></table></div></div>`;
+}
+
+
+/* ===== 문의함 통합(2026-10-06 사용자 요청) — 미팅 신청 · 고객센터 1:1 문의도 문의함에서 본다 =====
+   사이트가 '가입 없이 미팅 신청'으로 바뀐 뒤 실제 문의는 행사 일정 › 신청자, 입점문의(고객센터 문의)로만 들어와
+   문의함(예전 견적 문의)은 비어 보였다. 원본 데이터는 그대로 두고 문의함에서 탭으로 함께 보여 준다.
+   배지(신규) = 상태가 '신청'인 미팅 신청 + '신규'인 고객센터 문의 + '신규'인 견적 문의. */
+let inboxMeet = null;          // 미팅 신청(임시 신청 제외). null = 아직 안 불러옴
+let inboxTrips = [];
+let inboxTab = 'meet';         // meet | support | quote
+let inboxMeetFilter = 'all';
+const INBOX_SUP_ST = { new:'신규', contacted:'답변함', done:'완료' };
+async function inboxLoadMeet(force){
+  if(inboxMeet && !force) return inboxMeet;
+  if(typeof MeetAdmin === 'undefined'){ inboxMeet = []; return inboxMeet; }
+  try{
+    const [reqs, trips] = await Promise.all([MeetAdmin.requests(), MeetAdmin.trips()]);
+    inboxTrips = trips || [];
+    inboxMeet = (reqs || []).filter(r => !String(r.buyer_id || '').startsWith('seed-'))
+      .sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
+  }catch(e){ inboxMeet = []; }
+  return inboxMeet;
+}
+function inboxSupport(){ return (ADM.leads || []).filter(l => l.cat === 'support').sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt))); }
+function inboxTripName(id){ const t = inboxTrips.find(x => x.id === id); return t ? ((t.title && (t.title.ko || t.title.vi || t.title.en)) || id) : id; }
+function inboxProdName(pid){ const p = mkProduct(pid); return p ? `${p.brand} · ${p.name.ko || p.name.vi || ''}` : pid; }
+function inboxNewCount(){
+  return (inboxMeet || []).filter(r => r.status === 'applied').length
+       + inboxSupport().filter(l => Admin.leadMeta(l.id).status === 'new').length
+       + (ADM.inqs || []).filter(i => Admin.inqMeta(i.id).status === 'new').length;
+}
+/* 대시보드용 — 세 종류를 한 줄 모양으로 */
+function inboxAll(){
+  const MST = (typeof MEET_REQ_ST !== 'undefined') ? MEET_REQ_ST : {};
+  const MCL = { applied:'st-new', contacted:'st-doing', met:'st-done', noshow:'st-done', cancelled:'st-done' };
+  const out = [];
+  (inboxMeet || []).forEach(r => out.push({ at: String(r.created_at || '').replace(' ', 'T'), kind: '미팅 신청', title: inboxProdName(r.product_id), company: r.company, name: r.contact_name, st: MST[r.status] || r.status, cls: MCL[r.status] || 'st-new' }));
+  inboxSupport().forEach(l => { const m = Admin.leadMeta(l.id); out.push({ at: String(l.createdAt || ''), kind: '고객센터', title: String(l.message || '').slice(0, 40), company: l.company, name: l.name, st: INBOX_SUP_ST[m.status] || '완료', cls: m.status === 'new' ? 'st-new' : m.status === 'contacted' ? 'st-doing' : 'st-done' }); });
+  (ADM.inqs || []).forEach(i => { const m = Admin.inqMeta(i.id), lb = ST_LABEL[m.status] || ST_LABEL.new, p = mkProduct(i.pid); out.push({ at: String(i.createdAt || ''), kind: '견적 문의', title: p ? (p.name.ko || p.name.vi) : i.pid, company: i.company, name: i.contactName, st: lb[0], cls: lb[1] }); });
+  return out.sort((a, b) => String(b.at).localeCompare(String(a.at)));
+}
+async function inboxSetReq(id, patch){
+  try{
+    await MeetAdmin.setRequest(id, patch);
+    const r = (inboxMeet || []).find(x => x.id === id); if(r) Object.assign(r, patch);
+    if(typeof meetCache !== 'undefined'){ const c = meetCache.reqs.find(x => x.id === id); if(c) Object.assign(c, patch); }
+    toastA('저장했습니다'); renderNav();
+    if(patch.status) renderInq();
+  }catch(e){ toastA('저장 실패: ' + e.message); }
+}
+function inboxMeetHtml(){
+  const all = inboxMeet || [];
+  const cnt = k => all.filter(r => r.status === k).length;
+  const list = all.filter(r => inboxMeetFilter === 'all' || r.status === inboxMeetFilter);
+  const MST = (typeof MEET_REQ_ST !== 'undefined') ? MEET_REQ_ST : { applied:'신청' };
+  const fb = (k, label, n) => `<button class="btn btn-sm ${inboxMeetFilter===k?'btn-primary':'btn-ghost'}" onclick="inboxMeetFilter='${k}';renderInq()">${label} ${n}</button>`;
+  return `<div class="card"><p class="note">제품·행사 페이지의 <b>미팅 신청</b>으로 들어온 문의입니다(임시 신청 제외). 연락했으면 상태를 <b>연락함</b>으로 바꾸세요 — 왼쪽 메뉴의 숫자는 <b>신청</b> 상태만 셉니다. 행사별로 보려면 <a href="#" onclick="event.preventDefault();showTab('meet')">행사 일정</a>.</p>
+    <div class="bar">${fb('all', '전체', all.length)}${Object.entries(MST).map(([k, v]) => fb(k, v, cnt(k))).join('')}<span class="grow"></span>
+      <button class="btn btn-ghost btn-sm" onclick="inboxLoadMeet(true).then(()=>{renderNav();renderInq()})">새로고침</button>
+      ${typeof meetCsv === 'function' ? `<button class="btn btn-ghost btn-sm" onclick="(async()=>{ if(!meetCache.reqs.length){ meetCache.reqs = await MeetAdmin.requests(); meetCache.trips = await MeetAdmin.trips(); } meetCsv(); })()">엑셀(CSV)</button>` : ''}</div>
+    <div class="tbl-wrap"><table><thead><tr><th style="width:112px">신청일</th><th>행사 · 제품</th><th>회사 · 담당자</th><th>연락처</th><th>업종 · 문의 내용</th><th style="width:150px">상태 · 메모</th></tr></thead><tbody>${list.length ? list.map(r => `
+      <tr><td>${esc(String(r.created_at || '').slice(0, 10))}<div class="sub">${esc(String(r.created_at || '').slice(11, 16))}</div></td>
+        <td><b>${esc(inboxProdName(r.product_id))}</b><div class="sub">${esc(inboxTripName(r.trip_id))}</div></td>
+        <td><b>${esc(r.company || '')}</b><div class="sub">${esc(r.contact_name || '')}${r.position ? ' (' + esc(r.position) + ')' : ''}</div>${r.homepage ? `<div class="sub">${esc(r.homepage)}</div>` : ''}</td>
+        <td>${esc(r.phone || '')}<div class="sub">${esc(r.email || '')}</div></td>
+        <td>${esc(r.channel || '')}${r.message ? `<div class="sub" style="margin-top:6px;white-space:pre-wrap;color:var(--mk-ink)">${esc(r.message)}</div>` : ''}</td>
+        <td><select class="srch" style="width:100%;min-width:0;font-size:12px;padding:5px 8px" onchange="inboxSetReq('${esc(r.id)}',{status:this.value})">${Object.entries(MST).map(([v, l]) => `<option value="${v}" ${r.status === v ? 'selected' : ''}>${l}</option>`).join('')}</select>
+          <input class="srch" style="width:100%;min-width:0;font-size:12px;padding:5px 8px;margin-top:6px" placeholder="메모" value="${esc(r.memo || '')}" onchange="inboxSetReq('${esc(r.id)}',{memo:this.value})"></td></tr>`).join('')
+      : `<tr class="empty-row"><td colspan="6">${all.length ? '조건에 맞는 신청이 없습니다' : '아직 들어온 미팅 신청이 없습니다'}</td></tr>`}</tbody></table></div></div>`;
+}
+function inboxSupportHtml(){
+  const list = inboxSupport();
+  return `<div class="card"><p class="note">고객센터 › <b>1:1 문의</b>로 들어온 문의입니다. 상태와 메모는 관리자에만 저장됩니다.</p>
+    <div class="tbl-wrap"><table><thead><tr><th style="width:112px">접수일</th><th>이름 · 회사</th><th>연락처</th><th>문의 내용</th><th style="width:150px">상태 · 메모</th></tr></thead><tbody>${list.length ? list.map(l => {
+      const m = Admin.leadMeta(l.id), st = INBOX_SUP_ST[m.status] ? m.status : 'done';
+      return `<tr><td>${esc(String(l.createdAt).slice(0, 10))}<div class="sub">${esc(String(l.createdAt).slice(11, 16))}</div></td>
+        <td><b>${esc(l.name || '')}</b>${l.company && l.company !== '-' ? `<div class="sub">${esc(l.company)}</div>` : ''}</td>
+        <td>${esc(l.tel && l.tel !== '-' ? l.tel : '')}<div class="sub">${esc(l.email && l.email !== '-' ? l.email : '')}</div></td>
+        <td style="white-space:pre-wrap">${esc(l.message || '')}</td>
+        <td><select class="srch" style="width:100%;min-width:0;font-size:12px;padding:5px 8px" onchange="admDo(Admin.setLeadMeta('${l.id}',{status:this.value}),0)">${Object.entries(INBOX_SUP_ST).map(([v, t]) => `<option value="${v}" ${st === v ? 'selected' : ''}>${t}</option>`).join('')}</select>
+          <input class="srch" style="width:100%;min-width:0;font-size:12px;padding:5px 8px;margin-top:6px" placeholder="메모" value="${esc(m.memo || '')}" onchange="Admin.setLeadMeta('${l.id}',{memo:this.value});toastA('메모 저장됨')"></td></tr>`;
+    }).join('') : `<tr class="empty-row"><td colspan="5">아직 들어온 1:1 문의가 없습니다</td></tr>`}</tbody></table></div></div>`;
+}
+function renderInq(){
+  const el = document.getElementById('tab-inq'); if(!el) return;
+  const meet = inboxMeet || [], sup = inboxSupport(), quote = ADM.inqs || [];
+  const nw = { meet: meet.filter(r => r.status === 'applied').length, support: sup.filter(l => Admin.leadMeta(l.id).status === 'new').length, quote: quote.filter(i => Admin.inqMeta(i.id).status === 'new').length };
+  const tab = (k, label, n) => `<button class="btn btn-sm ${inboxTab===k?'btn-primary':'btn-ghost'}" onclick="inboxTab='${k}';renderInq()">${label} ${n}${nw[k] ? ` · 신규 ${nw[k]}` : ''}</button>`;
+  el.innerHTML = `<div class="card" style="padding-bottom:6px"><div class="bar" style="margin:0 0 10px">${tab('meet', '미팅 신청', meet.length)}${tab('support', '고객센터 문의', sup.length)}${tab('quote', '견적 문의(예전)', quote.length)}</div></div><div id="inq-body"></div>`;
+  const body = document.getElementById('inq-body');
+  if(inboxTab === 'quote') return renderInqQuote();
+  if(inboxTab === 'support'){ body.innerHTML = inboxSupportHtml(); return; }
+  if(inboxMeet === null){
+    body.innerHTML = `<div class="card"><p class="note">불러오는 중…</p></div>`;
+    inboxLoadMeet().then(() => { renderNav(); if(curTab === 'inq') renderInq(); });
+    return;
+  }
+  body.innerHTML = inboxMeetHtml();
 }
 
 /* ============================================================
