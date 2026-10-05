@@ -2217,3 +2217,8 @@ img.lg-trim{object-fit:contain!important;box-sizing:border-box;padding:7px;backg
   .pd-cobox .tg{font-size:13.5px}
   .pd-cobox .go{grid-column:1/-1;justify-content:center;height:40px}
 }
+
+/* 공급사 로고는 자르지 않는다(2026-10-05) — 가로로 긴 로고가 정사각 상자에서 가운데만 잘려 보이던 것. 상자 안에 전체가 들어가게 */
+.co-card .lg,.co-head .lg{object-fit:contain;padding:5px;box-sizing:border-box}
+.co-head .lg{padding:8px}
+.co-inline img{object-fit:contain}
