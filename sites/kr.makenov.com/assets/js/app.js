@@ -5,6 +5,20 @@
 function mkAboutUrl(){var l=window.MK_FORCE_LANG;try{l=l||MK_LANG}catch(e){}if(typeof MK_HOST_LANG!=='undefined'&&MK_HOST_LANG)return 'about.html';return (l&&l!=='vi')?l+'/about.html':'about.html'}
 
 function esc(s){ return String(s??'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+/* 칼럼 언어 — 원고가 베트남어뿐인 글은 한국어·영어 사이트에서 숨긴다(2026-10).
+   bake-columns.js 가 baked.js 의 columnLangs 에 칼럼별 '정말 그 언어로 쓰인' 언어를 적어 둔다.
+   목록에 없는 새 글은 베트남어 원고로 본다. 번역된 글이 생기면 그 글만 자동으로 나온다. */
+function mkColHasLang(c){
+  const m = (window.MK_BAKED || {}).columnLangs;
+  if(!m) return true;
+  const a = m[c && c.id];
+  return a ? a.includes(MK_LANG) : MK_LANG === 'vi';
+}
+function mkColsHere(){
+  const m = (window.MK_BAKED || {}).columnLangs;
+  if(!m || MK_LANG === 'vi') return true;
+  return Object.values(m).some(a => a.includes(MK_LANG));
+}
 function timeAgo(iso){
   const diff = Date.now() - new Date(iso).getTime();
   const h = Math.floor(diff/36e5);
@@ -138,10 +152,10 @@ function renderChrome(active){
       ${s
         ? `<a class="mk-util" href="mypage.html">${MK_ICO.user}<span class="lb">${esc(s.contactName||s.email.split('@')[0])}</span></a><a class="mk-util" onclick="Store.logout();location.reload()" style="cursor:pointer">${MK_ICO.logout}<span class="lb" data-i18n="logout"></span></a>`
         : `<a class="mk-util" href="mypage.html" onclick="event.preventDefault();openAuth('login')">${MK_ICO.user}<span class="lb" data-i18n="login"></span></a><button class="btn btn-primary btn-sm" style="margin-left:6px;height:40px;padding:0 18px" onclick="openAuth('signup')" data-i18n="signup"></button>`}
-    </div></div><nav class="mk-nav mk-head-nav"><a href="${mkUrl('products.html')}" data-i18n="nav_directory"></a><a href="${mkUrl('companies.html')}" data-i18n="nav_companies"></a><a href="${mkUrl('meetings.html')}" data-i18n="nav_meetings"></a><a href="${mkUrl('columns.html')}" data-i18n="nav_columns"></a><span class="gnb"><a href="${mkUrl('guide.html')}" data-i18n="nav_guide"></a><span class="drop"><a href="${mkUrl('support.html')}" data-i18n="nav_support"></a><span class="menu"><a href="${mkUrl('support.html#notice')}" data-i18n="nav_sp_notice"></a><a href="${mkUrl('support.html#faq')}" data-i18n="nav_sp_faq"></a><a href="${mkUrl('support.html#ask')}" data-i18n="nav_sp_ask"></a></span></span></span></nav></div>`;
+    </div></div><nav class="mk-nav mk-head-nav"><a href="${mkUrl('products.html')}" data-i18n="nav_directory"></a><a href="${mkUrl('companies.html')}" data-i18n="nav_companies"></a><a href="${mkUrl('meetings.html')}" data-i18n="nav_meetings"></a>${mkColsHere() ? `<a href="${mkUrl('columns.html')}" data-i18n="nav_columns"></a>` : ''}<span class="gnb"><a href="${mkUrl('guide.html')}" data-i18n="nav_guide"></a><span class="drop"><a href="${mkUrl('support.html')}" data-i18n="nav_support"></a><span class="menu"><a href="${mkUrl('support.html#notice')}" data-i18n="nav_sp_notice"></a><a href="${mkUrl('support.html#faq')}" data-i18n="nav_sp_faq"></a><a href="${mkUrl('support.html#ask')}" data-i18n="nav_sp_ask"></a></span></span></span></nav></div>`;
   document.getElementById('mk-footer').innerHTML = `
   <div class="wrap"><div class="brand"><div class="logo"><img src="${mkAsset('assets/img/logo.png')}" alt="MAKENOV"
-      onerror="this.parentNode.classList.add(&quot;txt&quot;);this.remove()"><span>MAKE<b>NOV</b></span></div><p class="desc" data-i18n="ft_desc"></p><a class="mail" href="mailto:notice@makenov.com">notice@makenov.com</a></div><div><h4 data-i18n="ft_platform"></h4><a href="${mkUrl('products.html')}" data-i18n="nav_directory"></a><a href="${mkUrl('companies.html')}" data-i18n="nav_companies"></a><a href="${mkUrl('meetings.html')}" data-i18n="nav_meetings"></a><a href="${mkUrl('columns.html')}" data-i18n="nav_columns"></a></div><div><h4 data-i18n="ft_partner"></h4><a href="mypage.html" onclick="return mkFtJoin(event)" data-i18n="ft_join"></a><a href="maker.html" data-i18n="util_maker"></a></div><div><h4 data-i18n="ft_support"></h4><a href="${mkUrl('support.html')}" data-i18n="nav_support"></a><a href="${mkUrl('guide.html')}" data-i18n="nav_guide"></a><a href="${mkUrl('support.html#ask')}" data-i18n="ft_contact"></a><a href="sitemap.html" data-i18n="ft_sitemap"></a></div></div><div class="base"><span>© 2026 MAKENOV. All rights reserved.</span><span class="ft-lang"><a data-lang="vi" href="${esc(mkLangHref('vi') || location.href)}" onclick="localStorage.setItem('mk_lang','vi')">Tiếng Việt</a><a data-lang="ko" href="${esc(mkLangHref('ko') || location.href)}" onclick="localStorage.setItem('mk_lang','ko')">한국어</a><a data-lang="en" href="${esc(mkLangHref('en') || location.href)}" onclick="localStorage.setItem('mk_lang','en')">English</a></span></div>`;
+      onerror="this.parentNode.classList.add(&quot;txt&quot;);this.remove()"><span>MAKE<b>NOV</b></span></div><p class="desc" data-i18n="ft_desc"></p><a class="mail" href="mailto:notice@makenov.com">notice@makenov.com</a></div><div><h4 data-i18n="ft_platform"></h4><a href="${mkUrl('products.html')}" data-i18n="nav_directory"></a><a href="${mkUrl('companies.html')}" data-i18n="nav_companies"></a><a href="${mkUrl('meetings.html')}" data-i18n="nav_meetings"></a>${mkColsHere() ? `<a href="${mkUrl('columns.html')}" data-i18n="nav_columns"></a>` : ''}</div><div><h4 data-i18n="ft_partner"></h4><a href="mypage.html" onclick="return mkFtJoin(event)" data-i18n="ft_join"></a><a href="maker.html" data-i18n="util_maker"></a></div><div><h4 data-i18n="ft_support"></h4><a href="${mkUrl('support.html')}" data-i18n="nav_support"></a><a href="${mkUrl('guide.html')}" data-i18n="nav_guide"></a><a href="${mkUrl('support.html#ask')}" data-i18n="ft_contact"></a><a href="sitemap.html" data-i18n="ft_sitemap"></a></div></div><div class="base"><span>© 2026 MAKENOV. All rights reserved.</span><span class="ft-lang"><a data-lang="vi" href="${esc(mkLangHref('vi') || location.href)}" onclick="localStorage.setItem('mk_lang','vi')">Tiếng Việt</a><a data-lang="ko" href="${esc(mkLangHref('ko') || location.href)}" onclick="localStorage.setItem('mk_lang','ko')">한국어</a><a data-lang="en" href="${esc(mkLangHref('en') || location.href)}" onclick="localStorage.setItem('mk_lang','en')">English</a></span></div>`;
   updateCartBadge();
   applyI18n();
 }

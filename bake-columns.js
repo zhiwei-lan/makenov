@@ -660,7 +660,14 @@ ${PAGE_COL}
   const bj = read('assets/js/baked.js');
   const map = Object.fromEntries(columns.map(c => [c.id, colFile(c)]));
   const bj2 = bj.replace(/("columns":\s*)\{[^}]*\}/, `$1${JSON.stringify(map, null, 4).replace(/\n/g, '\n  ')}`);
-  if(!/"columns":\s*\{/.test(bj)) console.log('⚠ baked.js columns 블록을 못 찾음'); else { write('assets/js/baked.js', bj2); console.log('baked.js columns 갱신:', Object.keys(map).length); }
+  /* 칼럼별로 "정말 그 언어로 쓰인" 언어 목록 — 한국어·영어 사이트에서 번역 없는 글(베트남어 원고)을 숨기는 데 쓴다(app.js mkColHasLang).
+     원고는 관리자 입력 칸이 하나라 title.ko 에 베트남어가 들어 있다 → 키가 아니라 LANG_OK(글자 판별)로 정한다. */
+  const langMap = Object.fromEntries(columns.map(c => [c.id, LANG_OK.get(c.id)]));
+  const langJson = JSON.stringify(langMap);
+  const bj3 = /"columnLangs":\s*\{[^}]*\}/.test(bj2)
+    ? bj2.replace(/"columnLangs":\s*\{[^}]*\}/, `"columnLangs": ${langJson}`)
+    : bj2.replace(/("columns":\s*\{[^}]*\})/, `$1,\n  "columnLangs": ${langJson}`);
+  if(!/"columns":\s*\{/.test(bj)) console.log('⚠ baked.js columns 블록을 못 찾음'); else { write('assets/js/baked.js', bj3); console.log('baked.js columns 갱신:', Object.keys(map).length, '· 언어별', LANGS.map(l => l + ' ' + columns.filter(c => LANG_OK.get(c.id).includes(l)).length).join(' / ')); }
 
   /* sitemaps/{vn,kr,en}.xml — 호스트별로 칼럼 <url> 전부 교체, 칼럼 목록 lastmod 갱신
      (구 public/sitemap.xml 은 서브도메인 전환 때 없어졌다 — Seo.php 가 호스트별 파일을 서빙,
@@ -678,7 +685,9 @@ ${PAGE_COL}
   try {
     const LAND = { vi:'index.html', ko:'ko/index.html', en:'en/index.html' };
     const CHIP = { vi:'Hướng dẫn', ko:'가이드', en:'Guide' }, KIND = { vi:'Bài viết', ko:'칼럼', en:'Article' };
-    const latest = columns.slice()
+    /* 2026-10: 그 언어로 번역된 글만 쓴다. 한국어·영어 판에 번역된 글이 없으면 구역을 통째로 숨긴다
+       (예전에는 원문(베트남어) 카드가 한국어·영어 홈에 그대로 나왔다). */
+    const latestOf = lang => columns.filter(c => LANG_OK.get(c.id).includes(lang))
       .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')) || String(b.id).localeCompare(String(a.id), undefined, { numeric:true }))
       .slice(0, 8);
     const card = (c, lang) => {
@@ -690,13 +699,17 @@ ${PAGE_COL}
       const rel = LAND[lang];
       if(!fs.existsSync(path.join(PUB, rel))) return;
       let src = read(rel);
+      const latest = latestOf(lang);
       const cards = latest.map(c => card(c, lang)).join('');
+      /* 구역 표시/숨김(멱등) — 래퍼 style 맨 앞의 display:none 을 넣었다 뺐다 한다 */
+      src = src.replace(/(<div class="mkcolslide" style=")(display:none;)?/, (m, a) => a + (latest.length ? '' : 'display:none;'));
       const inner = `<!-- mk:landing-cols (bake-columns.js가 관리 — 직접 수정 금지) --><div style="display:flex">${cards}</div><div style="display:flex" aria-hidden="true">${cards}</div><!-- /mk:landing-cols -->`;
       const rx = /(<div class="mkcol-marq"[^>]*>)[\s\S]*?(?=<\/div><\/div><\/div><style>@keyframes mkcolroll)/;
       if(!rx.test(src)){ console.log(`⚠ ${rel}: 홈 칼럼 슬라이드(.mkcol-marq)를 못 찾음 — 건너뜀`); return; }
-      const next = src.replace(rx, (m, open) => open + inner);
-      if(next !== src) write(rel, next);
-      console.log(`${rel} — 홈 칼럼 슬라이드 ${latest.length}편 (최신 ${latest[0] ? latest[0].date : '-'})${next === src ? ' · 변경 없음' : ''}`);
+      const orig = read(rel);
+      const next = latest.length ? src.replace(rx, (m, open) => open + inner) : src;
+      if(next !== orig) write(rel, next);
+      console.log(`${rel} — 홈 칼럼 슬라이드 ${latest.length ? latest.length + '편 (최신 ' + latest[0].date + ')' : '숨김(이 언어로 번역된 글 없음)'}${next === orig ? ' · 변경 없음' : ''}`);
     });
   } catch (e) { console.log('⚠ 홈 칼럼 슬라이드 갱신 실패:', e.message); }
 

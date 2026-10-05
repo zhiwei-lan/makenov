@@ -2226,3 +2226,7 @@ img.lg-trim{object-fit:contain!important;box-sizing:border-box;padding:7px;backg
 /* 전체 점검(2026-10-05)에서 나온 모바일 가로 넘침 2곳 */
 .nb-search input{min-width:0}
 .blog-body a.btn,section.cta a.btn{max-width:100%;height:auto;white-space:normal;text-align:center;line-height:1.4}
+
+/* 칼럼 목록: 이 언어로 쓰인 글이 없을 때(한국어·영어 사이트) */
+.col-none{grid-column:1/-1;padding:56px 24px;text-align:center;border:1px solid var(--mk-line);border-radius:8px;background:#fff}
+.col-none p{margin:0 0 16px;font-size:15px;color:var(--mk-body)}
