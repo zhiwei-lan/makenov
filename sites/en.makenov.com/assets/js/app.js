@@ -1060,6 +1060,138 @@ function mtMini(tr){
     <div style="margin-top:10px">${mtBar({ count: n, goal: Math.max(1, g), confirmed: done })}${mtProg({ count: n, goal: g }, `<span>${esc(mtRep('mt_suppliers', { n: items.length }))}</span>`)}</div>
   </div></a>`;
 }
+/* ===== 방문 일정 페이지(meetings.html) — 행사 안내 문서형 레이아웃 (2026-10-05) =====
+   kfesta.vn 의 수출상담회 안내 페이지 구성을 따른다: 사진 히어로 + 주최 로고 띠 → 남색 모집 띠 → 개요 표 →
+   참가 공급사 → 무엇이 다른가 → 진행 방식(번호 절차) → 참가 바이어 지원 내용.
+   행사별 부가 정보(주최 로고·주관·운영·세부 장소·사진)는 일정 데이터에 칸이 없어 아래 표에 일정 ID 로 적는다.
+   표에 없는 일정은 로고·주관 줄 없이 같은 틀로 나온다. */
+const MT_EVENT_X = {
+  'hcm-20261203': {
+    photo: 'https://kfesta.vn/assets/img/beauty/day1-vip.webp',
+    logos: [
+      { src: 'https://kfesta.vn/assets/img/daegu-ci.webp', alt: 'Daegu Metropolitan City' },
+      { src: 'https://kfesta.vn/assets/img/b85af70e2ee60.webp', alt: 'KFESTA' },
+    ],
+    sub:  { ko: '한국–베트남 비즈니스 상담회', vi: 'Hội nghị kết nối giao thương Hàn – Việt', en: 'Korea–Vietnam Business Matching' },   // 바이어가 보는 페이지라 '수출상담회' 대신
+    band: { ko: '한국 대구의 혁신기업을 {y}호치민에서 직접{/y} 만나보세요', vi: 'Gặp {y}trực tiếp tại TP.HCM{/y} các doanh nghiệp đổi mới đến từ Daegu, Hàn Quốc', en: 'Meet innovative companies from Daegu, Korea {y}in person in Ho Chi Minh City{/y}' },
+    name: { ko: '2026 대구메이드 K-Festa 베트남 수출상담회', vi: '2026 DAEGU MADE K-FESTA – Hội nghị kết nối giao thương Hàn – Việt', en: '2026 Daegu Made K-Festa – Korea–Vietnam Business Matching' },
+    venue:{ ko: '베트남 호치민시 1군, 호텔 니코 사이공 4층 컨퍼런스룸', vi: 'Phòng hội nghị tầng 4, Khách sạn Nikko Saigon, Quận 1, TP. Hồ Chí Minh', en: 'Conference room, 4F, Hotel Nikko Saigon, District 1, Ho Chi Minh City' },
+    host: { ko: '대구광역시 호치민사무소', vi: 'Văn phòng đại diện TP. Daegu tại TP. Hồ Chí Minh', en: 'Daegu Metropolitan City Ho Chi Minh Office' },
+    org:  { ko: '주식회사 퍼스트마케팅컴퍼니 (KFESTA 베트남 사무국)', vi: 'First Marketing Company (Ban thư ký KFESTA Việt Nam)', en: 'First Marketing Company (KFESTA Vietnam Secretariat)' },
+    map:  { q: 'Hotel Nikko Saigon, 235 Nguyen Van Cu, District 1, Ho Chi Minh City',
+            addr: { ko: '235 Nguyễn Văn Cừ, 1군, 호치민 (Hotel Nikko Saigon)', vi: '235 Nguyễn Văn Cừ, Phường Nguyễn Cư Trinh, Quận 1, TP. Hồ Chí Minh', en: '235 Nguyen Van Cu, District 1, Ho Chi Minh City' } },
+    booth: true,       // 공급사별 상담 부스 · 한–베 통역 배치(행사 안내문 기준)
+    growing: true,     // 참가 공급사가 계속 추가되는 행사
+    fixed: true,       // 날짜·장소가 정해져 그대로 열리는 행사 — '5곳이 모이면 확정 / 안 모이면 화상 미팅' 안내 대신 행사 진행 순서·행사용 FAQ 를 쓴다
+  },
+};
+/* 행사 카드·일정 페이지가 같이 쓰는 공급사 카드(사진 · 달성 막대 · 미팅 신청) */
+function mtSupCard(tr, it){
+  const p = mkProduct(it.product_id);
+  const mine = it.mine || mtIsMine(tr.id, p.id);
+  return `<a class="mt-evd-sup ${it.confirmed ? 'done' : ''}" href="${mkDocUrl('product', p.id)}#meet">
+      <div class="im"><img src="${esc(p.img)}" alt="${esc(L(p.name))}" loading="lazy"></div>
+      <div class="tx"><span class="br">${esc(p.brand)}</span><span class="nm">${esc(L(p.name))}</span>${mtBar(it)}
+        <div class="pr">${mtJoinedHtml(it)}<em>${mtPct(it)}%</em></div>
+        <span class="act ${mine ? 'on' : ''}">${mine ? MT_ICO.check + esc(t('mt_btn_applied')) : esc(t('mt_btn_apply')) + ' →'}</span></div></a>`;
+}
+function mtKfHead(kick, title){ return `<div class="kf-hd"><span class="kf-k">${esc(kick)}</span><h2>${title}</h2></div>`; }
+function mtKfGo(){ const el = document.getElementById('mt-kf-sups'); if(el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+function mtEventPage(tr){
+  const x = MT_EVENT_X[tr.id] || {};
+  const items = MkMeet.itemsOf(tr);
+  const title = L(tr.title) || t('mt_page_kick');
+  const when = tr.visit_date ? mtFmt(tr.visit_date, { year:'numeric', month:'long', day:'numeric', weekday:'short' }) : t('mt_date_tbd');
+  const dl = tr.deadline ? mtFmt(tr.deadline, { month:'long', day:'numeric', weekday:'short' }) : '';
+  const state = mtTripState(tr);
+  const dday = tr.open && tr.days_left != null ? (tr.days_left > 0 ? mtRep('mt_kf_dday', { n: tr.days_left }) : t('mt_dday_today')) : '';
+  const bandH = esc(x.band ? L(x.band) : t('mt_kf_band_h')).split('{y}').join('<span class="y">').split('{/y}').join('</span>');
+  const bandMeta = [dl ? `${t('mt_deadline')} ${dl}` : '', t('mt_kf_free'), x.booth ? t('mt_kf_interp') : ''].filter(Boolean).join(' · ');
+  const cta = cls => items.length && tr.open ? `<button type="button" class="kf-btn ${cls || ''}" onclick="mtKfGo()">${esc(t('mt_kf_cta'))}</button>` : '';
+  const row = (k, v) => v ? `<tr><th>${esc(t(k))}</th><td>${v}</td></tr>` : '';
+  const time = mtTime(tr);
+  const step = (n, h, p) => `<li><span class="n">${n}</span><div><h3>${esc(h)}</h3><p>${esc(p)}</p></div></li>`;
+  const steps = x.fixed
+    ? [1, 2, 3].map(n => step(n, t('mt_kf_s' + n + '_h'), t('mt_kf_s' + n + '_p'))).join('')
+      + step(4, t('mt_kf_s4_h'), mtRep('mt_kf_s4_p', { d: tr.visit_date ? mtFmt(tr.visit_date, { month:'long', day:'numeric' }) : t('mt_date_tbd'), v: L(tr.venue) || L(tr.city) || '' }) + (x.booth ? ' ' + t('mt_kf_s4_interp') : ''))
+    : [1, 2, 3].map(n => step(n, t('mt_step' + n + '_h'), t('mt_step' + n + '_p'))).join('');
+  const faq = x.fixed ? `<section class="kf-sec"><div class="kf-doc mt-faq">
+    ${mtKfHead('FAQ', esc(t('mt_faq_h')))}
+    ${[1, 2, 3, x.booth ? 4 : 0, 5].filter(Boolean).map(n => `<details><summary>${esc(t('mt_kf_q' + n))}</summary><p>${esc(t('mt_kf_a' + n))}</p></details>`).join('')}
+  </div></section>` : '';
+  const perks = ['mt_kf_b1', x.booth ? 'mt_kf_b2' : '', x.booth ? 'mt_kf_b3' : '', 'mt_kf_b4', 'mt_kf_b5'].filter(Boolean)
+    .map(k => `<li>${MT_ICO.check}<span>${esc(t(k))}</span></li>`).join('');
+  /* 오시는 길 — 구글 지도(키 없이 되는 embed). 행사 표에 map 이 없으면 행사장·도시 이름으로 찾는다 */
+  const mapQ = (x.map && x.map.q) || [tr.venue && (tr.venue.en || L(tr.venue)), tr.city && (tr.city.en || L(tr.city))].filter(Boolean).join(', ');
+  const mapSec = mapQ && (x.map || String(L(tr.venue) || '').trim()) ? `<section class="kf-sec"><div class="kf-doc">
+    ${mtKfHead('Location', esc(t('mt_kf_map_h')))}
+    <div class="kf-map"><iframe src="https://www.google.com/maps?q=${encodeURIComponent(mapQ)}&hl=${MK_LANG}&z=16&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="${esc(L(tr.venue) || 'Map')}" allowfullscreen></iframe></div>
+    <div class="kf-map-info"><div><b>${esc(L(tr.venue) || '')}</b>${x.map && x.map.addr ? `<span>${esc(L(x.map.addr))}</span>` : ''}</div>
+      <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapQ)}" target="_blank" rel="noopener">${MT_ICO.pin}${esc(t('mt_kf_map_open'))}</a></div>
+  </div></section>` : '';
+  return `<section class="kf-hero ${x.photo ? 'has-photo' : ''}" id="trip-${esc(tr.id)}"${x.photo ? ` style="background-image:url('${esc(x.photo)}')"` : ''}>
+    <div class="kf-hero-in">
+      <h1>${esc(title)}${x.sub ? `<br><span>${esc(L(x.sub))}</span>` : ''}</h1>
+      ${x.logos && x.logos.length ? `<div class="kf-logos">${x.logos.map(l => `<img src="${esc(l.src)}" alt="${esc(l.alt)}">`).join('<i></i>')}</div>` : ''}
+      <ul class="kf-hero-meta">
+        <li>${MT_ICO.cal}<span>${esc(when)}</span></li>
+        ${time ? `<li>${MT_ICO.clock}<span>${esc(time)}</span></li>` : ''}
+        <li>${MT_ICO.pin}<span>${esc(mtWhere(tr) || t('mt_tba'))}</span></li>
+      </ul>
+    </div>
+  </section>
+  <section class="kf-band"><div class="kf-doc kf-band-in">
+    <div>
+      <span class="kf-badge">${esc(tr.open ? t('mt_kf_badge') : t('mt_st_' + state))}</span>${dday ? `<span class="kf-dday">${esc(dday)}</span>` : ''}
+      <h2>${bandH}</h2>
+      <p class="kf-band-meta">${esc(bandMeta)}</p>
+    </div>
+    ${cta('yellow')}
+  </div></section>
+  <section class="kf-sec"><div class="kf-doc">
+    ${mtKfHead('Overview', esc(t('mt_kf_over_h')))}
+    <table class="kf-table">
+      ${row('mt_kf_o_name', esc(x.name ? L(x.name) : title))}
+      ${row('mt_kf_o_date', esc(when + (time ? ' · ' + time : '')))}
+      ${row('mt_kf_o_venue', esc(x.venue ? L(x.venue) : (mtWhere(tr) || t('mt_tba'))))}
+      ${row('mt_kf_o_host', x.host ? esc(L(x.host)) : '')}
+      ${row('mt_kf_o_org', x.org ? esc(L(x.org)) : '')}
+      ${row('mt_kf_o_who', esc(t('mt_kf_o_who_v')))}
+      ${row('mt_kf_o_fee', `<b>${esc(t('mt_kf_o_fee_v'))}</b>`)}
+      ${row('mt_deadline', dl ? esc(mtFmt(tr.deadline, { year:'numeric', month:'long', day:'numeric', weekday:'short' })) : '')}
+    </table>
+  </div></section>
+  <section class="kf-sec" id="mt-kf-sups"><div class="kf-doc wide">
+    ${mtKfHead('Suppliers', esc(mtRep('mt_sup_h', { n: items.length })))}
+    <div class="mt-evd-sups kf-sups">${items.map(it => mtSupCard(tr, it)).join('')}</div>
+    ${x.growing && tr.open ? `<p class="kf-note">${esc(t('mt_kf_sup_note'))}</p>` : ''}
+  </div></section>
+  <section class="kf-sec"><div class="kf-doc">
+    ${mtKfHead("What's Different", esc(t('mt_kf_diff_h')))}
+    <div class="kf-quote"><p>${esc(t('mt_kf_diff_p1'))}</p><p><b>${esc(t('mt_kf_diff_b'))}</b> ${esc(t('mt_kf_diff_p2'))}</p></div>
+  </div></section>
+  <section class="kf-sec"><div class="kf-doc">
+    ${mtKfHead('Process', esc(t('mt_how_h')))}
+    <ol class="kf-steps">${steps}</ol>
+  </div></section>
+  <section class="kf-sec"><div class="kf-doc">
+    ${mtKfHead('Benefits', esc(t('mt_kf_ben_h')))}
+    <ul class="kf-checks">${perks}</ul>
+  </div></section>
+  ${mapSec}
+  ${faq}`;
+}
+/* 페이지 맨 아래 마무리 띠(자주 묻는 질문 다음) */
+function mtEventEnd(tr){
+  const items = MkMeet.itemsOf(tr);
+  if(!items.length || !tr.open) return '';
+  const dl = tr.deadline ? mtFmt(tr.deadline, { year:'numeric', month:'long', day:'numeric', weekday:'short' }) : '';
+  return `<section class="kf-end"><div class="kf-doc">
+    ${dl ? `<p class="d">${esc(t('mt_deadline'))} <b>${esc(dl)}</b></p>` : ''}
+    <p>${esc(t('mt_kf_end_p'))}</p>
+    <button type="button" class="kf-btn navy" onclick="mtKfGo()">${esc(t('mt_kf_cta'))}</button>
+  </div></section>`;
+}
 /* 홈 '예정된 행사 일정' 카드(10차, 2026-10-03) — 위아래 2단.
    위: 날짜 배지 · 행사명 · 시간/장소/마감/공급사·신청 수 한 줄 · '행사 일정 자세히' 버튼
    아래: 참가 공급사(사진 크게, 달성 막대, '미팅 신청') — 공급사 수만큼 칸을 나눠 폭을 채운다(최대 4칸).
@@ -1072,15 +1204,7 @@ function mtFeatured(tr){
   const href = `${mkUrl('meetings.html')}#trip-${esc(tr.id)}`;
   /* 공급사가 4곳 이상이면 좌우 슬라이드(모두 표시), 3곳 이하는 폭을 나눠 채운다 */
   const slide = items.length >= 4;
-  const cards = items.map(it => {
-    const p = mkProduct(it.product_id);
-    const mine = it.mine || mtIsMine(tr.id, p.id);
-    return `<a class="mt-evd-sup ${it.confirmed ? 'done' : ''}" href="${mkDocUrl('product', p.id)}#meet">
-      <div class="im"><img src="${esc(p.img)}" alt="${esc(L(p.name))}" loading="lazy"></div>
-      <div class="tx"><span class="br">${esc(p.brand)}</span><span class="nm">${esc(L(p.name))}</span>${mtBar(it)}
-        <div class="pr">${mtJoinedHtml(it)}<em>${mtPct(it)}%</em></div>
-        <span class="act ${mine ? 'on' : ''}">${mine ? MT_ICO.check + esc(t('mt_btn_applied')) : esc(t('mt_btn_apply')) + ' →'}</span></div></a>`;
-  }).join('');
+  const cards = items.map(it => mtSupCard(tr, it)).join('');
   const nav = d => `<button type="button" class="mt-evd-nav ${d < 0 ? 'prev' : 'next'}" aria-label="${d < 0 ? 'Previous' : 'Next'}" onclick="mtEvdGo(this,${d})"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="${d < 0 ? 'M15 5l-7 7 7 7' : 'M9 5l7 7-7 7'}"/></svg></button>`;
   const sups = slide
     ? `<div class="mt-evd-rail at-start">${nav(-1)}<div class="mt-evd-sups slide" onscroll="mtEvdSync(this)">${cards}</div>${nav(1)}</div>`
