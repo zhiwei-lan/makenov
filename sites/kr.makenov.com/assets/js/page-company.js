@@ -6,7 +6,7 @@ function pageInit(){
   const c = mkCompany(id) || MK_COMPANIES[0];
   const prods = mkCompanyProducts(c.id);
   const cat = mkCat(c.cat);
-  const totalInq = prods.reduce((s,p)=>s+p.inquiries,0);
+  const totalInq = prods.reduce((s,p)=>s+(Number(p.inquiries)||0),0);
   const yrs = new Date().getFullYear() - Number(c.since);
   document.title = L(c.name) + ' | MAKENOV';
   /* 공급사 상세 조회 — 제품과 같은 ViewContent 지만 content_type 으로 구분. 언어 전환 재렌더는 한 번만 */
@@ -85,7 +85,7 @@ function pageInit(){
               data-i18n="co_cta_btn"></button>
             <div class="meta">
               <div><span data-i18n="co_products"></span> <b>${prods.length}</b></div>
-              <div><span data-i18n="inquiries_count"></span> <b>${totalInq}</b></div>
+              <div><span data-i18n="co_inq"></span> <b>${totalInq}</b></div>
               <div><span data-i18n="co_since"></span> <b>${esc(c.since)}</b></div>
             </div>
           </div>

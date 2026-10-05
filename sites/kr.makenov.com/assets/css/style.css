@@ -920,7 +920,8 @@ button{font-family:var(--font-body);cursor:pointer;border:none;background:none;c
 .co-table{width:100%;font-size:15px}
 .co-table tr{border-bottom:1px solid var(--mk-line)}
 .co-table tr:last-child{border-bottom:0}
-.co-table th{width:140px;text-align:left;padding:14px 0;color:var(--mk-muted);font-weight:500;vertical-align:top}
+.co-table th{width:1%;white-space:nowrap;text-align:left;padding:14px 32px 14px 0;color:var(--mk-muted);font-weight:500;vertical-align:top}
+@media(max-width:480px){.co-table th{width:42%;white-space:normal;padding-right:14px}}
 .co-table td{padding:14px 0;color:var(--mk-ink)}
 
 /* 인증 태그 */

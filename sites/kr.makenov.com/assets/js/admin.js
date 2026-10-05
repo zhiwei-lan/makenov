@@ -949,8 +949,8 @@ function companyForm(id){
     return `<div class="fld">${tag}${kind==='ta' ? `<textarea id="${base}-${l}">${esc(g(val,l))}</textarea>` : `<input id="${base}-${l}" value="${esc(g(val,l))}">`}</div>`;
   }).join('')}</div></div>`;
   return `
-    <div class="card"><div class="bar"><h3 style="margin:0">${c?'공급사 수정':'새 공급사 등록'}</h3><span class="grow"></span><button class="btn btn-ghost btn-sm" onclick="autoTranslate(this,['co-name','co-tag','co-intro','co-loc'])" title="베트남어를 한국어·영어로 자동 번역 (빈 칸만 채움). 저장할 때도 베트남어가 바뀐 칸은 자동으로 다시 번역됩니다">🌐 베트남어 → 한·영 번역</button><button class="btn btn-ghost btn-sm" onclick="coEditing=null;renderCompanies()">취소</button><button class="btn btn-primary btn-sm" onclick="saveCompany('${id}')">저장</button></div><div class="fgrid two"><div class="fld"><label>회사 ID (영문 소문자 — 주소·연결에 쓰임${c?', 수정 불가':''})</label><input id="co-id" value="${esc(c?c.id:'')}" ${c?'disabled':''} placeholder="wellbeing"></div><div class="fld"><label>대표 브랜드명</label><input id="co-brand" value="${esc(c?c.brand||'':'')}" placeholder="WELLBEING HEALTHFARM"></div></div><div class="fgrid two"><div class="fld"><label>주력 카테고리</label><select id="co-cat">${MK_CATEGORIES.map(x=>`<option value="${x.id}" ${c&&c.cat===x.id?'selected':''}>${esc(x.name.ko)}</option>`).join('')}</select></div><div class="fld"><label>노출 순서 (작을수록 먼저)</label><input id="co-sort" type="number" value="${esc(c&&c.sort!=null?c.sort:MK_COMPANIES.length+1)}"></div></div>
-    ${tri3('co-name','회사명',nm)}
+    <div class="card"><div class="bar"><h3 style="margin:0">${c?'공급사 수정':'새 공급사 등록'}</h3><span class="grow"></span><button class="btn btn-ghost btn-sm" onclick="autoTranslate(this,['co-tag','co-intro','co-loc'])" title="베트남어를 한국어·영어로 자동 번역 (빈 칸만 채움). 저장할 때도 베트남어가 바뀐 칸은 자동으로 다시 번역됩니다">🌐 베트남어 → 한·영 번역</button><button class="btn btn-ghost btn-sm" onclick="coEditing=null;renderCompanies()">취소</button><button class="btn btn-primary btn-sm" onclick="saveCompany('${id}')">저장</button></div><div class="fgrid two"><div class="fld"><label>회사 ID (영문 소문자 — 주소·연결에 쓰임${c?', 수정 불가':''})</label><input id="co-id" value="${esc(c?c.id:'')}" ${c?'disabled':''} placeholder="wellbeing"></div><div class="fld"><label>대표 브랜드명</label><input id="co-brand" value="${esc(c?c.brand||'':'')}" placeholder="WELLBEING HEALTHFARM"></div></div><div class="fgrid two"><div class="fld"><label>주력 카테고리</label><select id="co-cat">${MK_CATEGORIES.map(x=>`<option value="${x.id}" ${c&&c.cat===x.id?'selected':''}>${esc(x.name.ko)}</option>`).join('')}</select></div><div class="fld"><label>노출 순서 (작을수록 먼저)</label><input id="co-sort" type="number" value="${esc(c&&c.sort!=null?c.sort:MK_COMPANIES.length+1)}"></div></div>
+    ${tri3('co-name','회사명 <span class="sub">번역하지 않습니다 · 빈 칸은 입력한 이름 그대로 채웁니다</span>',nm)}
     ${tri3('co-tag','한 줄 소개',tg)}
     ${tri3('co-intro','회사 소개',it,'ta')}
     ${tri3('co-loc','소재지 (예: Incheon, Korea)',lc)}
@@ -973,8 +973,12 @@ function certsFromInput(text, prev){
   return text.split(',').map(s=>s.trim()).filter(Boolean).map(s=>keep.get(s) || s);
 }
 async function saveCompany(id){
-  await viSync(['co-name','co-tag','co-intro','co-loc'], false);
+  /* 회사명은 고유명사라 번역하지 않는다(2026-10-05: 'LARGE'가 '크기가 큰'으로 번역돼 노출됨).
+     비어 있는 언어 칸은 입력된 이름을 그대로 넣는다. */
+  await viSync(['co-tag','co-intro','co-loc'], false);
   const name = tri('co-name');
+  const nameAny = name.vi || name.en || name.ko || '';
+  ['vi','ko','en'].forEach(l => { if(!name[l]) name[l] = nameAny; });
   if(!name.ko && !name.vi && !name.en){ toastA('회사명을 입력하세요'); return; }
   const cid = id || slugify(av('co-id')) || slugify(av('co-brand') || name.en || '');
   if(!cid){ toastA('회사 ID(영문)를 입력하세요'); return; }
