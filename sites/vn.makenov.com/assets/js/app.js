@@ -755,7 +755,7 @@ function productCard(p){
   const flag = '';   // 2026-09-30 '신제품 등록'·FEATURED 배지 삭제(사용자 요청) — 카드 사진 위 표시 없음
   return `
   <a class="p-card" href="${mkDocUrl('product',p.id)}" data-cat="${esc(p.cat||'')}"><div class="thumb"><img src="${p.img}" alt="${esc(L(p.name))}" loading="lazy">${flag}
-      <button class="heart ${inCart?'on':''}" onclick="event.preventDefault();event.stopPropagation();toggleCart('${p.id}',this)">${inCart?'♥':'♡'}</button></div><div class="body"><span class="brand">${esc(p.brand)}</span>${hook ? `<span class="pname">${esc(L(p.name))}</span>` : ''}<h3 class="${hook ? 'hooked' : ''}">${esc(hook || L(p.name))}</h3><div class="meta">${cardMeta(p)}<span class="left">${esc(p.origin)}</span></div>${mtCardLine(p.id)}</div></a>`;
+      <button class="heart ${inCart?'on':''}" onclick="event.preventDefault();event.stopPropagation();toggleCart('${p.id}',this)">${inCart?'♥':'♡'}</button></div><div class="body"><span class="brand">${esc(p.brand)}</span>${hook ? `<span class="pname">${esc(L(p.name))}</span>` : ''}<h3 class="${hook ? 'hooked' : ''}">${esc(hook || L(p.name))}</h3>${mtCardLine(p.id)}</div></a>`;   // 2026-10-05: 카드의 '관심 n · 지역' 줄 삭제(사용자 지시)
 }
 
 /* ============================================================
