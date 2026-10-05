@@ -875,7 +875,9 @@ button{font-family:var(--font-body);cursor:pointer;border:none;background:none;c
 .co-head{display:flex;align-items:flex-start;gap:20px;padding:24px 0 28px;
   border-bottom:1px solid var(--mk-line)}
 .co-head .lg{width:94px;height:94px;object-fit:cover;border-radius:8px;
-  background:#fff;border:1px solid var(--mk-line);flex-shrink:0;margin-top:-58px;position:relative;z-index:2}
+  background:#fff;border:1px solid rgba(4,20,63,.14);flex-shrink:0;margin-top:-58px;position:relative;z-index:2;
+  /* 흰 로고 상자가 흰 바탕·밝은 커버에 묻히지 않게: 외곽선을 진하게 + 그림자 */
+  box-shadow:0 6px 20px rgba(4,20,63,.16)}
 .co-head .tx{min-width:0;flex:1;padding-top:2px}
 .co-head h1{font-size:24px;font-weight:700;letter-spacing:-.02em;color:#000}
 .co-head .sub{font-size:15px;color:var(--mk-body);margin-top:8px;line-height:1.6}
