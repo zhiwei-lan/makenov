@@ -700,7 +700,7 @@ function mkLogoTrim(img){
   if(!img || img.dataset.trim || /HeadlessChrome/.test(navigator.userAgent)) return;
   img.dataset.trim = '1';
   const src = img.currentSrc || img.src;
-  if(!/^https?:/.test(src)) return;
+  if(!/^https?:/.test(src) || !/\/storage\/v1\//.test(src)) return;   // 저장소(/storage/v1/) 이미지만 — 정적 자산은 CORS 헤더가 없어 콘솔 오류만 난다
   if(!MK_LOGO_TRIM[src]) MK_LOGO_TRIM[src] = new Promise(res => {
     const im = new Image(); im.crossOrigin = 'anonymous';
     im.onerror = () => res('');
