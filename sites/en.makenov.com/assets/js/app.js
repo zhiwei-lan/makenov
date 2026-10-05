@@ -1018,54 +1018,62 @@ function mtEventHero(tr){
    DB 슬라이드(hero_slides)에 넣지 않은 이유: 관리자 '문구 수정'이 슬라이드를 순번(hero.0.title …)으로
    덮어쓰고 있어 맨 앞에 끼우면 기존 문구가 한 칸씩 밀린다. 행사명·날짜·장소가 바뀌면 자동으로 따라간다.
    products.html renderHero 가 s.html 이 있으면 그대로 그리고, cls 의 light 로 점·화살표 색을 바꾼다. */
-/* ===== 제품 페이지 히어로 배너(3차, 2026-10-05) — 왼쪽 글 칸 + 오른쪽은 실제 사진을 칸에 꽉 채운 타일 =====
-   2차(연한 그라데이션 바탕 · 알약 라벨 · 떠 있는 카드)는 장식이 많아 보인다는 피드백으로 교체.
-   알약·그림자 카드·그라데이션 없이 사이트 톤(평평한 면, 4~8px 모서리)으로. products.html renderHero 가 그린다. */
-function mkHbShell(cls, href, kick, title, line, cta, tiles){
+/* ===== 제품 페이지 히어로 배너(4차, 2026-10-06) — 왼쪽은 글 · 버튼, 오른쪽은 사진 한 장 =====
+   3차(사진 타일 여러 칸 + 이름표 · 진행 막대 · 로고 덮개)는 HTML 조각이 많아 지저분하다는 피드백으로 교체.
+   슬라이드마다 대표 사진 한 장만 꽉 채운다. 같은 사진이 두 슬라이드에 나오지 않게 mkHbPick 이 쓴 사진을 기억한다.
+   (배너용 이미지가 따로 준비되면 이 사진 자리에 그대로 넣으면 된다) products.html renderHero 가 그린다. */
+function mkHbShell(cls, href, kick, title, line, cta, img, alt){
   return `<a class="hb ${cls || ''}" href="${href}">
     <div class="hb-tx"><span class="hb-k">${esc(kick)}</span><h2>${esc(title)}</h2><p>${esc(line)}</p><span class="hb-cta">${esc(cta)} →</span></div>
-    <div class="hb-ph n${Math.min(4, Math.max(1, tiles.length))}">${tiles.slice(0, 4).join('')}</div>
+    <div class="hb-ph">${img ? `<img src="${esc(img)}" alt="${esc(alt || '')}">` : ''}</div>
   </a>`;
 }
-function mkHbTile(img, cap, extra){
-  return `<span class="pi" style="background-image:url('${esc(img)}')">${cap ? `<em>${esc(cap)}</em>` : ''}${extra || ''}</span>`;
+/* 후보 사진 중 아직 안 쓴 첫 장 — 슬라이드끼리 사진도, 공급사도 겹치지 않게(같은 회사 사진이 연달아 나오지 않는다).
+   안 쓴 회사의 사진 → 안 쓴 사진 → 첫 장 순으로 고른다. */
+function mkHbPick(list){
+  const used = window._mkHbUsed || (window._mkHbUsed = new Set());
+  const c = list.filter(x => x && x.img);
+  const hit = c.find(x => !used.has(x.img) && !(x.co && used.has('co:' + x.co))) || c.find(x => !used.has(x.img)) || c[0];
+  if(hit){ used.add(hit.img); if(hit.co) used.add('co:' + hit.co); }
+  return hit || null;
 }
 function mtHeroSlides(){
+  window._mkHbUsed = new Set();   // renderHero 가 mtHeroSlides → mkHeroSlides 순으로 부른다
   if(typeof MkMeet === 'undefined') return [];
   const tr = MkMeet.upcoming().find(x => x.open && x.visit_date && MkMeet.itemsOf(x).length);   // 날짜가 정해진 일정만
   if(!tr) return [];
-  const items = MkMeet.itemsOf(tr);
   const href = mkUrl('meetings.html') + '#trip-' + tr.id;
   const kick = [mtFmt(tr.visit_date, { month:'long', day:'numeric', weekday:'short' }), L(tr.city)].filter(Boolean).join(' · ');
   const line = t('mt_hero_line') + (tr.deadline ? ' · ' + t('mt_deadline') + ' ' + mtFmt(tr.deadline, { month:'long', day:'numeric' }) : '');
-  const tiles = items.map((it, i) => { const p = mkProduct(it.product_id); return mkHbTile(p.img, p.brand, i === 3 && items.length > 4 ? `<b>+${items.length - 4}</b>` : ''); });
-  return [{ cls: 'light', link: href, html: mkHbShell('ev', href, kick, L(tr.title) || t('mt_page_kick'), line, t('mt_evc_detail'), tiles) }];
+  const pic = mkHbPick(MkMeet.itemsOf(tr).map(it => { const p = mkProduct(it.product_id); return p && { img: p.img, alt: p.brand, co: p.companyId }; }));
+  return [{ cls: 'light', link: href, html: mkHbShell('ev', href, kick, L(tr.title) || t('mt_page_kick'), line, t('mt_evc_detail'), pic && pic.img, pic && pic.alt) }];
 }
 function mkHeroSlides(){
   const out = [];
   const prods = (typeof MK_PRODUCTS !== 'undefined' ? MK_PRODUCTS : []).filter(p => p && p.img);
+  const asPic = p => p && { img: p.img, alt: p.brand, co: p.companyId };
 
-  /* 1) 미팅이 어떻게 확정되나 — 실제 신청 현황이 붙은 제품 사진 한 장 */
+  /* 1) 미팅이 어떻게 확정되나 */
   const hit = typeof MkMeet !== 'undefined' ? MkMeet.upcoming().find(x => x.open && MkMeet.itemsOf(x).length) : null;
   if(hit){
-    const it = MkMeet.itemsOf(hit)[0], p = mkProduct(it.product_id);
-    const bar = `<span class="hb-bar"><span class="t"><b>${esc(p.brand)}</b>${mtJoinedHtml(it)}<i>${mtPct(it)}%</i></span>${mtBar(it)}</span>`;
+    const pic = mkHbPick(MkMeet.itemsOf(hit).map(it => asPic(mkProduct(it.product_id))));
     out.push({ cls: 'light', html: mkHbShell('', `${mkUrl('meetings.html')}#trip-${esc(hit.id)}`,
-      t('hs_how_kick'), t('hs_how_t'), t('hs_how_p'), t('hs_how_cta'), [mkHbTile(p.img, '', bar)]) });
+      t('hs_how_kick'), t('hs_how_t'), t('hs_how_p'), t('hs_how_cta'), pic && pic.img, pic && pic.alt) });
   }
 
-  /* 2) 제품 — 실제 제품 사진 */
+  /* 2) 제품 */
   if(prods.length){
+    const pic = mkHbPick((typeof mkFeaturedOrder === 'function' ? mkFeaturedOrder(prods) : prods).map(asPic));
     out.push({ cls: 'light', html: mkHbShell('', mkUrl('products.html'),
-      t('hs_prod_kick'), t('hs_prod_t'), t('hs_prod_p'), t('hs_prod_cta'), prods.slice(0, 3).map(p => mkHbTile(p.img, p.brand))) });
+      t('hs_prod_kick'), t('hs_prod_t'), t('hs_prod_p'), t('hs_prod_cta'), pic && pic.img, pic && pic.alt) });
   }
 
-  /* 3) 공급사 — 공급사 대표 사진 + 로고 */
-  const cos = (typeof MK_COMPANIES !== 'undefined' ? MK_COMPANIES : []).filter(c => c && c.cover).slice(0, 3);
+  /* 3) 공급사 — 공급사 대표 사진 */
+  const cos = (typeof MK_COMPANIES !== 'undefined' ? MK_COMPANIES : []).filter(c => c && c.cover);
   if(cos.length){
+    const pic = mkHbPick(cos.map(c => ({ img: c.cover, alt: c.brand || L(c.name), co: c.id })));
     out.push({ cls: 'light', html: mkHbShell('', mkUrl('companies.html'),
-      t('hs_co_kick'), t('hs_co_t'), t('hs_co_p'), t('hs_co_cta'),
-      cos.map(c => mkHbTile(c.cover, '', c.logo ? `<span class="lgc"><img src="${esc(c.logo)}" alt="${esc(c.brand || '')}" onload="window.mkLogoTrim&&mkLogoTrim(this)"></span>` : `<em>${esc(c.brand || L(c.name))}</em>`))) });
+      t('hs_co_kick'), t('hs_co_t'), t('hs_co_p'), t('hs_co_cta'), pic && pic.img, pic && pic.alt) });
   }
   return out;
 }
