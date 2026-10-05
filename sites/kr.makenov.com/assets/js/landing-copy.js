@@ -43,19 +43,19 @@ const LND = {
  },
  "stats": {
   "b1": {
-   "vi": "Đăng ký miễn phí",
-   "ko": "가입 무료",
-   "en": "Free to join"
+   "vi": "Miễn phí đăng ký",
+   "ko": "미팅 신청 무료",
+   "en": "Free to request"
   },
   "b2": {
-   "vi": "Xác thực doanh nghiệp ~1 phút",
-   "ko": "사업자 인증 약 1분",
-   "en": "Business verification in about a minute"
+   "vi": "Không cần tài khoản",
+   "ko": "가입 없이 1분",
+   "en": "No account, one minute"
   },
   "b3": {
-   "vi": "Đăng ký·xác thực·hỏi đáp đều miễn phí",
-   "ko": "가입·인증·문의 전부 무료",
-   "en": "Signup, verification and inquiries are all free"
+   "vi": "Có phiên dịch",
+   "ko": "한국어–베트남어 통역 지원",
+   "en": "Korean–Vietnamese interpreters"
   },
   "l1": {
    "vi": "Thương hiệu đăng ký",
@@ -81,9 +81,9 @@ const LND = {
    "_br": 1
   },
   "sub": {
-   "vi": "Sản phẩm từ nhà cung cấp Hàn Quốc đang được đăng tải lần lượt. Hãy xem trước danh mục bạn quan tâm.",
-   "ko": "한국 공급사의 제품이 순차 등록되고 있습니다. 관심 카테고리를 먼저 살펴보세요.",
-   "en": "Products from Korean suppliers are being added. Start with the category you care about."
+   "ko": "글로벌 공급사의 제품이 순차 등록되고 있습니다. 관심 카테고리를 먼저 살펴보세요.",
+   "vi": "Sản phẩm từ các nhà cung cấp toàn cầu đang được đăng tải lần lượt. Hãy xem trước danh mục bạn quan tâm.",
+   "en": "Products from global suppliers are being added. Start with the category you care about."
   }
  },
  "steps": {
@@ -125,9 +125,9 @@ const LND = {
    "_br": 1
   },
   "s2p": {
-   "vi": "MAKENOV kết nối các buổi gặp trực tiếp để nhà cung cấp Hàn Quốc và nhà phân phối Việt Nam cùng trao đổi về cơ hội kinh doanh thực tế.",
-   "ko": "MAKENOV는 한국 공급사와 베트남 유통사가 실제 비즈니스 기회를 논의할 수 있도록 직접 미팅을 연결합니다.",
-   "en": "MAKENOV arranges in-person meetings so Korean suppliers and Vietnamese distributors can discuss real business opportunities."
+   "ko": "MAKENOV는 공급사와 베트남 유통사가 실제 비즈니스 기회를 논의할 수 있도록 직접 미팅을 연결합니다.",
+   "vi": "MAKENOV kết nối các buổi gặp trực tiếp để nhà cung cấp và nhà phân phối Việt Nam cùng trao đổi về cơ hội kinh doanh thực tế.",
+   "en": "MAKENOV arranges in-person meetings so suppliers and Vietnamese distributors can discuss real business opportunities."
   },
   "s3k": {
    "vi": "Hỗ trợ toàn bộ quá trình kết nối",
@@ -215,9 +215,9 @@ const LND = {
    "en": "Which events are coming up?"
   },
   "a6": {
-   "vi": "Bạn có thể xem các sự kiện sắp tới và nhà cung cấp tham gia tại trang Lịch gặp mặt.\nDanh sách nhà cung cấp sẽ tiếp tục được bổ sung.",
-   "ko": "방문 일정 페이지에서 예정된 행사와 참가 공급사를 확인할 수 있습니다.\n참가 공급사는 순차적으로 추가됩니다.",
-   "en": "See upcoming events and the participating suppliers on the Meetings page.\nMore suppliers are being added.",
+   "vi": "Bạn có thể xem các sự kiện sắp tới và nhà cung cấp tham gia tại trang Lịch sự kiện.\nDanh sách nhà cung cấp sẽ tiếp tục được bổ sung.",
+   "ko": "행사 일정 페이지에서 예정된 행사와 참가 공급사를 확인할 수 있습니다.\n참가 공급사는 순차적으로 추가됩니다.",
+   "en": "See upcoming events and the participating suppliers on the Events page.\nMore suppliers are being added.",
    "_br": 1
   },
   "q7": {

@@ -33,7 +33,7 @@
 <script src="assets/js/config.js?v=20260915c"></script>
 <script src="assets/js/pixel.js?v=20260915b"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="assets/js/i18n.js?v=20261006i"></script>
+<script src="assets/js/i18n.js?v=20261006j"></script>
 <script src="assets/js/baked.js?v=20260826a"></script>
 <script src="assets/js/data.js?v=20261006h"></script>
 <script src="assets/js/copy.js?v=20260918c"></script>
@@ -177,6 +177,7 @@ async function saveProfile(){
 }
 
 function pageInit(){
+  document.title = t('mypage') + ' | MAKENOV';   // 파일이 하나라 탭 제목을 언어에 맞춰 바꾼다
   const s = Store.session();
   renderSummary(s);
   renderWish();
