@@ -739,13 +739,12 @@ button{font-family:var(--font-body);cursor:pointer;border:none;background:none;c
 .blog-item-link:hover .blog-item-img img{transform:scale(1.05)}
 /* 뱃지·브랜드 글자가 뜨도록 위아래에만 얇게 깐다 */
 .blog-item-img .veil{position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(180deg,rgba(4,20,63,.34) 0%,rgba(4,20,63,0) 34%,
-                              rgba(4,20,63,0) 66%,rgba(4,20,63,.34) 100%)}
+  background:linear-gradient(180deg,rgba(4,20,63,.28) 0%,rgba(4,20,63,0) 34%)}
 .blog-item-img .on-cover{position:absolute;inset:0;padding:20px 22px;display:flex;flex-direction:column}
-.blog-item-img .badge{align-self:flex-start;background:rgba(255,255,255,.16);color:#fff;
-  border:1px solid rgba(255,255,255,.38);border-radius:var(--r-pill);
-  font-size:11px;font-weight:700;padding:5px 12px;backdrop-filter:blur(2px)}
-.blog-item-img .brand{margin-top:auto;font-size:11px;font-weight:600;letter-spacing:.12em;color:rgba(255,255,255,.72)}
+/* 2026-10-05: 반투명 유리 배지 → 민트색으로 채움, 아래 'MAKENOV' 글자는 삭제(사용자 지시) */
+.blog-item-img .badge{align-self:flex-start;background:var(--mk-primary);color:#fff;
+  border-radius:var(--r-pill);font-size:11px;font-weight:700;letter-spacing:.02em;padding:6px 12px}
+.blog-item-img .brand{display:none}
 
 /* 카드 하단 정보 */
 .blog-item-info{padding:28px 28px 24px}
@@ -2008,6 +2007,12 @@ img.lg-trim{object-fit:contain!important;box-sizing:border-box;padding:7px;backg
 .ev-row .pd-sec h2{font-size:22px;margin-bottom:26px}
 .ev-row .pd-sec.pd-dist h2{margin-bottom:10px}
 .pd-gallery.ev-nophoto .main{display:flex;align-items:center;justify-content:center;background:var(--mk-navy);color:#fff;font-size:28px;font-weight:700}
+.ev-gal .main{display:block}
+.ev-gal .main img{object-fit:contain;background:var(--mk-bg-soft)}
+.ev-cap{position:absolute;left:14px;bottom:14px;z-index:2;max-width:calc(100% - 100px);display:flex;align-items:baseline;gap:8px;padding:7px 12px;border-radius:6px;background:rgba(0,0,0,.55);color:#fff;font-size:13px;line-height:1.4;pointer-events:none}
+.ev-cap b{flex:none;font-weight:700;letter-spacing:.02em}
+.ev-cap span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.9}
+.ev-thumbs img{cursor:pointer}
 .ev-logos{display:flex;align-items:center;gap:14px;margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--mk-line)}
 .ev-logos img{height:26px;width:auto;display:block}
 .ev-logos i{width:1px;height:20px;background:var(--mk-line-strong)}

@@ -1092,6 +1092,36 @@ function mtSupCard(tr, it){
         <div class="pr">${mtJoinedHtml(it)}<em>${mtPct(it)}%</em></div>
         <span class="act ${mine ? 'on' : ''}">${mine ? MT_ICO.check + esc(t('mt_btn_applied')) : esc(t('mt_btn_apply')) + ' →'}</span></div></a>`;
 }
+/* 일정 상세 맨 위 사진 — 참가 제품 사진 슬라이드(제품 상세 갤러리와 같은 모양: 큰 사진 + 아래 썸네일, 4초마다 넘어감).
+   2026-10-05: 행사 사진(도시 전경) 대신 '무엇을 만나는지'가 보이게. 제품이 없을 때만 행사 사진 · 날짜로 대신한다 */
+function mtEvGallery(tr, items, x, title, when){
+  const gal = items.map(it => mkProduct(it.product_id)).filter(p => p && p.img)
+    .map(p => ({ img: p.img, brand: p.brand || '', name: L(p.name), href: mkDocUrl('product', p.id) + '#meet' }));
+  window._mtEvGal = gal; window._mtEvCur = 0;
+  clearInterval(window._mtEvTimer);
+  if(!gal.length) return `<div class="pd-gallery ${x.photo ? '' : 'ev-nophoto'}"><div class="main">${x.photo ? `<img src="${esc(x.photo)}" alt="${esc(title)}">` : `<span>${esc(when)}</span>`}</div></div>`;
+  if(gal.length > 1 && !/HeadlessChrome/.test(navigator.userAgent)) window._mtEvTimer = setInterval(() => {
+    if(!document.getElementById('ev-shot')) return clearInterval(window._mtEvTimer);
+    mtEvShot((window._mtEvCur + 1) % window._mtEvGal.length, true);
+  }, 4000);
+  const g = gal[0];
+  return `<div class="pd-gallery ev-gal"><a class="main" id="ev-shot-a" href="${esc(g.href)}"><img id="ev-shot" src="${esc(g.img)}" alt="${esc(g.name)}"></a>
+      <div class="ev-cap"><b id="ev-cap-b">${esc(g.brand)}</b><span id="ev-cap-n">${esc(g.name)}</span></div>
+      ${gal.length > 1 ? `<span class="cnt" id="ev-cnt">1 / ${gal.length}</span>` : ''}</div>
+    ${gal.length > 1 ? `<div class="pd-thumbs ev-thumbs">${gal.map((p, i) => `<img src="${esc(p.img)}" alt="" class="${i ? '' : 'on'}" onclick="mtEvShot(${i})">`).join('')}</div>` : ''}`;
+}
+function mtEvShot(i, auto){
+  const gal = window._mtEvGal || [], g = gal[i], img = document.getElementById('ev-shot');
+  if(!g || !img) return;
+  window._mtEvCur = i;
+  img.src = g.img; img.alt = g.name;
+  document.getElementById('ev-shot-a').href = g.href;
+  document.getElementById('ev-cap-b').textContent = g.brand;
+  document.getElementById('ev-cap-n').textContent = g.name;
+  const cnt = document.getElementById('ev-cnt'); if(cnt) cnt.textContent = (i + 1) + ' / ' + gal.length;
+  document.querySelectorAll('.ev-thumbs img').forEach((el, n) => el.classList.toggle('on', n === i));
+  if(!auto) clearInterval(window._mtEvTimer);     // 직접 고르면 자동 넘김을 멈춘다
+}
 function mtKfGo(){ const el = document.getElementById('mt-kf-sups'); if(el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
 /* 일정 페이지 본문 — 제품 상세(page-product.js)와 같은 틀을 그대로 쓴다: 왼쪽 사진 + 본문 구역(.pd-main/.pd-sec), 오른쪽 신청 상자(.pd-side .box).
    2026-10-05: 따로 만든 히어로(그라데이션 · 알약 배지 · 떠 있는 날짜 배지)는 'AI 티가 난다'는 피드백으로 버리고 사이트 기존 컴포넌트로 통일.
@@ -1135,7 +1165,7 @@ function mtEventPage(tr){
     </section>` : '';
   return `<div class="wrap"><div class="pd-row mt-on ev-row" id="trip-${esc(tr.id)}">
     <div class="pd-main">
-      <div class="pd-gallery ${x.photo ? '' : 'ev-nophoto'}"><div class="main">${x.photo ? `<img src="${esc(x.photo)}" alt="${esc(title)}">` : `<span>${esc(when)}</span>`}</div></div>
+      ${mtEvGallery(tr, items, x, title, when)}
       <section class="pd-sec" id="mt-kf-sups">
         <h2>${esc(t('mt_kf_sup_h'))}</h2>
         <div class="mt-evd-sups kf-sups">${items.map(it => mtSupCard(tr, it)).join('')}</div>
