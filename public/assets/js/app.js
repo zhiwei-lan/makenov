@@ -1206,15 +1206,14 @@ function mtEventRow(tr){
   const kind = mtEventKind(tr), d = mtDate(tr.visit_date);
   const items = MkMeet.itemsOf(tr);
   const x = MT_EVENT_X[tr.id] || {};
-  const photo = x.photo || (items[0] && mkProduct(items[0].product_id).img) || '';
+  /* 왼쪽 칸: 참가 제품 사진 모음(최대 4칸, 더 있으면 마지막 칸에 +n) — 행사 사진보다 무엇을 만나는지가 먼저 보이게(2026-10-05) */
+  const pics = items.slice(0, 4).map((it, i) => `<span class="pi" style="background-image:url('${esc(mkProduct(it.product_id).img)}')">${i === 3 && items.length > 4 ? `<em>+${items.length - 4}</em>` : ''}</span>`).join('');
   const st = kind === 'past' ? t('mt_tab_past') : kind === 'open' ? t('mt_st_open') : t('mt_st_' + mtTripState(tr));
-  const thumbs = items.slice(0, 5).map(it => `<img src="${esc(mkProduct(it.product_id).img)}" alt="" loading="lazy">`).join('')
-    + (items.length > 5 ? `<span>+${items.length - 5}</span>` : '');
   const side = kind === 'open'
     ? `<span class="lb">${esc(t('mt_ev_until'))}</span><b>${tr.days_left != null && tr.days_left > 0 ? 'D-' + tr.days_left : esc(t('mt_dday_today'))}</b><span class="btn btn-primary">${esc(t('mt_list_go'))}</span>`
     : `<b class="off">${esc(st)}</b><span class="btn btn-ghost">${esc(t('mt_list_go'))}</span>`;
   return `<a class="mt-evl ${kind}" href="${mkUrl('meetings.html')}#trip-${esc(tr.id)}">
-    <div class="ph">${photo ? `<img src="${esc(photo)}" alt="" loading="lazy">` : ''}
+    <div class="ph n${Math.min(items.length, 4)}">${pics}
       <div class="mt-evd-date"><span class="mo">${esc(mtFmt(tr.visit_date, { month:'long' }))}</span><b>${d ? String(d.getDate()).padStart(2, '0') : ''}</b><span class="dw">${esc(mtFmt(tr.visit_date, { weekday:'long' }))}</span></div></div>
     <div class="mt-evl-main">
       <span class="mt-evl-st">${esc(st)}</span>
@@ -1224,7 +1223,6 @@ function mtEventRow(tr){
         <li>${MT_ICO.pin}<span>${esc(mtWhere(tr) || t('mt_tba'))}</span></li>
         ${tr.deadline && kind !== 'past' ? `<li>${MT_ICO.clock}<span>${esc(t('mt_deadline'))} ${esc(mtFmt(tr.deadline, { month:'long', day:'numeric', weekday:'short' }))}</span></li>` : ''}
       </ul>
-      <div class="mt-evl-thumbs">${thumbs}</div>
     </div>
     <div class="mt-evl-side">${side}</div>
   </a>`;

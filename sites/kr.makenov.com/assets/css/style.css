@@ -2073,9 +2073,12 @@ img.lg-trim{object-fit:contain!important;box-sizing:border-box;padding:7px;backg
 #mt-more.mt-evl-list{padding:0}
 .mt-evl{display:grid;grid-template-columns:300px minmax(0,1fr) 220px;border:1px solid var(--mk-line);border-radius:8px;background:#fff;color:inherit;overflow:hidden;transition:border-color .15s,box-shadow .15s}
 .mt-evl:hover{border-color:var(--mk-primary);box-shadow:0 6px 20px rgba(4,20,63,.07)}
-.mt-evl .ph{position:relative;min-height:204px;background:var(--mk-bg-soft)}
-.mt-evl .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.mt-evl.past .ph img{filter:grayscale(1);opacity:.75}
+.mt-evl .ph{position:relative;min-height:204px;display:grid;gap:2px;grid-auto-rows:minmax(0,1fr);background:#fff;border-right:1px solid var(--mk-line)}
+.mt-evl .ph.n2,.mt-evl .ph.n3,.mt-evl .ph.n4{grid-template-columns:1fr 1fr}
+.mt-evl .ph.n3 .pi:first-child{grid-row:span 2}
+.mt-evl .ph .pi{position:relative;display:block;background:var(--mk-bg-soft) center/cover no-repeat}
+.mt-evl .ph .pi em{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(4,20,63,.55);color:#fff;font-style:normal;font-size:20px;font-weight:700}
+.mt-evl.past .ph .pi{filter:grayscale(1);opacity:.75}
 .mt-evl .mt-evd-date{position:absolute;left:14px;bottom:14px;width:68px;height:76px;border-radius:8px;color:#fff;box-shadow:0 4px 14px rgba(0,0,0,.22)}
 .mt-evl .mt-evd-date b{font-size:30px}
 .mt-evl .mt-evd-date .mo,.mt-evl .mt-evd-date .dw{font-size:11px}
@@ -2089,9 +2092,6 @@ img.lg-trim{object-fit:contain!important;box-sizing:border-box;padding:7px;backg
 .mt-evl .meta{list-style:none;margin:0;padding:0;display:grid;gap:5px}
 .mt-evl .meta li{display:flex;align-items:center;gap:8px;font-size:14.5px;line-height:1.5;color:var(--mk-body)}
 .mt-evl .meta .mt-ico{flex:none;width:16px;height:16px;color:var(--mk-muted)}
-.mt-evl-thumbs{display:flex;align-items:center;margin-top:14px}
-.mt-evl-thumbs img{width:40px;height:40px;border-radius:6px;object-fit:cover;border:1px solid var(--mk-line);background:var(--mk-bg-soft);margin-right:6px}
-.mt-evl-thumbs span{font-size:13px;font-weight:600;color:var(--mk-muted)}
 .mt-evl-side{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:24px 22px;border-left:1px solid var(--mk-line);background:var(--mk-bg-soft);text-align:center}
 .mt-evl-side .lb{font-size:12.5px;color:var(--mk-muted)}
 .mt-evl-side b{font-size:34px;font-weight:800;line-height:1.15;letter-spacing:-.03em;color:var(--mk-ink)}
@@ -2115,3 +2115,13 @@ img.lg-trim{object-fit:contain!important;box-sizing:border-box;padding:7px;backg
   .mt-evl-list{padding:16px 0 56px}
   .mt-evl-tabs{gap:16px}
 }
+
+/* 랜딩 히어로 제목 4% 축소(2026-10-05) — 베트남어 첫 줄이 화면 폭에 꽉 차서. 원래 32 / 44 / 56 / 60px */
+#hero h1{font-size:30.7px}
+@media(min-width:640px){#hero h1{font-size:42.2px}}
+@media(min-width:768px){#hero h1{font-size:53.8px}}
+@media(min-width:1024px){#hero h1{font-size:57.6px}}
+
+/* 랜딩 '막막했던 해외 브랜드…' 제목 — 긴 베트남어가 끝에 한 단어만 떨어지지 않게 줄 길이를 고르게(각 문장이 한 덩어리) */
+#problem h2>span{display:block;text-wrap:balance}
+#problem h2>br{display:none}
