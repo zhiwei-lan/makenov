@@ -432,7 +432,7 @@ const MK_MAKER = {
   stats: [
     { n:'0원',       label:'제품 등록비',           note:'' },
     { n:'3개 언어',   label:'제품 정보 등록 지원',     note:'' },
-    { n:'사업자 인증', label:'유통 파트너 거래조건 열람 기준', note:'' },
+    { n:'1:1 미팅',  label:'신청한 유통 파트너와 현지 미팅', note:'' },
     { n:'365일',     label:'제품 상시 노출',         note:'' },
   ],
   markets: [
