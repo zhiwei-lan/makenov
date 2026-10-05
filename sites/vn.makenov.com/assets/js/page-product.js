@@ -93,7 +93,7 @@ function pageInit(){
         <div class="pd-body"><p>${esc(L(p.brandStory))}</p></div>
         ${co?`
         <a class="co-inline" href="${mkDocUrl('company',co.id)}">
-          <img src="${co.logo}" alt="" loading="lazy" onload="mkLogoTrim(this)">
+          <img src="${co.logo}" alt="" loading="lazy" onload="window.mkLogoTrim&&mkLogoTrim(this)">
           <div class="tx">
             <div class="nm">${esc(L(co.name))}</div>
             <div class="sub">${esc(L(co.location))} · ${(co.certs||[]).slice(0,3).map(x=>esc(L(x))).join(' · ')}</div>

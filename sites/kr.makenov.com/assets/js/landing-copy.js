@@ -9,53 +9,48 @@
    ============================================================ */
 const LND = {
  "hero": {
-  "kick": {
-   "vi": "NỀN TẢNG NHÀ PHÂN PHỐI TẠI VIỆT NAM",
-   "ko": "베트남 유통 파트너 플랫폼",
-   "en": "DISTRIBUTION PARTNER PLATFORM FOR VIETNAM"
-  },
   "h1a": {
-   "vi": "Ai cũng có thể trở thành nhà phân phối chính thức",
-   "ko": "누구나 글로벌 혁신 제품의",
-   "en": "Anyone can become the official distributor"
+   "vi": "Gặp trực tiếp nhà cung cấp Hàn Quốc",
+   "ko": "한국 공급사를",
+   "en": "Meet Korean suppliers"
   },
   "h1b": {
-   "vi": "của sản phẩm tiên phong toàn cầu",
-   "ko": "공식 유통사가 될 수 있습니다",
-   "en": "of a global innovative product"
+   "vi": "ngay tại Việt Nam",
+   "ko": "베트남에서 직접 만나세요",
+   "en": "in person in Vietnam"
   },
   "sub": {
-   "vi": "Xem điều kiện phân phối của những sản phẩm chưa có mặt tại Việt Nam\nvà trao đổi trực tiếp với nhà cung cấp. \nChưa có kinh nghiệm nhập khẩu vẫn bắt đầu được",
-   "ko": "아직 베트남에 들어오지 않은 제품의 유통 조건을 확인하고\n공급사와 직접 상담하세요. 수입 경험이 없어도 시작할 수 있습니다",
-   "en": "Check the trade terms of products that have not entered Vietnam yet\nand talk directly with suppliers. No import experience needed.",
+   "vi": "Chọn sản phẩm bạn quan tâm và đăng ký gặp mặt\nđể trao đổi 1:1 với đại diện nhà cung cấp.\nĐăng ký miễn phí, không cần tạo tài khoản",
+   "ko": "관심 있는 제품을 고르고 미팅을 신청하면\n공급사 담당자와 1:1로 상담합니다. 신청은 무료, 가입 없이 1분이면 됩니다",
+   "en": "Pick the products you are interested in and request a meeting\nto talk 1:1 with the supplier. Free to request, no account needed.",
    "_br": 1
   },
   "cta1": {
+   "vi": "Xem lịch sự kiện",
+   "ko": "행사 일정 보기",
+   "en": "See the event schedule"
+  },
+  "cta2": {
    "vi": "Khám phá sản phẩm",
    "ko": "제품 둘러보기",
    "en": "Browse products"
-  },
-  "cta2": {
-   "vi": "Xem hướng dẫn sử dụng",
-   "ko": "이용 가이드 보기",
-   "en": "See the user guide"
   }
  },
  "stats": {
   "b1": {
-   "vi": "Đăng ký miễn phí",
-   "ko": "가입 무료",
-   "en": "Free to join"
+   "vi": "Đăng ký gặp mặt miễn phí",
+   "ko": "미팅 신청 무료",
+   "en": "Free to request"
   },
   "b2": {
-   "vi": "Xác thực doanh nghiệp ~1 phút",
-   "ko": "사업자 인증 약 1분",
-   "en": "Business verification in about a minute"
+   "vi": "Không cần tài khoản, chỉ 1 phút",
+   "ko": "가입 없이 1분",
+   "en": "No account, one minute"
   },
   "b3": {
-   "vi": "Đăng ký·xác thực·hỏi đáp đều miễn phí",
-   "ko": "가입·인증·문의 전부 무료",
-   "en": "Signup, verification and inquiries are all free"
+   "vi": "Có phiên dịch Hàn – Việt",
+   "ko": "한국어–베트남어 통역 지원",
+   "en": "Korean–Vietnamese interpreters"
   },
   "l1": {
    "vi": "Thương hiệu đăng ký",
@@ -153,47 +148,6 @@ const LND = {
    "en": "Guides for future distributors"
   }
  },
- "pain": {
-  "h1": {
-   "vi": "Năng lực cạnh tranh trong phân phối",
-   "ko": "유통의 경쟁력은",
-   "en": "Competitive distribution starts with"
-  },
-  "h2": {
-   "vi": " Bắt đầu từ việc bạn bán sản phẩm nào",
-   "ko": "무엇을 파느냐에서 시작됩니다",
-   "en": "what you choose to sell"
-  },
-  "p": {
-   "vi": "MAKENOV tìm kiếm những sản phẩm tiên phong toàn cầu chưa được phân phối chính thức tại Việt Nam. Hãy chủ động khám phá tiềm năng của sản phẩm và chuẩn bị cho những cơ hội thị trường mới.",
-   "ko": "메이크노브는 아직 베트남에 공식 유통되지 않은 글로벌 혁신 제품을 발굴합니다.\n제품이 가진 가능성을 먼저 살펴보고 새로운 시장을 준비해 보세요.",
-   "en": "MAKENOV discovers global innovative products not yet officially distributed in Vietnam.\nSee a product's potential first and get ready for a new market.",
-   "_br": 1
-  }
- },
- "cost": {
-  "kick": {
-   "vi": "Chi phí dịch vụ",
-   "ko": "비용 안내",
-   "en": "Pricing"
-  },
-  "h1": {
-   "vi": "Từ tìm kiếm sản phẩm đến kết nối với nhà cung cấp",
-   "ko": "제품을 찾고 연결되는 과정까지",
-   "en": "The process of finding and connecting to a product"
-  },
-  "h2": {
-   "vi": "MAKENOV hỗ trợ hoàn toàn miễn phí",
-   "ko": "메이크노브는 무료입니다",
-   "en": "MAKENOV is free"
-  },
-  "p": {
-   "vi": "Từ khám phá sản phẩm toàn cầu, xem điều kiện giao dịch đến gửi yêu cầu báo giá cho nhà cung cấp — tất cả đều không mất phí sử dụng.\nKhi cần, MAKENOV cũng hỗ trợ miễn phí việc kết nối, trao đổi với nhà cung cấp và sắp xếp lịch gặp.",
-   "ko": "글로벌 제품 탐색부터 거래 조건 확인, 공급사 견적 문의까지 별도의 이용료 없이 이용할 수 있습니다.\n필요한 경우 공급사 연결과 소통, 미팅 조율까지 무료로 지원합니다.",
-   "en": "Product discovery, trade-term checks and supplier quote requests come with no usage fee.\nWhen needed, supplier connection, communication and meeting coordination are also supported for free.",
-   "_br": 1
-  }
- },
  "faq": {
   "q1": {
    "vi": "MAKENOV là dịch vụ gì?",
@@ -201,42 +155,42 @@ const LND = {
    "en": "What is MAKENOV?"
   },
   "a1": {
-   "vi": "MAKENOV là nền tảng B2B kết nối sản phẩm đổi mới toàn cầu với nhà phân phối tại Việt Nam.\nBạn có thể xem điều kiện giao dịch và khả năng phân phối chính thức của nhiều sản phẩm, rồi hỏi trực tiếp nhà cung cấp.\nKhi cần, chúng tôi còn hỗ trợ giao tiếp và tiến hành cuộc họp.",
-   "ko": "메이크노브는 글로벌 혁신 제품과 베트남 유통 파트너를 연결하는 B2B 플랫폼입니다.\n다양한 제품의 거래 조건과 공식 유통 가능성을 확인하고 공급사에 직접 문의할 수 있습니다.\n필요한 경우 소통과 미팅 진행도 지원합니다.",
-   "en": "MAKENOV is a B2B platform that connects global innovative products with distribution partners in Vietnam.\nYou can check trade terms and official distribution opportunities across many products and contact suppliers directly.\nWhen needed, we also support communication and meetings.",
+   "vi": "MAKENOV là nền tảng B2B kết nối nhà cung cấp Hàn Quốc với nhà phân phối tại Việt Nam.\nBạn xem sản phẩm, đăng ký gặp mặt và trao đổi trực tiếp với đại diện nhà cung cấp.\nChúng tôi cũng hỗ trợ giao tiếp và sắp xếp lịch gặp.",
+   "ko": "메이크노브는 한국 공급사와 베트남 유통사를 연결하는 B2B 플랫폼입니다.\n제품을 살펴보고 미팅을 신청하면 공급사 담당자를 직접 만나 상담할 수 있습니다.\n소통과 일정 조율도 함께 지원합니다.",
+   "en": "MAKENOV is a B2B platform connecting Korean suppliers with distributors in Vietnam.\nBrowse products, request a meeting and talk to the supplier in person.\nWe also support communication and scheduling.",
    "_br": 1
   },
   "q2": {
-   "vi": "Đăng ký và sử dụng có mất phí không?",
-   "ko": "가입과 이용에 비용이 드나요?",
-   "en": "Does it cost anything to join and use?"
+   "vi": "Sử dụng có mất phí không?",
+   "ko": "이용에 비용이 드나요?",
+   "en": "Does it cost anything?"
   },
   "a2": {
-   "vi": "Không. Từ đăng ký tài khoản, khám phá sản phẩm, xem điều kiện giao dịch đến gửi yêu cầu báo giá cho nhà cung cấp đều không mất phí sử dụng.\nKhi cần, việc kết nối nhà cung cấp, giao tiếp và điều phối cuộc họp cũng được hỗ trợ miễn phí.",
-   "ko": "아니요. 회원가입부터 제품 탐색, 거래 조건 확인, 공급사 견적 문의까지 별도의 이용료 없이 이용할 수 있습니다.\n필요한 경우 공급사 연결과 소통, 미팅 조율도 무료로 지원합니다.",
-   "en": "No. From signup to browsing products, checking trade terms and requesting quotes, there is no usage fee.\nSupplier connection, communication and meeting coordination are also supported for free when needed.",
+   "vi": "Không. Từ xem sản phẩm, đăng ký gặp mặt đến tham dự sự kiện đều miễn phí.\nViệc kết nối nhà cung cấp, phiên dịch và sắp xếp lịch gặp cũng được hỗ trợ miễn phí.",
+   "ko": "아니요. 제품 탐색부터 미팅 신청, 행사 참가까지 모두 무료입니다.\n공급사 연결과 통역, 미팅 조율도 별도 비용 없이 지원합니다.",
+   "en": "No. Browsing products, requesting meetings and attending events are all free.\nSupplier introductions, interpretation and meeting coordination are free as well.",
    "_br": 1
   },
   "q3": {
-   "vi": "Vì sao giá và MOQ bị khóa?",
-   "ko": "가격과 MOQ는 왜 잠겨 있나요?",
-   "en": "Why are price and MOQ locked?"
+   "vi": "Đăng ký gặp mặt như thế nào?",
+   "ko": "미팅은 어떻게 신청하나요?",
+   "en": "How do I request a meeting?"
   },
   "a3": {
-   "vi": "Giá cung cấp và MOQ là thông tin B2B phục vụ giao dịch thực tế nên chỉ hiển thị với doanh nghiệp đã xác thực.\nHoàn tất xác thực doanh nghiệp đơn giản là bạn xem được các điều kiện giao dịch chính như giá cung cấp, số lượng đặt hàng tối thiểu, thời gian giao hàng theo từng sản phẩm.",
-   "ko": "공급가와 MOQ는 실제 거래를 위한 B2B 정보이기 때문에 인증된 사업자에게만 공개됩니다.\n간단한 사업자 인증을 완료하면 제품별 공급가와 최소 주문 수량, 납기 등 주요 거래 조건을 확인할 수 있습니다.",
-   "en": "Supply price and MOQ are B2B information for real transactions, so they are shown only to verified businesses.\nComplete a quick business verification to see each product’s supply price, minimum order quantity and lead time.",
+   "vi": "Bấm «Đăng ký gặp mặt» trên trang sản phẩm hoặc trang lịch sự kiện, rồi để lại tên công ty và thông tin liên hệ.\nKhông cần tạo tài khoản, chỉ mất khoảng 1 phút.",
+   "ko": "제품 페이지나 행사 일정에서 ‘미팅 신청’을 누르고 회사명과 연락처를 남기면 됩니다.\n회원 가입은 필요 없고 1분이면 끝납니다.",
+   "en": "Click \"Request a meeting\" on a product page or the event schedule and leave your company name and contact details.\nNo account is needed and it takes about a minute.",
    "_br": 1
   },
   "q4": {
-   "vi": "Xác thực doanh nghiệp như thế nào?",
-   "ko": "사업자 인증은 어떻게 하나요?",
-   "en": "How does business verification work?"
+   "vi": "Sau khi đăng ký thì quy trình tiếp theo ra sao?",
+   "ko": "신청한 뒤에는 어떻게 진행되나요?",
+   "en": "What happens after I apply?"
   },
   "a4": {
-   "vi": "Sau khi đăng ký tài khoản, bạn nộp thông tin đăng ký kinh doanh để tiến hành xác thực.\nXác thực mất khoảng 1 phút, hoàn tất là xem ngay được các điều kiện giao dịch đang khóa.",
-   "ko": "회원가입 후 사업자 등록 정보를 제출하면 인증을 진행할 수 있습니다.\n인증에는 약 1분이 소요되며, 완료 후 잠겨 있던 제품의 거래 조건을 바로 확인할 수 있습니다.",
-   "en": "After signing up, submit your business registration details to start verification.\nIt takes about a minute, and locked trade terms open right after completion.",
+   "vi": "Người phụ trách sẽ liên hệ theo thông tin bạn để lại để xác nhận đăng ký.\nSau đó chúng tôi thông báo thời gian và địa điểm gặp.",
+   "ko": "담당자가 남겨주신 연락처로 연락드려 신청 내용을 확인합니다.\n이후 미팅 일정과 장소를 안내해 드립니다.",
+   "en": "Our coordinator contacts you to confirm your request.\nWe then let you know the meeting time and place.",
    "_br": 1
   },
   "q5": {
@@ -251,14 +205,14 @@ const LND = {
    "_br": 1
   },
   "q6": {
-   "vi": "Có thể đàm phán MOQ không?",
-   "ko": "MOQ 협의가 가능한가요?",
-   "en": "Can the MOQ be negotiated?"
+   "vi": "Hiện có những sự kiện nào sắp diễn ra?",
+   "ko": "어떤 행사가 예정되어 있나요?",
+   "en": "Which events are coming up?"
   },
   "a6": {
-   "vi": "Khả năng đàm phán MOQ tùy theo sản phẩm và nhà cung cấp.\nHãy ghi số lượng mong muốn trong yêu cầu, chúng tôi sẽ xác nhận với nhà cung cấp và hỗ trợ trao đổi cần thiết.",
-   "ko": "MOQ 협의 가능 여부는 제품과 공급사에 따라 달라집니다.\n원하는 수량을 문의에 남겨주시면 공급사에 협의 가능 여부를 확인하고 필요한 소통을 지원합니다.",
-   "en": "It depends on the product and the supplier.\nLeave your target quantity in an inquiry and we will check with the supplier and support the discussion.",
+   "vi": "Bạn có thể xem các sự kiện sắp tới và nhà cung cấp tham gia tại trang Lịch gặp mặt.\nDanh sách nhà cung cấp sẽ tiếp tục được bổ sung.",
+   "ko": "방문 일정 페이지에서 예정된 행사와 참가 공급사를 확인할 수 있습니다.\n참가 공급사는 순차적으로 추가됩니다.",
+   "en": "See upcoming events and the participating suppliers on the Meetings page.\nMore suppliers are being added.",
    "_br": 1
   },
   "q7": {
@@ -267,9 +221,9 @@ const LND = {
    "en": "Can I start without import experience?"
   },
   "a7": {
-   "vi": "Được. Bạn có thể bắt đầu từ việc tìm sản phẩm quan tâm và để lại yêu cầu.\nNếu việc giao tiếp hay họp với nhà cung cấp còn khó khăn, MAKENOV sẽ hỗ trợ, nên chưa có kinh nghiệm nhập khẩu vẫn có thể tìm hiểu cơ hội phân phối một cách thoải mái.",
-   "ko": "네. 관심 있는 제품을 찾고 문의를 남기는 것부터 시작할 수 있습니다.\n공급사와의 소통이나 미팅 진행이 어려운 경우 메이크노브가 필요한 과정을 지원하므로 수입 경험이 없어도 부담 없이 유통 가능성을 살펴볼 수 있습니다.",
-   "en": "Yes. Start by finding a product you like and leaving an inquiry.\nIf communicating with suppliers or running meetings is difficult, MAKENOV supports those steps, so you can explore distribution opportunities without prior import experience.",
+   "vi": "Được. Bạn có thể bắt đầu từ việc tìm sản phẩm quan tâm và đăng ký gặp mặt.\nNếu việc giao tiếp hay họp với nhà cung cấp còn khó khăn, MAKENOV sẽ hỗ trợ, nên chưa có kinh nghiệm nhập khẩu vẫn có thể tìm hiểu cơ hội phân phối một cách thoải mái.",
+   "ko": "네. 관심 있는 제품을 찾고 미팅을 신청하는 것부터 시작할 수 있습니다.\n공급사와의 소통이나 미팅 진행이 어려운 경우 메이크노브가 필요한 과정을 지원하므로 수입 경험이 없어도 부담 없이 유통 가능성을 살펴볼 수 있습니다.",
+   "en": "Yes. Start by finding a product you like and requesting a meeting.\nIf communicating with suppliers or running meetings is difficult, MAKENOV supports those steps, so you can explore distribution opportunities without prior import experience.",
    "_br": 1
   },
   "q8": {
@@ -278,43 +232,43 @@ const LND = {
    "en": "How does exclusive distribution negotiation work?"
   },
   "a8": {
-   "vi": "Hãy kiểm tra khả năng đàm phán độc quyền hoặc phân phối chính thức trên trang sản phẩm rồi để lại yêu cầu.\nChúng tôi hỗ trợ trọn quá trình cần cho đàm phán, từ kết nối nhà cung cấp, xác nhận điều kiện đến giao tiếp và điều phối cuộc họp.\nĐiều kiện phân phối cuối cùng được quyết định qua thỏa thuận với nhà cung cấp.",
-   "ko": "제품 페이지에서 독점 또는 공식 유통 협의 가능 여부를 확인한 뒤 문의를 남겨주세요.\n공급사와의 연결부터 조건 확인, 소통과 미팅 조율까지 협의에 필요한 과정을 지원합니다.\n최종 유통 조건은 공급사와의 협의를 통해 결정됩니다.",
-   "en": "Check on the product page whether exclusive or official distribution is negotiable, then leave an inquiry.\nWe support the whole negotiation process — connection, term checks, communication and meeting coordination.\nFinal distribution terms are decided through negotiation with the supplier.",
+   "vi": "Hãy kiểm tra khả năng đàm phán độc quyền hoặc phân phối chính thức trên trang sản phẩm rồi đăng ký gặp mặt.\nChúng tôi hỗ trợ trọn quá trình cần cho đàm phán, từ kết nối nhà cung cấp, xác nhận điều kiện đến giao tiếp và điều phối cuộc họp.\nĐiều kiện phân phối cuối cùng được quyết định qua thỏa thuận với nhà cung cấp.",
+   "ko": "제품 페이지에서 독점 또는 공식 유통 협의 가능 여부를 확인한 뒤 미팅을 신청해 주세요.\n공급사와의 연결부터 조건 확인, 소통과 미팅 조율까지 협의에 필요한 과정을 지원합니다.\n최종 유통 조건은 공급사와의 협의를 통해 결정됩니다.",
+   "en": "Check on the product page whether exclusive or official distribution is negotiable, then request a meeting.\nWe support the whole negotiation process — connection, term checks, communication and meeting coordination.\nFinal distribution terms are decided through negotiation with the supplier.",
    "_br": 1
   },
   "q9": {
-   "vi": "Tôi có thể hỏi bằng ngôn ngữ nào?",
-   "ko": "어떤 언어로 문의할 수 있나요?",
+   "vi": "Tôi có thể trao đổi bằng ngôn ngữ nào?",
+   "ko": "어떤 언어로 상담할 수 있나요?",
    "en": "Which languages can I use?"
   },
   "a9": {
-   "vi": "Bạn có thể hỏi bằng tiếng Hàn, tiếng Việt hoặc tiếng Anh.\nKhi cần phiên dịch trong quá trình làm việc với nhà cung cấp, chúng tôi hỗ trợ để đàm phán diễn ra suôn sẻ.",
-   "ko": "한국어, 베트남어 또는 영어로 문의할 수 있습니다.\n공급사와의 소통 과정에서 통역이 필요한 경우 원활하게 협의할 수 있도록 지원합니다.",
-   "en": "You can inquire in Korean, Vietnamese or English.\nIf interpretation is needed while talking with a supplier, we support the conversation.",
+   "vi": "Bạn có thể trao đổi bằng tiếng Hàn, tiếng Việt hoặc tiếng Anh.\nTại các buổi gặp có phiên dịch hỗ trợ để việc đàm phán diễn ra suôn sẻ.",
+   "ko": "한국어, 베트남어 또는 영어로 상담할 수 있습니다.\n미팅에는 통역이 함께해 원활하게 협의할 수 있도록 지원합니다.",
+   "en": "You can talk in Korean, Vietnamese or English.\nInterpreters join the meetings so the conversation goes smoothly.",
    "_br": 1
   }
  },
  "cta": {
   "h1": {
-   "vi": "Cơ hội của một thị trường mới,",
-   "ko": "새로운 시장의 가능성,",
-   "en": "The potential of a new market —"
+   "vi": "Bạn muốn gặp nhà cung cấp nào?",
+   "ko": "만나고 싶은 공급사가 있다면,",
+   "en": "Found a supplier you want to meet?"
   },
   "h2": {
-   "vi": "hãy là người phát hiện trước",
-   "ko": "먼저 발견해 보세요",
-   "en": "discover it first"
+   "vi": "Đăng ký gặp mặt ngay hôm nay",
+   "ko": "지금 미팅을 신청하세요",
+   "en": "Request a meeting today"
   },
   "p": {
-   "vi": "Gặp gỡ những sản phẩm tiên phong toàn cầu đang tìm nhà phân phối chính thức tại Việt Nam.",
-   "ko": "베트남 공식 유통 파트너를 찾고 있는 글로벌 혁신 제품을 만나보세요.",
-   "en": "Meet global innovative products looking for their official distribution partner in Vietnam."
+   "vi": "Đăng ký miễn phí, không cần tạo tài khoản, chỉ mất 1 phút.",
+   "ko": "신청은 무료이고, 가입 없이 1분이면 됩니다.",
+   "en": "It is free, needs no account and takes a minute."
   },
   "btn": {
-   "vi": "Xem sản phẩm",
-   "ko": "제품 확인하기",
-   "en": "See the products"
+   "vi": "Xem lịch sự kiện",
+   "ko": "행사 일정 보기",
+   "en": "See the event schedule"
   }
  },
  "float": {

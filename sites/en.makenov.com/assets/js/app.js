@@ -694,7 +694,7 @@ function openCatalog(pid){
 
 /* ---------- shared renderers ---------- */
 /* 로고 여백 잘라내기 — 올린 로고 파일이 '큰 흰 정사각형 가운데 작은 로고'면 상자 안에서 글자가 깨알처럼 보인다.
-   로드된 뒤 내용이 있는 영역만 잘라 다시 그린다(<img onload="mkLogoTrim(this)">). 여백이 적거나 실패(CORS 등)하면 원본 그대로. */
+   로드된 뒤 내용이 있는 영역만 잘라 다시 그린다(<img onload="window.mkLogoTrim&&mkLogoTrim(this)">). 여백이 적거나 실패(CORS 등)하면 원본 그대로. */
 const MK_LOGO_TRIM = {};
 function mkLogoTrim(img){
   if(!img || img.dataset.trim || /HeadlessChrome/.test(navigator.userAgent)) return;
@@ -738,7 +738,7 @@ function mkLogoTrim(img){
 function companyCard(c){
   const n = mkCompanyProducts(c.id).length;
   return `
-  <a class="co-card" href="${mkDocUrl('company',c.id)}" data-cat="${esc(c.cat||'')}"><div class="cv"><img src="${c.cover}" alt="" loading="lazy"></div><div class="bd"><img class="lg" src="${c.logo}" alt="${esc(L(c.name))}" loading="lazy" onload="mkLogoTrim(this)"><h3>${esc(L(c.name))}</h3><p class="tag">${esc(L(c.tagline))}</p><div class="meta"><span>${esc(L(c.location))}</span><i></i><span><b>${n}</b> <span data-i18n="co_prod_unit"></span></span>${String(c.since||'').replace(/[\s\-—–]/g,'') ? `<i></i><span>since ${esc(c.since)}</span>` : ''}</div></div></a>`;
+  <a class="co-card" href="${mkDocUrl('company',c.id)}" data-cat="${esc(c.cat||'')}"><div class="cv"><img src="${c.cover}" alt="" loading="lazy"></div><div class="bd"><img class="lg" src="${c.logo}" alt="${esc(L(c.name))}" loading="lazy" onload="window.mkLogoTrim&&mkLogoTrim(this)"><h3>${esc(L(c.name))}</h3><p class="tag">${esc(L(c.tagline))}</p><div class="meta"><span>${esc(L(c.location))}</span><i></i><span><b>${n}</b> <span data-i18n="co_prod_unit"></span></span>${String(c.since||'').replace(/[\s\-—–]/g,'') ? `<i></i><span>since ${esc(c.since)}</span>` : ''}</div></div></a>`;
 }
 /* 카드 지표 — ★2026-09-29 문의수는 뺀다(사용자 지시). 미팅 펀딩 달성률(mtCardLine)과 숫자가 겹쳐
    '43건 문의 · 0% 달성'처럼 헷갈렸다. 관심(wish)만 남기고, 0이면 생략. */
@@ -1037,7 +1037,7 @@ function mkHeroSlides(){
   if(cos.length){
     out.push({ cls: 'light', html: shell('hs-co', mkUrl('companies.html'),
       leftHtml('hs_co_kick', 'hs_co_t', 'hs_co_p', 'hs_co_cta'),
-      `<div class="hs-cos">${cos.map(c => `<div class="hs-co-row"><span class="lg">${c.logo ? `<img src="${esc(c.logo)}" alt="" onload="mkLogoTrim(this)">` : ''}</span><div><b>${esc(c.brand || L(c.name))}</b><span>${esc(L(c.location))}</span></div><em>${MT_ICO.check}</em></div>`).join('')}</div>`) });
+      `<div class="hs-cos">${cos.map(c => `<div class="hs-co-row"><span class="lg">${c.logo ? `<img src="${esc(c.logo)}" alt="" onload="window.mkLogoTrim&&mkLogoTrim(this)">` : ''}</span><div><b>${esc(c.brand || L(c.name))}</b><span>${esc(L(c.location))}</span></div><em>${MT_ICO.check}</em></div>`).join('')}</div>`) });
   }
   return out;
 }

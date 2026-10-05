@@ -28,7 +28,7 @@ function pageInit(){
 
     <div class="co-wrap">
       <div class="co-head">
-        <img class="lg" src="${c.logo}" alt="" onload="mkLogoTrim(this)">
+        <img class="lg" src="${c.logo}" alt="" onload="window.mkLogoTrim&&mkLogoTrim(this)">
         <div class="tx">
           <h1>${esc(L(c.name))}</h1>
           <p class="sub">${esc(L(c.tagline))}</p>
