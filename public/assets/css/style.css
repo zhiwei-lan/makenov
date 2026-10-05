@@ -1924,6 +1924,7 @@ body.mkedit-on .omc-hero .slide.on .shot{pointer-events:none}
 .mt-evd+.mt-evd{margin-top:16px}
 .mt-evd-top{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:22px;align-items:center}
 .mt-evd-date{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;width:98px;height:106px;border-radius:16px;background:linear-gradient(160deg,#0B45B4 0%,#022E7D 75%);color:#fff;text-align:center}
+.mt-evd .mt-evd-date,.mt-evd .mt-evd-date:hover{color:#fff}
 .mt-evd-date .mo{font-size:12.5px;font-weight:700;letter-spacing:.06em;opacity:.86}
 .mt-evd-date b{font-size:44px;font-weight:800;line-height:1.08;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
 .mt-evd-date .dw{font-size:12.5px;font-weight:600;opacity:.86}
@@ -2001,8 +2002,11 @@ img.lg-trim{object-fit:contain!important;box-sizing:border-box;padding:7px;backg
 /* ===== 방문 일정 페이지 본문 (app.js mtEventPage) — 제품 상세와 같은 틀(.pd-row/.pd-main/.pd-side)을 쓰고, 여기는 그 안에 들어가는 조각만 ===== */
 .pd-row.ev-row{scroll-margin-top:240px}
 @media(min-width:961px){.pd-row.mt-on.ev-row .pd-side{position:sticky;top:154px}}
-.ev-row .pd-main .pd-sec{margin-top:64px}
-.ev-row .pd-main .pd-sec.pd-dist{margin-top:64px}
+.ev-row .pd-main .pd-sec{margin-top:104px}
+.ev-row .pd-main .pd-gallery+.pd-sec{margin-top:72px}
+.ev-row .pd-main .pd-sec.pd-dist{margin-top:104px;padding:30px 32px 16px}
+.ev-row .pd-sec h2{font-size:22px;margin-bottom:26px}
+.ev-row .pd-sec.pd-dist h2{margin-bottom:10px}
 .pd-gallery.ev-nophoto .main{display:flex;align-items:center;justify-content:center;background:var(--mk-navy);color:#fff;font-size:28px;font-weight:700}
 .ev-logos{display:flex;align-items:center;gap:14px;margin-bottom:18px;padding-bottom:18px;border-bottom:1px solid var(--mk-line)}
 .ev-logos img{height:26px;width:auto;display:block}
@@ -2047,7 +2051,9 @@ img.lg-trim{object-fit:contain!important;box-sizing:border-box;padding:7px;backg
 .kf-faq details[open] summary::after{transform:translateY(2px) rotate(-135deg)}
 .kf-faq details p{margin:0;padding:0 28px 18px 2px;font-size:15px;line-height:1.75;color:var(--mk-body);word-break:keep-all}
 @media(max-width:960px){
-  .ev-row .pd-main .pd-sec,.ev-row .pd-main .pd-sec.pd-dist{margin-top:44px}
+  .ev-row .pd-main .pd-sec,.ev-row .pd-main .pd-gallery+.pd-sec,.ev-row .pd-main .pd-sec.pd-dist{margin-top:68px}
+  .ev-row .pd-main .pd-sec.pd-dist{padding:24px 20px 10px}
+  .ev-row .pd-sec h2{font-size:20px;margin-bottom:20px}
   .kf-map iframe{height:280px}
 }
 @media(max-width:640px){
