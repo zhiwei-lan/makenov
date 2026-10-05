@@ -1285,7 +1285,7 @@ function mtFeatured(tr){
           <li>${MT_ICO.clock}<span>${esc(mtTime(tr) || t('mt_tba'))}</span></li>
           <li>${MT_ICO.pin}<span>${esc(mtWhere(tr) || t('mt_tba'))}</span></li>
           ${tr.deadline ? `<li>${MT_ICO.cal}<span>${esc(t('mt_deadline'))} · ${esc(mtFmt(tr.deadline, { month:'long', day:'numeric', weekday:'short' }))}</span></li>` : ''}
-          <li>${MT_ICO.users}<span>${esc(mtRep('mt_evc_sups', { n: items.length }))} · ${esc(mtRep('mt_evc_joined', { n: joined }))}</span></li>
+          <li>${MT_ICO.users}<span>${esc(mtRep('mt_evc_sups', { n: items.length }))}</span></li>
         </ul>
       </div>
       <a class="btn btn-ghost mt-evd-go" href="${href}">${esc(t('mt_evc_detail'))} →</a>
