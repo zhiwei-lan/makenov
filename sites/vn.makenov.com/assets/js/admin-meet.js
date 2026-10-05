@@ -1,8 +1,8 @@
 /* ============================================================
-   관리자 · 미팅 펀딩(방문 일정)  — /meet/v1/admin/*
+   관리자 · 미팅 펀딩(행사 일정)  — /meet/v1/admin/*
    백엔드: app/Controllers/Api/Meet.php · 사이트: app.js MkMeet · 페이지: meetings.html
    ------------------------------------------------------------
-   방문 일정 1건 = 한국 공급사 담당자가 베트남에 오는 날 하나.
+   행사 일정 1건 = 한국 공급사 담당자가 베트남에 오는 날 하나.
    그 안에 공급사(제품)별 목표 인원(기본 5)을 건다. 마감 전까지 인증 바이어가 신청한다.
    공개(published)를 켜야 사이트에 보인다. 신청이 있는 일정은 삭제 대신 숨김/취소로.
    ============================================================ */
@@ -17,7 +17,7 @@ const MeetAdmin = {
     const r = await fetch(this.base() + path, { method, headers: h, body: body === undefined ? undefined : JSON.stringify(body) });
     let d = null; try{ d = await r.json(); }catch(e){}
     if(!r.ok){
-      if(d && d.error === 'schema_missing') throw new Error('방문 일정 테이블을 만드는 중입니다. 잠시 뒤 다시 열어 주세요. 계속되면 서버에서 php spark migrate 를 돌려야 합니다.');
+      if(d && d.error === 'schema_missing') throw new Error('행사 일정 테이블을 만드는 중입니다. 잠시 뒤 다시 열어 주세요. 계속되면 서버에서 php spark migrate 를 돌려야 합니다.');
       throw new Error((d && d.message) || ('HTTP ' + r.status));
     }
     return d;
@@ -122,7 +122,7 @@ function meetListHtml(){
   return `
     <div class="card"><p class="note"><b>행사 일정</b> — 공급사를 직접 만나는 행사를 올리면, 바이어가 가입 없이 회사명·연락처만 남겨 공급사(제품)별로 미팅을 신청합니다.
       신청 수가 목표 인원(기본 5곳)에 닿은 제품은 <b>확정</b>으로 표시됩니다. 마감일이 지나면 신청이 닫히고, 행사일이 지나면 사이트의 ‘종료’ 탭으로 넘어갑니다(베트남 시간 기준).<br>
-      <b>사이트 노출</b>을 켜야 vn/kr/en 의 <b>방문 일정</b> 페이지 · 홈 · 제품 상세에 보입니다. 행사일을 비운 일정은 목록에 나오지 않습니다.</p>
+      <b>사이트 노출</b>을 켜야 vn/kr/en 의 <b>행사 일정</b> 페이지 · 홈 · 제품 상세에 보입니다. 행사일을 비운 일정은 목록에 나오지 않습니다.</p>
       <div class="bar"><span class="grow"></span><button class="btn btn-ghost btn-sm" onclick="meetCsv()">전체 신청 엑셀(CSV)</button><button class="btn btn-primary btn-sm" onclick="meetEdit='';renderMeet()">+ 새 행사 일정</button></div>
       <div class="tbl-wrap"><table><thead><tr><th style="width:150px">행사일 · 마감</th><th>행사 · 공급사별 신청</th><th style="width:120px">상태</th><th style="width:220px"></th></tr></thead><tbody>
       ${rows || `<tr class="empty-row"><td colspan="4">행사 일정이 없습니다. 오른쪽 위 ‘새 행사 일정’으로 등록하세요.</td></tr>`}
@@ -311,7 +311,7 @@ async function meetSave(id){
   catch(e){ toastA('저장 실패: ' + e.message); }
 }
 async function meetDelete(id){
-  if(!confirm('이 방문 일정을 삭제할까요? (신청이 있으면 삭제되지 않습니다 — 숨김이나 취소로 바꾸세요)')) return;
+  if(!confirm('이 행사 일정을 삭제할까요? (신청이 있으면 삭제되지 않습니다 — 숨김이나 취소로 바꾸세요)')) return;
   try{ await MeetAdmin.deleteTrip(id); toastA('삭제했습니다'); renderMeet(); }
   catch(e){ toastA(e.message); }
 }
