@@ -35,24 +35,22 @@
 <body>
 <div id="mk-topbar" class="topbar"><div class="wrap"><span></span><button class="x" onclick="sessionStorage.setItem('mk_topbar_off','1');this.closest('.topbar').remove()">✕</button></div></div><header class="mk-header" id="mk-header"></header><main>
 <!-- mk:pre (prerender.js가 관리 — 직접 수정 금지) -->
-<div id="mk-prerender"><div><section class="kf-hero has-photo" style="background-image:url('https://kfesta.vn/assets/img/beauty/day1-vip.webp')">
-    <div class="kf-hero-in">
-      <h1>DAEGU MADE KFESTA<br><span>Korea–Vietnam Business Matching</span></h1>
+<div id="mk-prerender"><div><section class="kf-hero"><div class="wrap kf-hero-in">
+    <div class="kf-hero-tx">
       <div class="kf-logos"><img src="https://kfesta.vn/assets/img/daegu-ci.webp" alt="Daegu Metropolitan City"><i></i><img src="https://kfesta.vn/assets/img/b85af70e2ee60.webp" alt="KFESTA"></div>
+      <h1>DAEGU MADE KFESTA<span>Korea–Vietnam Business Matching</span></h1>
+      <p class="kf-lead">Meet innovative companies from Daegu, Korea <span class="y">in person in Ho Chi Minh City</span></p>
       <ul class="kf-hero-meta">
-        <li><svg class="mt-ico" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg><span>Fri, December 4, 2026</span></li>
-        <li><svg class="mt-ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg><span>09:00 – 15:00</span></li>
-        <li><svg class="mt-ico" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg><span>Hotel Nikko Saigon · Ho Chi Minh City</span></li>
+        <li><span class="k">Date &amp; time</span><span class="v">Fri, December 4, 2026 · 09:00 – 15:00</span></li>
+        <li><span class="k">Venue</span><span class="v">Hotel Nikko Saigon · Ho Chi Minh City</span></li>
+        <li><span class="k">Sign-up deadline</span><span class="v">Sun, November 22<em>48 days left</em></span></li>
       </ul>
+      <div class="kf-hero-cta">
+        <button type="button" class="btn btn-primary btn-lg" onclick="mtKfGo()">Request a meeting →</button>
+        <span class="kf-cta-note">Free to attend · Korean–Vietnamese interpreters on site</span>
+      </div>
     </div>
-  </section>
-  <section class="kf-band"><div class="kf-doc kf-band-in">
-    <div>
-      <span class="kf-badge">Meeting requests open</span><span class="kf-dday">D-48 to deadline</span>
-      <h2>Meet innovative companies from Daegu, Korea <span class="y">in person in Ho Chi Minh City</span></h2>
-      <p class="kf-band-meta">Sign-up deadline Sun, November 22 · Free to attend · Korean–Vietnamese interpreters on site</p>
-    </div>
-    <button type="button" class="kf-btn yellow" onclick="mtKfGo()">Request a meeting</button>
+    <div class="kf-hero-ph "><img src="https://kfesta.vn/assets/img/beauty/day1-vip.webp" alt="DAEGU MADE KFESTA"><div class="mt-evd-date"><span class="mo">December</span><b>04</b><span class="dw">Friday</span></div></div>
   </div></section>
   <section class="kf-sec"><div class="kf-doc">
     <div class="kf-hd"><span class="kf-k">Overview</span><h2>Event overview</h2></div>
@@ -98,9 +96,9 @@
     <div class="kf-map-info"><div><b>Hotel Nikko Saigon</b><span>235 Nguyen Van Cu, District 1, Ho Chi Minh City</span></div>
       <a href="https://www.google.com/maps/search/?api=1&amp;query=Hotel%20Nikko%20Saigon%2C%20235%20Nguyen%20Van%20Cu%2C%20District%201%2C%20Ho%20Chi%20Minh%20City" target="_blank" rel="noopener"><svg class="mt-ico" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>Open in Google Maps</a></div>
   </div></section>
-  <section class="kf-sec"><div class="kf-doc mt-faq">
+  <section class="kf-sec"><div class="kf-doc">
     <div class="kf-hd"><span class="kf-k">FAQ</span><h2>FAQ</h2></div>
-    <details><summary>Is there a fee?</summary><p>No. Requesting meetings and attending the event are both free.</p></details><details><summary>Who can join?</summary><p>Any company in Vietnam interested in importing or distributing Korean products. No account is needed.</p></details><details><summary>What happens after I apply?</summary><p>Our coordinator contacts you and sets a time slot with each supplier.</p></details><details><summary>What if I don't speak Korean?</summary><p>No problem. Professional Korean–Vietnamese interpreters join the meetings.</p></details><details><summary>Can I meet more than one supplier?</summary><p>Yes. Request each supplier you want to meet and we schedule the slots so they do not overlap.</p></details>
+    <div class="kf-faq"><details open=""><summary><span>Is there a fee to take part?</span></summary><p>No. Requesting meetings and attending the event are both free.</p></details><details><summary><span>Which companies can apply?</span></summary><p>Distributors, importers, agents and any company in Vietnam looking to source Korean products.</p></details><details><summary><span>How do I apply?</span></summary><p>Click "Request a meeting" on the supplier you want to meet and enter your company name, industry, contact person and contact details. No account is needed and it takes about a minute.</p></details><details><summary><span>What happens after I apply?</span></summary><p>Our coordinator contacts you by the phone number or email you left to confirm your request and tell you the time slot with each supplier.</p></details><details><summary><span>When is the deadline?</span></summary><p>Requests are accepted until Sun, November 22, 2026. After that we fix the time slots and notify each company.</p></details><details><summary><span>Can I take part if I don't speak Korean?</span></summary><p>Yes. A professional Korean–Vietnamese interpreter joins every meeting.</p></details><details><summary><span>Can I meet several suppliers on the same day?</span></summary><p>Yes. Request each supplier you want to meet and we schedule the slots so they do not overlap.</p></details><details><summary><span>What should I prepare for the meeting?</span></summary><p>Bring business cards and a company profile. If you already have products in mind, prepare your questions on price, minimum order quantity and distribution terms.</p></details></div>
   </div></section></div>
 <section class="mt-hero" hidden=""><div class="wrap">
 <div class="kick" data-i18n="mt_page_kick">MEET KOREAN SUPPLIERS IN PERSON</div>
@@ -116,7 +114,7 @@ the Korean supplier flies in to meet you</h1>
 <div><section class="kf-end"><div class="kf-doc">
     <p class="d">Sign-up deadline <b>Sun, November 22, 2026</b></p>
     <p>It's free. Just leave your company name and contact details.</p>
-    <button type="button" class="kf-btn navy" onclick="mtKfGo()">Request a meeting</button>
+    <button type="button" class="btn btn-primary btn-lg" onclick="mtKfGo()">Request a meeting →</button>
   </div></section></div>
 
 <nav class="mk-static-mk-header">

@@ -35,24 +35,22 @@
 <body>
 <div id="mk-topbar" class="topbar"><div class="wrap"><span></span><button class="x" onclick="sessionStorage.setItem('mk_topbar_off','1');this.closest('.topbar').remove()">✕</button></div></div><header class="mk-header" id="mk-header"></header><main>
 <!-- mk:pre (prerender.js가 관리 — 직접 수정 금지) -->
-<div id="mk-prerender"><div><section class="kf-hero has-photo" style="background-image:url('https://kfesta.vn/assets/img/beauty/day1-vip.webp')">
-    <div class="kf-hero-in">
-      <h1>DAEGU MADE KFESTA<br><span>한국–베트남 비즈니스 상담회</span></h1>
+<div id="mk-prerender"><div><section class="kf-hero"><div class="wrap kf-hero-in">
+    <div class="kf-hero-tx">
       <div class="kf-logos"><img src="https://kfesta.vn/assets/img/daegu-ci.webp" alt="Daegu Metropolitan City"><i></i><img src="https://kfesta.vn/assets/img/b85af70e2ee60.webp" alt="KFESTA"></div>
+      <h1>DAEGU MADE KFESTA<span>한국–베트남 비즈니스 상담회</span></h1>
+      <p class="kf-lead">한국 대구의 혁신기업을 <span class="y">호치민에서 직접</span> 만나보세요</p>
       <ul class="kf-hero-meta">
-        <li><svg class="mt-ico" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg><span>2026년 12월 4일 금</span></li>
-        <li><svg class="mt-ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg><span>09:00 – 15:00</span></li>
-        <li><svg class="mt-ico" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg><span>호텔 니코 사이공 · 호치민</span></li>
+        <li><span class="k">일시</span><span class="v">2026년 12월 4일 금 · 09:00 – 15:00</span></li>
+        <li><span class="k">장소</span><span class="v">호텔 니코 사이공 · 호치민</span></li>
+        <li><span class="k">신청 마감</span><span class="v">11월 22일 (일)<em>D-48</em></span></li>
       </ul>
+      <div class="kf-hero-cta">
+        <button type="button" class="btn btn-primary btn-lg" onclick="mtKfGo()">미팅 신청하기 →</button>
+        <span class="kf-cta-note">참가비 무료 · 한국어–베트남어 통역 지원</span>
+      </div>
     </div>
-  </section>
-  <section class="kf-band"><div class="kf-doc kf-band-in">
-    <div>
-      <span class="kf-badge">미팅 신청 접수 중</span><span class="kf-dday">마감 D-48</span>
-      <h2>한국 대구의 혁신기업을 <span class="y">호치민에서 직접</span> 만나보세요</h2>
-      <p class="kf-band-meta">신청 마감 11월 22일 (일) · 참가비 무료 · 한국어–베트남어 통역 지원</p>
-    </div>
-    <button type="button" class="kf-btn yellow" onclick="mtKfGo()">미팅 신청하기</button>
+    <div class="kf-hero-ph "><img src="https://kfesta.vn/assets/img/beauty/day1-vip.webp" alt="DAEGU MADE KFESTA"><div class="mt-evd-date"><span class="mo">12월</span><b>04</b><span class="dw">금요일</span></div></div>
   </div></section>
   <section class="kf-sec"><div class="kf-doc">
     <div class="kf-hd"><span class="kf-k">Overview</span><h2>행사 개요</h2></div>
@@ -98,9 +96,9 @@
     <div class="kf-map-info"><div><b>호텔 니코 사이공</b><span>235 Nguyễn Văn Cừ, 1군, 호치민 (Hotel Nikko Saigon)</span></div>
       <a href="https://www.google.com/maps/search/?api=1&amp;query=Hotel%20Nikko%20Saigon%2C%20235%20Nguyen%20Van%20Cu%2C%20District%201%2C%20Ho%20Chi%20Minh%20City" target="_blank" rel="noopener"><svg class="mt-ico" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>Google 지도에서 열기</a></div>
   </div></section>
-  <section class="kf-sec"><div class="kf-doc mt-faq">
+  <section class="kf-sec"><div class="kf-doc">
     <div class="kf-hd"><span class="kf-k">FAQ</span><h2>자주 묻는 질문</h2></div>
-    <details><summary>참가비가 있나요?</summary><p>아니요. 미팅 신청과 행사 참가 모두 무료입니다.</p></details><details><summary>누가 참가할 수 있나요?</summary><p>한국 제품의 수입·유통에 관심 있는 베트남 기업이면 누구나 신청할 수 있습니다. 회원 가입은 필요 없습니다.</p></details><details><summary>신청하면 어떻게 진행되나요?</summary><p>담당자가 남겨주신 연락처로 연락드려 공급사별 상담 시간을 정해 드립니다.</p></details><details><summary>한국어를 못해도 되나요?</summary><p>네. 한국어–베트남어 전문 통역이 상담에 함께합니다.</p></details><details><summary>여러 공급사를 만날 수 있나요?</summary><p>네. 만나고 싶은 공급사마다 신청하시면 시간이 겹치지 않게 배정해 드립니다.</p></details>
+    <div class="kf-faq"><details open=""><summary><span>참가비가 있나요?</span></summary><p>없습니다. 미팅 신청과 행사 참가 모두 무료입니다.</p></details><details><summary><span>어떤 기업이 신청할 수 있나요?</span></summary><p>유통사, 수입사, 대리점 등 한국 제품을 찾는 베트남 기업이면 어디든 신청할 수 있습니다.</p></details><details><summary><span>신청은 어떻게 하나요?</span></summary><p>만나고 싶은 공급사의 ‘미팅 신청’을 누르고 회사명, 업종, 담당자, 연락처를 적으면 됩니다. 회원 가입은 필요 없고 1분이면 끝납니다.</p></details><details><summary><span>신청한 뒤에는 어떻게 진행되나요?</span></summary><p>담당자가 남겨주신 전화번호나 이메일로 연락드려 신청 내용을 확인하고, 공급사별 상담 시간을 안내해 드립니다.</p></details><details><summary><span>신청은 언제까지 받나요?</span></summary><p>2026년 11월 22일 일까지 받습니다. 마감 뒤에 상담 시간을 확정해 기업별로 안내드립니다.</p></details><details><summary><span>한국어를 못해도 상담할 수 있나요?</span></summary><p>네. 모든 상담에 한국어–베트남어 전문 통역이 함께합니다.</p></details><details><summary><span>하루에 여러 공급사를 만날 수 있나요?</span></summary><p>네. 만나고 싶은 공급사마다 신청하시면 상담 시간이 겹치지 않게 배정해 드립니다.</p></details><details><summary><span>상담 당일 무엇을 준비하면 되나요?</span></summary><p>명함과 회사 소개 자료를 가져오시면 좋습니다. 관심 제품이 있다면 가격, 최소 주문 수량, 유통 조건에 대한 질문을 미리 정리해 두세요.</p></details></div>
   </div></section></div>
 <section class="mt-hero" hidden=""><div class="wrap">
 <div class="kick" data-i18n="mt_page_kick">한국 공급사 대면 미팅</div>
@@ -116,7 +114,7 @@
 <div><section class="kf-end"><div class="kf-doc">
     <p class="d">신청 마감 <b>2026년 11월 22일 일</b></p>
     <p>신청은 무료이며, 회사명과 연락처만 남기면 됩니다.</p>
-    <button type="button" class="kf-btn navy" onclick="mtKfGo()">미팅 신청하기</button>
+    <button type="button" class="btn btn-primary btn-lg" onclick="mtKfGo()">미팅 신청하기 →</button>
   </div></section></div>
 
 <nav class="mk-static-mk-header">

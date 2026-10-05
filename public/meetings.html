@@ -34,24 +34,22 @@
 <body>
 <div id="mk-topbar" class="topbar"><div class="wrap"><span></span><button class="x" onclick="sessionStorage.setItem('mk_topbar_off','1');this.closest('.topbar').remove()">✕</button></div></div><header class="mk-header" id="mk-header"></header><main>
 <!-- mk:pre (prerender.js가 관리 — 직접 수정 금지) -->
-<div id="mk-prerender"><div><section class="kf-hero has-photo" style="background-image:url('https://kfesta.vn/assets/img/beauty/day1-vip.webp')">
-    <div class="kf-hero-in">
-      <h1>DAEGU MADE KFESTA<br><span>Hội nghị kết nối giao thương Hàn – Việt</span></h1>
+<div id="mk-prerender"><div><section class="kf-hero"><div class="wrap kf-hero-in">
+    <div class="kf-hero-tx">
       <div class="kf-logos"><img src="https://kfesta.vn/assets/img/daegu-ci.webp" alt="Daegu Metropolitan City"><i></i><img src="https://kfesta.vn/assets/img/b85af70e2ee60.webp" alt="KFESTA"></div>
+      <h1>DAEGU MADE KFESTA<span>Hội nghị kết nối giao thương Hàn – Việt</span></h1>
+      <p class="kf-lead">Gặp <span class="y">trực tiếp tại TP.HCM</span> các doanh nghiệp đổi mới đến từ Daegu, Hàn Quốc</p>
       <ul class="kf-hero-meta">
-        <li><svg class="mt-ico" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2"></rect><path d="M3.5 10h17M8 3v4M16 3v4"></path></svg><span>Thứ 6, 4 tháng 12, 2026</span></li>
-        <li><svg class="mt-ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg><span>09:00 – 15:00</span></li>
-        <li><svg class="mt-ico" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg><span>Khách sạn Nikko Saigon · TP. Hồ Chí Minh</span></li>
+        <li><span class="k">Thời gian</span><span class="v">Thứ 6, 4 tháng 12, 2026 · 09:00 – 15:00</span></li>
+        <li><span class="k">Địa điểm</span><span class="v">Khách sạn Nikko Saigon · TP. Hồ Chí Minh</span></li>
+        <li><span class="k">Hạn đăng ký</span><span class="v">CN, 22 tháng 11<em>còn 48 ngày</em></span></li>
       </ul>
+      <div class="kf-hero-cta">
+        <button type="button" class="btn btn-primary btn-lg" onclick="mtKfGo()">Đăng ký gặp mặt →</button>
+        <span class="kf-cta-note">Miễn phí tham gia · Có phiên dịch Hàn – Việt</span>
+      </div>
     </div>
-  </section>
-  <section class="kf-band"><div class="kf-doc kf-band-in">
-    <div>
-      <span class="kf-badge">Đang nhận đăng ký gặp mặt</span><span class="kf-dday">Còn 48 ngày</span>
-      <h2>Gặp <span class="y">trực tiếp tại TP.HCM</span> các doanh nghiệp đổi mới đến từ Daegu, Hàn Quốc</h2>
-      <p class="kf-band-meta">Hạn đăng ký CN, 22 tháng 11 · Miễn phí tham gia · Có phiên dịch Hàn – Việt</p>
-    </div>
-    <button type="button" class="kf-btn yellow" onclick="mtKfGo()">Đăng ký gặp mặt</button>
+    <div class="kf-hero-ph "><img src="https://kfesta.vn/assets/img/beauty/day1-vip.webp" alt="DAEGU MADE KFESTA"><div class="mt-evd-date"><span class="mo">Tháng 12</span><b>04</b><span class="dw">Thứ Sáu</span></div></div>
   </div></section>
   <section class="kf-sec"><div class="kf-doc">
     <div class="kf-hd"><span class="kf-k">Overview</span><h2>Tổng quan sự kiện</h2></div>
@@ -97,9 +95,9 @@
     <div class="kf-map-info"><div><b>Khách sạn Nikko Saigon</b><span>235 Nguyễn Văn Cừ, Phường Nguyễn Cư Trinh, Quận 1, TP. Hồ Chí Minh</span></div>
       <a href="https://www.google.com/maps/search/?api=1&amp;query=Hotel%20Nikko%20Saigon%2C%20235%20Nguyen%20Van%20Cu%2C%20District%201%2C%20Ho%20Chi%20Minh%20City" target="_blank" rel="noopener"><svg class="mt-ico" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>Mở trong Google Maps</a></div>
   </div></section>
-  <section class="kf-sec"><div class="kf-doc mt-faq">
+  <section class="kf-sec"><div class="kf-doc">
     <div class="kf-hd"><span class="kf-k">FAQ</span><h2>Câu hỏi thường gặp</h2></div>
-    <details><summary>Có mất phí không?</summary><p>Không. Đăng ký gặp mặt và tham dự sự kiện đều miễn phí.</p></details><details><summary>Ai có thể tham gia?</summary><p>Mọi doanh nghiệp tại Việt Nam quan tâm đến nhập khẩu, phân phối sản phẩm Hàn Quốc đều có thể đăng ký. Không cần tạo tài khoản.</p></details><details><summary>Sau khi đăng ký thì thế nào?</summary><p>Người phụ trách sẽ liên hệ theo thông tin bạn để lại và xếp giờ gặp với từng nhà cung cấp.</p></details><details><summary>Tôi không biết tiếng Hàn thì có sao không?</summary><p>Không sao. Có phiên dịch viên Hàn – Việt chuyên nghiệp hỗ trợ trong buổi trao đổi.</p></details><details><summary>Tôi có thể gặp nhiều nhà cung cấp không?</summary><p>Có. Hãy đăng ký với từng nhà cung cấp bạn muốn gặp, chúng tôi sẽ xếp giờ để không trùng nhau.</p></details>
+    <div class="kf-faq"><details open=""><summary><span>Tham gia có mất phí không?</span></summary><p>Không. Đăng ký gặp mặt và tham dự sự kiện đều hoàn toàn miễn phí.</p></details><details><summary><span>Doanh nghiệp nào có thể đăng ký?</span></summary><p>Nhà phân phối, nhà nhập khẩu, đại lý và mọi doanh nghiệp tại Việt Nam đang tìm nguồn hàng Hàn Quốc đều có thể đăng ký.</p></details><details><summary><span>Đăng ký như thế nào?</span></summary><p>Bấm «Đăng ký gặp mặt» ở nhà cung cấp bạn muốn gặp, rồi điền tên công ty, ngành hàng, người phụ trách và thông tin liên hệ. Không cần tạo tài khoản, chỉ mất khoảng 1 phút.</p></details><details><summary><span>Sau khi đăng ký thì quy trình tiếp theo ra sao?</span></summary><p>Người phụ trách sẽ liên hệ theo số điện thoại hoặc email bạn để lại để xác nhận đăng ký và thông báo giờ gặp với từng nhà cung cấp.</p></details><details><summary><span>Hạn đăng ký đến khi nào?</span></summary><p>Nhận đăng ký đến hết ngày CN, 22 tháng 11, 2026. Sau đó chúng tôi chốt giờ gặp và thông báo cho từng doanh nghiệp.</p></details><details><summary><span>Tôi không nói được tiếng Hàn thì có trao đổi được không?</span></summary><p>Được. Mỗi buổi trao đổi đều có phiên dịch viên Hàn – Việt chuyên nghiệp hỗ trợ.</p></details><details><summary><span>Tôi có thể gặp nhiều nhà cung cấp trong cùng một ngày không?</span></summary><p>Có. Hãy đăng ký với từng nhà cung cấp bạn muốn gặp, chúng tôi sẽ xếp giờ để các buổi gặp không trùng nhau.</p></details><details><summary><span>Tôi cần chuẩn bị gì cho buổi gặp?</span></summary><p>Bạn nên mang theo danh thiếp và tài liệu giới thiệu công ty. Nếu đã có sản phẩm quan tâm, hãy chuẩn bị trước các câu hỏi về giá, số lượng đặt hàng tối thiểu và điều kiện phân phối.</p></details></div>
   </div></section></div>
 <section class="mt-hero" hidden=""><div class="wrap">
 <div class="kick" data-i18n="mt_page_kick">GẶP TRỰC TIẾP NHÀ CUNG CẤP HÀN QUỐC</div>
@@ -115,7 +113,7 @@ nhà cung cấp Hàn Quốc sang tận nơi gặp bạn</h1>
 <div><section class="kf-end"><div class="kf-doc">
     <p class="d">Hạn đăng ký <b>CN, 22 tháng 11, 2026</b></p>
     <p>Đăng ký miễn phí, chỉ cần để lại tên công ty và thông tin liên hệ.</p>
-    <button type="button" class="kf-btn navy" onclick="mtKfGo()">Đăng ký gặp mặt</button>
+    <button type="button" class="btn btn-primary btn-lg" onclick="mtKfGo()">Đăng ký gặp mặt →</button>
   </div></section></div>
 
 <nav class="mk-static-mk-header">
