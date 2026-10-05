@@ -38,17 +38,17 @@ const LND = {
  },
  "stats": {
   "b1": {
-   "vi": "Đăng ký gặp mặt miễn phí",
+   "vi": "Miễn phí đăng ký",
    "ko": "미팅 신청 무료",
    "en": "Free to request"
   },
   "b2": {
-   "vi": "Không cần tài khoản, chỉ 1 phút",
+   "vi": "Không cần tài khoản",
    "ko": "가입 없이 1분",
    "en": "No account, one minute"
   },
   "b3": {
-   "vi": "Có phiên dịch Hàn – Việt",
+   "vi": "Có phiên dịch",
    "ko": "한국어–베트남어 통역 지원",
    "en": "Korean–Vietnamese interpreters"
   },
