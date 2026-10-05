@@ -2193,3 +2193,27 @@ img.lg-trim{object-fit:contain!important;box-sizing:border-box;padding:7px;backg
 .pd-nomeet b{display:block;font-size:15px;font-weight:700;color:var(--mk-ink)}
 .pd-nomeet p{margin:6px 0 0;font-size:13.5px;line-height:1.6;color:var(--mk-body)}
 .pd-ctas a.btn{text-align:center}
+
+
+/* 제품 상세의 공급사 상자(page-product.js .pd-cobox) — 예전 한 줄짜리 .co-inline 을 대체 */
+.pd-cobox{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:20px;align-items:center;margin-top:20px;padding:22px 24px;border:1px solid var(--mk-line);border-radius:8px;background:#fff;color:inherit;transition:border-color .15s}
+.pd-cobox:hover{border-color:var(--mk-primary)}
+.pd-cobox .lg{display:flex;align-items:center;justify-content:center;width:96px;height:96px;border:1px solid var(--mk-line);border-radius:8px;background:#fff;overflow:hidden}
+.pd-cobox .lg img{width:100%;height:100%;object-fit:contain}
+.pd-cobox .lg img.lg-trim{padding:8px}
+.pd-cobox .nm{font-size:18px;font-weight:700;letter-spacing:-.01em;color:var(--mk-ink)}
+.pd-cobox .tg{margin:4px 0 0;font-size:14.5px;line-height:1.55;color:var(--mk-body);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:keep-all}
+.pd-cobox .mt{display:flex;flex-wrap:wrap;gap:2px 0;margin-top:8px;font-size:13px;color:var(--mk-muted)}
+.pd-cobox .mt span+span::before{content:'·';margin:0 7px;color:var(--mk-line-strong)}
+.pd-cobox .ct{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.pd-cobox .ct span{padding:3px 9px;border-radius:4px;background:var(--mk-bg-soft);font-size:12px;font-weight:500;color:var(--mk-body)}
+.pd-cobox .go{display:inline-flex;align-items:center;height:42px;padding:0 18px;border:1px solid var(--mk-line-strong);border-radius:4px;font-size:14px;font-weight:600;color:var(--mk-ink);white-space:nowrap}
+.pd-cobox:hover .go{border-color:var(--mk-primary);color:var(--mk-primary-dark)}
+@media(max-width:640px){
+  .pd-cobox{grid-template-columns:auto minmax(0,1fr);gap:14px;padding:16px;align-items:start}
+  .pd-cobox .lg{width:64px;height:64px}
+  .pd-cobox .lg img.lg-trim{padding:5px}
+  .pd-cobox .nm{font-size:16px}
+  .pd-cobox .tg{font-size:13.5px}
+  .pd-cobox .go{grid-column:1/-1;justify-content:center;height:40px}
+}

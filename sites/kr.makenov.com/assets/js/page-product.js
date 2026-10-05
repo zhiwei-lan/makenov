@@ -92,13 +92,16 @@ function pageInit(){
         <h2 data-i18n="brand_story"></h2>
         <div class="pd-body"><p>${esc(L(p.brandStory))}</p></div>
         ${co?`
-        <a class="co-inline" href="${mkDocUrl('company',co.id)}">
-          <img src="${co.logo}" alt="" loading="lazy" onload="window.mkLogoTrim&&mkLogoTrim(this)">
+        <!-- 공급사 상자(2026-10-05 레이아웃 변경): 로고 크게 · 회사명 · 한 줄 소개 · 지역/설립/제품 수 · 인증 · '기업정보 보기' 버튼 -->
+        <a class="pd-cobox" href="${mkDocUrl('company',co.id)}">
+          <span class="lg"><img src="${co.logo}" alt="${esc(co.brand || L(co.name))}" loading="lazy" onload="window.mkLogoTrim&&mkLogoTrim(this)"></span>
           <div class="tx">
             <div class="nm">${esc(L(co.name))}</div>
-            <div class="sub">${esc(L(co.location))} · ${(co.certs||[]).slice(0,3).map(x=>esc(L(x))).join(' · ')}</div>
+            ${L(co.tagline) ? `<p class="tg">${esc(L(co.tagline))}</p>` : ''}
+            <div class="mt">${[L(co.location), /\d/.test(String(co.since||'')) ? 'since ' + co.since : '', mkCompanyProducts(co.id).length + ' ' + t('co_prod_unit')].filter(Boolean).map(x => `<span>${esc(x)}</span>`).join('')}</div>
+            ${(co.certs||[]).length ? `<div class="ct">${(co.certs||[]).slice(0,4).map(x => `<span>${esc(L(x))}</span>`).join('')}</div>` : ''}
           </div>
-          <span class="go" data-i18n="co_view"></span>
+          <span class="go"><span data-i18n="co_view"></span> →</span>
         </a>`:''}
       </div>
 
