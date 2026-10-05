@@ -175,8 +175,8 @@ window.MK_COPY_BAKED = {
     "en": "Supplier store opening inquiry"
   },
   "ui.promo_desc": {
-    "vi": "Hãy đăng ký gặp nhà cung cấp bạn quan tâm. Khi đủ số lượng, đại diện Hàn Quốc sẽ sang Việt Nam gặp trực tiếp 1:1.",
-    "ko": "만나고 싶은 공급사에 미팅을 신청하세요. 목표 인원이 차면 한국 담당자가 베트남에 와서 1:1로 만납니다.",
+    "ko": "만나고 싶은 공급사에 미팅을 신청하세요. 목표 인원이 차면 공급사 담당자가 베트남에 와서 1:1로 만납니다.",
+    "vi": "Hãy đăng ký gặp nhà cung cấp bạn quan tâm. Khi đủ số lượng, đại diện nhà cung cấp sẽ sang Việt Nam gặp trực tiếp 1:1.",
     "en": "Request a meeting with the suppliers you want. Once enough buyers join, their team comes to Vietnam to meet you 1:1."
   },
   "about.lock.tag": {
@@ -195,9 +195,9 @@ window.MK_COPY_BAKED = {
     "en": "When you register a product on MAKENOV, it will be introduced to certified buyers, and quotation inquiries will be sent directly to the supplier."
   },
   "ui.promo_title": {
-    "vi": "Đủ 5 doanh nghiệp,\nnhà cung cấp Hàn Quốc sang tận nơi",
-    "ko": "5곳이 모이면\n한국 공급사가 직접 찾아옵니다",
-    "en": "Five sign-ups,\nand the Korean supplier comes to you"
+    "ko": "5곳이 모이면\n공급사가 직접 찾아옵니다",
+    "vi": "Đủ 5 doanh nghiệp,\nnhà cung cấp sang tận nơi",
+    "en": "Five sign-ups,\nand the supplier comes to you"
   },
   "about.hero.kick": {
     "en": "What if you are a buyer?",
