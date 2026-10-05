@@ -1191,6 +1191,51 @@ function mtEventPage(tr){
 }
 /* 예전 문서형의 맨 아래 마무리 띠 — 오른쪽 신청 상자가 따라다니므로 지금은 내지 않는다(meetings.html 이 부르므로 함수는 둔다) */
 function mtEventEnd(tr){ return ''; }
+/* ===== 방문 일정 목록(meetings.html, 주소에 #trip-아이디 가 없을 때) — 행사가 여러 개일 때를 위한 목록 + 상태 탭 =====
+   상태: open(모집 중) · closed(모집 마감, 행사는 아직) · past(종료). 방문일 미정·공개 제품 없는 일정은 내지 않는다.
+   줄을 누르면 같은 페이지의 #trip-아이디 로 가서 상세(mtEventPage)가 열린다. */
+function mtEventKind(tr){ return tr.days_to_visit != null && tr.days_to_visit < 0 ? 'past' : tr.open ? 'open' : 'closed'; }
+function mtEventsAll(){
+  const ok = tr => tr.visit_date && MkMeet.itemsOf(tr).length;
+  const up = MkMeet.upcoming().filter(ok), past = MkMeet.past().filter(ok);
+  return up.filter(tr => tr.open).concat(up.filter(tr => !tr.open), past);
+}
+function mtEventRow(tr){
+  const kind = mtEventKind(tr), d = mtDate(tr.visit_date);
+  const items = MkMeet.itemsOf(tr);
+  const st = kind === 'past' ? t('mt_tab_past') : kind === 'open'
+    ? t('mt_st_open') + (tr.days_left != null && tr.days_left > 0 ? ' · D-' + tr.days_left : '')
+    : t('mt_st_' + mtTripState(tr));
+  const thumbs = items.slice(0, 4).map(it => `<img src="${esc(mkProduct(it.product_id).img)}" alt="" loading="lazy">`).join('')
+    + (items.length > 4 ? `<span>+${items.length - 4}</span>` : '');
+  return `<a class="mt-evl ${kind}" href="${mkUrl('meetings.html')}#trip-${esc(tr.id)}">
+    <div class="mt-evd-date"><span class="mo">${esc(mtFmt(tr.visit_date, { month:'long' }))}</span><b>${d ? String(d.getDate()).padStart(2, '0') : ''}</b><span class="dw">${esc(mtFmt(tr.visit_date, { weekday:'long' }))}</span></div>
+    <div class="mt-evl-main">
+      <span class="mt-evl-st">${esc(st)}</span>
+      <h3>${esc(L(tr.title) || t('mt_page_kick'))}</h3>
+      <ul class="meta">
+        <li>${MT_ICO.cal}<span>${esc(mtFmt(tr.visit_date, { year:'numeric', month:'long', day:'numeric' }))}${mtTime(tr) ? ' · ' + esc(mtTime(tr)) : ''}</span></li>
+        <li>${MT_ICO.pin}<span>${esc(mtWhere(tr) || t('mt_tba'))}</span></li>
+        ${tr.deadline && kind !== 'past' ? `<li>${MT_ICO.clock}<span>${esc(t('mt_deadline'))} ${esc(mtFmt(tr.deadline, { month:'long', day:'numeric', weekday:'short' }))}</span></li>` : ''}
+      </ul>
+    </div>
+    <div class="mt-evl-thumbs">${thumbs}</div>
+    <span class="mt-evl-go">${esc(t('mt_list_go'))} →</span>
+  </a>`;
+}
+let _mtListTab = 'all';
+function mtListTab(k){ _mtListTab = k; const el = document.getElementById('mt-kf'); if(el){ el.innerHTML = mtEventList(); } }
+function mtEventList(){
+  const all = mtEventsAll();
+  const n = k => all.filter(tr => mtEventKind(tr) === k).length;
+  const tabs = [['all', t('mt_tab_all'), all.length], ['open', t('mt_st_open'), n('open')], ['closed', t('mt_st_closed'), n('closed')], ['past', t('mt_tab_past'), n('past')]];
+  const rows = all.filter(tr => _mtListTab === 'all' || mtEventKind(tr) === _mtListTab);
+  return `<div class="wrap">
+    <div class="dir-top"><h1>${esc(t('mt_list_h'))}</h1><p>${esc(t('mt_list_p'))}</p></div>
+    <div class="filterbar mt-evl-tabs">${tabs.map(([k, lb, c]) => `<a class="chip ${_mtListTab === k ? 'on' : ''}" href="#" onclick="mtListTab('${k}');return false">${esc(lb)} <em>${c}</em></a>`).join('')}</div>
+    <div class="mt-evl-list">${rows.length ? rows.map(mtEventRow).join('') : `<div class="mt-evl-empty">${esc(t(all.length ? 'mt_list_empty' : 'mt_empty_h'))}</div>`}</div>
+  </div>`;
+}
 /* 홈 '예정된 행사 일정' 카드(10차, 2026-10-03) — 위아래 2단.
    위: 날짜 배지 · 행사명 · 시간/장소/마감/공급사·신청 수 한 줄 · '행사 일정 자세히' 버튼
    아래: 참가 공급사(사진 크게, 달성 막대, '미팅 신청') — 공급사 수만큼 칸을 나눠 폭을 채운다(최대 4칸).

@@ -2065,3 +2065,43 @@ img.lg-trim{object-fit:contain!important;box-sizing:border-box;padding:7px;backg
   .kf-map-info{flex-direction:column;align-items:flex-start;gap:8px}
   .kf-faq summary{font-size:15px;padding:15px 2px}
 }
+
+/* ===== 방문 일정 목록 (app.js mtEventList · mtEventRow) — 공급사 목록과 같은 머리말(.dir-top) + 탭(.filterbar .chip) ===== */
+.mt-evl-tabs{gap:22px}
+.mt-evl-tabs .chip em{font-style:normal;font-weight:600;color:var(--mk-muted);margin-left:2px}
+.mt-evl-list{display:grid;gap:12px;padding:24px 0 80px}
+#mt-more.mt-evl-list{padding:0}
+.mt-evl{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:24px;align-items:center;padding:20px 24px;border:1px solid var(--mk-line);border-radius:8px;background:#fff;color:inherit;transition:border-color .15s}
+.mt-evl:hover{border-color:var(--mk-primary)}
+.mt-evl .mt-evd-date{width:84px;height:92px;border-radius:8px;color:#fff}
+.mt-evl .mt-evd-date b{font-size:36px}
+.mt-evl.closed .mt-evd-date,.mt-evl.past .mt-evd-date{background:#868E96}
+.mt-evl-main{min-width:0}
+.mt-evl-st{font-size:12.5px;font-weight:700;color:var(--mk-primary-dark)}
+.mt-evl.closed .mt-evl-st,.mt-evl.past .mt-evl-st{color:var(--mk-muted)}
+.mt-evl h3{font-size:19px;font-weight:700;line-height:1.4;letter-spacing:-.02em;color:var(--mk-ink);margin:3px 0 8px;word-break:keep-all}
+.mt-evl.past h3{color:var(--mk-body)}
+.mt-evl .meta{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:4px 20px}
+.mt-evl .meta li{display:inline-flex;align-items:center;gap:6px;font-size:14px;line-height:1.5;color:var(--mk-body)}
+.mt-evl .meta .mt-ico{flex:none;width:15px;height:15px;color:var(--mk-muted)}
+.mt-evl-thumbs{display:flex;align-items:center}
+.mt-evl-thumbs img{width:46px;height:46px;border-radius:6px;object-fit:cover;border:2px solid #fff;background:var(--mk-bg-soft);margin-left:-10px}
+.mt-evl-thumbs img:first-child{margin-left:0}
+.mt-evl-thumbs span{margin-left:6px;font-size:13px;font-weight:600;color:var(--mk-muted)}
+.mt-evl-go{font-size:14px;font-weight:600;color:var(--mk-primary-dark);white-space:nowrap}
+.mt-evl-empty{padding:56px 0;text-align:center;font-size:15px;color:var(--mk-muted);border:1px dashed var(--mk-line-strong);border-radius:8px}
+.ev-back{display:inline-block;margin-top:22px;font-size:14px;font-weight:600;color:var(--mk-body)}
+.ev-back:hover{color:var(--mk-ink)}
+.ev-back+.pd-row,.wrap:has(>.ev-back)+.wrap>.pd-row{padding-top:16px}
+@media(max-width:860px){
+  .mt-evl{grid-template-columns:auto minmax(0,1fr);gap:14px;padding:14px;align-items:start}
+  .mt-evl .mt-evd-date{width:64px;height:72px}
+  .mt-evl .mt-evd-date b{font-size:28px}
+  .mt-evl .mt-evd-date .mo,.mt-evl .mt-evd-date .dw{font-size:10.5px}
+  .mt-evl h3{font-size:16.5px;margin-bottom:6px}
+  .mt-evl .meta{flex-direction:column;gap:2px}
+  .mt-evl .meta li{font-size:13px}
+  .mt-evl-thumbs,.mt-evl-go{display:none}
+  .mt-evl-list{padding:16px 0 56px}
+  .mt-evl-tabs{gap:16px}
+}
