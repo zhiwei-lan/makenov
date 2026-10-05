@@ -7,7 +7,15 @@ function pageInit(){
   const prods = mkCompanyProducts(c.id);
   const cat = mkCat(c.cat);
   const totalInq = prods.reduce((s,p)=>s+(Number(p.inquiries)||0),0);
-  const yrs = new Date().getFullYear() - Number(c.since);
+  /* 값이 없는 항목(빈 칸·'—'·'-')은 칸째 숨긴다 */
+  const has = v => !!String(v ?? '').replace(/[\s\-—–.·]/g, '');
+  const yrs = has(c.since) ? new Date().getFullYear() - Number(c.since) : NaN;
+  const metrics = [
+    has(c.since)  ? `<div class="co-metric"><b>${esc(c.since)}</b><span data-i18n="co_since"></span></div>` : '',
+    has(c.staff)  ? `<div class="co-metric"><b>${esc(c.staff)}</b><span data-i18n="co_staff"></span></div>` : '',
+    has(c.export) ? `<div class="co-metric"><b>${esc(c.export)}</b><span data-i18n="co_export"></span></div>` : '',
+    `<div class="co-metric"><b>${prods.length}</b><span data-i18n="co_prod_unit"></span></div>`,
+  ].filter(Boolean);
   document.title = L(c.name) + ' | MAKENOV';
   /* 공급사 상세 조회 — 제품과 같은 ViewContent 지만 content_type 으로 구분. 언어 전환 재렌더는 한 번만 */
   if(window._vcSentCo !== c.id){
@@ -27,7 +35,7 @@ function pageInit(){
           <div class="chips">
             <span>${esc(L(c.location))}</span>
             ${cat?`<span>${esc(L(cat.name))}</span>`:''}
-            <span>${yrs}${t('co_years')}</span>
+            ${yrs > 0 ? `<span>${yrs}${t('co_years')}</span>` : ''}
             ${c.brn?`<span>${esc(c.brn)}</span>`:''}
           </div>
         </div>
@@ -38,12 +46,7 @@ function pageInit(){
 
           <section class="co-sec">
             <h2 data-i18n="co_metrics"></h2>
-            <div class="co-metrics">
-              <div class="co-metric"><b>${esc(c.since)}</b><span data-i18n="co_since"></span></div>
-              <div class="co-metric"><b>${esc(c.staff)}</b><span data-i18n="co_staff"></span></div>
-              <div class="co-metric"><b>${esc(c.export)}</b><span data-i18n="co_export"></span></div>
-              <div class="co-metric"><b>${prods.length}</b><span data-i18n="co_prod_unit"></span></div>
-            </div>
+            <div class="co-metrics n${metrics.length}" style="--n:${metrics.length}">${metrics.join('')}</div>
           </section>
 
           <section class="co-sec">
@@ -61,7 +64,7 @@ function pageInit(){
             <table class="co-table">
               <tr><th data-i18n="co_th_name"></th><td>${esc(L(c.name))}</td></tr>
               ${c.ceo?`<tr><th data-i18n="co_th_ceo"></th><td>${esc(c.ceo)}</td></tr>`:''}
-              <tr><th data-i18n="co_since"></th><td>${esc(c.since)}</td></tr>
+              ${has(c.since)?`<tr><th data-i18n="co_since"></th><td>${esc(c.since)}</td></tr>`:''}
               <tr><th data-i18n="auth_address"></th><td>${esc(L(c.location))}</td></tr>
               ${c.brn?`<tr><th data-i18n="auth_brn"></th><td>${esc(c.brn)}</td></tr>`:''}
               ${c.moqPolicy?`<tr><th data-i18n="moq"></th><td>${esc(c.moqPolicy)}</td></tr>`:''}
@@ -86,7 +89,7 @@ function pageInit(){
             <div class="meta">
               <div><span data-i18n="co_products"></span> <b>${prods.length}</b></div>
               <div><span data-i18n="co_inq"></span> <b>${totalInq}</b></div>
-              <div><span data-i18n="co_since"></span> <b>${esc(c.since)}</b></div>
+              ${has(c.since)?`<div><span data-i18n="co_since"></span> <b>${esc(c.since)}</b></div>`:''}
             </div>
           </div>
         </aside>
