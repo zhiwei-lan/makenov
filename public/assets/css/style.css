@@ -2232,3 +2232,11 @@ img.lg-trim{object-fit:contain!important;box-sizing:border-box;padding:7px;backg
 /* 칼럼 목록: 이 언어로 쓰인 글이 없을 때(한국어·영어 사이트) */
 .col-none{grid-column:1/-1;padding:56px 24px;text-align:center;border:1px solid var(--mk-line);border-radius:8px;background:#fff}
 .col-none p{margin:0 0 16px;font-size:15px;color:var(--mk-body)}
+
+/* 한 칸씩 롤링하는 제품 줄(.grid.roll, app.js mkRollStep) — 한 화면 칸 수는 .grid 와 같다(4 → 3 → 2) */
+.grid.roll{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:calc((100% - 72px)/4);overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+.grid.roll::-webkit-scrollbar{display:none}
+.grid.roll>*{scroll-snap-align:start}
+@media(max-width:1024px){.grid.roll{grid-template-columns:none;grid-auto-columns:calc((100% - 48px)/3)}}
+@media(max-width:768px){.grid.roll{grid-template-columns:none;grid-auto-columns:calc((100% - 16px)/2)}}
+@media(max-width:460px){.grid.roll{grid-template-columns:none;grid-auto-columns:78%}}

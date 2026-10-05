@@ -5,6 +5,32 @@
 function mkAboutUrl(){var l=window.MK_FORCE_LANG;try{l=l||MK_LANG}catch(e){}if(typeof MK_HOST_LANG!=='undefined'&&MK_HOST_LANG)return 'about.html';return (l&&l!=='vi')?l+'/about.html':'about.html'}
 
 function esc(s){ return String(s??'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+/* 한 칸씩 롤링 — data-roll 이 붙은 가로 줄(.grid.roll)을 4초마다 한 칸 넘긴다(2026-10-06, 제품 페이지 '주목할 제품').
+   끝없이 이어지도록, 넘기기 직전에 이미 지나간 앞 카드를 맨 뒤로 옮기고 그만큼 스크롤 위치를 당긴다.
+   마우스를 올렸거나 방금 손으로 넘겼거나 화면 밖이면 쉰다. 카드가 한 화면에 다 들어오면 아무것도 안 한다. */
+function mkRollStep(sc){
+  if(sc.children.length < 2 || sc.scrollWidth <= sc.clientWidth + 4) return;
+  const pos = el => el.getBoundingClientRect().left - sc.getBoundingClientRect().left + sc.scrollLeft;   // 줄 안에서의 카드 시작 위치
+  let guard = sc.children.length;
+  sc.style.scrollSnapType = 'none';                       // 카드를 옮기는 동안 스냅이 위치를 건드리지 않게
+  while(guard-- > 0 && sc.scrollLeft >= pos(sc.children[1]) - 2){
+    const keep = sc.scrollLeft - pos(sc.children[1]);     // 둘째 카드 기준으로 남은 어긋남(보통 0)
+    sc.appendChild(sc.firstElementChild);
+    sc.scrollLeft = keep;
+  }
+  sc.style.scrollSnapType = '';
+  sc.scrollTo({ left: pos(sc.children[1]), behavior: 'smooth' });   // 다음 카드의 시작 위치로 정확히 — 소수 폭이 쌓여 밀리지 않게
+}
+if(!window._mkRollAuto && !/HeadlessChrome/.test(navigator.userAgent)) window._mkRollAuto = setInterval(() => {
+  if(document.hidden || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+  document.querySelectorAll('[data-roll]').forEach(sc => {
+    if(!sc._rollBound){ sc._rollBound = 1; ['pointerdown', 'touchstart', 'wheel'].forEach(ev => sc.addEventListener(ev, () => { sc._t = Date.now(); }, { passive: true })); }
+    if(sc.matches(':hover') || Date.now() - (sc._t || 0) < 8000) return;
+    const b = sc.getBoundingClientRect();
+    if(b.bottom < 0 || b.top > innerHeight) return;
+    mkRollStep(sc);
+  });
+}, 4000);
 /* 칼럼 언어 — 원고가 베트남어뿐인 글은 한국어·영어 사이트에서 숨긴다(2026-10).
    bake-columns.js 가 baked.js 의 columnLangs 에 칼럼별 '정말 그 언어로 쓰인' 언어를 적어 둔다.
    목록에 없는 새 글은 베트남어 원고로 본다. 번역된 글이 생기면 그 글만 자동으로 나온다. */
