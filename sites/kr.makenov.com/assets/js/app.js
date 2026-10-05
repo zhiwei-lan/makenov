@@ -231,7 +231,7 @@ function openAuth(mode){
       <div class="fs-t" data-i18n="auth_grp_company"></div>
       <div class="f-row"><label data-i18n="auth_country"></label>
         <select id="su-country" onchange="suCountryChange(this.value)">
-          ${MK_COUNTRIES.map(c=>`<option value="${c.code}">${c.flag} ${esc(L(c.name))}</option>`).join('')}
+          ${MK_COUNTRIES.map(c=>`<option value="${c.code}">${esc(L(c.name))}</option>`).join('')}
         </select></div>
       <div id="su-verify"></div>
       <div class="mst-result" id="v-result" style="display:none"></div>

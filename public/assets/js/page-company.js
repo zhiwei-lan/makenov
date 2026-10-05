@@ -6,7 +6,8 @@ function pageInit(){
   const c = mkCompany(id) || MK_COMPANIES[0];
   const prods = mkCompanyProducts(c.id);
   const cat = mkCat(c.cat);
-  const totalInq = prods.reduce((s,p)=>s+(Number(p.inquiries)||0),0);
+  /* 이 공급사의 제품이 모집 중인 행사에 걸려 있으면 그 미팅 신청으로 바로 — 예전엔 가입·사업자 인증 창이 떴다(2026-10-05 전체 점검) */
+  const meetHit = (typeof MkMeet !== 'undefined' ? prods.map(p => MkMeet.forProduct(p.id)) : []).find(h => h && h.trip && h.trip.open) || null;
   /* 값이 없는 항목(빈 칸·'—'·'-')은 칸째 숨긴다 */
   const has = v => !!String(v ?? '').replace(/[\s\-—–.·]/g, '');
   const yrs = has(c.since) ? new Date().getFullYear() - Number(c.since) : NaN;
@@ -81,14 +82,13 @@ function pageInit(){
 
         <aside class="co-aside">
           <div class="co-box">
-            <div class="t" data-i18n="co_cta_title"></div>
-            <p class="d" data-i18n="co_cta_desc"></p>
-            <button class="btn btn-primary"
-              onclick="openInquiry(${JSON.stringify(prods.map(p=>p.id)).replace(/"/g,"'")})"
-              data-i18n="co_cta_btn"></button>
+            <div class="t" data-i18n="co_meet_t"></div>
+            <p class="d" data-i18n="${meetHit ? 'co_meet_d' : 'co_meet_none'}"></p>
+            ${meetHit
+              ? `<button class="btn btn-primary" onclick="openMeetApply('${esc(meetHit.trip.id)}','${esc(meetHit.item.product_id)}')" data-i18n="mt_btn_apply"></button>`
+              : `<a class="btn btn-primary" href="${mkUrl('meetings.html')}" data-i18n="pd_nomeet_cta"></a>`}
             <div class="meta">
               <div><span data-i18n="co_products"></span> <b>${prods.length}</b></div>
-              <div><span data-i18n="co_inq"></span> <b>${totalInq}</b></div>
               ${has(c.since)?`<div><span data-i18n="co_since"></span> <b>${esc(c.since)}</b></div>`:''}
             </div>
           </div>
