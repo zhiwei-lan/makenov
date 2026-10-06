@@ -82,6 +82,14 @@
   </url>
   <url><loc>https://en.makenov.com/products.html</loc></url>
   <url>
+    <loc>https://en.makenov.com/products/p5.html</loc>
+    <lastmod>2026-10-06</lastmod>
+      <xhtml:link rel="alternate" hreflang="vi" href="https://vn.makenov.com/products/p5.html"/>
+      <xhtml:link rel="alternate" hreflang="ko" href="https://kr.makenov.com/products/p5.html"/>
+      <xhtml:link rel="alternate" hreflang="en" href="https://en.makenov.com/products/p5.html"/>
+      <xhtml:link rel="alternate" hreflang="x-default" href="https://vn.makenov.com/products/p5.html"/>
+  </url>
+  <url>
     <loc>https://en.makenov.com/products/p3.html</loc>
     <lastmod>2026-10-06</lastmod>
       <xhtml:link rel="alternate" hreflang="vi" href="https://vn.makenov.com/products/p3.html"/>
