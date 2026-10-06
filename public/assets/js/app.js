@@ -1396,7 +1396,8 @@ function mtHomeHtml(){
   /* 방문일이 정해진 일정만 — '방문일 미정' 일정은 이 섹션에 안 나온다(제품 카드·상세에서만 '방문일 미정'으로 신청받는다) */
   const list = MkMeet.upcoming().filter(tr => tr.visit_date && MkMeet.itemsOf(tr).length).slice(0, 4);
   if(!list.length) return '';
-  return `<div class="sec-head"><h2>${esc(t('mt_home_h'))}</h2><a class="more" href="${mkUrl('meetings.html')}">${esc(t('mt_home_more'))}</a></div>`
+  /* 2026-10-06 사용자 지시: 머리글 오른쪽의 '전체 일정 보기' 링크 삭제(카드 안에 '행사 일정 자세히' 버튼이 있다) */
+  return `<div class="sec-head"><h2>${esc(t('mt_home_h'))}</h2></div>`
     + list.map(mtFeatured).join('');
 }
 /* 제품 상세 = 펀딩 페이지. 텀블벅 프로젝트 오른쪽처럼
