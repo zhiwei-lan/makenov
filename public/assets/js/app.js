@@ -721,7 +721,7 @@ async function sendInquiry(pidCsv){
 /* 카탈로그 숨김 — 관리자 '숨기기' 체크 시 catalog 값 앞에 'hide:' 가 붙는다(DB 스키마 변경 없이).
    뒤의 PDF 주소는 보존해서, 체크를 풀면 그대로 다시 나온다. */
 /* 2026-10-06 사용자 지시: 카탈로그 PDF 가 없는 제품은 버튼 자체를 안 그린다(예전에는 '준비 중' 안내) — 관리자가 숨김(hide:)을 켠 것도 같다 */
-function mkCatalogHidden(p){ return ! mkCatalogUrl(p); }
+function mkCatalogHidden(p){ return /^hide:/.test(String((p && p.catalog) || '')) || ! mkCatalogUrl(p); }
 function mkCatalogUrl(p){ return String((p && p.catalog) || '').replace(/^hide:/, ''); }
 /* 카탈로그 — 2026-10-06 사용자 지시: 로그인 없이 연다(가입 없이 미팅을 신청하는 사이트라 카탈로그만 로그인을 요구할 이유가 없다).
    관리자가 PDF 를 등록한 제품은 바로 열고, 없으면 '준비 중' 안내만 한다. */
