@@ -1,27 +1,29 @@
 # MAKENOV
 
-> MAKENOV (메이크노브) là nền tảng B2B kết nối sản phẩm đổi mới toàn cầu với nhà phân phối tại Việt Nam. / 메이크노브는 글로벌 혁신 제품과 베트남 유통 파트너를 연결하는 B2B 플랫폼입니다. / MAKENOV is a B2B platform connecting innovative products from global suppliers with distribution partners in Vietnam.
+> MAKENOV (메이크노브) là nền tảng B2B kết nối sản phẩm đổi mới toàn cầu với nhà phân phối tại Việt Nam. / 메이크노브는 글로벌 혁신 제품과 베트남 유통 파트너를 연결하는 B2B 플랫폼입니다. / MAKENOV is a B2B platform connecting innovative global products with distribution partners in Vietnam.
 
-Website: https://vn.makenov.com/ (vi) · https://kr.makenov.com/index.html (ko) · https://en.makenov.com/index.html (en)
+Website: https://vn.makenov.com/ (vi) · https://kr.makenov.com/ (ko) · https://en.makenov.com/ (en)
 Contact: notice@makenov.com
 Languages: Vietnamese, Korean, English
 
 ## What MAKENOV does
-- Lists innovative products from verified suppliers (mainly Korea) by category: beauty, food & beverage, living, health, kids, tech.
-- Trade terms (supply price, MOQ, lead time) are unlocked only for distribution partners that pass a free business verification (Vietnam: tax code MST; Korea: business registration number).
-- Inquiries go directly to the supplier. MAKENOV supports supplier connection, communication, interpretation and online/offline meetings.
-- Exclusive or official distribution rights can be discussed per product ("negotiable" badge).
-- Registration, browsing, verification and inquiries are free.
+- Lists innovative products from global suppliers (mainly Korea) by category: beauty, food & beverage, living, health, kids, tech. Product pages are in Vietnamese, Korean and English.
+- Buyers (distributors, importers, retail chains in Vietnam) request an in-person meeting with the supplier they want — no account, no business verification, free. The request form takes about a minute: company, industry, contact person, phone, email, optional message.
+- Meetings happen at events in Vietnam (for example "DAEGU MADE KFESTA", Ho Chi Minh City, 4 Dec 2026, Hotel Nikko Saigon). Once enough buyers sign up for a supplier, the supplier's team comes to Vietnam and meets each buyer 1:1 with an interpreter.
+- Price, MOQ, lead time and exclusivity are discussed directly with the supplier at the meeting; MAKENOV does not publish prices.
+- MAKENOV supports supplier connection, communication, interpretation and meeting scheduling. It does not guarantee a deal.
+- For suppliers: listing a product is free; listings are published in three languages and buyers request meetings (https://kr.makenov.com/maker.html, Korean).
 
 ## Key pages
-- Products: https://kr.makenov.com/products.html · https://vn.makenov.com/products.html
-- Product directory (filter by category): https://kr.makenov.com/directory.html
-- Suppliers: https://kr.makenov.com/companies.html
-- Guide (how to join, verify, find products, contact suppliers): https://kr.makenov.com/guide.html
-- Insights / columns: https://kr.makenov.com/columns.html
-- Support (FAQ, notices, 1:1 contact): https://kr.makenov.com/support.html
+- Events / meeting schedule: https://vn.makenov.com/meetings.html · https://kr.makenov.com/meetings.html · https://en.makenov.com/meetings.html
+- Products: https://vn.makenov.com/products.html · https://kr.makenov.com/products.html · https://en.makenov.com/products.html
+- Product directory (filter by category): https://vn.makenov.com/directory.html
+- Suppliers: https://vn.makenov.com/companies.html
+- User guide (how to find products, request a meeting, what happens next): https://vn.makenov.com/guide.html · https://kr.makenov.com/guide.html · https://en.makenov.com/guide.html
+- Insights / articles (Vietnamese): https://vn.makenov.com/columns.html
+- Support (FAQ, notices, 1:1 contact): https://vn.makenov.com/support.html
 - For suppliers (list a product, Korean): https://kr.makenov.com/maker.html
-- Sitemaps: https://vn.makenov.com/sitemap.xml · https://kr.makenov.com/sitemap.xml · https://en.makenov.com/sitemap.xml · RSS (columns, ko): https://makenov.com/rss.xml
+- Sitemaps: https://vn.makenov.com/sitemap.xml · https://kr.makenov.com/sitemap.xml · https://en.makenov.com/sitemap.xml
 
 ## Articles
 Guides for distributors sourcing from Korea — importing, contracts, MOQ, exclusivity, samples, quotations.
@@ -74,7 +76,9 @@ Guides for distributors sourcing from Korea — importing, contracts, MOQ, exclu
 - MOQ là gì, vì sao nhà cung cấp Hàn Quốc đặt MOQ và con số đó được tính từ đâu? (vi): https://vn.makenov.com/columns/c3.html
 
 ## Frequently asked
-- Is it free? Yes — signup, browsing, business verification and quote inquiries are free.
-- Why are price and MOQ locked? They are B2B trade terms shown only to verified businesses; verification takes about a minute.
-- Do I deal with the supplier directly? Yes; quotes and terms are negotiated with the supplier, and MAKENOV supports the process (connection, communication, meetings).
-- Can I start without import experience? Yes; start by finding a product and leaving an inquiry.
+- Is it free? Yes — browsing, meeting requests and event attendance are free. No account is needed.
+- How do I request a meeting? On a product page or an event page, press "request a meeting" and leave your company name, industry, contact person, phone and email. It takes about a minute.
+- What happens after I apply? A MAKENOV coordinator contacts you to confirm, then tells you the meeting time and place. Meetings are held in Vietnam with an interpreter.
+- Where do I see price and MOQ? They are not published; you discuss them directly with the supplier at the meeting.
+- Do I deal with the supplier directly? Yes. Quotes and terms are agreed with the supplier; MAKENOV supports connection, communication and scheduling.
+- Can I start without import experience? Yes — find a product you like and request a meeting.

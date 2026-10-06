@@ -44,6 +44,7 @@ jobs:
           node bake-landing.js
           node bake-columns.js
           node bake-products.js
+          node bake-meet.js
           node prerender.js
           node build-sites.js
 

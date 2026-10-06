@@ -40,7 +40,7 @@ const VERIFY = {
 };
 
 /* 루트에만 있는 언어 중립 페이지(JS 가 호스트 언어로 그림). kr/en 사이트에도 복사한다 */
-const NEUTRAL = ['mypage.html', 'product.html', 'company.html', 'column.html', 'sitemap.html', 'maker.html', 'about.html', 'favicon.ico'];
+const NEUTRAL = ['mypage.html', 'product.html', 'company.html', 'column.html', 'sitemap.html', 'maker.html', 'about.html', 'favicon.ico', 'llms.txt'];   // llms.txt: AI 크롤러용 안내(2026-10-06 kr·en 에도)
 
 const NEUTRAL_META = {
   'product.html': {
