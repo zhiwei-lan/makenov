@@ -251,6 +251,7 @@ const I18N = {
     removed_cart: "Đã xóa khỏi danh sách",
     catalog_locked: "Xác thực doanh nghiệp để tải catalogue",
     catalog_ok: "Catalogue sẽ được gửi qua email của bạn.",
+    catalog_none: "Catalogue đang được chuẩn bị. Khi bạn đăng ký gặp mặt, nhân viên phụ trách sẽ gửi cho bạn.",
     // 마이페이지
     my_unset: "Chưa nhập",
     my_bulk_note: "Gửi một lần cho tất cả sản phẩm đã chọn",
@@ -895,6 +896,7 @@ const I18N = {
     removed_cart: "관심제품에서 제거했습니다",
     catalog_locked: "카탈로그는 사업자 인증 후 받을 수 있습니다",
     catalog_ok: "카탈로그를 이메일로 보내드립니다.",
+    catalog_none: "카탈로그를 준비 중입니다. 미팅을 신청하시면 담당자가 보내드립니다.",
     // 마이페이지
     my_unset: "미입력",
     my_bulk_note: "담아둔 제품 전체에 한 번에 문의합니다",
@@ -1544,6 +1546,7 @@ const I18N = {
     removed_cart: "Removed from wishlist",
     catalog_locked: "Verify your business to download the catalogue",
     catalog_ok: "The catalogue will be sent to your email.",
+    catalog_none: "The catalogue is being prepared. Request a meeting and our team will send it to you.",
     // My page
     my_unset: "Not set",
     my_bulk_note: "Send one request covering every saved product",

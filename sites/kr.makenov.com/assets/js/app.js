@@ -722,14 +722,13 @@ async function sendInquiry(pidCsv){
    뒤의 PDF 주소는 보존해서, 체크를 풀면 그대로 다시 나온다. */
 function mkCatalogHidden(p){ return /^hide:/.test(String((p && p.catalog) || '')); }
 function mkCatalogUrl(p){ return String((p && p.catalog) || '').replace(/^hide:/, ''); }
+/* 카탈로그 — 2026-10-06 사용자 지시: 로그인 없이 연다(가입 없이 미팅을 신청하는 사이트라 카탈로그만 로그인을 요구할 이유가 없다).
+   관리자가 PDF 를 등록한 제품은 바로 열고, 없으면 '준비 중' 안내만 한다. */
 function openCatalog(pid){
-  requireAuth(()=>{
-    const p = mkProduct(pid);
-    mkTrack('RequestCatalog', mkProductParams(p));
-    /* 관리자가 PDF 를 등록한 제품은 바로 연다. 없으면 종전대로 '이메일로 보내드립니다' 안내 */
-    if(p && mkCatalogUrl(p)){ window.open(mkCatalogUrl(p), '_blank', 'noopener'); return; }
-    toast(t('catalog_ok'));
-  });
+  const p = mkProduct(pid);
+  mkTrack('RequestCatalog', mkProductParams(p));
+  if(p && mkCatalogUrl(p)){ window.open(mkCatalogUrl(p), '_blank', 'noopener'); return; }
+  toast(t('catalog_none'));
 }
 
 /* ---------- shared renderers ---------- */
