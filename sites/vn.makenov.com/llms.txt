@@ -9,7 +9,7 @@ Languages: Vietnamese, Korean, English
 ## What MAKENOV does
 - Lists innovative products from global suppliers (mainly Korea) by category: beauty, food & beverage, living, health, kids, tech. Product pages are in Vietnamese, Korean and English.
 - Buyers (distributors, importers, retail chains in Vietnam) request an in-person meeting with the supplier they want — no account, no business verification, free. The request form takes about a minute: company, industry, contact person, phone, email, optional message.
-- Meetings happen at events in Vietnam (for example "DAEGU MADE KFESTA", Ho Chi Minh City, 4 Dec 2026, Hotel Nikko Saigon). Once enough buyers sign up for a supplier, the supplier's team comes to Vietnam and meets each buyer 1:1 with an interpreter.
+- Meetings happen at events in Vietnam (for example "DAEGU MADE KFESTA", Ho Chi Minh City, 11 Dec 2026, Hotel Nikko Saigon). Once enough buyers sign up for a supplier, the supplier's team comes to Vietnam and meets each buyer 1:1 with an interpreter.
 - Price, MOQ, lead time and exclusivity are discussed directly with the supplier at the meeting; MAKENOV does not publish prices.
 - MAKENOV supports supplier connection, communication, interpretation and meeting scheduling. It does not guarantee a deal.
 - For suppliers: listing a product is free; listings are published in three languages and buyers request meetings (https://kr.makenov.com/maker.html, Korean).
