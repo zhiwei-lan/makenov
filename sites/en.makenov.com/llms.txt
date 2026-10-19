@@ -27,6 +27,7 @@ Languages: Vietnamese, Korean, English
 
 ## Articles
 Guides for distributors sourcing from Korea — importing, contracts, MOQ, exclusivity, samples, quotations.
+- Cách tính giá bán lẻ từ giá FOB qua 7 bước (vi): https://vn.makenov.com/columns/c50.html
 - Chứng nhận HACCP có lợi ích gì cho doanh nghiệp? (vi): https://vn.makenov.com/columns/c48.html
 - Bán hàng trước hay xây dựng thương hiệu trước? (vi): https://vn.makenov.com/columns/c49.html
 - Lưu ý về giấy ủy quyền công bố mỹ phẩm nhập khẩu (vi): https://vn.makenov.com/columns/c47.html
