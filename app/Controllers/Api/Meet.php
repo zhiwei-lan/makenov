@@ -398,8 +398,9 @@ class Meet extends BaseApiController
         if (! in_array($status, self::STATUSES_TRIP, true)) {
             return $this->err('bad_status', 'status: ' . implode('|', self::STATUSES_TRIP), 400);
         }
-        $items = [];
-        $seen  = [];
+        $items    = [];
+        $seen     = [];
+        $seedWant = [];
         foreach ((array) ($in['items'] ?? []) as $it) {
             $it  = (array) $it;
             $pid = trim((string) ($it['product_id'] ?? ''));
@@ -408,6 +409,10 @@ class Meet extends BaseApiController
             }
             $seen[$pid] = true;
             $items[] = ['product_id' => $pid, 'goal' => min(50, max(1, (int) ($it['goal'] ?? 5)))];
+            /* 표시용 임시 신청 수(2026-10-22 사용자 요청: 신청 0인 카드가 비어 보이지 않게 관리자가 숫자를 정한다). 칸을 보낸 경우에만 맞춘다 */
+            if (isset($it['seed']) && $it['seed'] !== '' && $it['seed'] !== null) {
+                $seedWant[$pid] = min(50, max(0, (int) $it['seed']));
+            }
         }
         $row = [
             'visit_date' => ($in['visit_date'] ?? '') ?: null,
@@ -445,6 +450,7 @@ class Meet extends BaseApiController
             if (! $db->transStatus()) {
                 return $this->err('server', 'ID 변경에 실패했습니다', 500);
             }
+            $this->syncSeeds($newId, $seedWant);
             return $this->trip($newId);
         }
         if ($exists) {
@@ -452,7 +458,58 @@ class Meet extends BaseApiController
         } else {
             $db->table('meet_trips')->insert($row + ['id' => $id, 'created_at' => date('Y-m-d H:i:s')]);
         }
+        $this->syncSeeds($id, $seedWant);
         return $this->trip($id);
+    }
+
+    /** 공급사(제품)별 임시 신청 행 수를 원하는 숫자에 맞춘다 — 모자라면 넣고, 많으면 최근 것부터 지운다. 실제 신청은 건드리지 않는다 */
+    private function syncSeeds(string $tid, array $want): void
+    {
+        if (! $want) {
+            return;
+        }
+        $db = db_connect();
+        foreach ($want as $pid => $n) {
+            $b    = $db->table('meet_requests')->where('trip_id', $tid)->where('product_id', $pid)->like('buyer_id', self::SEED_PREFIX, 'after');
+            $have = (clone $b)->countAllResults();
+            if ($n > $have) {
+                $this->addSeedRows($tid, $pid, $n - $have, []);
+            } elseif ($n < $have) {
+                $ids = array_column((clone $b)->select('id')->orderBy('created_at', 'DESC')->limit($have - $n)->get()->getResultArray(), 'id');
+                if ($ids) {
+                    $db->table('meet_requests')->whereIn('id', $ids)->delete();
+                }
+            }
+        }
+    }
+
+    /** 임시(시드) 신청 행 n개 추가 — adminAddRequests 와 syncSeeds 가 같이 쓴다 */
+    private function addSeedRows(string $tid, string $pid, int $n, array $in): void
+    {
+        $db   = db_connect();
+        $now  = date('Y-m-d H:i:s');
+        $have = $db->table('meet_requests')->where('trip_id', $tid)->where('product_id', $pid)
+            ->like('buyer_id', self::SEED_PREFIX, 'after')->countAllResults();
+        for ($i = 1; $i <= $n; $i++) {
+            $k = $have + $i;
+            $db->table('meet_requests')->insert([
+                'id'           => $this->uuid(),
+                'trip_id'      => $tid,
+                'product_id'   => $pid,
+                'buyer_id'     => self::SEED_PREFIX . $this->uuid(),
+                'company'      => $this->cut(($in['company'] ?? '') ?: "임시 신청 {$k}", 200),
+                'contact_name' => $this->cut($in['contact_name'] ?? '', 120),
+                'phone'        => $this->cut($in['phone'] ?? '', 60),
+                'email'        => '',
+                'channel'      => $this->cut(($in['channel'] ?? '') ?: 'other', 200),
+                'volume'       => '',
+                'message'      => '',
+                'memo'         => $this->cut(($in['memo'] ?? '') ?: '임시(시드) — 실제 신청 아님', 500),
+                'status'       => 'applied',
+                'created_at'   => $now,
+                'updated_at'   => $now,
+            ]);
+        }
     }
 
     /** 행사 부가 정보 정리 — 정해진 칸만, 길이 제한. 3개 언어 칸은 {vi,ko,en} 문자열만 남긴다 */
@@ -843,29 +900,7 @@ class Meet extends BaseApiController
         if (! $ok) {
             return $this->err('not_found', '이 일정에 없는 제품입니다', 404);
         }
-        $now  = date('Y-m-d H:i:s');
-        $have = $db->table('meet_requests')->where('trip_id', $tid)->where('product_id', $pid)
-            ->like('buyer_id', self::SEED_PREFIX, 'after')->countAllResults();
-        for ($i = 1; $i <= $n; $i++) {
-            $k = $have + $i;
-            $db->table('meet_requests')->insert([
-                'id'           => $this->uuid(),
-                'trip_id'      => $tid,
-                'product_id'   => $pid,
-                'buyer_id'     => self::SEED_PREFIX . $this->uuid(),
-                'company'      => $this->cut(($in['company'] ?? '') ?: "임시 신청 {$k}", 200),
-                'contact_name' => $this->cut($in['contact_name'] ?? '', 120),
-                'phone'        => $this->cut($in['phone'] ?? '', 60),
-                'email'        => '',
-                'channel'      => $this->cut(($in['channel'] ?? '') ?: 'other', 200),
-                'volume'       => '',
-                'message'      => '',
-                'memo'         => $this->cut(($in['memo'] ?? '') ?: '임시(시드) — 실제 신청 아님', 500),
-                'status'       => 'applied',
-                'created_at'   => $now,
-                'updated_at'   => $now,
-            ]);
-        }
+        $this->addSeedRows($tid, $pid, $n, $in);
         return $this->json(['ok' => true, 'added' => $n, 'count' => $this->counts()[$tid . '|' . $pid] ?? 0], 201);
     }
 

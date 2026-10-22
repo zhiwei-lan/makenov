@@ -219,11 +219,15 @@ function meetReqTable(tr){
     </tbody></table>`;
 }
 
-function meetItemRow(it){
+function meetItemRow(it, tripId){
   const prods = (typeof MK_PRODUCTS !== 'undefined' ? MK_PRODUCTS : []);
-  return `<div class="fgrid meet-item" style="grid-template-columns:1fr 120px 60px;align-items:end">
+  /* 표시용 임시 신청 수 — 지금 들어 있는 임시(시드) 행 수. 저장하면 이 숫자에 맞춰 늘리거나 줄인다(실제 신청은 그대로) */
+  const seeds = (it && tripId) ? meetCache.reqs.filter(r => r.trip_id === tripId && r.product_id === it.product_id && String(r.buyer_id || '').startsWith('seed-')).length : 0;
+  const real  = (it && tripId) ? meetCache.reqs.filter(r => r.trip_id === tripId && r.product_id === it.product_id && !String(r.buyer_id || '').startsWith('seed-') && r.status !== 'cancelled').length : 0;
+  return `<div class="fgrid meet-item" style="grid-template-columns:1fr 100px 150px 60px;align-items:end">
     <div class="fld"><label>제품(공급사)</label><select class="mi-pid">${prods.map(p => `<option value="${esc(p.id)}" ${it && it.product_id === p.id ? 'selected' : ''}>${esc(p.brand)} · ${esc(triText(p.name))}${p.published === false ? ' (비공개)' : ''}</option>`).join('')}</select></div>
     <div class="fld"><label>목표 인원</label><input class="mi-goal" type="number" min="1" max="50" value="${esc(it ? it.goal : 5)}"></div>
+    <div class="fld"><label>표시용 임시 신청 <span class="sub">(실제 ${real})</span></label><input class="mi-seed" type="number" min="0" max="50" value="${seeds}" title="사이트에 보이는 신청 수에 더해지는 임시 건수. 0 이면 임시 건을 모두 지운다"></div>
     <div class="fld"><button class="btn btn-ghost btn-sm" onclick="this.closest('.meet-item').remove()">빼기</button></div></div>`;
 }
 
@@ -289,9 +293,10 @@ function meetForm(id){
       <div class="sect"><h4>행사장 <span class="sub">(예: 호텔 니코 사이공 — 비우면 “추후 안내”)</span></h4><div class="fgrid">${langRow('mt-venue', venue)}</div></div>
       <div class="sect"><h4>소개 (선택)</h4><div class="fgrid">${langRow('mt-sum', sum, true)}</div></div>
       <div class="sect"><h4>참가 공급사(제품)와 목표 인원</h4>
-        <div id="mt-items">${(items.length ? items : [null]).map(meetItemRow).join('')}</div>
+        <div id="mt-items">${(items.length ? items : [null]).map(it => meetItemRow(it, tr ? tr.id : '')).join('')}</div>
         <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="document.getElementById('mt-items').insertAdjacentHTML('beforeend', meetItemRow(null))">+ 공급사 추가</button>
-        <p class="hint">같은 제품을 두 번 넣으면 첫 번째만 남습니다. 이미 신청이 들어온 제품을 빼면 그 신청은 사이트에 보이지 않게 됩니다(데이터는 남음).</p></div>
+        <p class="hint">같은 제품을 두 번 넣으면 첫 번째만 남습니다. 이미 신청이 들어온 제품을 빼면 그 신청은 사이트에 보이지 않게 됩니다(데이터는 남음).<br>
+          <b>표시용 임시 신청</b>은 사이트의 신청 수·달성률에 더해져 보이는 가짜 건수입니다(실제 신청이 0일 때 카드가 비어 보이지 않게). 엑셀·알림에는 포함되지 않습니다.</p></div>
 
       <div class="sect"><h4>행사 상세 페이지 정보 <span class="sub">(전부 선택 사항 — 넣은 것만 행사 상세 페이지에 나옵니다)</span></h4>
         <div style="margin:8px 0 4px;font-weight:600;font-size:13px">부제 <span class="sub">(행사명 아래 초록색 작은 줄. 예: 한국–베트남 비즈니스 상담회)</span></div><div class="fgrid">${langRow('mx-sub', x.sub)}</div>
@@ -340,6 +345,7 @@ async function meetSave(id){
     title: tri3('mt-title'), city: tri3('mt-city'), venue: tri3('mt-venue'), summary: tri3('mt-sum'),
     items: [...document.querySelectorAll('#mt-items .meet-item')].map(r => ({
       product_id: r.querySelector('.mi-pid').value, goal: Number(r.querySelector('.mi-goal').value) || 5,
+      seed: Math.max(0, Number(r.querySelector('.mi-seed').value) || 0),
     })),
     extra: {
       sub: tri3('mx-sub'), lead: tri3('mx-lead'), name: tri3('mx-name'), venue_detail: tri3('mx-venue'),
