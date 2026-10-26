@@ -51,4 +51,22 @@ class Makenov extends BaseConfig
 
     /** PDF(제품 카탈로그)도 20MB 까지 */
     public int $uploadMaxPdf = 20 * 1024 * 1024;
+
+    /* ---------- 명함 (Api\Cards · Libraries\CardStorage) ----------
+       ⚠ 제품 이미지(uploads, 공개)와 다른 길이다. 명함에는 실명·전화가 있어 웹 루트 밖에 둔다. */
+
+    /** 명함 원본 저장 폴더(절대경로). 비우면 writable/cards. 서버에서 따로 두려면 .env: makenov.cardStoragePath */
+    public string $cardStoragePath = '';
+
+    /** 명함으로 받는 형식 — 내용(매직바이트)으로 판정한다. 확장자·헤더는 믿지 않는다 */
+    public array $cardMimes = ['image/jpeg', 'image/png', 'image/webp'];
+
+    /** 명함 한 장 최대 크기 — 프론트가 1600px JPEG 로 줄여 보내므로 넉넉하다 */
+    public int $cardMaxBytes = 8 * 1024 * 1024;
+
+    /** 명함 이미지 서명 링크 키. 비우면 writable/card_secret 에 자동 생성. 서버 여러 대면 .env 로 같은 값을 */
+    public string $imageUrlSecret = '';
+
+    /** 서명 링크 유효 시간(초) — 화면에 떠 있는 동안만 */
+    public int $imageUrlTtl = 600;
 }

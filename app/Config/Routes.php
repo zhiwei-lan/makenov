@@ -62,6 +62,10 @@ $routes->post('functions/v1/admin-users', '\App\Controllers\Api\AdminUsers::hand
 /* ── Meta 전환 API(서버 전송) — pixel.js 가 전환 이벤트를 같은 event_id 로 여기에도 보낸다 ── */
 $routes->post('functions/v1/pixel-event', '\App\Controllers\Api\Pixel::handle');
 
+/* ── 명함 API — 업로드·확인·관리자 검증·서명 링크 이미지. /functions/v1/cards/{경로} 를 Cards::handle 이 나눠 처리 ── */
+$routes->match(['GET', 'POST', 'DELETE'], 'functions/v1/cards', '\App\Controllers\Api\Cards::handle');
+$routes->match(['GET', 'POST', 'DELETE'], 'functions/v1/cards/(:any)', '\App\Controllers\Api\Cards::handle/$1');
+
 /* ── 제휴(affiliate, CTV) API — /aff/v1/{경로} 를 Aff::handle 이 세그먼트로 나눠 처리 ── */
 $routes->match(['GET', 'POST', 'PATCH', 'DELETE'], 'aff/v1/(:any)', '\App\Controllers\Api\Aff::handle/$1');
 $routes->match(['GET', 'POST', 'PATCH', 'DELETE'], 'aff/v1', '\App\Controllers\Api\Aff::handle');

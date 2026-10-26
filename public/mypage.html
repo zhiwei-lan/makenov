@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="facebook-domain-verification" content="v2c3qvkf2vtfyqntlbv59k1m1oa5x8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="assets/css/style.css?v=20261007g">
+<link rel="stylesheet" href="assets/css/style.css?v=20261026a">
 <link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
 <!-- mk:seo (bake.js가 관리 — 직접 수정 금지) -->
 <title>Trang của tôi | MAKENOV</title>
@@ -33,14 +33,14 @@
 <script src="assets/js/config.js?v=20260915c"></script>
 <script src="assets/js/pixel.js?v=20261007h"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="assets/js/i18n.js?v=20261007v"></script>
+<script src="assets/js/i18n.js?v=20261026a"></script>
 <script src="assets/js/baked.js?v=20261006m"></script>
 <script src="assets/js/data.js?v=20261006k"></script>
 <script src="assets/js/copy.js?v=20260918c"></script>
 <script src="assets/js/store.js?v=20260817b"></script>
 <script src="assets/js/verify.js?v=20260817b"></script>
 <script src="assets/js/upload.js?v=20260918a"></script>
-<script src="assets/js/store-supabase.js?v=20261002a"></script>
+<script src="assets/js/store-supabase.js?v=20261026a"></script>
 <script src="assets/js/copy-edit.js?v=20260918c"></script>
 <script src="assets/js/app.js?v=20261007u"></script>
 <script>
@@ -113,8 +113,84 @@ function renderProfile(){
   }
   const c = s.country ? mkCountry(s.country) : null;
   el.innerHTML = `
-    <div class="pf-grid"><div class="pf-box"><div class="pf-head"><h3 data-i18n="my_pf_company"></h3><button class="btn btn-ghost btn-sm" onclick="reverify()" data-i18n="my_pf_reverify"></button></div><div class="pf-row"><b data-i18n="auth_company"></b><span>${val(s.company)}</span></div><div class="pf-row"><b data-i18n="auth_country"></b><span>${c?c.flag+' ':''}${val(s.countryName)}</span></div><div class="pf-row"><b data-i18n="auth_brn"></b><span>${val(s.regNo||s.mst)}</span></div><div class="pf-row"><b data-i18n="auth_address"></b><span>${val(s.address)}</span></div><p class="pf-note" data-i18n="my_pf_locked"></p></div><div class="pf-box"><div class="pf-head"><h3 data-i18n="my_pf_contact"></h3><button class="btn btn-ghost btn-sm" onclick="editProfile()" data-i18n="my_pf_edit"></button></div><div class="pf-row"><b data-i18n="auth_contact_name"></b><span>${val(s.contactName)}</span></div><div class="pf-row"><b data-i18n="auth_position"></b><span>${val(s.position)}</span></div><div class="pf-row"><b data-i18n="auth_phone"></b><span>${val(s.phone)}</span></div><div class="pf-row"><b data-i18n="auth_email"></b><span>${esc(s.email)}</span></div></div></div>`;
+    <div class="pf-grid"><div class="pf-box"><div class="pf-head"><h3 data-i18n="my_pf_company"></h3><button class="btn btn-ghost btn-sm" onclick="reverify()" data-i18n="my_pf_reverify"></button></div><div class="pf-row"><b data-i18n="auth_company"></b><span>${val(s.company)}</span></div><div class="pf-row"><b data-i18n="auth_country"></b><span>${c?c.flag+' ':''}${val(s.countryName)}</span></div><div class="pf-row"><b data-i18n="auth_brn"></b><span>${val(s.regNo||s.mst)}</span></div><div class="pf-row"><b data-i18n="auth_address"></b><span>${val(s.address)}</span></div><p class="pf-note" data-i18n="my_pf_locked"></p></div><div class="pf-box"><div class="pf-head"><h3 data-i18n="my_pf_contact"></h3><button class="btn btn-ghost btn-sm" onclick="editProfile()" data-i18n="my_pf_edit"></button></div><div class="pf-row"><b data-i18n="auth_contact_name"></b><span>${val(s.contactName)}</span></div><div class="pf-row"><b data-i18n="auth_position"></b><span>${val(s.position)}</span></div><div class="pf-row"><b data-i18n="auth_phone"></b><span>${val(s.phone)}</span></div><div class="pf-row"><b data-i18n="auth_email"></b><span>${esc(s.email)}</span></div></div>
+    <div class="pf-box pf-card" id="pf-card"><div class="pf-head"><h3 data-i18n="my_card"></h3><span class="badge-verified" id="pf-card-badge" style="display:none" data-i18n="my_card_verified"></span></div><p class="pf-note" style="margin:0 0 14px" data-i18n="my_card_sub"></p><div id="pf-card-body"></div><input type="file" id="pf-card-file" accept="image/*" hidden onchange="cardPick(this)"></div></div>`;
   applyI18n(el);
+  loadCards();
+}
+
+/* ---------- 명함 (MkCards → /functions/v1/cards) ----------
+   사진은 웹 루트 밖에 저장되고 서명 링크(10분)로만 보인다 — 띄울 때마다 새로 받는다.
+   정적 모드(MkCards 없음)에선 상자를 숨긴다. */
+let _cards = [];
+async function loadCards(){
+  const box = document.getElementById('pf-card'), body = document.getElementById('pf-card-body');
+  if(!box || !body) return;
+  if(typeof MkCards === 'undefined'){ box.style.display = 'none'; return; }
+  const r = await MkCards.list();
+  _cards = (r.ok && r.cards) ? r.cards : [];
+  const c = _cards[0];
+  const badge = document.getElementById('pf-card-badge');
+  if(badge) badge.style.display = (c && c.verified) ? '' : 'none';
+  body.innerHTML = c ? `
+    <img class="pf-card-img" src="${esc(c.image_url||'')}" alt="" onerror="this.style.display='none'">
+    <p class="pf-card-st" data-i18n="${c.verified?'my_card_verified':'my_card_pending'}"></p>
+    <div class="pf-card-acts"><button class="btn btn-ghost btn-sm" onclick="document.getElementById('pf-card-file').click()" data-i18n="my_card_replace"></button><button class="btn btn-ghost btn-sm" onclick="cardDelete(${c.id})" data-i18n="my_card_delete"></button></div>
+    <p class="pf-note" data-i18n="my_card_private"></p>`
+  : `<p class="pf-card-st" data-i18n="my_card_none"></p>
+    <div class="pf-card-acts"><button class="btn btn-primary btn-sm" onclick="document.getElementById('pf-card-file').click()" data-i18n="my_card_upload"></button></div>
+    <p class="pf-note" data-i18n="my_card_private"></p>`;
+  applyI18n(body);
+}
+async function cardPick(input){
+  const f = input.files && input.files[0];
+  input.value = '';
+  if(!f) return;
+  if(f.size > 20 * 1024 * 1024){ toast(t('my_card_too_big')); return; }
+  const r = await MkCards.upload(f);
+  if(!r.ok){ toast(t(r.err === 'too_large' ? 'my_card_too_big' : 'my_card_fail')); return; }
+  toast(t('my_card_uploaded'));
+  /* 새 명함이 올라가면 이전 것은 지운다 — 한 사람에 한 장 */
+  for(const old of _cards){ if(old.id !== r.card.id) await MkCards.remove(old.id); }
+  await loadCards();
+  cardConfirm(r.card.id);
+}
+/* 올린 직후: 명함에 적힌 값을 확인받아 프로필 담당자 정보에 반영한다 */
+function cardConfirm(id){
+  const s = Store.session() || {};
+  mkModal(`
+    <h2 data-i18n="my_card_confirm_title"></h2>
+    <p class="sub" data-i18n="my_card_confirm_sub"></p>
+    <div class="f-2col">
+      <div class="f-row"><label data-i18n="auth_contact_name"></label><input id="cf-name" value="${esc(s.contactName||'')}"></div>
+      <div class="f-row"><label data-i18n="auth_position"></label><input id="cf-pos" value="${esc(s.position||'')}"></div>
+    </div>
+    <div class="f-row"><label data-i18n="auth_phone"></label><input id="cf-tel" inputmode="tel" value="${esc(s.phone||'')}"></div>
+    <div class="f-row"><label data-i18n="auth_company"></label><input id="cf-company" value="${esc(s.company||'')}"></div>
+    <button class="btn btn-primary btn-block" onclick="cardConfirmDone(${id},true)" data-i18n="my_card_apply"></button>
+    <button class="btn btn-ghost btn-block" style="margin-top:8px" onclick="cardConfirmDone(${id},false)" data-i18n="my_card_skip"></button>`);
+}
+async function cardConfirmDone(id, apply){
+  const v = k => (document.getElementById(k)||{}).value?.trim() || '';
+  const fields = { name:v('cf-name'), position:v('cf-pos'), phone:v('cf-tel'), company:v('cf-company') };
+  const btn = document.querySelector('#mk-modal-back .btn-primary');
+  if(btn) btn.disabled = true;
+  const r = await MkCards.confirm(id, fields, apply);
+  if(btn) btn.disabled = false;
+  if(!r.ok){ toast(t('inq_err')); return; }
+  if(apply && window.MkData && MkData.profile){
+    if(fields.name) MkData.profile.contact_name = fields.name;
+    if(fields.position) MkData.profile.position = fields.position;
+    if(fields.phone) MkData.profile.phone = fields.phone;
+  }
+  closeModal(); toast(t('my_pf_saved'));
+  renderProfile(); renderSummary(Store.session()); renderChrome();
+}
+async function cardDelete(id){
+  if(!confirm(t('my_card_del_confirm'))) return;
+  const r = await MkCards.remove(id);
+  if(!r.ok){ toast(t('inq_err')); return; }
+  loadCards();
 }
 
 /* 기업 정보 재인증 — 가입 때 인증이 비었거나(스킵 계정) 정보가 바뀐 경우.

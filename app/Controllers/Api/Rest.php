@@ -20,7 +20,7 @@ class Rest extends BaseApiController
     /** 테이블별 컬럼·타입 정보 (json = jsonb 였던 것, bool = boolean 이었던 것) */
     private const SCHEMA = [
         'companies' => [
-            'cols' => ['id','brand','cat','name','tagline','intro','location','since','staff','export','brn','ceo','tel','site','certs','moq_policy','logo','cover','sort','created_at'],
+            'cols' => ['id','brand','cat','name','tagline','intro','location','since','staff','export','brn','ceo','tel','site','certs','moq_policy','logo','cover','sort','created_at','card_verified_at'],
             'json' => ['name','tagline','intro','location','certs'], 'bool' => [],
         ],
         'products' => [
@@ -53,8 +53,9 @@ class Rest extends BaseApiController
             'json' => ['value'], 'bool' => [],
         ],
         'profiles' => [
-            'cols' => ['id','email','country','company','address','reg_no','verified_by','verify_note','status','tier','contact_name','position','messenger','phone','created_at'],
-            'json' => [], 'bool' => [],
+            'cols' => ['id','email','country','company','address','reg_no','verified_by','verify_note','status','tier','contact_name','position','messenger','phone','created_at',
+                       'card_verified_at','categories','channels','import_experience','purchase_scale'],   // 명함 확인 배지 + 매칭 데이터 (2026-10-26, Api\Cards)
+            'json' => ['categories','channels'], 'bool' => [],
         ],
         'wishlist' => [
             'cols' => ['buyer_id','product_id','created_at'],
@@ -339,7 +340,7 @@ class Rest extends BaseApiController
             }
             $b->where(self::OWNER[$table], $this->uid());
             if ($table === 'profiles') {
-                unset($body['status'], $body['verified_by'], $body['tier'], $body['id']);
+                unset($body['status'], $body['verified_by'], $body['tier'], $body['id'], $body['card_verified_at']);   // 명함 배지는 Api\Cards::verify 만 준다
             }
             if ($table === 'inquiries' || $table === 'maker_leads') {
                 return $this->emptyWrite();      // 바이어는 문의 수정 불가 (관리자 전용)
