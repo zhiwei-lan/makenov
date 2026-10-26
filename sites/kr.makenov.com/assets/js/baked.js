@@ -3,6 +3,8 @@
    정식 주소(products/…html)로 링크하고, 없으면 ?id= 뷰어로 보낸다. */
 window.MK_BAKED = {
   "products": [
+      "p19",
+      "p20",
       "p18",
       "p16",
       "p17",
