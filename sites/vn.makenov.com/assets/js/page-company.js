@@ -38,6 +38,7 @@ function pageInit(){
             ${cat?`<span>${esc(L(cat.name))}</span>`:''}
             ${yrs > 0 ? `<span>${yrs}${t('co_years')}</span>` : ''}
             ${c.brn?`<span>${esc(c.brn)}</span>`:''}
+            ${c.cardVerifiedAt?`<span class="badge-verified" title="${esc(t('co_card_verified'))}">✓ ${esc(t('co_card_verified'))}</span>`:''}
           </div>
         </div>
       </div>

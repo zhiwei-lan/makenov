@@ -878,7 +878,9 @@ function openBuyer(email){
         <option value="verified" ${tier!=='vip'?'selected':''}>인증 유통 파트너</option>
         <option value="vip" ${tier==='vip'?'selected':''}>VIP</option></select>
       <p class="note" style="margin:8px 0 0">VIP로 올리면 한국 기업 직통 연락처를 열어줍니다.</p>
-    </div>`);
+    </div>
+    ${cardPanel('profile', b._id)}`);
+  cardPanelLoad('profile', b._id);
 }
 
 /* 화면에서 걸어 둔 검색·제품·상태·정렬을 그대로 내보낸다 */
@@ -970,7 +972,7 @@ function renderBuyers(){
         const c = b.country ? mkCountry(b.country) : null;
         const tier = Admin.tier(b.email);
         const n = bInqCount(b);
-        return `<tr class="row-hover" style="cursor:pointer" onclick="if(!event.target.closest('input,select,button'))openBuyer('${esc(b.email)}')"><td>${b.createdAt?new Date(b.createdAt).toLocaleDateString('ko-KR'):'-'}</td><td>${c?c.flag:''} ${esc(b.countryName||b.country||'')}</td><td>${esc(b.company)}<div class="sub">${esc(b.address||'')}</div></td><td>${esc(b.regNo||b.mst||'-')}</td><td>${esc(VERIFY_LABEL[b.verifiedBy]||'-')}<div class="sub">${esc(b.status||'')}</div></td><td>${esc(b.contactName||'')}<div class="sub">${esc(b.position||'')}</div></td><td>${esc(b.phone||b.zalo||'')}<div class="sub">${esc(b.messenger||'')} ${esc(b.messengerId||'')}<br>${esc(b.email)}</div></td><td><b>${n}</b></td><td>${tier==='vip'?'<span class="pill-st st-vip">VIP</span>':'<span class="pill-st st-done">인증</span>'}
+        return `<tr class="row-hover" style="cursor:pointer" onclick="if(!event.target.closest('input,select,button'))openBuyer('${esc(b.email)}')"><td>${b.createdAt?new Date(b.createdAt).toLocaleDateString('ko-KR'):'-'}</td><td>${c?c.flag:''} ${esc(b.countryName||b.country||'')}</td><td>${esc(b.company)}${b.cardVerifiedAt?' <span class="pill-st st-done" title="명함 확인 완료">명함✓</span>':''}<div class="sub">${esc(b.address||'')}</div></td><td>${esc(b.regNo||b.mst||'-')}</td><td>${esc(VERIFY_LABEL[b.verifiedBy]||'-')}<div class="sub">${esc(b.status||'')}</div></td><td>${esc(b.contactName||'')}<div class="sub">${esc(b.position||'')}</div></td><td>${esc(b.phone||b.zalo||'')}<div class="sub">${esc(b.messenger||'')} ${esc(b.messengerId||'')}<br>${esc(b.email)}</div></td><td><b>${n}</b></td><td>${tier==='vip'?'<span class="pill-st st-vip">VIP</span>':'<span class="pill-st st-done">인증</span>'}
             <div style="margin-top:6px"><select class="srch" style="width:100%;min-width:0;font-size:12px;padding:5px 8px"
                 onchange="admDo(Admin.setTier('${esc(b.email)}',this.value),0);toastA('등급 변경됨')"><option value="verified" ${tier!=='vip'?'selected':''}>인증 유통 파트너</option><option value="vip"${tier==='vip'?'selected':''}>VIP</option></select></div></td></tr>`;
       }).join('') : `<tr class="empty-row"><td colspan="9">${all.length?'조건에 맞는 유통 파트너가 없습니다':'아직 가입한 유통 파트너가 없습니다'}</td></tr>`}
@@ -1030,7 +1032,7 @@ let coEditing = null;
 function renderCompanies(){
   const el = document.getElementById('tab-companies');
   if(!el) return;
-  if(coEditing !== null){ el.innerHTML = companyForm(coEditing); return; }
+  if(coEditing !== null){ el.innerHTML = companyForm(coEditing); if(coEditing) cardPanelLoad('company', coEditing); return; }
   const prodCnt = id => MK_PRODUCTS.filter(p=>p.companyId===id).length;
   el.innerHTML = `
     <div class="card"><p class="note">제조사·브랜드의 <b>기업정보</b>입니다. 제품 수정 화면의 <b>공급사 연결</b>에서 이 목록을 고르면
@@ -1061,6 +1063,7 @@ function companyForm(id){
     }).join('')}</div><p class="hint" style="margin-top:8px">다른 공급사 소속 제품을 체크하면 이 공급사로 옮겨집니다. 체크를 풀면 연결이 해제됩니다.</p>` : `<p class="hint" style="margin:0">등록된 제품이 없습니다. 제품 탭에서 먼저 등록하세요.</p>`}</div>
     <div class="sect"><h4>로고</h4>${uploader('co-logo', c?c.logo||'':'', {hint:'회사 카드·제품 상세의 로고. 정사각형 권장.'})}</div>
     <div class="sect"><h4>커버 이미지</h4>${uploader('co-cover', c?c.cover||'':'', {hint:'회사 목록 카드 상단의 넓은 사진 (16:9 권장).'})}</div>
+    ${c ? `<div class="sect"><h4>담당자 명함 <span style="color:var(--adm-sub);font-size:11px"> 공급사는 계정이 없어 운영팀이 대신 올립니다. 확인하면 회사 페이지에 '담당자 명함 확인' 표시가 붙습니다</span></h4>${cardPanel('company', c.id)}</div>` : ''}
     <div class="bar" style="margin-top:22px"><span class="grow"></span><button class="btn btn-ghost" onclick="coEditing=null;renderCompanies()">취소</button><button class="btn btn-primary" onclick="saveCompany('${id}')">저장</button></div></div>`;
 }
 
@@ -2491,4 +2494,86 @@ function pddSave(){
   if(!any){ toastA('제목이나 항목을 하나 이상 입력하세요 (숨기려면 "사이트에 노출"만 끄세요)'); return; }
   toastA('저장하는 중…');
   admDo(Promise.resolve(Admin.saveSettings({ pdDist: d })), 0).then(() => { pddOpen = false; pddDraft = null; renderProducts(); });
+}
+
+/* ============================================================
+   명함 (MkCards → /functions/v1/cards)
+   바이어 상세 모달·공급사 수정 폼 양쪽에서 같은 패널을 쓴다.
+   공급사는 계정이 없어 운영팀이 대신 올린다(source=staff). 확인(verify)하면 배지가 붙는다.
+   사진은 서명 링크(10분)라 패널을 열 때마다 새로 받는다.
+   ============================================================ */
+const CARD_SRC = { self:'본인 등록', staff:'운영팀 수집' };
+function cardPanel(type, id){
+  const key = type + '-' + String(id).replace(/[^A-Za-z0-9_-]/g,'_');
+  return `<div class="mbox" id="cardp-${key}"><h4>명함</h4><div id="cardp-${key}-body"><p class="note" style="margin:0">불러오는 중…</p></div>
+    <input type="file" id="cardp-${key}-file" accept="image/*" hidden onchange="cardPanelPick(this,'${esc(type)}','${esc(id)}')"></div>`;
+}
+async function cardPanelLoad(type, id){
+  const key = type + '-' + String(id).replace(/[^A-Za-z0-9_-]/g,'_');
+  const body = document.getElementById('cardp-' + key + '-body');
+  if(!body) return;
+  if(typeof MkCards === 'undefined'){ body.innerHTML = '<p class="note" style="margin:0">서버 모드에서만 동작합니다.</p>'; return; }
+  const r = await MkCards.list({ type, id });
+  if(!r.ok){ body.innerHTML = `<p class="note" style="margin:0">${esc(admErr(r))}</p>`; return; }
+  const cards = r.cards || [];
+  const f = c => c.fields || {};
+  body.innerHTML = (cards.length ? cards.map(c => `
+    <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--adm-line,#eee)">
+      <a href="${esc(c.image_url||'#')}" target="_blank" rel="noopener"><img src="${esc(c.image_url||'')}" alt="" style="width:220px;max-width:100%;border-radius:6px;border:1px solid #ddd;background:#fff" onerror="this.style.display='none'"></a>
+      <div style="flex:1;min-width:220px">
+        <div>${c.verified ? '<span class="pill-st st-done">명함 확인 완료</span>' : '<span class="pill-st">확인 대기</span>'} <span class="sub">${esc(CARD_SRC[c.source]||c.source)} · ${fmtDT(c.created_at)}${c.verified_at?' · 확인 '+fmtDT(c.verified_at):''}</span></div>
+        <div class="fgrid two" style="margin-top:8px">
+          <div class="fld"><label>이름</label><input id="cf-${c.id}-name" value="${esc(f(c).name||'')}"></div>
+          <div class="fld"><label>직책</label><input id="cf-${c.id}-position" value="${esc(f(c).position||'')}"></div>
+          <div class="fld"><label>회사</label><input id="cf-${c.id}-company" value="${esc(f(c).company||'')}"></div>
+          <div class="fld"><label>전화</label><input id="cf-${c.id}-phone" value="${esc(f(c).phone||'')}"></div>
+          <div class="fld"><label>이메일</label><input id="cf-${c.id}-email" value="${esc(f(c).email||'')}"></div>
+        </div>
+        <div class="bar" style="margin-top:8px;gap:6px;flex-wrap:wrap">
+          ${type==='profile' ? `<label class="chk" style="margin:0"><input type="checkbox" id="cf-${c.id}-apply"><span>이름·직책·전화를 회원 프로필에 반영</span></label>` : ''}
+          <button class="btn btn-ghost btn-sm" onclick="cardPanelSave(${c.id},'${esc(type)}','${esc(id)}')">내용 저장</button>
+          <button class="btn ${c.verified?'btn-ghost':'btn-primary'} btn-sm" onclick="cardPanelVerify(${c.id},${c.verified?'false':'true'},'${esc(type)}','${esc(id)}')">${c.verified?'확인 해제':'명함 확인'}</button>
+          <button class="btn btn-ghost btn-sm" onclick="if(confirm('이 명함을 삭제할까요? 사진 파일도 지워집니다.'))cardPanelRemove(${c.id},'${esc(type)}','${esc(id)}')">삭제</button>
+        </div>
+        <div id="cf-${c.id}-cand"></div>
+      </div>
+    </div>`).join('') : '<p class="note" style="margin:0 0 8px">등록된 명함이 없습니다.</p>')
+    + `<div style="margin-top:10px"><button class="btn btn-ghost btn-sm" onclick="document.getElementById('cardp-${key}-file').click()">+ 명함 사진 올리기 (운영팀 대리)</button>
+       <p class="hint" style="margin:6px 0 0">사진은 공개되지 않고 본인·운영팀만 봅니다. 확인하면 ${type==='profile'?'회원':'회사 페이지'}에 '명함 확인' 표시가 붙습니다.</p></div>`;
+}
+async function cardPanelPick(input, type, id){
+  const file = input.files && input.files[0]; input.value = '';
+  if(!file) return;
+  toastA('명함을 올리는 중…');
+  const r = await MkCards.upload(file, { type, id });
+  if(!r.ok){ toastA('업로드 실패: ' + admErr(r)); return; }
+  toastA('명함을 올렸습니다'); cardPanelLoad(type, id);
+}
+async function cardPanelSave(cid, type, id){
+  const v = k => (document.getElementById('cf-' + cid + '-' + k)||{}).value || '';
+  const fields = { name:v('name'), position:v('position'), company:v('company'), phone:v('phone'), email:v('email') };
+  const applyEl = document.getElementById('cf-' + cid + '-apply');
+  const r = await MkCards.confirm(cid, fields, !!(applyEl && applyEl.checked));
+  if(!r.ok){ toastA('저장 실패: ' + admErr(r)); return; }
+  toastA((r.applied||[]).length ? '저장하고 프로필에 반영했습니다' : '저장했습니다');
+  const cand = document.getElementById('cf-' + cid + '-cand');
+  if(cand) cand.innerHTML = (r.candidates||[]).length
+    ? `<p class="note" style="margin:8px 0 0"><b>같은 사람·회사일 수 있는 회원</b> (자동 합치지 않습니다)</p>` + r.candidates.map(x => `<div class="sub">${esc(x.company||'')} · ${esc(x.contact_name||'')} · ${esc(x.email||'')} <i>(${x.matched_on.join(', ')})</i></div>`).join('')
+    : '';
+  if((r.applied||[]).length && type === 'profile' && typeof loadAdminData === 'function') { /* 목록은 다음 새로고침 때 따라온다 */ }
+}
+async function cardPanelVerify(cid, on, type, id){
+  const r = await MkCards.verify(cid, on);
+  if(!r.ok){ toastA('실패: ' + admErr(r)); return; }
+  toastA(on ? '명함 확인 완료 — 배지가 붙었습니다' : '확인을 해제했습니다');
+  /* 목록·회사 캐시에도 반영해 두어 모달을 닫았을 때 바로 보이게 */
+  const at = on ? new Date().toISOString() : null;
+  if(type === 'profile'){ const b = (ADM.buyers||[]).find(x => x._id === id); if(b) b.cardVerifiedAt = at; }
+  else { const c = MK_COMPANIES.find(x => x.id === id); if(c) c.cardVerifiedAt = at; }
+  cardPanelLoad(type, id);
+}
+async function cardPanelRemove(cid, type, id){
+  const r = await MkCards.remove(cid);
+  if(!r.ok){ toastA('삭제 실패: ' + admErr(r)); return; }
+  toastA('삭제했습니다'); cardPanelLoad(type, id);
 }

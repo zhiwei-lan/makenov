@@ -127,6 +127,7 @@ const MkData = {
       location:c.location, since:c.since, staff:c.staff, export:c.export, brn:c.brn,
       ceo:c.ceo, tel:c.tel, site:c.site, certs:c.certs||[], moqPolicy:c.moq_policy,
       logo:c.logo, cover:c.cover, sort:c.sort,
+      cardVerifiedAt:c.card_verified_at||null,   // 담당자 명함 확인 배지 (운영팀이 Api\Cards::verify 로 준다)
     }));
 
     MK_PRODUCTS.length = 0;
@@ -284,6 +285,7 @@ Object.assign(Store, {
       contactName: p.contact_name, position: p.position,
       phone: p.phone, zalo: p.messenger, messengerId: p.messenger,
       tier: p.tier, createdAt: p.created_at, isAdmin: MkData.admin,
+      cardVerifiedAt: p.card_verified_at || null,   // 명함 확인 배지 — 마이페이지 명함 상자가 읽는다
     };
   },
 
@@ -531,6 +533,7 @@ Object.assign(Store, {
       country:p.country, address:p.address, phone:p.phone,
       contactName:p.contact_name, position:p.position, zalo:p.messenger, messenger:p.messenger,
       verifiedBy:p.verified_by, status:p.verify_note, tier:p.tier, createdAt:p.created_at, _id:p.id,
+      cardVerifiedAt:p.card_verified_at||null,
     }));
   },
 
@@ -817,6 +820,56 @@ window.MkAdminApi = {
       return { ok:false, err:'http_' + r.status };
     }catch(e){ return { ok:false, err:'unreachable' }; }
   },
+};
+
+/* ---------- 명함 (Api\Cards) ----------
+   /functions/v1/cards — 바이어 본인은 자기 프로필에, 관리자는 아무 대상(profile|company)에.
+   업로드는 제품 이미지처럼 원본 바이너리 본문으로 보낸다(이 서버는 multipart 를 못 읽는다, _store 참고).
+   image_url 은 만료되는 서명 링크(기본 10분)라 화면에 띄울 때마다 list() 로 새로 받는다.
+   응답은 언제나 {ok, ...}. */
+window.MkCards = {
+  async _req(path, opt){
+    const { data:{ session } } = await SB.auth.getSession();
+    if(!session) return { ok:false, err:'no_session' };
+    opt = opt || {};
+    const headers = Object.assign({ 'apikey': MK_SUPABASE_ANON, 'Authorization':'Bearer ' + session.access_token }, opt.headers || {});
+    try{
+      const r = await fetch(MK_SUPABASE_URL.replace(/\/$/,'') + '/functions/v1/cards' + (path || ''),
+        { method: opt.method || 'GET', headers, body: opt.body });
+      const j = await r.json().catch(()=>null);
+      if(j && typeof j.ok === 'boolean') return j;
+      return { ok:false, err:'http_' + r.status };
+    }catch(e){ return { ok:false, err:'unreachable' }; }
+  },
+  /* owner 없으면 내 프로필. 관리자는 {type:'profile'|'company', id} 로 아무 대상 */
+  list(owner){
+    const q = owner && owner.type ? '?owner_type=' + encodeURIComponent(owner.type) + '&owner_id=' + encodeURIComponent(owner.id) : '';
+    return this._req(q);
+  },
+  /* 파일 → 1600px 로 줄여 올린다. owner 를 주면 관리자 대리 업로드(source=staff) */
+  async upload(file, owner){
+    let blob;
+    try{
+      const { dataUrl } = await MkImg.compress(file);
+      blob = await (await fetch(dataUrl)).blob();
+    }catch(e){ return { ok:false, err:'compress' }; }
+    if(blob.size > 8 * 1024 * 1024) return { ok:false, err:'too_large' };
+    const headers = { 'Content-Type': blob.type || 'image/jpeg',
+                      'Idempotency-Key': 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10) };
+    if(owner && owner.type){ headers['X-Owner-Type'] = owner.type; headers['X-Owner-Id'] = owner.id; }
+    return this._req('', { method:'POST', headers, body: blob });
+  },
+  /* 사람이 확인한 값. apply=true 면 프로필 담당자 정보(이름·직책·전화)에 반영 */
+  confirm(id, fields, apply){
+    return this._req('/' + id + '/confirm', { method:'POST', headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({ fields: fields || {}, apply: !!apply }) });
+  },
+  /* 관리자만 — "명함 확인" 배지 부여(on!==false)·해제(false) */
+  verify(id, on){
+    return this._req('/' + id + '/verify', { method:'POST', headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify({ verified: on !== false }) });
+  },
+  remove(id){ return this._req('/' + id, { method:'DELETE' }); },
 };
 
 }  /* end supabase mode */
