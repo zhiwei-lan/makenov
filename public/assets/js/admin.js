@@ -2516,7 +2516,13 @@ async function cardPanelLoad(type, id){
   const r = await MkCards.list({ type, id });
   if(!r.ok){ body.innerHTML = `<p class="note" style="margin:0">${esc(admErr(r))}</p>`; return; }
   const cards = r.cards || [];
-  const f = c => c.fields || {};
+  /* 칸이 비어 있으면 회원(담당자·직책·전화·이메일) / 공급사(대표자·대표 전화) 정보로 미리 채운다 —
+     OCR 이 아직 없어 운영팀이 직접 적는데, 빈 칸보다 "이미 아는 값"에서 시작하는 게 빠르다 */
+  const own = type === 'profile' ? (ADM.buyers||[]).find(x => x._id === id) : (window.MK_COMPANIES||[]).find(x => x.id === id);
+  const pre = !own ? {} : type === 'profile'
+    ? { name:own.contactName||'', position:own.position||'', phone:own.phone||'', email:own.email||'' }
+    : { name:own.ceo||'', position:'', phone:own.tel||'', email:'' };
+  const f = c => Object.assign({}, pre, c.fields || {});
   body.innerHTML = (cards.length ? cards.map(c => `
     <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--adm-line,#eee)">
       <a href="${esc(c.image_url||'#')}" target="_blank" rel="noopener"><img src="${esc(c.image_url||'')}" alt="" style="width:220px;max-width:100%;border-radius:6px;border:1px solid #ddd;background:#fff" onerror="this.style.display='none'"></a>
@@ -2548,21 +2554,25 @@ async function cardPanelPick(input, type, id){
   if(!r.ok){ toastA('업로드 실패: ' + admErr(r)); return; }
   toastA('명함을 올렸습니다'); cardPanelLoad(type, id);
 }
-async function cardPanelSave(cid, type, id){
-  const v = k => (document.getElementById('cf-' + cid + '-' + k)||{}).value || '';
+/* quiet=true 면 토스트 없이 저장만 (명함 확인 버튼이 먼저 부른다). 저장 성공 여부를 돌려준다 */
+async function cardPanelSave(cid, type, id, quiet){
+  const v = k => ((document.getElementById('cf-' + cid + '-' + k)||{}).value || '').trim();
   /* 회사명은 받지 않는다 — 바이어는 사업자 인증이 확정한 값, 공급사는 폼 자체가 그 회사. 서버가 소유자 회사명을 채운다 */
   const fields = { name:v('name'), position:v('position'), phone:v('phone'), email:v('email') };
   const applyEl = document.getElementById('cf-' + cid + '-apply');
   const r = await MkCards.confirm(cid, fields, !!(applyEl && applyEl.checked));
-  if(!r.ok){ toastA('저장 실패: ' + admErr(r)); return; }
+  if(!r.ok){ toastA('저장 실패: ' + admErr(r)); return false; }
+  if(quiet) return true;
   toastA((r.applied||[]).length ? '저장하고 프로필에 반영했습니다' : '저장했습니다');
   const cand = document.getElementById('cf-' + cid + '-cand');
   if(cand) cand.innerHTML = (r.candidates||[]).length
     ? `<p class="note" style="margin:8px 0 0"><b>같은 사람·회사일 수 있는 회원</b> (자동 합치지 않습니다)</p>` + r.candidates.map(x => `<div class="sub">${esc(x.company||'')} · ${esc(x.contact_name||'')} · ${esc(x.email||'')} <i>(${x.matched_on.join(', ')})</i></div>`).join('')
     : '';
-  if((r.applied||[]).length && type === 'profile' && typeof loadAdminData === 'function') { /* 목록은 다음 새로고침 때 따라온다 */ }
+  return true;
 }
 async function cardPanelVerify(cid, on, type, id){
+  /* ⚠ 패널을 다시 그리면 입력 중이던 칸이 사라진다 — 확인하기 전에 적어 둔 내용을 먼저 저장한다 (2026-10-27 felix 지적) */
+  if(on && !(await cardPanelSave(cid, type, id, true))) return;
   const r = await MkCards.verify(cid, on);
   if(!r.ok){ toastA('실패: ' + admErr(r)); return; }
   toastA(on ? '명함 확인 완료 — 배지가 붙었습니다' : '확인을 해제했습니다');
