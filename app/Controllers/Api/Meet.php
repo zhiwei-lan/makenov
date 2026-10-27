@@ -603,43 +603,21 @@ class Meet extends BaseApiController
 
     /* ---- 메일 서버(SMTP) — 2026-10-06: 서버 .env 를 고치지 않고 관리자 화면에서 넣는다(구글 · 네이버웍스 등).
        meet_config 는 REST 로 노출되지 않는 테이블이고, 비밀번호는 암호화해서 저장한다(화면에는 다시 내려보내지 않는다). */
-    private function secretKey(): string
-    {
-        $d = config('Database')->default ?? [];
-        return hash('sha256', 'mk-mail|' . ($d['password'] ?? '') . '|' . ($d['database'] ?? ''), true);
-    }
-
+    /* 암호화·SMTP·전송은 2026-10-27 Libraries\MkMail 로 옮겼다 (명함 안내 메일과 공유). 아래는 위임만 */
     private function enc(string $plain): string
     {
-        $iv = random_bytes(16);
-        return 'enc:' . base64_encode($iv . openssl_encrypt($plain, 'aes-256-cbc', $this->secretKey(), OPENSSL_RAW_DATA, $iv));
+        return \App\Libraries\MkMail::enc($plain);
     }
 
     private function dec(string $stored): string
     {
-        if (strncmp($stored, 'enc:', 4) !== 0) {
-            return $stored;
-        }
-        $raw = base64_decode(substr($stored, 4), true);
-        if ($raw === false || strlen($raw) < 17) {
-            return '';
-        }
-        $out = openssl_decrypt(substr($raw, 16), 'aes-256-cbc', $this->secretKey(), OPENSSL_RAW_DATA, substr($raw, 0, 16));
-        return $out === false ? '' : $out;
+        return \App\Libraries\MkMail::dec($stored);
     }
 
     /** @return array{host:string,port:int,user:string,pass:string,crypto:string,from:string,from_name:string} */
     private function smtpConf(): array
     {
-        return [
-            'host'      => $this->cfgGet('smtp_host'),
-            'port'      => (int) ($this->cfgGet('smtp_port') ?: 587),
-            'user'      => $this->cfgGet('smtp_user'),
-            'pass'      => $this->dec($this->cfgGet('smtp_pass')),
-            'crypto'    => $this->cfgGet('smtp_crypto'),
-            'from'      => $this->cfgGet('mail_from'),
-            'from_name' => $this->cfgGet('mail_from_name'),
-        ];
+        return \App\Libraries\MkMail::smtpConf();
     }
 
     private function adminConfig(): ResponseInterface
@@ -746,40 +724,7 @@ class Meet extends BaseApiController
      *  보내는 방법: 관리자 화면에서 넣은 메일 서버(meet_config 의 smtp_*)가 있으면 그것으로, 없으면 app/Config/Email.php(.env 의 email.*) */
     private function sendMail(array $to, string $subject, string $body): array
     {
-        try {
-            $cfg   = config('Email');
-            $email = \Config\Services::email();
-            $m     = $this->smtpConf();
-            if ($m['host'] !== '') {
-                $email->initialize([
-                    'protocol'    => 'smtp',
-                    'SMTPHost'    => $m['host'],
-                    'SMTPPort'    => $m['port'],
-                    'SMTPUser'    => $m['user'],
-                    'SMTPPass'    => $m['pass'],
-                    'SMTPCrypto'  => $m['crypto'],
-                    'SMTPTimeout' => 12,
-                    'mailType'    => 'text',
-                    'charset'     => 'UTF-8',
-                    'newline'     => "\r\n",
-                    'CRLF'        => "\r\n",
-                    'wordWrap'    => false,
-                ]);
-            }
-            $email->clear(true);
-            if ($m['host'] !== '') {
-                $email->setFrom($m['from'] ?: $m['user'], $m['from_name'] ?: 'MAKENOV');
-            } else {
-                $email->setFrom($cfg->fromEmail ?: 'no-reply@makenov.com', $cfg->fromName ?: 'MAKENOV');
-            }
-            $email->setTo($to);
-            $email->setSubject($subject);
-            $email->setMessage($body);
-            $ok = (bool) $email->send(false);
-            return [$ok, $ok ? '' : trim(strip_tags((string) $email->printDebugger(['headers'])))];
-        } catch (\Throwable $e) {
-            return [false, $e->getMessage()];
-        }
+        return \App\Libraries\MkMail::send($to, $subject, $body);
     }
 
     /** 새 미팅 신청 알림 — 실패해도 신청 접수에는 영향을 주지 않는다 */

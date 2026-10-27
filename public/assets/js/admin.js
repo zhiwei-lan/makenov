@@ -967,6 +967,7 @@ function renderBuyers(){
         <span class="note" style="margin:0">${list.length}명${filtered?` / ${all.length}`:''}</span>
         ${filtered?`<button class="btn btn-ghost btn-sm" onclick="bSearch='';bCountry='all';bVerify='all';bTier='all';bSort='new';renderBuyers()">초기화</button>`:''}
         <button class="btn btn-ghost btn-sm" onclick="exportBuyers()">CSV</button>
+        <button class="btn btn-ghost btn-sm" onclick="cardNotifyAll()" title="명함이 없는 인증 바이어에게 명함 등록 안내 메일을 보냅니다 (한 사람에게 한 번만)">명함 안내 메일</button>
       </div>
       <div class="tbl-wrap"><table><thead><tr><th style="width:88px">가입일</th><th>국가</th><th>회사</th><th>등록번호</th><th>인증</th><th>담당자</th><th>연락처</th><th>문의</th><th style="width:118px">등급</th></tr></thead><tbody>${list.length ? list.map(b=>{
         const c = b.country ? mkCountry(b.country) : null;
@@ -2581,6 +2582,27 @@ async function cardPanelVerify(cid, on, type, id){
   if(type === 'profile'){ const b = (ADM.buyers||[]).find(x => x._id === id); if(b) b.cardVerifiedAt = at; }
   else { const c = MK_COMPANIES.find(x => x.id === id); if(c) c.cardVerifiedAt = at; }
   cardPanelLoad(type, id);
+}
+/* 명함이 없는 인증 바이어에게 명함 등록 안내 메일 — 서버가 보낸 사람에게 card_notified_at 을 찍어 두 번 가지 않는다.
+   SMTP 는 행사 일정 › 알림 설정의 것을 쓴다. 먼저 내 메일로 샘플을 받아본 뒤 전체 발송. */
+async function cardNotifyAll(){
+  if(typeof MkCards === 'undefined'){ toastA('서버 모드에서만 동작합니다'); return; }
+  const d = await MkCards.notify({ dry:true });
+  if(!d.ok){ toastA('확인 실패: ' + admErr(d)); return; }
+  if(!d.smtp){ toastA('먼저 행사 일정 › 알림 설정에서 메일 서버(SMTP)를 넣어 주세요'); return; }
+  if(!d.total){ toastA('보낼 대상이 없습니다 — 명함이 없는 인증 바이어 중 아직 안내하지 않은 사람'); return; }
+  const test = prompt(`명함이 없는 인증 바이어 ${d.total}명에게 안내 메일을 보냅니다.\n\n먼저 샘플을 받아볼 이메일을 넣으세요(베트남어 본문).\n비우고 확인을 누르면 바로 전체 발송으로 넘어갑니다.`, '');
+  if(test === null) return;
+  if(test.trim()){
+    const r = await MkCards.notify({ test: test.trim() });
+    toastA(r.ok ? '샘플을 보냈습니다: ' + test.trim() : '샘플 실패: ' + (r.message || admErr(r)));
+    return;
+  }
+  if(!confirm(`${d.total}명에게 지금 보낼까요?\n한 번에 최대 100명이고, 남으면 버튼을 다시 누르면 이어서 보냅니다.`)) return;
+  toastA('보내는 중… (최대 1~2분)');
+  const r = await MkCards.notify({ limit:100 });
+  if(!r.ok){ toastA('발송 실패: ' + (r.message || admErr(r))); return; }
+  toastA(`보냄 ${r.sent}명 · 실패 ${(r.failed||[]).length}명 · 남음 ${r.remaining}명`);
 }
 async function cardPanelRemove(cid, type, id){
   const r = await MkCards.remove(cid);

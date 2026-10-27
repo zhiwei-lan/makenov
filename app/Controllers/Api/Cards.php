@@ -4,6 +4,7 @@ namespace App\Controllers\Api;
 
 use App\Controllers\BaseApiController;
 use App\Libraries\CardStorage;
+use App\Libraries\MkMail;
 use CodeIgniter\HTTP\ResponseInterface;
 
 /**
@@ -35,7 +36,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 class Cards extends BaseApiController
 {
     /** 마이그레이션을 추가하면 올린다 — writable/cards_schema_ok 와 다르면 latest() 를 다시 돈다 */
-    private const SCHEMA_VER = '1';
+    private const SCHEMA_VER = '2';   // 2: profiles.card_notified_at (안내 메일)
     private const OWNER_TYPES = ['profile', 'company'];
     /** 확인 값으로 받는 키 — 그 밖은 버린다 */
     private const FIELD_KEYS = ['name', 'position', 'company', 'phone', 'email', 'address', 'website', 'note'];
@@ -82,6 +83,8 @@ class Cards extends BaseApiController
             if ($a === '') {
                 if ($method === 'GET')  return $this->index();
                 if ($method === 'POST') return $this->create();
+            } elseif ($a === 'notify' && $method === 'POST') {
+                return $this->notify();
             } elseif (ctype_digit($a)) {
                 $id = (int) $a;
                 if ($b === '' && $method === 'GET')          return $this->show($id);
@@ -286,6 +289,125 @@ class Cards extends BaseApiController
         return $this->json(['ok' => true, 'card' => $this->present($this->find($id))]);
     }
 
+    /* ================= 관리자: 명함 등록 안내 메일 ================= */
+
+    /**
+     * body: { dry:true }            대상 수만
+     *       { test:"me@x.com" }     샘플 한 통(베트남어)
+     *       { limit:100 }           명함이 없는 인증 바이어에게 발송 — 보낸 사람은 card_notified_at 을 찍어 다시 안 보낸다
+     * SMTP 는 관리자 › 행사 일정 › 알림 설정에 넣은 것을 쓴다(MkMail). 없으면 대량 발송은 막는다.
+     */
+    private function notify(): ResponseInterface
+    {
+        if (! $this->isAdmin) {
+            return $this->err('admin_only', '관리자만 할 수 있습니다', 403);
+        }
+        $body = $this->bodyJson() ?? [];
+        $db   = db_connect();
+
+        if (! empty($body['test'])) {
+            $to = strtolower(trim((string) $body['test']));
+            if (! filter_var($to, FILTER_VALIDATE_EMAIL)) {
+                return $this->err('bad_email', '이메일 형식이 아닙니다', 422);
+            }
+            [$subject, $text] = $this->inviteText('vi', 'Nguyễn Văn A');
+            [$ok, $why]       = MkMail::send([$to], '[TEST] ' . $subject, $text);
+            return $this->json(['ok' => $ok, 'sent' => $ok ? 1 : 0, 'message' => $why]);
+        }
+
+        $q = $db->table('profiles')->select('id, email, country, contact_name')
+            ->where('status', 'verified')
+            ->where('card_notified_at', null)
+            ->where('email IS NOT NULL', null, false)
+            ->where("id NOT IN (SELECT owner_id FROM business_cards WHERE owner_type = 'profile' AND deleted_at IS NULL)", null, false)
+            ->orderBy('created_at', 'ASC');
+        $total = $q->countAllResults(false);
+
+        if (! empty($body['dry'])) {
+            return $this->json(['ok' => true, 'total' => $total, 'smtp' => MkMail::configured()]);
+        }
+        if (! MkMail::configured()) {
+            return $this->err('no_smtp', '관리자 › 행사 일정 › 알림 설정에서 메일 서버(SMTP)를 먼저 넣어 주세요', 409);
+        }
+        $limit = max(1, min(100, (int) ($body['limit'] ?? 50)));
+        $rows  = $q->limit($limit)->get()->getResultArray();
+        $sent  = 0;
+        $failed = [];
+        foreach ($rows as $p) {
+            $lang = match (strtoupper((string) $p['country'])) { 'VN' => 'vi', 'KR' => 'ko', default => 'en' };
+            [$subject, $text] = $this->inviteText($lang, (string) ($p['contact_name'] ?? ''));
+            [$ok, $why]       = MkMail::send([$p['email']], $subject, $text);
+            if ($ok) {
+                $db->table('profiles')->where('id', $p['id'])->update(['card_notified_at' => date('Y-m-d H:i:s')]);
+                $sent++;
+            } else {
+                $failed[] = $p['email'];
+                log_message('error', 'cards notify ' . $p['email'] . ': ' . $why);
+            }
+        }
+        return $this->json(['ok' => true, 'total' => $total, 'sent' => $sent, 'failed' => $failed,
+            'remaining' => max(0, $total - $sent - count($failed))]);
+    }
+
+    /** 안내 메일 본문 — 텍스트. 바이어 언어(국가)별 */
+    private function inviteText(string $lang, string $name): array
+    {
+        $name = trim($name);
+        $url  = 'https://makenov.com/mypage.html';
+        if ($lang === 'ko') {
+            return ['[MAKENOV] 명함을 올리면 \'명함 확인\' 표시가 붙습니다', implode("\n", [
+                ($name !== '' ? $name . ' 님, ' : '') . '안녕하세요. MAKENOV 입니다.',
+                '',
+                'MAKENOV 에 명함 기능이 생겼습니다. 명함 사진을 올리고 운영팀이 확인하면',
+                '프로필에 \'명함 확인\' 표시가 붙습니다. 공급사는 담당자가 확인된 바이어를 먼저 찾습니다.',
+                '',
+                '방법 (1분):',
+                '1. 로그인: ' . $url,
+                '2. \'프로필\' 탭 → \'명함\' → \'명함 올리기\'',
+                '3. 이름·직책·전화번호를 확인하고 저장',
+                '',
+                '명함 사진은 본인과 MAKENOV 운영팀에게만 보이고 공개되지 않습니다.',
+                '',
+                'MAKENOV — 한국 공급사와 베트남 유통 파트너를 잇습니다',
+                'notice@makenov.com',
+            ])];
+        }
+        if ($lang === 'en') {
+            return ['[MAKENOV] Upload your business card to get the \'Card verified\' mark', implode("\n", [
+                'Hello' . ($name !== '' ? ' ' . $name : '') . ',',
+                '',
+                'MAKENOV now supports business cards. Upload a photo of your card and, once the MAKENOV team',
+                'confirms it, your profile shows a \'Card verified\' mark. Suppliers reach out to verified contacts first.',
+                '',
+                'How (1 minute):',
+                '1. Sign in: ' . $url,
+                '2. \'Profile\' tab → \'Business card\' → \'Upload card\'',
+                '3. Check your name, title and phone, then save',
+                '',
+                'Your card photo is visible only to you and the MAKENOV team. It is never public.',
+                '',
+                'MAKENOV — Connecting Korean suppliers and Vietnamese distributors',
+                'notice@makenov.com',
+            ])];
+        }
+        return ['[MAKENOV] Tải danh thiếp lên để nhận dấu \'Đã xác nhận danh thiếp\'', implode("\n", [
+            'Xin chào' . ($name !== '' ? ' ' . $name : '') . ',',
+            '',
+            'MAKENOV vừa có tính năng danh thiếp. Khi bạn tải ảnh danh thiếp lên và đội ngũ MAKENOV xác nhận,',
+            'hồ sơ của bạn sẽ có dấu \'Đã xác nhận danh thiếp\'. Nhà cung cấp Hàn Quốc sẽ ưu tiên liên hệ người phụ trách đã được xác nhận.',
+            '',
+            'Cách làm (1 phút):',
+            '1. Đăng nhập: ' . $url,
+            '2. Thẻ \'Hồ sơ\' → \'Danh thiếp\' → \'Tải danh thiếp lên\'',
+            '3. Kiểm tra tên, chức vụ, số điện thoại rồi lưu',
+            '',
+            'Ảnh danh thiếp chỉ hiển thị cho bạn và đội ngũ MAKENOV, không công khai.',
+            '',
+            'MAKENOV — Kết nối nhà cung cấp Hàn Quốc và nhà phân phối Việt Nam',
+            'notice@makenov.com',
+        ])];
+    }
+
     /* ================= 삭제 ================= */
 
     private function destroy(int $id): ResponseInterface
@@ -474,8 +596,10 @@ class Cards extends BaseApiController
             if (method_exists($db, 'resetDataCache')) {
                 $db->resetDataCache();
             }
+            $pf = $db->getFieldNames('profiles');
             if ($db->tableExists('business_cards')
-                && in_array('card_verified_at', $db->getFieldNames('profiles'), true)
+                && in_array('card_verified_at', $pf, true)
+                && in_array('card_notified_at', $pf, true)
                 && in_array('card_verified_at', $db->getFieldNames('companies'), true)) {
                 @file_put_contents($flag, self::SCHEMA_VER);
                 return null;

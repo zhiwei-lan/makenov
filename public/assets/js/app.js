@@ -475,7 +475,39 @@ async function suDone(){
   });
 
   closeModal(); toast(t('auth_welcome'));
+  /* 가입 직후 명함을 받는다(선택). 세션이 바로 생긴 서버 모드에서만 — 이메일 확인 대기면 예전처럼 새로고침 */
+  if(typeof MkCards !== 'undefined' && res.session){
+    if(typeof renderChrome === 'function') renderChrome();
+    setTimeout(openCardStep, 400);
+    return;
+  }
   setTimeout(()=>location.reload(), 700);
+}
+
+/* ---------- 가입 직후: 명함 올리기(선택) ----------
+   가입 = 사업자 인증까지 끝난 상태. 여기서 명함까지 받으면 운영팀 확인 뒤 '명함 확인' 배지가 붙는다.
+   건너뛰면 마이페이지 상단에서 다시 권한다(my_card_nudge). 업로드는 MkCards(store-supabase.js). */
+function openCardStep(){
+  mkModal(`
+    <h2 data-i18n="su_card_title"></h2>
+    <p class="sub" data-i18n="su_card_sub"></p>
+    <input type="file" id="su-card-file" accept="image/*" hidden onchange="suCardPick(this)">
+    <button class="btn btn-primary btn-block" onclick="document.getElementById('su-card-file').click()" data-i18n="my_card_upload"></button>
+    <button class="btn btn-ghost btn-block" style="margin-top:8px" onclick="closeModal();location.reload()" data-i18n="su_card_skip"></button>
+    <p class="pf-note" style="margin-top:12px" data-i18n="my_card_private"></p>`);
+}
+async function suCardPick(input){
+  const f = input.files && input.files[0]; input.value = '';
+  if(!f) return;
+  const btn = document.querySelector('#mk-modal-back .btn-primary'); if(btn) btn.disabled = true;
+  const r = await MkCards.upload(f);
+  if(btn) btn.disabled = false;
+  if(!r.ok){ toast(t(r.err === 'too_large' ? 'my_card_too_big' : 'my_card_fail')); return; }
+  /* 가입 폼에서 이미 받은 이름·직책·전화를 명함 값으로 같이 저장 — 다시 묻지 않는다 */
+  const s = (typeof Store !== 'undefined' && Store.session()) || {};
+  await MkCards.confirm(r.card.id, { name:s.contactName||'', position:s.position||'', phone:s.phone||'' }, false);
+  toast(t('my_card_uploaded'));
+  closeModal(); setTimeout(()=>{ location.href = 'mypage.html'; }, 600);
 }
 
 /* ---------- 간편 문의 ----------
