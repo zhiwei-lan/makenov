@@ -165,14 +165,13 @@ function cardConfirm(id){
       <div class="f-row"><label data-i18n="auth_contact_name"></label><input id="cf-name" value="${esc(s.contactName||'')}"></div>
       <div class="f-row"><label data-i18n="auth_position"></label><input id="cf-pos" value="${esc(s.position||'')}"></div>
     </div>
-    <div class="f-row"><label data-i18n="auth_phone"></label><input id="cf-tel" inputmode="tel" value="${esc(s.phone||'')}"></div>
-    <div class="f-row"><label data-i18n="auth_company"></label><input id="cf-company" value="${esc(s.company||'')}"></div>
+    <div class="f-row"><label data-i18n="auth_phone"></label><input id="cf-tel" inputmode="tel" autocomplete="off" value="${esc(s.phone||'')}"></div>
     <button class="btn btn-primary btn-block" onclick="cardConfirmDone(${id},true)" data-i18n="my_card_apply"></button>
     <button class="btn btn-ghost btn-block" style="margin-top:8px" onclick="cardConfirmDone(${id},false)" data-i18n="my_card_skip"></button>`);
 }
 async function cardConfirmDone(id, apply){
   const v = k => (document.getElementById(k)||{}).value?.trim() || '';
-  const fields = { name:v('cf-name'), position:v('cf-pos'), phone:v('cf-tel'), company:v('cf-company') };
+  const fields = { name:v('cf-name'), position:v('cf-pos'), phone:v('cf-tel') };   // 회사명은 인증값 — 서버가 채운다
   const btn = document.querySelector('#mk-modal-back .btn-primary');
   if(btn) btn.disabled = true;
   const r = await MkCards.confirm(id, fields, apply);

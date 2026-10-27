@@ -2523,11 +2523,10 @@ async function cardPanelLoad(type, id){
       <div style="flex:1;min-width:220px">
         <div>${c.verified ? '<span class="pill-st st-done">명함 확인 완료</span>' : '<span class="pill-st">확인 대기</span>'} <span class="sub">${esc(CARD_SRC[c.source]||c.source)} · ${fmtDT(c.created_at)}${c.verified_at?' · 확인 '+fmtDT(c.verified_at):''}</span></div>
         <div class="fgrid two" style="margin-top:8px">
-          <div class="fld"><label>이름</label><input id="cf-${c.id}-name" value="${esc(f(c).name||'')}"></div>
-          <div class="fld"><label>직책</label><input id="cf-${c.id}-position" value="${esc(f(c).position||'')}"></div>
-          <div class="fld"><label>회사</label><input id="cf-${c.id}-company" value="${esc(f(c).company||'')}"></div>
-          <div class="fld"><label>전화</label><input id="cf-${c.id}-phone" value="${esc(f(c).phone||'')}"></div>
-          <div class="fld"><label>이메일</label><input id="cf-${c.id}-email" value="${esc(f(c).email||'')}"></div>
+          <div class="fld"><label>이름</label><input id="cf-${c.id}-name" autocomplete="off" value="${esc(f(c).name||'')}"></div>
+          <div class="fld"><label>직책</label><input id="cf-${c.id}-position" autocomplete="off" value="${esc(f(c).position||'')}"></div>
+          <div class="fld"><label>전화</label><input id="cf-${c.id}-phone" autocomplete="off" value="${esc(f(c).phone||'')}"></div>
+          <div class="fld"><label>이메일</label><input id="cf-${c.id}-email" autocomplete="off" value="${esc(f(c).email||'')}"></div>
         </div>
         <div class="bar" style="margin-top:8px;gap:6px;flex-wrap:wrap">
           ${type==='profile' ? `<label class="chk" style="margin:0"><input type="checkbox" id="cf-${c.id}-apply"><span>이름·직책·전화를 회원 프로필에 반영</span></label>` : ''}
@@ -2551,7 +2550,8 @@ async function cardPanelPick(input, type, id){
 }
 async function cardPanelSave(cid, type, id){
   const v = k => (document.getElementById('cf-' + cid + '-' + k)||{}).value || '';
-  const fields = { name:v('name'), position:v('position'), company:v('company'), phone:v('phone'), email:v('email') };
+  /* 회사명은 받지 않는다 — 바이어는 사업자 인증이 확정한 값, 공급사는 폼 자체가 그 회사. 서버가 소유자 회사명을 채운다 */
+  const fields = { name:v('name'), position:v('position'), phone:v('phone'), email:v('email') };
   const applyEl = document.getElementById('cf-' + cid + '-apply');
   const r = await MkCards.confirm(cid, fields, !!(applyEl && applyEl.checked));
   if(!r.ok){ toastA('저장 실패: ' + admErr(r)); return; }

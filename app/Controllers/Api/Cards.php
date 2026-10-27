@@ -225,6 +225,14 @@ class Cards extends BaseApiController
             }
         }
         $db = db_connect();
+        /* 회사명은 화면에서 받지 않는다 — 바이어는 사업자 인증이 확정한 profiles.company,
+           공급사는 companies.name(3개 국어 JSON). 중복 후보 비교에 쓰도록 소유자 값으로 채운다 */
+        if (empty($fields['company'])) {
+            $owner = $this->ownerCompanyName($card['owner_type'], $card['owner_id']);
+            if ($owner !== '') {
+                $fields['company'] = $owner;
+            }
+        }
         $db->table('business_cards')->where('id', $id)->update([
             'fields'     => $fields === [] ? null : json_encode($fields, JSON_UNESCAPED_UNICODE),
             'updated_at' => date('Y-m-d H:i:s'),
@@ -351,6 +359,23 @@ class Cards extends BaseApiController
     {
         $table = $type === 'company' ? 'companies' : 'profiles';
         return (bool) db_connect()->table($table)->where('id', $oid)->countAllResults();
+    }
+
+    /** 소유자의 회사명 — profiles.company 또는 companies.name(JSON {ko,vi,en} 중 첫 값) */
+    private function ownerCompanyName(string $type, string $oid): string
+    {
+        $db = db_connect();
+        if ($type === 'company') {
+            $row = $db->table('companies')->select('name')->where('id', $oid)->get()->getRowArray();
+            $n   = $row['name'] ?? '';
+            $j   = is_string($n) ? json_decode($n, true) : null;
+            if (is_array($j)) {
+                $n = $j['ko'] ?? $j['vi'] ?? $j['en'] ?? '';
+            }
+            return trim((string) $n);
+        }
+        $row = $db->table('profiles')->select('company')->where('id', $oid)->get()->getRowArray();
+        return trim((string) ($row['company'] ?? ''));
     }
 
     /** 확인된 명함이 한 장이라도 있으면 배지, 없으면 해제 — verify/destroy 뒤에 다시 계산 */
