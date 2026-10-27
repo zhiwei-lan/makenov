@@ -61,7 +61,8 @@ body{background:var(--adm-bg);color:var(--adm-ink)}
 
 /* ---------- KPI ---------- */
 .kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
-@media(max-width:900px){.kpi{grid-template-columns:repeat(2,1fr)}}
+.kpi.k5{grid-template-columns:repeat(5,1fr)}
+@media(max-width:900px){.kpi,.kpi.k5{grid-template-columns:repeat(2,1fr)}}
 .kpi-card{background:#fff;border:1px solid var(--adm-line);border-radius:12px;padding:18px 20px}
 .kpi-card .lbl{font-size:12px;font-weight:600;color:var(--adm-sub);display:flex;align-items:center;gap:6px}
 .kpi-card .num{font-size:28px;font-weight:800;letter-spacing:-.03em;margin-top:8px;line-height:1}
@@ -279,10 +280,10 @@ tbody tr:hover{background:#FAFBFC}
 <script src="../assets/js/store.js?v=20260817b"></script>
 <script src="../assets/js/verify.js?v=20260817b"></script>
 <script src="../assets/js/upload.js?v=20260918a"></script>
-<script src="../assets/js/store-supabase.js?v=20261027c"></script>
+<script src="../assets/js/store-supabase.js?v=20261027d"></script>
 <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
-<script src="../assets/js/admin.js?v=20261027c"></script>
+<script src="../assets/js/admin.js?v=20261027d"></script>
 <script src="../assets/js/admin-aff.js?v=20260923b"></script>
-<script src="../assets/js/admin-meet.js?v=20261022a"></script>
+<script src="../assets/js/admin-meet.js?v=20261027d"></script>
 </body>
 </html>

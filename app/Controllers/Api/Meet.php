@@ -783,15 +783,21 @@ class Meet extends BaseApiController
         }
         $rows = $b->orderBy('created_at', 'DESC')->get()->getResultArray();
         /* 사업자 인증 여부 — 인증 없이도 신청할 수 있게 바꿔서(2026-09-30) 관리자가 구분해 볼 수 있게 */
-        $ids = array_values(array_unique(array_column($rows, 'buyer_id')));
-        $ver = [];
+        $ids  = array_values(array_unique(array_column($rows, 'buyer_id')));
+        $ver  = [];
+        $card = [];
         if ($ids) {
-            foreach (db_connect()->table('profiles')->select('id, status')->whereIn('id', $ids)->get()->getResultArray() as $p) {
-                $ver[$p['id']] = ($p['status'] ?? '') === 'verified';
+            $db = db_connect();
+            /* 명함 확인(card_verified_at) — Api\Cards 스키마 가드가 아직 안 돈 서버에서도 깨지지 않게 컬럼을 먼저 본다 */
+            $hasCard = in_array('card_verified_at', $db->getFieldNames('profiles'), true);
+            foreach ($db->table('profiles')->select($hasCard ? 'id, status, card_verified_at' : 'id, status')->whereIn('id', $ids)->get()->getResultArray() as $p) {
+                $ver[$p['id']]  = ($p['status'] ?? '') === 'verified';
+                $card[$p['id']] = ! empty($p['card_verified_at']);
             }
         }
         foreach ($rows as &$r) {
-            $r['verified'] = $ver[$r['buyer_id']] ?? false;
+            $r['verified']      = $ver[$r['buyer_id']] ?? false;
+            $r['card_verified'] = $card[$r['buyer_id']] ?? false;   // 담당자 명함 확인 — 공급사가 먼저 볼 신청 (2026-10-27)
         }
         unset($r);
         return $this->json($rows);

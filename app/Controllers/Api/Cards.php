@@ -85,6 +85,8 @@ class Cards extends BaseApiController
                 if ($method === 'POST') return $this->create();
             } elseif ($a === 'notify' && $method === 'POST') {
                 return $this->notify();
+            } elseif ($a === 'owners' && $method === 'GET') {
+                return $this->owners();
             } elseif (ctype_digit($a)) {
                 $id = (int) $a;
                 if ($b === '' && $method === 'GET')          return $this->show($id);
@@ -287,6 +289,32 @@ class Cards extends BaseApiController
         $this->refreshBadge($card['owner_type'], $card['owner_id']);
 
         return $this->json(['ok' => true, 'card' => $this->present($this->find($id))]);
+    }
+
+    /* ================= 관리자: 소유자별 명함 현황 ================= */
+
+    /**
+     * GET cards/owners?owner_type=profile → { ok, owners: { "<owner_id>": { cards:N, verified:bool } } }
+     * 바이어 목록의 "명함 확인 / 확인 대기 / 명함 없음" 필터용. 사진·내용은 주지 않는다 — 개수와 상태만.
+     */
+    private function owners(): ResponseInterface
+    {
+        if (! $this->isAdmin) {
+            return $this->err('admin_only', '관리자만 할 수 있습니다', 403);
+        }
+        $type = (string) (service('request')->getGet('owner_type') ?? 'profile');
+        if (! in_array($type, self::OWNER_TYPES, true)) {
+            return $this->err('bad_owner', 'owner_type 은 profile 또는 company', 400);
+        }
+        $rows = db_connect()->table('business_cards')
+            ->select('owner_id, COUNT(*) AS n, MAX(verified_at) AS v', false)
+            ->where('owner_type', $type)->where('deleted_at', null)
+            ->groupBy('owner_id')->get()->getResultArray();
+        $out = [];
+        foreach ($rows as $r) {
+            $out[$r['owner_id']] = ['cards' => (int) $r['n'], 'verified' => ! empty($r['v'])];
+        }
+        return $this->json(['ok' => true, 'owners' => (object) $out]);
     }
 
     /* ================= 관리자: 명함 등록 안내 메일 ================= */
