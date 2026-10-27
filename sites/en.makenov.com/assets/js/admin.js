@@ -967,6 +967,7 @@ function renderBuyers(){
         <span class="note" style="margin:0">${list.length}명${filtered?` / ${all.length}`:''}</span>
         ${filtered?`<button class="btn btn-ghost btn-sm" onclick="bSearch='';bCountry='all';bVerify='all';bTier='all';bSort='new';renderBuyers()">초기화</button>`:''}
         <button class="btn btn-ghost btn-sm" onclick="exportBuyers()">CSV</button>
+        <button class="btn btn-ghost btn-sm" onclick="cardNotifyAll()" title="명함이 없는 인증 바이어에게 명함 등록 안내 메일을 보냅니다 (한 사람에게 한 번만)">명함 안내 메일</button>
       </div>
       <div class="tbl-wrap"><table><thead><tr><th style="width:88px">가입일</th><th>국가</th><th>회사</th><th>등록번호</th><th>인증</th><th>담당자</th><th>연락처</th><th>문의</th><th style="width:118px">등급</th></tr></thead><tbody>${list.length ? list.map(b=>{
         const c = b.country ? mkCountry(b.country) : null;
@@ -2516,18 +2517,23 @@ async function cardPanelLoad(type, id){
   const r = await MkCards.list({ type, id });
   if(!r.ok){ body.innerHTML = `<p class="note" style="margin:0">${esc(admErr(r))}</p>`; return; }
   const cards = r.cards || [];
-  const f = c => c.fields || {};
+  /* 칸이 비어 있으면 회원(담당자·직책·전화·이메일) / 공급사(대표자·대표 전화) 정보로 미리 채운다 —
+     OCR 이 아직 없어 운영팀이 직접 적는데, 빈 칸보다 "이미 아는 값"에서 시작하는 게 빠르다 */
+  const own = type === 'profile' ? (ADM.buyers||[]).find(x => x._id === id) : (window.MK_COMPANIES||[]).find(x => x.id === id);
+  const pre = !own ? {} : type === 'profile'
+    ? { name:own.contactName||'', position:own.position||'', phone:own.phone||'', email:own.email||'' }
+    : { name:own.ceo||'', position:'', phone:own.tel||'', email:'' };
+  const f = c => Object.assign({}, pre, c.fields || {});
   body.innerHTML = (cards.length ? cards.map(c => `
     <div style="display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--adm-line,#eee)">
       <a href="${esc(c.image_url||'#')}" target="_blank" rel="noopener"><img src="${esc(c.image_url||'')}" alt="" style="width:220px;max-width:100%;border-radius:6px;border:1px solid #ddd;background:#fff" onerror="this.style.display='none'"></a>
       <div style="flex:1;min-width:220px">
         <div>${c.verified ? '<span class="pill-st st-done">명함 확인 완료</span>' : '<span class="pill-st">확인 대기</span>'} <span class="sub">${esc(CARD_SRC[c.source]||c.source)} · ${fmtDT(c.created_at)}${c.verified_at?' · 확인 '+fmtDT(c.verified_at):''}</span></div>
         <div class="fgrid two" style="margin-top:8px">
-          <div class="fld"><label>이름</label><input id="cf-${c.id}-name" value="${esc(f(c).name||'')}"></div>
-          <div class="fld"><label>직책</label><input id="cf-${c.id}-position" value="${esc(f(c).position||'')}"></div>
-          <div class="fld"><label>회사</label><input id="cf-${c.id}-company" value="${esc(f(c).company||'')}"></div>
-          <div class="fld"><label>전화</label><input id="cf-${c.id}-phone" value="${esc(f(c).phone||'')}"></div>
-          <div class="fld"><label>이메일</label><input id="cf-${c.id}-email" value="${esc(f(c).email||'')}"></div>
+          <div class="fld"><label>이름</label><input id="cf-${c.id}-name" autocomplete="off" value="${esc(f(c).name||'')}"></div>
+          <div class="fld"><label>직책</label><input id="cf-${c.id}-position" autocomplete="off" value="${esc(f(c).position||'')}"></div>
+          <div class="fld"><label>전화</label><input id="cf-${c.id}-phone" autocomplete="off" value="${esc(f(c).phone||'')}"></div>
+          <div class="fld"><label>이메일</label><input id="cf-${c.id}-email" autocomplete="off" value="${esc(f(c).email||'')}"></div>
         </div>
         <div class="bar" style="margin-top:8px;gap:6px;flex-wrap:wrap">
           ${type==='profile' ? `<label class="chk" style="margin:0"><input type="checkbox" id="cf-${c.id}-apply"><span>이름·직책·전화를 회원 프로필에 반영</span></label>` : ''}
@@ -2549,20 +2555,25 @@ async function cardPanelPick(input, type, id){
   if(!r.ok){ toastA('업로드 실패: ' + admErr(r)); return; }
   toastA('명함을 올렸습니다'); cardPanelLoad(type, id);
 }
-async function cardPanelSave(cid, type, id){
-  const v = k => (document.getElementById('cf-' + cid + '-' + k)||{}).value || '';
-  const fields = { name:v('name'), position:v('position'), company:v('company'), phone:v('phone'), email:v('email') };
+/* quiet=true 면 토스트 없이 저장만 (명함 확인 버튼이 먼저 부른다). 저장 성공 여부를 돌려준다 */
+async function cardPanelSave(cid, type, id, quiet){
+  const v = k => ((document.getElementById('cf-' + cid + '-' + k)||{}).value || '').trim();
+  /* 회사명은 받지 않는다 — 바이어는 사업자 인증이 확정한 값, 공급사는 폼 자체가 그 회사. 서버가 소유자 회사명을 채운다 */
+  const fields = { name:v('name'), position:v('position'), phone:v('phone'), email:v('email') };
   const applyEl = document.getElementById('cf-' + cid + '-apply');
   const r = await MkCards.confirm(cid, fields, !!(applyEl && applyEl.checked));
-  if(!r.ok){ toastA('저장 실패: ' + admErr(r)); return; }
+  if(!r.ok){ toastA('저장 실패: ' + admErr(r)); return false; }
+  if(quiet) return true;
   toastA((r.applied||[]).length ? '저장하고 프로필에 반영했습니다' : '저장했습니다');
   const cand = document.getElementById('cf-' + cid + '-cand');
   if(cand) cand.innerHTML = (r.candidates||[]).length
     ? `<p class="note" style="margin:8px 0 0"><b>같은 사람·회사일 수 있는 회원</b> (자동 합치지 않습니다)</p>` + r.candidates.map(x => `<div class="sub">${esc(x.company||'')} · ${esc(x.contact_name||'')} · ${esc(x.email||'')} <i>(${x.matched_on.join(', ')})</i></div>`).join('')
     : '';
-  if((r.applied||[]).length && type === 'profile' && typeof loadAdminData === 'function') { /* 목록은 다음 새로고침 때 따라온다 */ }
+  return true;
 }
 async function cardPanelVerify(cid, on, type, id){
+  /* ⚠ 패널을 다시 그리면 입력 중이던 칸이 사라진다 — 확인하기 전에 적어 둔 내용을 먼저 저장한다 (2026-10-27 felix 지적) */
+  if(on && !(await cardPanelSave(cid, type, id, true))) return;
   const r = await MkCards.verify(cid, on);
   if(!r.ok){ toastA('실패: ' + admErr(r)); return; }
   toastA(on ? '명함 확인 완료 — 배지가 붙었습니다' : '확인을 해제했습니다');
@@ -2571,6 +2582,27 @@ async function cardPanelVerify(cid, on, type, id){
   if(type === 'profile'){ const b = (ADM.buyers||[]).find(x => x._id === id); if(b) b.cardVerifiedAt = at; }
   else { const c = MK_COMPANIES.find(x => x.id === id); if(c) c.cardVerifiedAt = at; }
   cardPanelLoad(type, id);
+}
+/* 명함이 없는 인증 바이어에게 명함 등록 안내 메일 — 서버가 보낸 사람에게 card_notified_at 을 찍어 두 번 가지 않는다.
+   SMTP 는 행사 일정 › 알림 설정의 것을 쓴다. 먼저 내 메일로 샘플을 받아본 뒤 전체 발송. */
+async function cardNotifyAll(){
+  if(typeof MkCards === 'undefined'){ toastA('서버 모드에서만 동작합니다'); return; }
+  const d = await MkCards.notify({ dry:true });
+  if(!d.ok){ toastA('확인 실패: ' + admErr(d)); return; }
+  if(!d.smtp){ toastA('먼저 행사 일정 › 알림 설정에서 메일 서버(SMTP)를 넣어 주세요'); return; }
+  if(!d.total){ toastA('보낼 대상이 없습니다 — 명함이 없는 인증 바이어 중 아직 안내하지 않은 사람'); return; }
+  const test = prompt(`명함이 없는 인증 바이어 ${d.total}명에게 안내 메일을 보냅니다.\n\n먼저 샘플을 받아볼 이메일을 넣으세요(베트남어 본문).\n비우고 확인을 누르면 바로 전체 발송으로 넘어갑니다.`, '');
+  if(test === null) return;
+  if(test.trim()){
+    const r = await MkCards.notify({ test: test.trim() });
+    toastA(r.ok ? '샘플을 보냈습니다: ' + test.trim() : '샘플 실패: ' + (r.message || admErr(r)));
+    return;
+  }
+  if(!confirm(`${d.total}명에게 지금 보낼까요?\n한 번에 최대 100명이고, 남으면 버튼을 다시 누르면 이어서 보냅니다.`)) return;
+  toastA('보내는 중… (최대 1~2분)');
+  const r = await MkCards.notify({ limit:100 });
+  if(!r.ok){ toastA('발송 실패: ' + (r.message || admErr(r))); return; }
+  toastA(`보냄 ${r.sent}명 · 실패 ${(r.failed||[]).length}명 · 남음 ${r.remaining}명`);
 }
 async function cardPanelRemove(cid, type, id){
   const r = await MkCards.remove(cid);

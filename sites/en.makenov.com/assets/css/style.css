@@ -650,6 +650,8 @@ button{font-family:var(--font-body);cursor:pointer;border:none;background:none;c
 .pf-card-img{display:block;width:100%;max-width:340px;border-radius:8px;border:1px solid var(--mk-line);background:#fff;margin-bottom:12px}
 .pf-card-st{margin:0 0 12px;font-size:14px;color:var(--mk-body)}
 .pf-card-acts{display:flex;flex-wrap:wrap;gap:8px}
+/* 마이페이지 상단 — 명함이 없을 때만 보이는 안내 (mypage.html loadCards 가 켠다) */
+.my-nudge{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--mk-primary-soft);color:var(--mk-primary-dark);border-radius:var(--r-card);padding:14px 18px;margin:12px 0 20px;font-size:14px;line-height:1.5}
 
 /* ---------- footer (밝은 회색) ---------- */
 .mk-footer{background:var(--mk-footer);color:var(--mk-footer-ink);margin-top:64px;border-top:1px solid var(--mk-line)}
