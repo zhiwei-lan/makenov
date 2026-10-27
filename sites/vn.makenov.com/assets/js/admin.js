@@ -376,6 +376,11 @@ async function refreshAdm(){
     Store.allInquiries(), Store.allBuyers(), Store.allMakerLeads(),
   ]);
   ADM.inqs = i || []; ADM.buyers = b || []; ADM.leads = l || [];
+  /* 바이어별 명함 현황 — 목록의 "확인 대기 / 명함 없음" 구분용. 실패해도 목록은 그대로 뜬다 */
+  ADM.cardOwners = {};
+  if(typeof MkCards !== 'undefined'){
+    try{ const r = await MkCards.owners('profile'); if(r && r.ok) ADM.cardOwners = r.owners || {}; }catch(e){}
+  }
   if(isSB()){
     Admin.primeInq(ADM.inqs); Admin.primeLeads(ADM.leads); Admin.primeTiers(ADM.buyers);
   }
@@ -878,6 +883,7 @@ function openBuyer(email){
         <option value="verified" ${tier!=='vip'?'selected':''}>인증 유통 파트너</option>
         <option value="vip" ${tier==='vip'?'selected':''}>VIP</option></select>
       <p class="note" style="margin:8px 0 0">VIP로 올리면 한국 기업 직통 연락처를 열어줍니다.</p>
+      ${tier!=='vip' && b.cardVerifiedAt ? `<p class="note" style="margin:6px 0 0;color:#0b7a5c"><b>검증 완료</b> — 사업자 인증${bVerifyGroup(b.verifiedBy)==='gov'?'(국세청)':''}과 담당자 명함이 모두 확인됐습니다. VIP 후보입니다.</p>` : ''}
     </div>
     ${cardPanel('profile', b._id)}`);
   cardPanelLoad('profile', b._id);
@@ -904,7 +910,13 @@ function exportInquiries(){
 const VERIFY_LABEL = { gov:'국세청', nts:'국세청', checksum:'체크섬', domain:'도메인' };
 
 /* ---------- 유통 파트너(회원) 필터 상태 ---------- */
-let bSearch='', bCountry='all', bVerify='all', bTier='all', bSort='new';
+let bSearch='', bCountry='all', bVerify='all', bTier='all', bSort='new', bCard='all';
+/* 명함 상태 — verified(운영팀 확인) · pending(올렸지만 미확인) · none(없음) */
+function bCardState(b){
+  if(b.cardVerifiedAt) return 'verified';
+  return (ADM.cardOwners||{})[b._id] ? 'pending' : 'none';
+}
+const B_CARD_RANK = { verified:0, pending:1, none:2 };
 function bVerifyGroup(vb){ if(vb==='gov'||vb==='nts') return 'gov'; if(vb==='checksum') return 'checksum'; if(vb==='domain') return 'domain'; return 'other'; }
 function bInqCount(b){ return (ADM.inqs||[]).filter(i=>i.buyerEmail===b.email).length; }
 
@@ -915,6 +927,7 @@ function filteredBuyers(){
     if(bCountry!=='all' && String(b.country||'')!==bCountry) return false;
     if(bVerify!=='all'  && bVerifyGroup(b.verifiedBy)!==bVerify) return false;
     if(bTier!=='all'){ const vip = Admin.tier(b.email)==='vip'; if(bTier==='vip'&&!vip) return false; if(bTier==='verified'&&vip) return false; }
+    if(bCard!=='all' && bCardState(b)!==bCard) return false;
     if(q){
       const hay = [b.company,b.email,b.contactName,b.regNo,b.mst,b.address,b.phone,b.countryName,b.position]
         .map(x=>String(x||'').toLowerCase()).join(' ');
@@ -928,6 +941,7 @@ function filteredBuyers(){
     company: (a,b)=>String(a.company||'').localeCompare(String(b.company||''),'ko'),
     country: (a,b)=>String(a.countryName||a.country||'').localeCompare(String(b.countryName||b.country||''),'ko'),
     inq:     (a,b)=>bInqCount(b)-bInqCount(a),
+    card:    (a,b)=>(B_CARD_RANK[bCardState(a)]-B_CARD_RANK[bCardState(b)]) || String(b.createdAt).localeCompare(String(a.createdAt)),
   };
   return list.slice().sort(S[bSort]||S.new);
 }
@@ -937,6 +951,7 @@ function renderBuyers(){
   const list = filteredBuyers();
   const vipCnt = all.filter(b=>Admin.tier(b.email)==='vip').length;
   const govCnt = all.filter(b=>bVerifyGroup(b.verifiedBy)==='gov').length;
+  const cardCnt = { verified:0, pending:0, none:0 }; all.forEach(b=>{ cardCnt[bCardState(b)]++; });
 
   /* 국가별 분포 → 클릭형 필터 칩 */
   const byC = {}; all.forEach(b=>{ const k=b.country||'??'; byC[k]=(byC[k]||0)+1; });
@@ -946,14 +961,15 @@ function renderBuyers(){
     const cnt = code==='all' ? all.length : byC[code];
     return `<button class="bchip${on?' on':''}" onclick="bCountry='${code}';renderBuyers()">${c?c.flag+' ':''}${esc(label)} <b>${cnt}</b></button>`; };
   const opt = (v,cur,label)=>`<option value="${v}" ${cur===v?'selected':''}>${label}</option>`;
-  const filtered = (bSearch||bCountry!=='all'||bVerify!=='all'||bTier!=='all');
+  const filtered = (bSearch||bCountry!=='all'||bVerify!=='all'||bTier!=='all'||bCard!=='all');
 
   document.getElementById('tab-buyers').innerHTML = `
-    <div class="kpi" style="margin-bottom:16px">
+    <div class="kpi k5" style="margin-bottom:16px">
       <div class="kpi-card"><div class="lbl">전체 회원</div><div class="num">${all.length}</div><div class="sub">인증 유통 파트너</div></div>
       <div class="kpi-card"><div class="lbl">VIP</div><div class="num">${vipCnt}</div><div class="sub">직통 연락처 열림</div></div>
       <div class="kpi-card"><div class="lbl">국세청 인증</div><div class="num">${govCnt}</div><div class="sub">정부 DB 대조 통과</div></div>
       <div class="kpi-card"><div class="lbl">진출 국가</div><div class="num">${countries.filter(k=>k!=='??').length}</div><div class="sub">국가 수</div></div>
+      <div class="kpi-card" style="cursor:pointer" onclick="bCard='${cardCnt.pending?'pending':'verified'}';renderBuyers()" title="눌러서 ${cardCnt.pending?'확인 대기':'명함 확인'} 바이어만 보기"><div class="lbl">명함 확인</div><div class="num">${cardCnt.verified}</div><div class="sub">확인 대기 <b>${cardCnt.pending}</b> · 없음 ${cardCnt.none}</div></div>
     </div>
     <div class="card">
       <p class="note" style="margin-bottom:14px">사업자 인증을 통과한 회원 명단입니다. <b>인증</b> = <code>국세청</code> 정부 DB 실시간 조회 · <code>체크섬</code> 번호 유효성만 · <code>도메인</code> 회사 이메일. 메신저 컨택 후 <b>VIP</b>로 승격하면 한국 기업 직통 연락처를 열어줄 수 있습니다.</p>
@@ -962,10 +978,11 @@ function renderBuyers(){
         <input class="srch" placeholder="회사·이메일·담당자·등록번호·주소 검색" value="${esc(bSearch)}" oninput="bSearch=this.value;renderBuyers()">
         <select class="srch" style="min-width:128px" onchange="bVerify=this.value;renderBuyers()">${opt('all',bVerify,'인증방식 전체')}${opt('gov',bVerify,'국세청')}${opt('checksum',bVerify,'체크섬')}${opt('domain',bVerify,'도메인')}</select>
         <select class="srch" style="min-width:108px" onchange="bTier=this.value;renderBuyers()">${opt('all',bTier,'등급 전체')}${opt('vip',bTier,'VIP')}${opt('verified',bTier,'인증')}</select>
-        <select class="srch" style="min-width:128px" onchange="bSort=this.value;renderBuyers()">${opt('new',bSort,'최신 가입순')}${opt('old',bSort,'오래된 순')}${opt('company',bSort,'회사명순')}${opt('country',bSort,'국가순')}${opt('inq',bSort,'문의 많은순')}</select>
+        <select class="srch" style="min-width:118px" onchange="bCard=this.value;renderBuyers()">${opt('all',bCard,'명함 전체')}${opt('verified',bCard,'명함 확인')}${opt('pending',bCard,'확인 대기')}${opt('none',bCard,'명함 없음')}</select>
+        <select class="srch" style="min-width:128px" onchange="bSort=this.value;renderBuyers()">${opt('new',bSort,'최신 가입순')}${opt('old',bSort,'오래된 순')}${opt('company',bSort,'회사명순')}${opt('country',bSort,'국가순')}${opt('inq',bSort,'문의 많은순')}${opt('card',bSort,'명함 확인 먼저')}</select>
         <span class="grow"></span>
         <span class="note" style="margin:0">${list.length}명${filtered?` / ${all.length}`:''}</span>
-        ${filtered?`<button class="btn btn-ghost btn-sm" onclick="bSearch='';bCountry='all';bVerify='all';bTier='all';bSort='new';renderBuyers()">초기화</button>`:''}
+        ${filtered?`<button class="btn btn-ghost btn-sm" onclick="bSearch='';bCountry='all';bVerify='all';bTier='all';bCard='all';bSort='new';renderBuyers()">초기화</button>`:''}
         <button class="btn btn-ghost btn-sm" onclick="exportBuyers()">CSV</button>
         <button class="btn btn-ghost btn-sm" onclick="cardNotifyAll()" title="명함이 없는 인증 바이어에게 명함 등록 안내 메일을 보냅니다 (한 사람에게 한 번만)">명함 안내 메일</button>
       </div>
@@ -973,7 +990,7 @@ function renderBuyers(){
         const c = b.country ? mkCountry(b.country) : null;
         const tier = Admin.tier(b.email);
         const n = bInqCount(b);
-        return `<tr class="row-hover" style="cursor:pointer" onclick="if(!event.target.closest('input,select,button'))openBuyer('${esc(b.email)}')"><td>${b.createdAt?new Date(b.createdAt).toLocaleDateString('ko-KR'):'-'}</td><td>${c?c.flag:''} ${esc(b.countryName||b.country||'')}</td><td>${esc(b.company)}${b.cardVerifiedAt?' <span class="pill-st st-done" title="명함 확인 완료">명함✓</span>':''}<div class="sub">${esc(b.address||'')}</div></td><td>${esc(b.regNo||b.mst||'-')}</td><td>${esc(VERIFY_LABEL[b.verifiedBy]||'-')}<div class="sub">${esc(b.status||'')}</div></td><td>${esc(b.contactName||'')}<div class="sub">${esc(b.position||'')}</div></td><td>${esc(b.phone||b.zalo||'')}<div class="sub">${esc(b.messenger||'')} ${esc(b.messengerId||'')}<br>${esc(b.email)}</div></td><td><b>${n}</b></td><td>${tier==='vip'?'<span class="pill-st st-vip">VIP</span>':'<span class="pill-st st-done">인증</span>'}
+        return `<tr class="row-hover" style="cursor:pointer" onclick="if(!event.target.closest('input,select,button'))openBuyer('${esc(b.email)}')"><td>${b.createdAt?new Date(b.createdAt).toLocaleDateString('ko-KR'):'-'}</td><td>${c?c.flag:''} ${esc(b.countryName||b.country||'')}</td><td>${esc(b.company)}${({verified:' <span class="pill-st st-done" title="명함 확인 완료">명함✓</span>', pending:' <span class="pill-st" title="명함을 올렸고 운영팀 확인을 기다립니다">명함 대기</span>', none:''})[bCardState(b)]}<div class="sub">${esc(b.address||'')}</div></td><td>${esc(b.regNo||b.mst||'-')}</td><td>${esc(VERIFY_LABEL[b.verifiedBy]||'-')}<div class="sub">${esc(b.status||'')}</div></td><td>${esc(b.contactName||'')}<div class="sub">${esc(b.position||'')}</div></td><td>${esc(b.phone||b.zalo||'')}<div class="sub">${esc(b.messenger||'')} ${esc(b.messengerId||'')}<br>${esc(b.email)}</div></td><td><b>${n}</b></td><td>${tier==='vip'?'<span class="pill-st st-vip">VIP</span>':'<span class="pill-st st-done">인증</span>'}
             <div style="margin-top:6px"><select class="srch" style="width:100%;min-width:0;font-size:12px;padding:5px 8px"
                 onchange="admDo(Admin.setTier('${esc(b.email)}',this.value),0);toastA('등급 변경됨')"><option value="verified" ${tier!=='vip'?'selected':''}>인증 유통 파트너</option><option value="vip"${tier==='vip'?'selected':''}>VIP</option></select></div></td></tr>`;
       }).join('') : `<tr class="empty-row"><td colspan="9">${all.length?'조건에 맞는 유통 파트너가 없습니다':'아직 가입한 유통 파트너가 없습니다'}</td></tr>`}
@@ -983,12 +1000,13 @@ function renderBuyers(){
 
 function exportBuyers(){
   const list = filteredBuyers();
-  const rows = [['가입일','국가','회사','주소','등록번호','인증방식','상태','담당자','직함','전화','메신저','메신저ID','이메일','등급']];
+  const rows = [['가입일','국가','회사','주소','등록번호','인증방식','상태','담당자','직함','전화','메신저','메신저ID','이메일','등급','명함']];
+  const CARD_KO = { verified:'확인', pending:'확인 대기', none:'' };
   list.forEach(b=>{
     rows.push([b.createdAt?new Date(b.createdAt).toLocaleDateString('ko-KR'):'', b.countryName||b.country||'',
       b.company||'', b.address||'', b.regNo||b.mst||'', VERIFY_LABEL[b.verifiedBy]||'', b.status||'',
       b.contactName||'', b.position||'', b.phone||b.zalo||'', b.messenger||'', b.messengerId||'',
-      b.email||'', Admin.tier(b.email)==='vip'?'VIP':'인증']);
+      b.email||'', Admin.tier(b.email)==='vip'?'VIP':'인증', CARD_KO[bCardState(b)]]);
   });
   downloadFile('makenov-유통 파트너_'+today()+'.csv',
     '﻿'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n'), 'text/csv');
@@ -2517,6 +2535,11 @@ async function cardPanelLoad(type, id){
   const r = await MkCards.list({ type, id });
   if(!r.ok){ body.innerHTML = `<p class="note" style="margin:0">${esc(admErr(r))}</p>`; return; }
   const cards = r.cards || [];
+  /* 목록 필터(명함 확인/대기/없음)가 패널에서 올리거나 지운 결과를 바로 따라가게 */
+  if(type === 'profile' && ADM.cardOwners){
+    if(cards.length) ADM.cardOwners[id] = { cards: cards.length, verified: cards.some(c => c.verified) };
+    else delete ADM.cardOwners[id];
+  }
   /* 칸이 비어 있으면 회원(담당자·직책·전화·이메일) / 공급사(대표자·대표 전화) 정보로 미리 채운다 —
      OCR 이 아직 없어 운영팀이 직접 적는데, 빈 칸보다 "이미 아는 값"에서 시작하는 게 빠르다 */
   const own = type === 'profile' ? (ADM.buyers||[]).find(x => x._id === id) : (window.MK_COMPANIES||[]).find(x => x.id === id);

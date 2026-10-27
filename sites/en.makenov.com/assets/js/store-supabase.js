@@ -870,6 +870,8 @@ window.MkCards = {
       body: JSON.stringify({ verified: on !== false }) });
   },
   remove(id){ return this._req('/' + id, { method:'DELETE' }); },
+  /* 관리자만 — 소유자별 명함 개수·확인 여부 {owners:{id:{cards,verified}}} (바이어 목록 필터용) */
+  owners(type){ return this._req('/owners?owner_type=' + encodeURIComponent(type || 'profile')); },
   /* 관리자만 — 명함이 없는 인증 바이어에게 안내 메일. {dry:true} 대상 수 · {test:email} 샘플 · {limit:N} 발송 */
   notify(payload){
     return this._req('/notify', { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(payload || {}) });

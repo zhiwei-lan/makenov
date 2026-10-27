@@ -62,13 +62,14 @@ async function renderMeet(){
 /* 신청자 엑셀(CSV) — 엑셀에서 한글이 깨지지 않게 BOM 을 붙인다. 임시(시드) 신청은 뺀다 */
 function meetCsv(tid){
   const trips = meetCache.trips, tname = id => { const t = trips.find(x => x.id === id); return t ? (triText(t.title) || id) : id; };
-  const rows = meetCache.reqs.filter(r => (!tid || r.trip_id === tid) && !String(r.buyer_id || '').startsWith('seed-'));
+  const rows = meetCache.reqs.filter(r => (!tid || r.trip_id === tid) && !String(r.buyer_id || '').startsWith('seed-'))
+    .sort((a, b) => (meetReqRank(a) - meetReqRank(b)) || String(b.created_at || '').localeCompare(String(a.created_at || '')));   // 공급사 전달용 — 명함 확인 바이어가 위로
   if(!rows.length){ toastA('내려받을 신청이 없습니다 (임시 신청은 제외됩니다)'); return; }
   const kind = r => String(r.buyer_id || '').startsWith('lead-') ? '간편 신청' : (r.verified ? '회원(인증)' : '회원');
-  const head = ['신청일', '행사', '제품', '회사', '담당자', '직함', '연락처', '이메일', '홈페이지', '업종', '문의 내용', '구분', '상태', '메모'];
+  const head = ['신청일', '행사', '제품', '회사', '담당자', '직함', '연락처', '이메일', '홈페이지', '업종', '문의 내용', '구분', '명함', '상태', '메모'];
   const cell = v => { const s = String(v == null ? '' : v); return /[",\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
   const lines = [head].concat(rows.map(r => [String(r.created_at || '').slice(0, 16), tname(r.trip_id), meetPname(r.product_id), r.company, r.contact_name, r.position,
-    r.phone ? '\t' + r.phone : '', r.email, r.homepage, MEET_CH[r.channel] || r.channel, r.message, kind(r), MEET_REQ_ST[r.status] || r.status, r.memo]));
+    r.phone ? '\t' + r.phone : '', r.email, r.homepage, MEET_CH[r.channel] || r.channel, r.message, kind(r), r.card_verified ? '확인' : '', MEET_REQ_ST[r.status] || r.status, r.memo]));
   const csv = '﻿' + lines.map(l => l.map(cell).join(',')).join('\r\n');
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
@@ -207,12 +208,22 @@ async function meetSeedClear(tid){
   try{ const r = await MeetAdmin.clearSeed(tid); toastA(`임시 신청 ${r.deleted}건 삭제`); meetReqTrip = tid; renderMeet(); }
   catch(e){ toastA('실패: ' + e.message); }
 }
+/* 신청 정렬 — 담당자 명함 확인 → 사업자 인증 회원 → 그 밖, 같은 묶음 안에서는 최신순.
+   공급사에 넘길 때 "실제 담당자가 확인된 바이어"가 위에 오도록 (2026-10-27) */
+function meetReqRank(r){
+  const id = String(r.buyer_id || '');
+  if(id.startsWith('seed-')) return 3;
+  if(r.card_verified) return 0;
+  if(r.verified) return 1;
+  return 2;
+}
 function meetReqTable(tr){
-  const list = meetCache.reqs.filter(r => r.trip_id === tr.id);
+  const list = meetCache.reqs.filter(r => r.trip_id === tr.id)
+    .sort((a, b) => (meetReqRank(a) - meetReqRank(b)) || String(b.created_at || '').localeCompare(String(a.created_at || '')));
   if(!list.length) return meetSeedBar(tr) + `<p class="sub" style="padding:8px">아직 신청이 없습니다.</p>`;
   return meetSeedBar(tr) + `<div class="bar" style="margin:0 0 8px"><span class="grow"></span><button class="btn btn-ghost btn-sm" onclick="meetCsv('${esc(tr.id)}')">이 행사 신청 엑셀(CSV)</button></div><table><thead><tr><th style="width:120px">신청일</th><th>제품</th><th>회사 · 담당자</th><th>업종 · 문의 내용</th><th style="width:150px">상태</th></tr></thead><tbody>${list.map(r => `
     <tr><td>${esc(String(r.created_at || '').slice(0, 16))}</td><td>${esc(meetPname(r.product_id))}</td>
-      <td><b>${esc(r.company || '')}</b> ${String(r.buyer_id || '').startsWith('seed-') ? '<span class="sub" style="color:#6c757d;font-weight:700">임시</span>' : String(r.buyer_id || '').startsWith('lead-') ? '<span class="sub" style="color:#0B45B4;font-weight:700">간편 신청</span>' : r.verified ? '<span class="sub" style="color:#0b7a5c;font-weight:700">인증</span>' : '<span class="sub" style="color:#B02A37">미인증</span>'}<div class="sub">${esc(r.contact_name || '')}${r.position ? ' (' + esc(r.position) + ')' : ''} · ${esc(r.phone || '')}<br>${esc(r.email || '')}${r.homepage ? ' · ' + esc(r.homepage) : ''}</div>${r.message ? `<div class="sub" style="white-space:pre-wrap">“${esc(r.message)}”</div>` : ''}${r.aff_ref ? `<div class="sub">CTV ${esc(r.aff_ref)}</div>` : ''}</td>
+      <td><b>${esc(r.company || '')}</b> ${String(r.buyer_id || '').startsWith('seed-') ? '<span class="sub" style="color:#6c757d;font-weight:700">임시</span>' : String(r.buyer_id || '').startsWith('lead-') ? '<span class="sub" style="color:#0B45B4;font-weight:700">간편 신청</span>' : r.verified ? '<span class="sub" style="color:#0b7a5c;font-weight:700">인증</span>' + (r.card_verified ? ' <span class="pill-st st-done" title="담당자 명함 확인 완료">명함✓</span>' : '') : '<span class="sub" style="color:#B02A37">미인증</span>'}<div class="sub">${esc(r.contact_name || '')}${r.position ? ' (' + esc(r.position) + ')' : ''} · ${esc(r.phone || '')}<br>${esc(r.email || '')}${r.homepage ? ' · ' + esc(r.homepage) : ''}</div>${r.message ? `<div class="sub" style="white-space:pre-wrap">“${esc(r.message)}”</div>` : ''}${r.aff_ref ? `<div class="sub">CTV ${esc(r.aff_ref)}</div>` : ''}</td>
       <td>${esc(MEET_CH[r.channel] || r.channel || '')}<div class="sub">${esc(r.volume || '')}</div>${r.message ? `<div class="sub" style="margin-top:6px;white-space:pre-wrap;color:var(--mk-ink)"><b>문의</b> ${esc(r.message)}</div>` : ''}</td>
       <td><select onchange="meetSetReq('${esc(r.id)}',{status:this.value})">${Object.entries(MEET_REQ_ST).map(([v, l]) => `<option value="${v}" ${r.status === v ? 'selected' : ''}>${l}</option>`).join('')}</select>
         <input style="margin-top:6px" placeholder="메모" value="${esc(r.memo || '')}" onchange="meetSetReq('${esc(r.id)}',{memo:this.value})"></td></tr>`).join('')}
