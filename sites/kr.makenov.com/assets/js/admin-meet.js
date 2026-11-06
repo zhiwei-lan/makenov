@@ -242,10 +242,10 @@ function meetItemRow(it, tripId){
   /* 표시용 임시 신청 수 — 지금 들어 있는 임시(시드) 행 수. 저장하면 이 숫자에 맞춰 늘리거나 줄인다(실제 신청은 그대로) */
   const seeds = (it && tripId) ? meetCache.reqs.filter(r => r.trip_id === tripId && r.product_id === it.product_id && String(r.buyer_id || '').startsWith('seed-')).length : 0;
   const real  = (it && tripId) ? meetCache.reqs.filter(r => r.trip_id === tripId && r.product_id === it.product_id && !String(r.buyer_id || '').startsWith('seed-') && r.status !== 'cancelled').length : 0;
-  return `<div class="fgrid meet-item" style="grid-template-columns:1fr 100px 150px 60px;align-items:end">
+  return `<div class="fgrid meet-item" style="grid-template-columns:1fr 90px 260px 60px;align-items:end">
     <div class="fld"><label>제품(공급사)</label><select class="mi-pid">${prods.map(p => `<option value="${esc(p.id)}" ${it && it.product_id === p.id ? 'selected' : ''}>${esc(p.brand)} · ${esc(triText(p.name))}${p.published === false ? ' (비공개)' : ''}</option>`).join('')}</select></div>
     <div class="fld"><label>목표 인원</label><input class="mi-goal" type="number" min="1" max="50" value="${esc(it ? it.goal : 5)}"></div>
-    <div class="fld"><label>추가(표시용) <span class="sub">실제 ${real} + 추가</span></label><input class="mi-seed" type="number" min="0" max="50" value="${seeds}" data-orig="${seeds}" title="사이트 숫자에 더해지는 표시용 건수. 0 이면 모두 지운다. 건드리지 않으면 저장해도 그대로다"></div>
+    <div class="fld"><label>사이트 표시 = 실제 + 추가</label><div style="display:flex;align-items:center;gap:6px;white-space:nowrap">실제 <b>${real}</b> + 추가<input class="mi-seed" type="number" min="0" max="50" value="${seeds}" data-orig="${seeds}" data-real="${real}" style="width:64px;text-align:center" title="사이트 숫자에 더해지는 표시용 건수. 0 이면 모두 지운다. 건드리지 않으면 저장해도 그대로다" oninput="this.parentNode.querySelector('.mi-total').textContent = (Number(this.dataset.real) || 0) + Math.max(0, Number(this.value) || 0)">= <b class="mi-total">${real + seeds}</b></div></div>
     <div class="fld"><button class="btn btn-ghost btn-sm" onclick="this.closest('.meet-item').remove()">빼기</button></div></div>`;
 }
 
