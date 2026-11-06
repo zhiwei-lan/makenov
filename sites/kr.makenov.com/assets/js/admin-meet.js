@@ -165,11 +165,12 @@ function meetListHtml(){
     const done = items.filter(i => i.confirmed).length;
     const prog = items.map(i => {
       const sp = meetSplit(tr.id, i.product_id);
-      return `<div class="sub" style="display:flex;gap:8px;align-items:center;padding:2px 0"><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(meetPname(i.product_id))}</span>
-        <span style="display:inline-block;width:60px;height:6px;border-radius:9px;background:#E9ECEF;overflow:hidden"><i style="display:block;height:100%;width:${Math.min(100, Math.round(i.count / i.goal * 100))}%;background:${i.confirmed ? '#022E7D' : '#27CAA1'}"></i></span>
-        <span style="white-space:nowrap">실제 <b style="color:var(--mk-ink)">${sp.real}</b> + 추가</span>
-        <input type="number" min="0" max="50" value="${sp.seed}" title="사이트 숫자에 더해지는 표시용 건수 — 바꾸면 바로 저장됩니다" style="width:54px;padding:3px 6px;font-size:12px;text-align:center${sp.seed ? ';border-color:#E0A800;background:#FFF8E1' : ''}" onchange="meetSeedSet('${esc(tr.id)}','${esc(i.product_id)}',this)">
-        <b style="min-width:62px;text-align:right;white-space:nowrap">= ${i.count}/${i.goal}</b></div>`;
+      return `<div class="sub" style="display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;padding:3px 0;border-bottom:1px dashed #EEF1F3"><span style="flex:1 1 220px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(meetPname(i.product_id))}</span>
+        <span style="flex:none;display:inline-flex;align-items:center;gap:6px;white-space:nowrap">
+          <span style="display:inline-block;width:48px;height:6px;border-radius:9px;background:#E9ECEF;overflow:hidden"><i style="display:block;height:100%;width:${Math.min(100, Math.round(i.count / i.goal * 100))}%;background:${i.confirmed ? '#022E7D' : '#27CAA1'}"></i></span>
+          실제 <b style="color:var(--mk-ink)">${sp.real}</b> + 추가
+          <input type="number" min="0" max="50" value="${sp.seed}" title="사이트 숫자에 더해지는 표시용 건수 — 바꾸면 바로 저장됩니다" style="width:54px;padding:3px 6px;font-size:12px;text-align:center${sp.seed ? ';border-color:#E0A800;background:#FFF8E1' : ''}" onchange="meetSeedSet('${esc(tr.id)}','${esc(i.product_id)}',this)">
+          <b style="min-width:58px;text-align:right;color:var(--mk-ink)">= ${i.count}/${i.goal}</b></span></div>`;
     }).join('');
     const dl = tr.days_left;
     const phase = tr.days_to_visit != null && tr.days_to_visit < 0 ? '종료' : tr.open ? '모집 중' : (MEET_ST[tr.status] || tr.status) === '모집 중' ? '마감' : (MEET_ST[tr.status] || tr.status);
