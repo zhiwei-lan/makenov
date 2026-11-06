@@ -29,6 +29,7 @@ const MeetAdmin = {
   setRequest(id, patch){ return this.call('POST', 'admin/requests/' + encodeURIComponent(id), patch); },
   addRequests(body){ return this.call('POST', 'admin/requests', body); },
   clearSeed(tid){ return this.call('DELETE', 'admin/requests/seed' + (tid ? '?trip_id=' + encodeURIComponent(tid) : '')); },
+  setSeed(body){ return this.call('POST', 'admin/seed', body); },
   config(){ return this.call('GET', 'admin/config'); },
   saveConfig(body){ return this.call('POST', 'admin/config', body); },
   testNotify(){ return this.call('POST', 'admin/config/test', {}); },
@@ -158,17 +159,24 @@ function meetCfgCard(){
 function meetListHtml(){
   const rows = meetCache.trips.map(tr => {
     const items = tr.items || [];
-    const reqN = meetCache.reqs.filter(r => r.trip_id === tr.id && r.status !== 'cancelled').length;
+    /* 2026-11-06: 사이트에 보이는 수 = 실제 신청 + 추가(표시용). 관리자에서는 둘을 나눠 보여 주고 '추가'는 그 자리에서 고친다 */
+    const reqN  = meetCache.reqs.filter(r => r.trip_id === tr.id && r.status !== 'cancelled' && !meetIsSeed(r)).length;
+    const seedN = meetCache.reqs.filter(r => r.trip_id === tr.id && r.status !== 'cancelled' && meetIsSeed(r)).length;
     const done = items.filter(i => i.confirmed).length;
-    const prog = items.map(i => `<div class="sub" style="display:flex;gap:8px;align-items:center"><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(meetPname(i.product_id))}</span>
-        <span style="display:inline-block;width:80px;height:6px;border-radius:9px;background:#E9ECEF;overflow:hidden"><i style="display:block;height:100%;width:${Math.min(100, Math.round(i.count / i.goal * 100))}%;background:${i.confirmed ? '#022E7D' : '#27CAA1'}"></i></span>
-        <b style="min-width:40px;text-align:right">${i.count}/${i.goal}</b></div>`).join('');
+    const prog = items.map(i => {
+      const sp = meetSplit(tr.id, i.product_id);
+      return `<div class="sub" style="display:flex;gap:8px;align-items:center;padding:2px 0"><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(meetPname(i.product_id))}</span>
+        <span style="display:inline-block;width:60px;height:6px;border-radius:9px;background:#E9ECEF;overflow:hidden"><i style="display:block;height:100%;width:${Math.min(100, Math.round(i.count / i.goal * 100))}%;background:${i.confirmed ? '#022E7D' : '#27CAA1'}"></i></span>
+        <span style="white-space:nowrap">실제 <b style="color:var(--mk-ink)">${sp.real}</b> + 추가</span>
+        <input type="number" min="0" max="50" value="${sp.seed}" title="사이트 숫자에 더해지는 표시용 건수 — 바꾸면 바로 저장됩니다" style="width:54px;padding:3px 6px;font-size:12px;text-align:center${sp.seed ? ';border-color:#E0A800;background:#FFF8E1' : ''}" onchange="meetSeedSet('${esc(tr.id)}','${esc(i.product_id)}',this)">
+        <b style="min-width:62px;text-align:right;white-space:nowrap">= ${i.count}/${i.goal}</b></div>`;
+    }).join('');
     const dl = tr.days_left;
     const phase = tr.days_to_visit != null && tr.days_to_visit < 0 ? '종료' : tr.open ? '모집 중' : (MEET_ST[tr.status] || tr.status) === '모집 중' ? '마감' : (MEET_ST[tr.status] || tr.status);
     return `<tr class="row-hover"><td><b>${esc(tr.visit_date || '미정')}</b>${tr.visit_end && tr.visit_end !== tr.visit_date ? `<div class="sub">~ ${esc(tr.visit_end)}</div>` : ''}<div class="sub">마감 ${esc(tr.deadline || '없음')}${tr.open && dl != null ? ` (D-${dl})` : ''}</div></td>
       <td><b>${esc(triText(tr.title) || tr.id)}</b><div class="sub">${esc(triText(tr.city))} · ${esc(tr.id)}</div>${prog}</td>
       <td>${esc(phase)}<div class="sub">${tr.published ? '사이트 노출' : '<span style="color:#B02A37">숨김</span>'}</div><div class="sub">확정 ${done}/${items.length}</div></td>
-      <td><button class="btn btn-ghost btn-sm" onclick="meetReqTrip=meetReqTrip==='${esc(tr.id)}'?null:'${esc(tr.id)}';document.getElementById('tab-meet').innerHTML=meetListHtml()">신청자 ${reqN}</button>
+      <td><button class="btn btn-ghost btn-sm" onclick="meetReqTrip=meetReqTrip==='${esc(tr.id)}'?null:'${esc(tr.id)}';document.getElementById('tab-meet').innerHTML=meetListHtml()">신청자 ${reqN}</button>${seedN ? `<div class="sub" style="margin:4px 0 0 2px;color:#8a6d00">+ 추가(표시용) ${seedN}</div>` : ''}
         <button class="btn btn-ghost btn-sm" onclick="meetEdit='${esc(tr.id)}';renderMeet()">수정</button>
         <button class="btn btn-ghost btn-sm" onclick="meetDelete('${esc(tr.id)}')">삭제</button></td></tr>
       ${meetReqTrip === tr.id ? `<tr><td colspan="4" style="background:#F8F9FA">${meetReqTable(tr)}</td></tr>` : ''}`;
@@ -176,7 +184,8 @@ function meetListHtml(){
   return `
     <div class="card"><p class="note"><b>행사 일정</b> — 공급사를 직접 만나는 행사를 올리면, 바이어가 가입 없이 회사명·연락처만 남겨 공급사(제품)별로 미팅을 신청합니다.
       신청 수가 목표 인원(기본 5곳)에 닿은 제품은 <b>확정</b>으로 표시됩니다. 마감일이 지나면 신청이 닫히고, 행사일이 지나면 사이트의 ‘종료’ 탭으로 넘어갑니다(베트남 시간 기준).<br>
-      <b>사이트 노출</b>을 켜야 vn/kr/en 의 <b>행사 일정</b> 페이지 · 홈 · 제품 상세에 보입니다. 행사일을 비운 일정은 목록에 나오지 않습니다.</p>
+      <b>사이트 노출</b>을 켜야 vn/kr/en 의 <b>행사 일정</b> 페이지 · 홈 · 제품 상세에 보입니다. 행사일을 비운 일정은 목록에 나오지 않습니다.<br>
+      <b>실제 n + 추가 [m] = 합계/목표</b> — 사이트에는 합계만 보입니다. <b>실제</b>는 바이어가 넣은 신청, <b>추가</b>는 사이트 숫자에만 더해지는 표시용 건수입니다. 추가 칸의 숫자를 바꾸면 바로 저장됩니다(엑셀·알림 메일·문의함에는 들어가지 않음).</p>
       <div class="bar"><span class="grow"></span><button class="btn btn-ghost btn-sm" onclick="meetCsv()">전체 신청 엑셀(CSV)</button><button class="btn btn-primary btn-sm" onclick="meetEdit='';renderMeet()">+ 새 행사 일정</button></div>
       <div class="tbl-wrap"><table><thead><tr><th style="width:150px">행사일 · 마감</th><th>행사 · 공급사별 신청</th><th style="width:120px">상태</th><th style="width:220px"></th></tr></thead><tbody>
       ${rows || `<tr class="empty-row"><td colspan="4">행사 일정이 없습니다. 오른쪽 위 ‘새 행사 일정’으로 등록하세요.</td></tr>`}
@@ -184,30 +193,26 @@ function meetListHtml(){
     ${meetCfgCard()}`;
 }
 
-/* 임시(시드) 신청 도구줄 — 실제 신청이 들어오기 전 카드가 전부 0으로 보이지 않게 채워 두는 용도 */
-function meetSeedBar(tr){
-  const items = tr.items || [];
-  const seeds = meetCache.reqs.filter(r => r.trip_id === tr.id && String(r.buyer_id || '').startsWith('seed-')).length;
-  return `<div class="bar" style="gap:8px;flex-wrap:wrap;padding:8px;background:#F6F8F7;border-radius:10px;margin-bottom:10px">
-    <span class="sub" style="font-weight:700">임시 신청</span>
-    <select id="seed-pid-${esc(tr.id)}">${items.map(i => `<option value="${esc(i.product_id)}">${esc(meetPname(i.product_id))}</option>`).join('')}</select>
-    <input id="seed-n-${esc(tr.id)}" type="number" min="1" max="10" value="2" style="width:64px">곳
-    <button class="btn btn-ghost btn-sm" onclick="meetSeedAdd('${esc(tr.id)}')">추가</button>
-    <span class="grow"></span>
-    <span class="sub">임시 ${seeds}건</span>
-    ${seeds ? `<button class="btn btn-ghost btn-sm" style="color:#B02A37" onclick="meetSeedClear('${esc(tr.id)}')">임시 신청 모두 지우기</button>` : ''}
-  </div>`;
+/* 추가(표시용) 신청 — buyer_id 가 'seed-' 로 시작하는 행. 사이트 숫자에만 더해지고 관리자 목록·엑셀·알림에서는 뺀다.
+   (예전 '임시 신청 n곳 추가' 도구줄은 2026-11-06 행사 목록의 '추가' 칸으로 대체) */
+function meetIsSeed(r){ return String((r && r.buyer_id) || '').startsWith('seed-'); }
+function meetSplit(tripId, pid){
+  const rs = meetCache.reqs.filter(r => r.trip_id === tripId && r.product_id === pid && r.status !== 'cancelled');
+  const seed = rs.filter(meetIsSeed).length;
+  return { real: rs.length - seed, seed };
 }
-async function meetSeedAdd(tid){
-  const pid = av('seed-pid-' + tid), n = Number(av('seed-n-' + tid)) || 1;
-  try{ await MeetAdmin.addRequests({ trip_id: tid, product_id: pid, count: n }); toastA(`임시 신청 ${n}곳 추가`); meetReqTrip = tid; renderMeet(); }
-  catch(e){ toastA('실패: ' + e.message); }
+async function meetSeedSet(tid, pid, input){
+  const n = Math.min(50, Math.max(0, Math.round(Number(input.value) || 0)));
+  input.disabled = true;
+  try{
+    const r = await MeetAdmin.setSeed({ trip_id: tid, product_id: pid, count: n });
+    const [trips, reqs] = await Promise.all([MeetAdmin.trips(), MeetAdmin.requests()]);
+    meetCache.trips = trips || []; meetCache.reqs = reqs || [];
+    toastA(`사이트 표시 ${r.count}건 = 실제 ${r.real} + 추가 ${r.seed}`);
+    document.getElementById('tab-meet').innerHTML = meetListHtml();
+  }catch(e){ toastA('저장 실패: ' + e.message); input.disabled = false; }
 }
-async function meetSeedClear(tid){
-  if(!confirm('이 일정의 임시 신청을 모두 지울까요? (실제 바이어 신청은 남습니다)')) return;
-  try{ const r = await MeetAdmin.clearSeed(tid); toastA(`임시 신청 ${r.deleted}건 삭제`); meetReqTrip = tid; renderMeet(); }
-  catch(e){ toastA('실패: ' + e.message); }
-}
+
 /* 신청 정렬 — 담당자 명함 확인 → 사업자 인증 회원 → 그 밖, 같은 묶음 안에서는 최신순.
    공급사에 넘길 때 "실제 담당자가 확인된 바이어"가 위에 오도록 (2026-10-27) */
 function meetReqRank(r){
@@ -218,10 +223,12 @@ function meetReqRank(r){
   return 2;
 }
 function meetReqTable(tr){
-  const list = meetCache.reqs.filter(r => r.trip_id === tr.id)
+  const seeds = meetCache.reqs.filter(r => r.trip_id === tr.id && meetIsSeed(r) && r.status !== 'cancelled').length;
+  const seedNote = seeds ? `<p class="sub" style="padding:8px;margin:0 0 8px;background:#FFF8E1;border-radius:8px;color:#8a6d00">추가(표시용) ${seeds}건은 이 목록에서 뺐습니다 — 아래는 바이어가 실제로 넣은 신청만입니다. 추가 수는 위 행사 줄의 ‘추가’ 칸에서 바꿉니다.</p>` : '';
+  const list = meetCache.reqs.filter(r => r.trip_id === tr.id && !meetIsSeed(r))
     .sort((a, b) => (meetReqRank(a) - meetReqRank(b)) || String(b.created_at || '').localeCompare(String(a.created_at || '')));
-  if(!list.length) return meetSeedBar(tr) + `<p class="sub" style="padding:8px">아직 신청이 없습니다.</p>`;
-  return meetSeedBar(tr) + `<div class="bar" style="margin:0 0 8px"><span class="grow"></span><button class="btn btn-ghost btn-sm" onclick="meetCsv('${esc(tr.id)}')">이 행사 신청 엑셀(CSV)</button></div><table><thead><tr><th style="width:120px">신청일</th><th>제품</th><th>회사 · 담당자</th><th>업종 · 문의 내용</th><th style="width:150px">상태</th></tr></thead><tbody>${list.map(r => `
+  if(!list.length) return seedNote + `<p class="sub" style="padding:8px">아직 실제 신청이 없습니다.</p>`;
+  return seedNote + `<div class="bar" style="margin:0 0 8px"><span class="grow"></span><button class="btn btn-ghost btn-sm" onclick="meetCsv('${esc(tr.id)}')">이 행사 신청 엑셀(CSV)</button></div><table><thead><tr><th style="width:120px">신청일</th><th>제품</th><th>회사 · 담당자</th><th>업종 · 문의 내용</th><th style="width:150px">상태</th></tr></thead><tbody>${list.map(r => `
     <tr><td>${esc(String(r.created_at || '').slice(0, 16))}</td><td>${esc(meetPname(r.product_id))}</td>
       <td><b>${esc(r.company || '')}</b> ${String(r.buyer_id || '').startsWith('seed-') ? '<span class="sub" style="color:#6c757d;font-weight:700">임시</span>' : String(r.buyer_id || '').startsWith('lead-') ? '<span class="sub" style="color:#0B45B4;font-weight:700">간편 신청</span>' : r.verified ? '<span class="sub" style="color:#0b7a5c;font-weight:700">인증</span>' + (r.card_verified ? ' <span class="pill-st st-done" title="담당자 명함 확인 완료">명함✓</span>' : '') : '<span class="sub" style="color:#B02A37">미인증</span>'}<div class="sub">${esc(r.contact_name || '')}${r.position ? ' (' + esc(r.position) + ')' : ''} · ${esc(r.phone || '')}<br>${esc(r.email || '')}${r.homepage ? ' · ' + esc(r.homepage) : ''}</div>${r.message ? `<div class="sub" style="white-space:pre-wrap">“${esc(r.message)}”</div>` : ''}${r.aff_ref ? `<div class="sub">CTV ${esc(r.aff_ref)}</div>` : ''}</td>
       <td>${esc(MEET_CH[r.channel] || r.channel || '')}<div class="sub">${esc(r.volume || '')}</div>${r.message ? `<div class="sub" style="margin-top:6px;white-space:pre-wrap;color:var(--mk-ink)"><b>문의</b> ${esc(r.message)}</div>` : ''}</td>
@@ -238,7 +245,7 @@ function meetItemRow(it, tripId){
   return `<div class="fgrid meet-item" style="grid-template-columns:1fr 100px 150px 60px;align-items:end">
     <div class="fld"><label>제품(공급사)</label><select class="mi-pid">${prods.map(p => `<option value="${esc(p.id)}" ${it && it.product_id === p.id ? 'selected' : ''}>${esc(p.brand)} · ${esc(triText(p.name))}${p.published === false ? ' (비공개)' : ''}</option>`).join('')}</select></div>
     <div class="fld"><label>목표 인원</label><input class="mi-goal" type="number" min="1" max="50" value="${esc(it ? it.goal : 5)}"></div>
-    <div class="fld"><label>표시용 임시 신청 <span class="sub">(실제 ${real})</span></label><input class="mi-seed" type="number" min="0" max="50" value="${seeds}" title="사이트에 보이는 신청 수에 더해지는 임시 건수. 0 이면 임시 건을 모두 지운다"></div>
+    <div class="fld"><label>추가(표시용) <span class="sub">실제 ${real} + 추가</span></label><input class="mi-seed" type="number" min="0" max="50" value="${seeds}" data-orig="${seeds}" title="사이트 숫자에 더해지는 표시용 건수. 0 이면 모두 지운다. 건드리지 않으면 저장해도 그대로다"></div>
     <div class="fld"><button class="btn btn-ghost btn-sm" onclick="this.closest('.meet-item').remove()">빼기</button></div></div>`;
 }
 
@@ -307,7 +314,7 @@ function meetForm(id){
         <div id="mt-items">${(items.length ? items : [null]).map(it => meetItemRow(it, tr ? tr.id : '')).join('')}</div>
         <button class="btn btn-ghost btn-sm" style="margin-top:8px" onclick="document.getElementById('mt-items').insertAdjacentHTML('beforeend', meetItemRow(null))">+ 공급사 추가</button>
         <p class="hint">같은 제품을 두 번 넣으면 첫 번째만 남습니다. 이미 신청이 들어온 제품을 빼면 그 신청은 사이트에 보이지 않게 됩니다(데이터는 남음).<br>
-          <b>표시용 임시 신청</b>은 사이트의 신청 수·달성률에 더해져 보이는 가짜 건수입니다(실제 신청이 0일 때 카드가 비어 보이지 않게). 엑셀·알림에는 포함되지 않습니다.</p></div>
+          <b>추가(표시용)</b>은 사이트의 신청 수·달성률에만 더해지는 건수입니다(사이트 표시 = 실제 + 추가). 엑셀·알림·문의함에는 포함되지 않습니다. 행사 목록의 ‘추가’ 칸과 같은 값입니다.</p></div>
 
       <div class="sect"><h4>행사 상세 페이지 정보 <span class="sub">(전부 선택 사항 — 넣은 것만 행사 상세 페이지에 나옵니다)</span></h4>
         <div style="margin:8px 0 4px;font-weight:600;font-size:13px">부제 <span class="sub">(행사명 아래 초록색 작은 줄. 예: 한국–베트남 비즈니스 상담회)</span></div><div class="fgrid">${langRow('mx-sub', x.sub)}</div>
@@ -356,7 +363,8 @@ async function meetSave(id){
     title: tri3('mt-title'), city: tri3('mt-city'), venue: tri3('mt-venue'), summary: tri3('mt-sum'),
     items: [...document.querySelectorAll('#mt-items .meet-item')].map(r => ({
       product_id: r.querySelector('.mi-pid').value, goal: Number(r.querySelector('.mi-goal').value) || 5,
-      seed: Math.max(0, Number(r.querySelector('.mi-seed').value) || 0),
+      /* 추가(표시용) 수는 이 화면에서 바꾼 칸만 보낸다 — 화면을 열어 둔 사이 목록에서 고친 값을 옛 값으로 덮지 않게 */
+      ...((s => (s && s.value !== s.dataset.orig) ? { seed: Math.max(0, Number(s.value) || 0) } : {})(r.querySelector('.mi-seed'))),
     })),
     extra: {
       sub: tri3('mx-sub'), lead: tri3('mx-lead'), name: tri3('mx-name'), venue_detail: tri3('mx-venue'),

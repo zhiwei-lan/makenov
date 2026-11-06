@@ -68,6 +68,9 @@ class Meet extends BaseApiController
                     if ($method === 'GET')    return $this->adminConfig();
                     if ($method === 'POST')   return $c === 'test' ? $this->adminNotifyTest() : $this->adminSaveConfig();
                 }
+                if ($b === 'seed' && $method === 'POST') {
+                    return $this->adminSetSeed();
+                }
                 if ($b === 'requests') {
                     if ($method === 'GET')    return $this->adminRequests();
                     if ($method === 'POST')   return $c === '' ? $this->adminAddRequests() : $this->adminSetRequest($c);
@@ -853,6 +856,38 @@ class Meet extends BaseApiController
         }
         $this->addSeedRows($tid, $pid, $n, $in);
         return $this->json(['ok' => true, 'added' => $n, 'count' => $this->counts()[$tid . '|' . $pid] ?? 0], 201);
+    }
+
+    /** POST admin/seed {trip_id, product_id, count} — 그 제품의 추가(표시용) 신청 수를 count 로 맞춘다(2026-11-06).
+     *  행사 목록에서 '실제 n + 추가 [m]' 의 m 을 바로 고치는 데 쓴다. 실제 신청은 건드리지 않는다. */
+    private function adminSetSeed(): ResponseInterface
+    {
+        $in = $this->input();
+        if ($in === null) {
+            return $this->err('bad_json', 'bad json', 400);
+        }
+        $tid = trim((string) ($in['trip_id'] ?? ''));
+        $pid = trim((string) ($in['product_id'] ?? ''));
+        $n   = min(50, max(0, (int) ($in['count'] ?? 0)));
+        $db  = db_connect();
+        $trip = $db->table('meet_trips')->where('id', $tid)->get()->getRowArray();
+        if (! $trip) {
+            return $this->err('not_found', '일정이 없습니다', 404);
+        }
+        $ok = false;
+        foreach ((array) $this->jdec($trip['items'] ?? null, []) as $it) {
+            if ((string) (((array) $it)['product_id'] ?? '') === $pid) {
+                $ok = true;
+            }
+        }
+        if (! $ok) {
+            return $this->err('not_found', '이 일정에 없는 제품입니다', 404);
+        }
+        $this->syncSeeds($tid, [$pid => $n]);
+        $b    = $db->table('meet_requests')->where('trip_id', $tid)->where('product_id', $pid)->where('status !=', 'cancelled');
+        $seed = (clone $b)->like('buyer_id', self::SEED_PREFIX, 'after')->countAllResults();
+        $all  = (clone $b)->countAllResults();
+        return $this->json(['ok' => true, 'seed' => $seed, 'real' => $all - $seed, 'count' => $all]);
     }
 
     private function adminClearSeed(): ResponseInterface
